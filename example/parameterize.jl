@@ -35,6 +35,8 @@ ts = []
 ss = []
 
 while t < 10.0
+    global t
+
     fmiDoStep(myFMU, t, dt)
 
     t += dt
