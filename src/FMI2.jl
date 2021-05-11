@@ -248,8 +248,17 @@ function fmi2Load(pathTofmu2::String)
 
     cd(dirname(@__FILE__))
 
+    cbLibPath = joinpath(dirname(@__FILE__),"callbackFunctions/binaries/win64/callbackFunctions.dll")
+
+    # check permission to execute the DLL
+    perm = filemode(cbLibPath)
+    permRWX = 16895
+    if perm != permRWX
+        chmod(cbLibPath, permRWX; recursive=true)
+    end
+
     # set helper function
-    fmu_2.cbLibHandle = dlopen(joinpath(dirname(@__FILE__),"callbackFunctions/binaries/win64/callbackFunctions.dll"))
+    fmu_2.cbLibHandle = dlopen(cbLibPath)
 
     cd(lastDirectory)
 
