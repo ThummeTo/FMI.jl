@@ -10,6 +10,7 @@ FMI.jl is a free-to-use software library for the Julia programming language, whi
 1. open a Julia-Command-Window, activate your prefered environemnt
 1. goto package manager using ```]```
 1. type ```add "https://github.com/ThummeTo/FMI.jl"```
+1. the repository includes binaries, the repository folder and subfolders need at least permission ```101``` (read and execute)
 
 ## What is currently supported in FMI.jl?
 - simulation / plotting of CS- and ME-FMUs
