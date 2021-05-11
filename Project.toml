@@ -1,0 +1,16 @@
+name = "FMI"
+uuid = "14a09403-18e3-468f-ad8a-74f8dda2d9ac"
+authors = ["TT <tobias.thummerer@informatik.uni-augsburg.de>", "LM <lars.mikelsons@informatik.uni-augsburg.de>", "JK <josef.kircher@student.uni-augsburg.de>"]
+version = "0.1.0"
+
+[deps]
+DiffEqCallbacks = "459566f4-90b8-5000-8ac3-15dfb0a30def"
+DiffEqFlux = "aae7a2af-3d4f-5e19-a356-7da93b79d9d0"
+DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
+Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+ZipFile = "a5390f91-8eb1-5f08-bee0-b1d1ffed6cea"
+Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
