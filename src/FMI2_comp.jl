@@ -631,7 +631,7 @@ function fmi2SimulateCS(c::fmi2Component, dt::Real, t_start::Real, t_stop::Real,
         sd = fmi2SimulationResult()
         sd.valueReferences = recordValues
         sd.dataPoints = []
-        sd.fmu = fmu2
+        sd.fmu = c.fmu
 
         values = fmi2GetReal(c, sd.valueReferences)
         push!(sd.dataPoints, (t, values...))
