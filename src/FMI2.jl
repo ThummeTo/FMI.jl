@@ -610,7 +610,7 @@ function fmi2GetReal!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array{<
     if length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
-        fmi2GetReal!(fmu2.components[end], vr, Csize_t(length(values)), fmi2Real(values))
+        fmi2GetReal!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Real}(values))
     end
     values
 end
@@ -626,7 +626,7 @@ function fmi2GetReal!(fmu2::FMU2, vr_string::Array{String}, values::Array{<:Real
     elseif length(values) != length(vr)
             display("[ERROR]: Number of value references and in place array doesn't match")
     else
-            fmi2GetReal!(fmu2.components[end], vr, Csize_t(length(values)), fmi2Real(values))
+            fmi2GetReal!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Real}(values))
     end
 end
 """
@@ -730,7 +730,7 @@ function fmi2GetInteger!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Arra
     if length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
-        fmi2GetInteger!(fmu2.components[end], vr, Csize_t(length(values)), fmi2Integer(values))
+        fmi2GetInteger!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Integer}(values))
     end
     values
 end
@@ -746,7 +746,7 @@ function fmi2GetInteger!(fmu2::FMU2, vr_string::Array{String}, values::Array{<:I
     elseif length(values) != length(vr)
             display("[ERROR]: Number of value references and in place array doesn't match")
     else
-            fmi2GetInteger!(fmu2.components[end], vr, Csize_t(length(values)), fmi2Integer(values))
+            fmi2GetInteger!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Integer}(values))
     end
 end
 """
@@ -846,7 +846,7 @@ function fmi2GetBoolean!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Arra
     if length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
-        fmi2GetBoolean!(fmu2.components[end], vr, Csize_t(length(values)), fmi2Boolean(values))
+        fmi2GetBoolean!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Boolean}(values))
     end
     values
 end
@@ -862,7 +862,7 @@ function fmi2GetBoolean!(fmu2::FMU2, vr_string::Array{String}, values::Array{Boo
     elseif length(values) != length(vr)
             display("[ERROR]: Number of value references and in place array doesn't match")
     else
-            fmi2GetBoolean!(fmu2.components[end], vr, Csize_t(length(values)), fmi2Boolean(values))
+            fmi2GetBoolean!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Boolean}(values))
     end
 end
 """
@@ -962,7 +962,7 @@ function fmi2GetString!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array
     if length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
-        fmi2GetString!(fmu2.components[end], vr, Csize_t(length(values)), fmi2String(values))
+        fmi2GetString!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2String}(values))
     end
     values
 end
@@ -978,7 +978,7 @@ function fmi2GetString!(fmu2::FMU2, vr_string::Array{String}, values::Array{Stri
     elseif length(values) != length(vr)
             display("[ERROR]: Number of value references and in place array doesn't match")
     else
-            fmi2GetString!(fmu2.components[end], vr, Csize_t(length(values)), fmi2String(values))
+            fmi2GetString!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2String}(values))
     end
 end
 """
