@@ -938,8 +938,8 @@ Free the allocated memory for the FMU state
 
 For more information call ?fmi2FreeFMUstate
 """
-function fmi2FreeFMUstate(fmu2::FMU2)
-    fmi2FreeFMUstate(fmu2.components[end], fmu2.fmi2FMUstate)
+function fmi2FreeFMUstate(fmu2::FMU2, state::fmi2FMUstate)
+    fmi2FreeFMUstate(fmu2.components[end], state)
 end
 
 """
