@@ -21,7 +21,7 @@ include("FMI_plot.jl")
 export fmiLoad, fmiSimulate, fmiSimulateCS, fmiSimulateME, fmiUnload
 export fmiGetNumberOfStates, fmiGetTypesPlatform, fmiGetVersion, fmiInstantiate!, fmiFreeInstance!
 export fmiSetDebugLogging, fmiSetupExperiment, fmiEnterInitializationMode, fmiExitInitializationMode, fmiTerminate , fmiReset
-export fmiGetReal, fmiSetReal, fmiGetInteger, fmiSetInteger, fmiGetBoolean, fmiSetBoolean, fmiGetString, fmiSetString
+export fmiGetReal, fmiSetReal, fmiGetInteger, fmiSetInteger, fmiGetBoolean, fmiSetBoolean, fmiGetString, fmiSetString, fmiGetReal!, fmiGetInteger!, fmiGetBoolean!, fmiGetString
 export fmiGetFMUstate, fmiSetFMUstate, fmiFreeFMUstate, fmiSerializedFMUstateSize, fmiSerializeFMUstate, fmiDeSerializeFMUstate
 export fmiGetDirectionalDerivative, fmiDoStep, fmiSetTime, fmiSetContinuousStates, fmi2EnterEventMode, fmiNewDiscreteStates
 export fmiEnterContinuousTimeMode, fmiCompletedIntegratorStep, fmiGetDerivatives, fmiGetEventIndicators, fmiGetContinuousStates, fmiGetNominalsOfContinuousStates
@@ -190,6 +190,11 @@ function fmiGetReal(fmu::fmi2Struct, vr::fmi2Reference)
     fmi2GetReal(fmu, vr)
 end
 
+"""Writes the real values of an array of variables in the given field"""
+function fmiGetReal!(fmu::fmi2Struct, vr::Union{Array{fmi2ValueReference}, Array{String}}, values::Array{<:Real})
+    fmi2GetReal!(fmu, vr, values)
+end
+
 """Set the values of an array of real variables"""
 function fmiSetReal(fmu::fmi2Struct, vr::fmi2Reference, value::Array{<:Real})
     fmi2SetReal(fmu, vr, Array{Real}(value))
@@ -202,6 +207,11 @@ end
 """Returns the integer values of an array of variables"""
 function fmiGetInteger(fmu::fmi2Struct, vr::fmi2Reference)
     fmi2GetInteger(fmu, vr)
+end
+
+"""Writes the integer values of an array of variables in the given field"""
+function fmiGetInteger!(fmu::fmi2Struct, vr::Union{Array{fmi2ValueReference}, Array{String}}, values::Array{<:Integer})
+    fmi2GetInteger!(fmu, vr, values)
 end
 
 """Set the values of an array of integer variables"""
@@ -218,6 +228,11 @@ function fmiGetBoolean(fmu::fmi2Struct, vr::fmi2Reference)
     fmi2GetBoolean(fmu, vr)
 end
 
+"""Writes the boolean values of an array of variables in the given field"""
+function fmiGetBoolean!(fmu::fmi2Struct, vr::Union{Array{fmi2ValueReference}, Array{String}}, values::Array{Bool})
+    fmi2GetBoolean!(fmu, vr, values)
+end
+
 """Set the values of an array of boolean variables"""
 function fmiSetBoolean(fmu::fmi2Struct, vr::fmi2Reference, value::Array{Bool})
     fmi2SetBoolean(fmu, vr, value)
@@ -230,6 +245,11 @@ end
 """Returns the string values of an array of variables"""
 function fmiGetString(fmu::fmi2Struct, vr::fmi2Reference)
     fmi2GetString(fmu, vr)
+end
+
+"""Writes the string values of an array of variables in the given field"""
+function fmiGetString!(fmu::fmi2Struct, vr::Union{Array{fmi2ValueReference}, Array{String}}, values::Array{String})
+    fmi2GetString!(fmu, vr, values)
 end
 
 """Set the values of an array of string variables"""
