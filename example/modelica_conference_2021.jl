@@ -3,7 +3,14 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
+################################## INSTALLATION ##################################
+# (1) Enter Package Manager via     ]
+# (2) Install FMI via               add "https://github.com/ThummeTo/FMI.jl"
+# (3) Install FMIFlux via           add "https://github.com/ThummeTo/FMIFlux.jl"
+################################ END INSTALLATION ################################
+
 using FMI
+using FMIFlux
 using Flux
 using DifferentialEquations: Tsit5
 import Plots
@@ -89,7 +96,7 @@ net = Chain(inputs -> NeuralFMUInputLayer(myFMU, inputs),
 problem = NeuralFMU(net, (t_start, t_stop), Tsit5(), tData)
 problem.fmu = myFMU
 solutionBefore = problem(t_start, x0)
-fmiPlot(myFMU, solutionBefore, true)
+fmiPlot(problem)
 
 # train it ...
 p_net = Flux.params(problem)
