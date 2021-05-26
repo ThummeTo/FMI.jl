@@ -92,6 +92,34 @@ function fmi2GetReal(c::fmi2Component, vr_string::String)
     end
 end
 """
+Get the values of an array of fmi2Real variables
+
+For more information call ?fmi2GetReal
+"""
+function fmi2GetReal!(c::fmi2Component, vr::Array{fmi2ValueReference}, values::Array{<:Real})
+    if length(values) != length(vr)
+        display("[ERROR]: Number of value references and in place array doesn't match")
+    else
+        fmi2GetReal!(c, vr, Csize_t(length(values)), Array{fmi2Real}(values))
+    end
+    values
+end
+"""
+Get the values of an array of fmi2Real variables by variable name
+
+For more information call ?fmi2GetReal
+"""
+function fmi2GetReal!(c::fmi2Component, vr_string::Array{String}, values::Array{<:Real})
+    vr = fmi2String2ValueReference(c.fmu, vr_string)
+    if length(vr) == 0
+        display("[Error]: no valueReferences could be converted")
+    elseif length(values) != length(vr)
+            display("[ERROR]: Number of value references and in place array doesn't match")
+    else
+            fmi2GetReal!(c, vr, Csize_t(length(values)), Array{fmi2Real}(values))
+    end
+end
+"""
 Set the values of an array of fmi2Real variables
 
 For more information call ?fmi2SetReal
@@ -184,6 +212,34 @@ function fmi2GetInteger(c::fmi2Component, vr_string::String)
     end
 end
 """
+Get the values of an array of fmi2Integer variables
+
+For more information call ?fmi2GetInteger
+"""
+function fmi2GetInteger!(c::fmi2Component, vr::Array{fmi2ValueReference}, values::Array{<:Integer})
+    if length(values) != length(vr)
+        display("[ERROR]: Number of value references and in place array doesn't match")
+    else
+        fmi2GetInteger!(c, vr, Csize_t(length(values)), Array{fmi2Integer}(values))
+    end
+    values
+end
+"""
+Get the values of an array of fmi2Integer variables by variable name
+
+For more information call ?fmi2GetInteger
+"""
+function fmi2GetInteger!(c::fmi2Component, vr_string::Array{String}, values::Array{<:Integer})
+    vr = fmi2String2ValueReference(c.fmu, vr_string)
+    if length(vr) == 0
+        display("[Error]: no valueReferences could be converted")
+    elseif length(values) != length(vr)
+            display("[ERROR]: Number of value references and in place array doesn't match")
+    else
+            fmi2GetInteger!(c, vr, Csize_t(length(values)), Array{fmi2Integer}(values))
+    end
+end
+"""
 Set the values of an array of fmi2Integer variables
 
 For more information call ?fmi2SetInteger
@@ -272,6 +328,34 @@ function fmi2GetBoolean(c::fmi2Component, vr_string::String)
     end
 end
 """
+Get the values of an array of fmi2Boolean variables
+
+For more information call ?fmi2GetBoolean
+"""
+function fmi2GetBoolean!(c::fmi2Component, vr::Array{fmi2ValueReference}, values::Array{Bool})
+    if length(values) != length(vr)
+        display("[ERROR]: Number of value references and in place array doesn't match")
+    else
+        fmi2GetBoolean!(c, vr, Csize_t(length(values)), Array{fmi2Boolean}(values))
+    end
+    values
+end
+"""
+Get the values of an array of fmi2Boolean variables by variable name
+
+For more information call ?fmi2GetBoolean
+"""
+function fmi2GetBoolean!(c::fmi2Component, vr_string::Array{String}, values::Array{Bool})
+    vr = fmi2String2ValueReference(c.fmu, vr_string)
+    if length(vr) == 0
+        display("[Error]: no valueReferences could be converted")
+    elseif length(values) != length(vr)
+            display("[ERROR]: Number of value references and in place array doesn't match")
+    else
+            fmi2GetBoolean!(c, vr, Csize_t(length(values)), Array{fmi2Boolean}(values))
+    end
+end
+"""
 Set the values of an array of fmi2Boolean variables
 
 For more information call ?fmi2SetBoolean
@@ -357,6 +441,34 @@ function fmi2GetString(c::fmi2Component, vr_string::String)
         display("[ERROR]: valueReference not found")
     else
         fmi2GetString(c, vr)
+    end
+end
+"""
+Get the values of an array of fmi2String variables
+
+For more information call ?fmi2GetString
+"""
+function fmi2GetString!(c::fmi2Component, vr::Array{fmi2ValueReference}, values::Array{String})
+    if length(values) != length(vr)
+        display("[ERROR]: Number of value references and in place array doesn't match")
+    else
+        fmi2GetString!(c, vr, Csize_t(length(values)), Array{fmi2String}(values))
+    end
+    values
+end
+"""
+Get the values of an array of fmi2String variables by variable name
+
+For more information call ?fmi2GetString
+"""
+function fmi2GetString!(c::fmi2Component, vr_string::Array{String}, values::Array{String})
+    vr = fmi2String2ValueReference(c.fmu, vr_string)
+    if length(vr) == 0
+        display("[Error]: no valueReferences could be converted")
+    elseif length(values) != length(vr)
+            display("[ERROR]: Number of value references and in place array doesn't match")
+    else
+            fmi2GetString!(c, vr, Csize_t(length(values)), Array{fmi2String}(values))
     end
 end
 """
@@ -596,4 +708,64 @@ function fmi2GetNominalsOfContinuousStates(c::fmi2Component)
     x = zeros(fmi2Real, nx)
     fmi2GetNominalsOfContinuousStates(c, x, nx)
     x
+end
+
+
+
+"""
+Starts a simulation of the fmu instance for the matching fmu type, if both types are available the CoSimulation Simulation is started
+"""
+function fmi2Simulate(c::fmi2Component, dt::Real, t_start::Real = 0.0, t_stop::Real = 1.0, recordValues::Union{Array{fmi2ValueReference}, Array{String}} = [])
+
+    if c.fmu.fmuType == fmi2CoSimulation::fmi2Type
+        fmi2SimulateCS(c, dt, t_start, t_stop, recordValues)
+    elseif c.fmu.fmuType == fmi2ModelExchange::fmi2Type
+        fmi2SimulateME(c, dt, t_start, t_stop)
+    else
+        error(unknownFMUType)
+    end
+end
+
+function fmi2SimulateCS(c::fmi2Component, dt::Real, t_start::Real, t_stop::Real, recordValues::Array{fmi2ValueReference} = [])
+
+    fmi2SetupExperiment(c, t_start, t_stop)
+    fmiEnterInitializationMode(c)
+    fmiExitInitializationMode(c)
+
+    t = t_start
+
+    sd = nothing
+    record = length(recordValues) > 0
+
+    numDigits = length(string(round(Integer, 1/dt)))
+
+    if record
+        sd = fmi2SimulationResult()
+        sd.valueReferences = recordValues
+        sd.dataPoints = []
+        sd.fmu = c.fmu
+
+        values = fmi2GetReal(c, sd.valueReferences)
+        push!(sd.dataPoints, (t, values...))
+
+        while t < t_stop
+            fmiDoStep(c, t, dt)
+            t = round(t + dt, digits=numDigits)
+
+            values = fmi2GetReal(c, sd.valueReferences)
+            push!(sd.dataPoints, (t, values...))
+        end
+    else
+        while t < t_stop
+            fmiDoStep(c, t, dt)
+            t = round(t + dt, digits=numDigits)
+        end
+    end
+
+    sd
+end
+
+function fmi2SimulateCS(c::fmi2Component, dt::Real, t_start::Real, t_stop::Real, recordValues::Array{String})
+    vr = fmi2String2ValueReference(c.fmu, recordValues)
+    fmi2SimulateCS(c, dt, t_start, t_stop, vr)
 end

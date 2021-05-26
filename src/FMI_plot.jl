@@ -6,7 +6,7 @@
 using Plots
 using OrdinaryDiffEq: ODESolution
 
-function plot(fmu::FMU2, solution::ODESolution, t_in_solution = false)
+function fmiPlot(fmu::FMU2, solution::ODESolution, t_in_solution = false)
     t = nothing
     offset = 0
     if t_in_solution
@@ -30,16 +30,11 @@ function plot(fmu::FMU2, solution::ODESolution, t_in_solution = false)
     end
     fig
 end
-
-function fmiPlot(fmu::FMU2, solution::ODESolution, t_in_solution = false)
-    plot(fmu, solution, t_in_solution)
+function Plots.plot(fmu::FMU2, solution::ODESolution, t_in_solution)
+    fmiPlot(fmu, solution, t_in_solution)
 end
 
-function plot(nfmu::NeuralFMU)
-    plot(nfmu.fmu, nfmu.solution)
-end
-
-function plot(sd::fmi2SimulationResult)
+function fmiPlot(sd::fmi2SimulationResult)
     ts = fmi2SimulationResultGetTime(sd)
 
     numVars = length(sd.dataPoints[1])-1
@@ -53,7 +48,6 @@ function plot(sd::fmi2SimulationResult)
     end
     fig
 end
-
-function fmiPlot(obj::Union{fmi2SimulationResult, NeuralFMU})
-    plot(obj)
+function Plots.plot(sd::fmi2SimulationResult)
+    fmiPlot(sd)
 end
