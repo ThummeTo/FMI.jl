@@ -2,9 +2,7 @@
 # FMI.jl
 
 ## What is FMI.jl?
-FMI.jl is a free-to-use software library for the Julia programming language, which offers two major features:
-- FMI in Julia: load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language
-- NeuralFMUs: place FMUs simply inside any feed-forward NN topology and still keep the resulting hybrid model trainable with a standard AD training process 
+FMI.jl is a free-to-use software library for the Julia programming language, which integrates FMI in Julia: load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
 
 ## How can I use FMI.jl?
 1. open a Julia-Command-Window, activate your prefered environemnt
@@ -13,7 +11,6 @@ FMI.jl is a free-to-use software library for the Julia programming language, whi
 
 ## What is currently supported in FMI.jl?
 - simulation / plotting of CS- and ME-FMUs
-- building and training ME-NeuralFMUs with the default Flux-Front-End (CS-NeuralFMUs untested)
 - event-handling for discontinuous ME-FMUs
 - the full FMI command set (except ```getFMUState``` and ```setFMUState```)
 - ...
@@ -24,3 +21,6 @@ FMI.jl is a free-to-use software library for the Julia programming language, whi
 - more examples
 - support for ```getFMUState``` and ```setFMUState```
 - ...
+
+## Interested in Hybrid Modelling in Julia using FMUs?
+See [FMIFlux.jl](https://github.com/ThummeTo/FMIFlux.jl).
