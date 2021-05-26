@@ -549,10 +549,10 @@ Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their fmi2valueReference
 """
-function fmi2GetString!(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Array{fmi2String})
+function fmi2GetString!(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Vector{Ptr{Cchar}})
     status = ccall(c.fmu.cGetString,
                 Cuint,
-                (Ptr{Nothing}, Ptr{fmi2ValueReference}, Csize_t,  Ptr{fmi2String}),
+                (Ptr{Nothing}, Ptr{fmi2ValueReference}, Csize_t,  Ptr{Cchar}),
                 c.compAddr, vr, nvr, value)
     status
 end
@@ -561,10 +561,10 @@ Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their fmi2valueReference
 """
-function fmi2SetString(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Array{fmi2String})
+function fmi2SetString(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Union{Array{Ptr{Cchar}}, Array{Ptr{UInt8}}})
     status = ccall(c.fmu.cSetString,
                 Cuint,
-                (Ptr{Nothing},Ptr{fmi2ValueReference}, Csize_t, Ptr{fmi2String}),
+                (Ptr{Nothing},Ptr{fmi2ValueReference}, Csize_t, Ptr{Cchar}),
                 c.compAddr, vr, nvr, value)
     status
 end

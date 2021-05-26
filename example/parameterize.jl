@@ -6,46 +6,34 @@
 using FMI
 using Plots
 
-pathToFMU = joinpath(dirname(@__FILE__), "../model/SpringPendulum1D.fmu")
+pathToFMU = joinpath(dirname(@__FILE__), "../model/IO.fmu")
 
 myFMU = fmiLoad(pathToFMU)
-fmiGetVersion(myFMU)
-fmiGetTypesPlatform(myFMU)
-
-c = fmiInstantiate!(myFMU; loggingOn=true)
-
-massValueRef = fmi2String2ValueReference(myFMU, "mass.s")
-springStiffnessValueRef = fmi2String2ValueReference(myFMU, "spring.c")
+fmiInstantiate!(myFMU; loggingOn=true)
 
 fmiSetupExperiment(myFMU, 0.0)
 
 fmiEnterInitializationMode(myFMU)
 
-# read spring stiffnes, set to 10% and set parameter
-stiffnes = fmiGetReal(myFMU, springStiffnessValueRef)
-stiffnes *= 0.1
-fmiSetReal(myFMU, springStiffnessValueRef, stiffnes)
+fmiGetString(myFMU, "p_string")
+
+rndReal = 100 * rand()
+rndInteger = round(Integer, 100 * rand())
+rndBoolean = rand() > 0.5
+rndString = "Not random!"
+
+fmiSetReal(myFMU, "p_real", rndReal)
+display("$rndReal == $(fmiGetReal(myFMU, "p_real"))")
+
+fmiSetInteger(myFMU, "p_integer", rndInteger)
+display("$rndInteger == $(fmiGetInteger(myFMU, "p_integer"))")
+
+fmiSetBoolean(myFMU, "p_boolean", rndBoolean)
+display("$rndBoolean == $(fmiGetBoolean(myFMU, "p_boolean"))")
+
+fmiSetString(myFMU, "p_string", rndString)
+display("$rndString == $(fmiGetString(myFMU, "p_string"))")
 
 fmiExitInitializationMode(myFMU)
-
-dt = 0.01
-t = 0.0
-
-ts = []
-ss = []
-
-while t < 10.0
-    global t
-
-    fmiDoStep(myFMU, t, dt)
-
-    t += dt
-    push!(ts, t)
-
-    massPosition = fmiGetReal(myFMU, massValueRef)
-    push!(ss, massPosition)
-end
-
-Plots.plot(ts, ss, xlabel="t [s]", ylabel="mass.s [m]", legend=false)
 
 fmiUnload(myFMU)
