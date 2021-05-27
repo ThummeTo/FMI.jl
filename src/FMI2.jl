@@ -850,12 +850,13 @@ Get the values of an array of fmi2Boolean variables
 For more information call ?fmi2GetBoolean
 """
 function fmi2GetBoolean!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array{Bool})
+    vars = zeros(fmi2Boolean, length(values))
     if length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
-        fmi2GetBoolean!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Boolean}(values))
+        fmi2GetBoolean!(fmu2.components[end], vr, Csize_t(length(values)),vars)
     end
-    values
+    values[:]  = vars
 end
 """
 Get the values of an array of fmi2Boolean variables by variable name
@@ -864,13 +865,15 @@ For more information call ?fmi2GetBoolean
 """
 function fmi2GetBoolean!(fmu2::FMU2, vr_string::Array{String}, values::Array{Bool})
     vr = fmi2String2ValueReference(fmu2, vr_string)
+    vars = zeros(fmi2Boolean, length(values))
     if length(vr) == 0
         display("[Error]: no valueReferences could be converted")
     elseif length(values) != length(vr)
             display("[ERROR]: Number of value references and in place array doesn't match")
     else
-            fmi2GetBoolean!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Boolean}(values))
+            fmi2GetBoolean!(fmu2.components[end], vr, Csize_t(length(values)), vars)
     end
+    values[:] = vars
 end
 """
 Set the values of an array of fmi2Boolean variables
@@ -967,10 +970,11 @@ Get the values of an array of fmi2String variables
 For more information call ?fmi2GetString
 """
 function fmi2GetString!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array{String})
+    ptrs = pointer.(values)
     if length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
-        fmi2GetString!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2String}(values))
+        fmi2GetString!(fmu2.components[end], vr, Csize_t(length(values)), ptrs)
     end
     values
 end
@@ -981,13 +985,15 @@ For more information call ?fmi2GetString
 """
 function fmi2GetString!(fmu2::FMU2, vr_string::Array{String}, values::Array{String})
     vr = fmi2String2ValueReference(fmu2, vr_string)
+    ptrs = pointer.(values)
     if length(vr) == 0
         display("[Error]: no valueReferences could be converted")
     elseif length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
-        fmi2GetString!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2String}(values))
+        fmi2GetString!(fmu2.components[end], vr, Csize_t(length(values)), ptrs)
     end
+    values
 end
 """
 Set the values of an array of fmi2String variables

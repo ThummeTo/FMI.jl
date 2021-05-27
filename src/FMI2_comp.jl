@@ -339,12 +339,13 @@ Get the values of an array of fmi2Boolean variables
 For more information call ?fmi2GetBoolean
 """
 function fmi2GetBoolean!(c::fmi2Component, vr::Array{fmi2ValueReference}, values::Array{Bool})
+    vars = zeros(fmi2Boolean, length(values))
     if length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
-        fmi2GetBoolean!(c, vr, Csize_t(length(values)), Array{fmi2Boolean}(values))
+        fmi2GetBoolean!(c, vr, Csize_t(length(values)), vars)
     end
-    values
+    values[:] = vars
 end
 """
 Get the values of an array of fmi2Boolean variables by variable name
@@ -353,13 +354,15 @@ For more information call ?fmi2GetBoolean
 """
 function fmi2GetBoolean!(c::fmi2Component, vr_string::Array{String}, values::Array{Bool})
     vr = fmi2String2ValueReference(c.fmu, vr_string)
+    vars = zeros(fmi2Real, length(values))
     if length(vr) == 0
         display("[Error]: no valueReferences could be converted")
     elseif length(values) != length(vr)
             display("[ERROR]: Number of value references and in place array doesn't match")
     else
-            fmi2GetBoolean!(c, vr, Csize_t(length(values)), Array{fmi2Boolean}(values))
+            fmi2GetBoolean!(c, vr, Csize_t(length(values)), vars)
     end
+    values[:] = vars
 end
 """
 Set the values of an array of fmi2Boolean variables
