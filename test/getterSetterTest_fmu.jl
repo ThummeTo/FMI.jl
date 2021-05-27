@@ -13,6 +13,7 @@ myFMU = fmiLoad(pathToFMU)
 vR = zeros(Real, 3)
 vI = zeros(Integer, 3)
 vB = zeros(Bool, 3)
+vS = ["test","test"]
 
 c1 = fmiInstantiate!(myFMU; loggingOn=true)
 @test typeof(c1) == FMI.fmi2Component
@@ -31,8 +32,8 @@ p = fmiGetReal(myFMU, "p_real")
 fmiGetInteger!(myFMU, ["u_integer", "y_integer", "p_integer"], vI)
 @test vI == [4, 4, 6]
 fmiGetBoolean!(myFMU, ["u_boolean", "y_boolean", "p_boolean"], vB)
-@test vB == [0, 0, 0]
-fmiGetString(myFMU, "")
+@test vB == [true, true, 0]
+fmiGetString!(myFMU, ["p_string", "p_string"], vS)
 fmiExitInitializationMode(myFMU)
 
 
