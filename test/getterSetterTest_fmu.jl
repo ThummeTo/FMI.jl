@@ -1,4 +1,3 @@
-using FMI
 cd(dirname(@__FILE__))
 pathToFMU = joinpath(pwd(), "../model/IO.fmu")
 
@@ -25,19 +24,24 @@ c1 = fmiInstantiate!(myFMU; loggingOn=true)
 @test fmiSetInteger(myFMU, ["u_integer"], [4]) == 0
 @test fmiSetBoolean(myFMU, "p_boolean", false) == 0
 @test fmiSetBoolean(myFMU, ["u_boolean"], [true]) == 0
+@test fmiSetString(myFMU, "p_string", "New String") == 0
 fmiGetReal!(myFMU, ["p_real", "y_real", "u_real"], vR)
 @test vR == [8.0, 7.0, 7.0]
 p = fmiGetReal(myFMU, "p_real")
 @test p == 8.0
 fmiGetInteger!(myFMU, ["u_integer", "y_integer", "p_integer"], vI)
 @test vI == [4, 4, 6]
+i = fmiGetInteger(myFMU, "y_integer")
+@test i == 4
 fmiGetBoolean!(myFMU, ["u_boolean", "y_boolean", "p_boolean"], vB)
-@test vB == [true, true, 0]
+@test vB == [true, true, false]
+b = fmiGetBoolean(myFMU, "p_boolean")
+@test b == false
 fmiGetString!(myFMU, ["p_string", "p_string"], vS)
+@test vS == ["New String", "New String"]
+s = fmiGetString(myFMU, "p_string")
+@test s == "New String"
 fmiExitInitializationMode(myFMU)
-
-
-fmiSetupExperiment(myFMU, 0.0)
 
 fmiReset(myFMU)
 fmiTerminate(myFMU)
