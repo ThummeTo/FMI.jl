@@ -19,17 +19,18 @@ c1 = fmiInstantiate!(myFMU; loggingOn=true)
 
 @test fmiEnterInitializationMode(myFMU) == 0
 @test fmiSetReal(myFMU, "p_real", 5.0) == 0
-fmiSetReal(myFMU, ["u_real", "p_real"], [7.0, 8.0])
-fmiSetInteger(myFMU, "p_integer", 6)
-fmiSetInteger(myFMU, ["u_integer"], [4])
-fmiSetBoolean(myFMU, "p_boolean", false)
-fmiSetBoolean(myFMU, ["u_boolean"], [false])
-vR = fmiGetReal!(myFMU, ["u_real", "y_real", "p_real"], vR)
-@test vR == [7.0, 0.0, 8.0]
+@test fmiSetReal(myFMU, ["u_real", "p_real"], [7.0, 8.0]) == 0
+@test fmiSetInteger(myFMU, "p_integer", 6) == 0
+@test fmiSetInteger(myFMU, ["u_integer"], [4]) == 0
+@test fmiSetBoolean(myFMU, "p_boolean", false) == 0
+@test fmiSetBoolean(myFMU, ["u_boolean"], [true]) == 0
+fmiGetReal!(myFMU, ["p_real", "y_real", "u_real"], vR)
+@test vR == [8.0, 7.0, 7.0]
 p = fmiGetReal(myFMU, "p_real")
-@test fmiGetInteger!(myFMU, ["u_integer", "y_integer", "p_integer"], vI) == 0
-@test vI == [0, 0, 0]
-@test fmiGetBoolean!(myFMU, ["u_boolean", "y_boolean", "p_boolean"], vB) == 0
+@test p == 8.0
+fmiGetInteger!(myFMU, ["u_integer", "y_integer", "p_integer"], vI)
+@test vI == [4, 4, 6]
+fmiGetBoolean!(myFMU, ["u_boolean", "y_boolean", "p_boolean"], vB)
 @test vB == [0, 0, 0]
 fmiGetString(myFMU, "")
 fmiExitInitializationMode(myFMU)
