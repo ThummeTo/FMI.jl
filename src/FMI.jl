@@ -12,7 +12,7 @@ include("assertions.jl")
 
 # ToDo: Submodules
 include("FMI2_sim.jl")
-include("FMI_neural.jl")
+#include("FMI_neural.jl")
 include("FMI_plot.jl")
 
 ### EXPORTING LISTS START ###
@@ -27,6 +27,7 @@ export fmiGetDirectionalDerivative, fmiDoStep, fmiSetTime, fmiSetContinuousState
 export fmiEnterContinuousTimeMode, fmiCompletedIntegratorStep, fmiGetDerivatives, fmiGetEventIndicators, fmiGetContinuousStates, fmiGetNominalsOfContinuousStates
 
 # FMI2.jl
+export FMU2, fmi2True, fmi2False
 export fmi2SimulationResultGetValuesAtIndex, fmi2SimulationResultGetTime, fmi2SimulationResultGetValues
 export fmi2String2ValueReference, fmi2ValueReference2String
 export fmi2Unzip, fmi2Load, fmi2Unload
@@ -69,10 +70,7 @@ export fmi2EnterEventMode, fmi2NewDiscreteStates, fmi2EnterContinuousTimeMode, f
 export fmi2SimulateME
 
 # FMI_plot.jl
-export fmiPlot, plot
-
-# FMI2_neural.jl
-export fmi2DoStepME, NeuralFMU, NeuralFMUInputLayer, NeuralFMUOutputLayer
+export fmiPlot
 
 # FMI2_md.jl
 # nothing to export
