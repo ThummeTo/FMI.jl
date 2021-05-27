@@ -607,12 +607,13 @@ Get the values of an array of fmi2Real variables
 For more information call ?fmi2GetReal
 """
 function fmi2GetReal!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array{<:Real})
+    vars = zeros(fmi2Real, length(values))
     if length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
-        fmi2GetReal!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Real}(values))
+        fmi2GetReal!(fmu2.components[end], vr, Csize_t(length(values)), vars)
     end
-    values
+    values[:] = vars
 end
 """
 Get the values of an array of fmi2Real variables by variable name
@@ -621,13 +622,15 @@ For more information call ?fmi2GetReal
 """
 function fmi2GetReal!(fmu2::FMU2, vr_string::Array{String}, values::Array{<:Real})
     vr = fmi2String2ValueReference(fmu2, vr_string)
+    vars = zeros(fmi2Real, length(values))
     if length(vr) == 0
         display("[Error]: no valueReferences could be converted")
     elseif length(values) != length(vr)
             display("[ERROR]: Number of value references and in place array doesn't match")
     else
-            fmi2GetReal!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Real}(values))
+            fmi2GetReal!(fmu2.components[end], vr, Csize_t(length(values)), vars)
     end
+    values[:] = vars
 end
 """
 Set the values of an array of fmi2Real variables
@@ -727,12 +730,13 @@ Get the values of an array of fmi2Integer variables
 For more information call ?fmi2GetInteger
 """
 function fmi2GetInteger!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array{<:Integer})
+    vars = zeros(fmi2Integer, length(values))
     if length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
-        fmi2GetInteger!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Integer}(values))
+        fmi2GetInteger!(fmu2.components[end], vr, Csize_t(length(values)), vars)
     end
-    values
+    values[:] = vars
 end
 """
 Get the values of an array of fmi2Integer variables by variable name
@@ -741,13 +745,15 @@ For more information call ?fmi2GetInteger
 """
 function fmi2GetInteger!(fmu2::FMU2, vr_string::Array{String}, values::Array{<:Integer})
     vr = fmi2String2ValueReference(fmu2, vr_string)
+    vars = zeros(fmi2Integer, length(values))
     if length(vr) == 0
         display("[Error]: no valueReferences could be converted")
     elseif length(values) != length(vr)
             display("[ERROR]: Number of value references and in place array doesn't match")
     else
-            fmi2GetInteger!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Integer}(values))
+            fmi2GetInteger!(fmu2.components[end], vr, Csize_t(length(values)), vars)
     end
+    values[:] = vars
 end
 """
 Set the values of an array of fmi2Integer variables
