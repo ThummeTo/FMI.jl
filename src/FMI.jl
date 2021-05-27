@@ -21,7 +21,7 @@ include("FMI_plot.jl")
 export fmiLoad, fmiSimulate, fmiSimulateCS, fmiSimulateME, fmiUnload
 export fmiGetNumberOfStates, fmiGetTypesPlatform, fmiGetVersion, fmiInstantiate!, fmiFreeInstance!
 export fmiSetDebugLogging, fmiSetupExperiment, fmiEnterInitializationMode, fmiExitInitializationMode, fmiTerminate , fmiReset
-export fmiGetReal, fmiSetReal, fmiGetInteger, fmiSetInteger, fmiGetBoolean, fmiSetBoolean, fmiGetString, fmiSetString, fmiGetReal!, fmiGetInteger!, fmiGetBoolean!, fmiGetString
+export fmiGetReal, fmiSetReal, fmiGetInteger, fmiSetInteger, fmiGetBoolean, fmiSetBoolean, fmiGetString, fmiSetString, fmiGetReal!, fmiGetInteger!, fmiGetBoolean!, fmiGetString!
 export fmiGetFMUstate, fmiSetFMUstate, fmiFreeFMUstate, fmiSerializedFMUstateSize, fmiSerializeFMUstate, fmiDeSerializeFMUstate
 export fmiGetDirectionalDerivative, fmiDoStep, fmiSetTime, fmiSetContinuousStates, fmi2EnterEventMode, fmiNewDiscreteStates
 export fmiEnterContinuousTimeMode, fmiCompletedIntegratorStep, fmiGetDerivatives, fmiGetEventIndicators, fmiGetContinuousStates, fmiGetNominalsOfContinuousStates
@@ -268,20 +268,20 @@ function fmiSetFMUstate(fmu2::fmi2Struct, state::fmi2FMUstate)
     fmi2SetFMUstate(fmu2, state)
 end
 """Free the memory for the allocated FMU state"""
-function fmiFreeFMUstate(fmu2::fmi2Struct)
+function fmiFreeFMUstate(fmu2::fmi2Struct, state::fmi2FMUstate)
     fmi2FreeFMUstate(fmu2)
 end
 """Returns the size of the byte vector the FMU can be stored in"""
-function fmiSerializedFMUstateSize(c::fmi2Struct, size::Int64)
-    fmi2SerializedFMUstateSize(c, size)
+function fmiSerializedFMUstateSize(c::fmi2Struct, state::fmi2FMUstate)
+    fmi2SerializedFMUstateSize(c, state)
 end
 """Serialize the data in the FMU state pointer"""
-function fmiSerializeFMUstate(c::fmi2Struct, serializedState::fmi2Byte, size::Int64)
-    fmi2SerializeFMUstate(c, serializedState, size)
+function fmiSerializeFMUstate(c::fmi2Struct, state::fmi2FMUstate)
+    fmi2SerializeFMUstate(c, state)
 end
 """Deserialize the data in the FMU state pointer"""
-function fmiDeSerializeFMUstate(c::fmi2Struct, serializedState::fmi2Byte, size::Int64)
-    fmi2DeSerializeFMUstate(c, serializedState, size)
+function fmiDeSerializeFMUstate(c::fmi2Struct, serializedState::Array{fmi2Byte})
+    fmi2DeSerializeFMUstate(c, serializedState)
 end
 """Returns the values of the directional derivatives"""
 function fmiGetDirectionalDerivative(fmu::fmi2Struct,
