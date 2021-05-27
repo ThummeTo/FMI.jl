@@ -970,13 +970,14 @@ Get the values of an array of fmi2String variables
 For more information call ?fmi2GetString
 """
 function fmi2GetString!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array{String})
-    ptrs = pointer.(values)
+    vars = Vector{Ptr{Cchar}}(undef, length(vr))
     if length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
-        fmi2GetString!(fmu2.components[end], vr, Csize_t(length(values)), ptrs)
+        fmi2GetString!(fmu2.components[end], vr, Csize_t(length(values)), vars)
+        values[:] = unsafe_string.(vars)
     end
-    values
+
 end
 """
 Get the values of an array of fmi2String variables by variable name
@@ -985,15 +986,15 @@ For more information call ?fmi2GetString
 """
 function fmi2GetString!(fmu2::FMU2, vr_string::Array{String}, values::Array{String})
     vr = fmi2String2ValueReference(fmu2, vr_string)
-    ptrs = pointer.(values)
+    vars = Vector{Ptr{Cchar}}(undef, length(vr))
     if length(vr) == 0
         display("[Error]: no valueReferences could be converted")
     elseif length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
-        fmi2GetString!(fmu2.components[end], vr, Csize_t(length(values)), ptrs)
+        fmi2GetString!(fmu2.components[end], vr, Csize_t(length(values)), vars)
+        values[:] = unsafe_string.(vars)
     end
-    values
 end
 """
 Set the values of an array of fmi2String variables
