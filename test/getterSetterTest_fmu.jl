@@ -24,8 +24,9 @@ fmiSetInteger(myFMU, "p_integer", 6)
 fmiSetInteger(myFMU, ["u_integer"], [4])
 fmiSetBoolean(myFMU, "p_boolean", false)
 fmiSetBoolean(myFMU, ["u_boolean"], [false])
-@test fmiGetReal!(myFMU, ["u_real", "y_real", "p_real"], vR) == 0
+vR = fmiGetReal!(myFMU, ["u_real", "y_real", "p_real"], vR)
 @test vR == [7.0, 0.0, 8.0]
+p = fmiGetReal(myFMU, "p_real")
 @test fmiGetInteger!(myFMU, ["u_integer", "y_integer", "p_integer"], vI) == 0
 @test vI == [0, 0, 0]
 @test fmiGetBoolean!(myFMU, ["u_boolean", "y_boolean", "p_boolean"], vB) == 0
