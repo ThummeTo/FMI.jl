@@ -573,11 +573,11 @@ Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
 
 fmi2GetFMUstate makes a copy of the internal FMU state and returns a pointer to this copy
 """
-function fmi2GetFMUstate(c::fmi2Component, FMUstate::fmi2FMUstate)
+function fmi2GetFMUstate(c::fmi2Component, FMUstate::Ref{fmi2FMUstate})
     status = ccall(c.fmu.cGetFMUstate,
                 Cuint,
                 (Ptr{Nothing}, Ptr{fmi2FMUstate}),
-                c.compAddr, Ref(FMUstate))
+                c.compAddr, FMUstate)
     status
 end
 """
@@ -597,10 +597,10 @@ Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
 
 fmi2FreeFMUstate frees all memory and other resources allocated with the fmi2GetFMUstate call for this FMUstate.
 """
-function fmi2FreeFMUstate(c::fmi2Component, FMUstate::fmi2FMUstate)
+function fmi2FreeFMUstate(c::fmi2Component, FMUstate::Ref{fmi2FMUstate})
     status = ccall(c.fmu.cFreeFMUstate,
                 Cuint,
-                (Ptr{Nothing}, Ptr{Nothing}),
+                (Ptr{Nothing}, Ptr{fmi2FMUstate}),
                 c.compAddr, FMUstate)
     status
 end
@@ -609,7 +609,7 @@ Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
 
 fmi2SerializedFMUstateSize returns the size of the byte vector, in order that FMUstate can be stored in it.
 """
-function fmi2SerializedFMUstateSize(c::fmi2Component, FMUstate::fmi2FMUstate, size::Ptr{Csize_t})
+function fmi2SerializedFMUstateSize(c::fmi2Component, FMUstate::fmi2FMUstate, size::Ref{Csize_t})
     status = ccall(c.fmu.cSerializedFMUstateSize,
                 Cuint,
                 (Ptr{Nothing}, Ptr{Cvoid}, Ptr{Csize_t}),
@@ -620,10 +620,10 @@ Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
 
 fmi2SerializeFMUstate serializes the data which is referenced by pointer FMUstate and copies this data in to the byte vector serializedState of length size,
 """
-function fmi2SerializeFMUstate(c::fmi2Component, FMUstate::fmi2FMUstate, serialzedState::fmi2Byte, size::Unsigned)
+function fmi2SerializeFMUstate(c::fmi2Component, FMUstate::fmi2FMUstate, serialzedState::Array{fmi2Byte}, size::Csize_t)
     status = ccall(c.fmu.cSerializeFMUstate,
                 Cuint,
-                (Ptr{Nothing}, Ptr{Cvoid}, Ptr{Cint}, Csize_t),
+                (Ptr{Nothing}, Ptr{Cvoid}, Ptr{Cchar}, Csize_t),
                 c.compAddr, FMUstate, serialzedState, size)
 end
 """
@@ -631,10 +631,10 @@ Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
 
 fmi2DeSerializeFMUstate deserializes the byte vector serializedState of length size, constructs a copy of the FMU state and returns FMUstate, the pointer to this copy.
 """
-function fmi2DeSerializeFMUstate(c::fmi2Component, serialzedState::fmi2Byte, size::Unsigned, FMUstate::fmi2FMUstate)
+function fmi2DeSerializeFMUstate(c::fmi2Component, serialzedState::Array{fmi2Byte}, size::Csize_t, FMUstate::Ref{fmi2FMUstate})
     status = ccall(c.fmu.cDeSerializeFMUstate,
                 Cuint,
-                (Ptr{Nothing}, Ptr{Cint}, Csize_t, Ptr{Cvoid}),
+                (Ptr{Nothing}, Ptr{Cchar}, Csize_t, Ptr{fmi2FMUstate}),
                 c.compAddr, serialzedState, size, FMUstate)
 end
 """
