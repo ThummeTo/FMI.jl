@@ -15,9 +15,8 @@ vB = zeros(Bool, 3)
 vS = ["test","test"]
 
 c1 = fmiInstantiate!(myFMU; loggingOn=true)
-@test typeof(c1) == FMI.fmi2Component
 
-@test fmiEnterInitializationMode(myFMU) == 0
+fmiEnterInitializationMode(myFMU)
 @test fmiSetReal(myFMU, "p_real", 5.0) == 0
 @test fmiSetReal(myFMU, ["u_real", "p_real"], [7.0, 8.0]) == 0
 @test fmiSetInteger(myFMU, "p_integer", 6) == 0

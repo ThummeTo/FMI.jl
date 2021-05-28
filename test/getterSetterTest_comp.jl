@@ -11,13 +11,12 @@ myFMU = fmiLoad(pathToFMU)
 # create arrays for in place getter
 vR = zeros(Real, 3)
 vI = zeros(Integer, 3)
-vB = zeros(Bool, 3)
+vB = [false, false, false]
 vS = ["test","test"]
 
 c1 = fmiInstantiate!(myFMU; loggingOn=true)
-@test typeof(c1) == FMI.fmi2Component
 
-@test fmiEnterInitializationMode(c1) == 0
+fmiEnterInitializationMode(c1)
 @test fmiSetReal(c1, "p_real", 5.0) == 0
 @test fmiSetReal(c1, ["u_real", "p_real"], [7.0, 8.0]) == 0
 @test fmiSetInteger(c1, "p_integer", 6) == 0

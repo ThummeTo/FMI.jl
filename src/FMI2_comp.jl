@@ -295,7 +295,7 @@ For more information call ?fmi2GetBoolean
 """
 function fmi2GetBoolean(c::fmi2Component, vr::Array{fmi2ValueReference})
     nvr = Csize_t(length(vr))
-    value = zeros(fmi2Boolean, nvr)
+    value = Array{fmiBoolean}(undef, nvr)
     fmi2GetBoolean!(c, vr, nvr, value)
 end
 """
@@ -339,7 +339,7 @@ Get the values of an array of fmi2Boolean variables
 For more information call ?fmi2GetBoolean
 """
 function fmi2GetBoolean!(c::fmi2Component, vr::Array{fmi2ValueReference}, values::Array{Bool})
-    vars = zeros(fmi2Boolean, length(values))
+    vars = Array{fmi2Boolean}(undef, length(values))
     if length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
