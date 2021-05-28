@@ -7,4 +7,4 @@ using Documenter, FMI
 
 makedocs(sitename="FMI.jl")
 
-deploydocs(repo = "github.com//ThummeTo/FMI.jl.git",)
+deploydocs(repo = "github.com/ThummeTo/FMI.jl.git",)
