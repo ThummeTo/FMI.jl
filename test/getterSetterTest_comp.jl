@@ -38,8 +38,8 @@ b = fmiGetBoolean(c1, "p_boolean")
 @test b == false
 fmiGetString!(c1, ["p_string", "p_string"], vS)
 @test vS == ["New String", "New String"]
-s = fmiGetString(c1, "p_string")
-@test s == "New String"
+string = fmiGetString(c1, "p_string")
+@test string == "New String"
 fmiExitInitializationMode(c1)
 
 fmiReset(c1)

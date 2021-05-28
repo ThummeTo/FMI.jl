@@ -38,8 +38,8 @@ b = fmiGetBoolean(myFMU, "p_boolean")
 @test b == false
 fmiGetString!(myFMU, ["p_string", "p_string"], vS)
 @test vS == ["New String", "New String"]
-s = fmiGetString(myFMU, "p_string")
-@test s == "New String"
+string = fmiGetString(myFMU, "p_string")
+@test string == "New String"
 fmiExitInitializationMode(myFMU)
 
 fmiReset(myFMU)

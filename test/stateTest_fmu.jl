@@ -12,19 +12,24 @@ fmiExitInitializationMode(myFMU)
 
 fmiSetupExperiment(myFMU, 0.0)
 
+@test fmiGetReal(myFMU, "p_real") == 0
 FMUstate = fmiGetFMUstate(myFMU)
 @test typeof(FMUstate) == FMI.fmi2FMUstate
-s = fmiSerializedFMUstateSize(myFMU, FMUstate)
-vyte = fmiSerializeFMUstate(myFMU, FMUstate)
-FMUstate2 = fmiDeSerializeFMUstate(myFMU, vyte)
+len = fmiSerializedFMUstateSize(myFMU, FMUstate)
+@test len > 0
+bytes = fmiSerializeFMUstate(myFMU, FMUstate)
+@test length(bytes) == len
+@test typeof(bytes) == Array{Char,1}
 
-fmiGetReal(myFMU, "p_real")
-FMUstate = fmiGetFMUstate(myFMU)
+
 fmiSetReal(myFMU, "p_real", 10.0)
-fmiGetReal(myFMU, "p_real")
+FMUstate = fmiGetFMUstate(myFMU)
+FMUstate2 = fmiDeSerializeFMUstate(myFMU, bytes)
 fmiSetFMUstate(myFMU, FMUstate2)
 fmiGetReal(myFMU, "p_real")
 fmi2FreeFMUstate(myFMU, FMUstate)
+
+
 
 FMUstate = fmiGetFMUstate(c1)
 s = fmiSerializedFMUstateSize(c1, FMUstate)
