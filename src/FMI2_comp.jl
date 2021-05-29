@@ -281,6 +281,7 @@ function fmi2GetBoolean(c::fmi2Component, vr::Array{fmi2ValueReference})
     nvr = Csize_t(length(vr))
     value = Array{fmi2Boolean}(undef, nvr)
     fmi2GetBoolean!(c, vr, nvr, value)
+    value
 end
 """
 Get the value of a fmi2Boolean variable
@@ -390,8 +391,9 @@ For more information call ?fmi2GetString
 """
 function fmi2GetString(c::fmi2Component, vr::Array{fmi2ValueReference})
     nvr = Csize_t(length(vr))
-    value = Array{fmi2String}(undef, nvr)
+    value = Vector{Ptr{Cchar}}(undef, nvr)
     fmi2GetString!(c, vr, nvr, value)
+    unsafe_string.(value)
 end
 """
 Get the value of a fmi2String variable
@@ -458,7 +460,8 @@ For more information call ?fmi2SetString
 """
 function fmi2SetString(c::fmi2Component, vr::Array{fmi2ValueReference}, value::Array{String})
     nvr = Csize_t(length(vr))
-    fmi2SetString(c, vr, nvr, Array{fmi2String}(value))
+    ptrs = pointer.(value)
+    fmi2SetString(c, vr, nvr, ptrs)
 end
 """
 Set the values of a fmi2String variable

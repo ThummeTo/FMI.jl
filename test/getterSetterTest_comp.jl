@@ -56,4 +56,4 @@ fmiExitInitializationMode(c1)
 
 fmiReset(c1)
 fmiTerminate(c1)
-fmiUnload(c1)
+fmiUnload(myFMU)
