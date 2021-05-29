@@ -564,7 +564,6 @@ function fmi2GetReal(fmu2::FMU2, vr::Array{fmi2ValueReference})
     fmi2GetReal!(fmu2.components[end], vr, nvr, values)
     values
 end
-
 """
 Get the value of a fmi2Real variable
 
