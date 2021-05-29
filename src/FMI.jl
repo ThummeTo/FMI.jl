@@ -269,7 +269,7 @@ function fmiSetFMUstate(fmu2::fmi2Struct, state::fmi2FMUstate)
 end
 """Free the memory for the allocated FMU state"""
 function fmiFreeFMUstate(fmu2::fmi2Struct, state::fmi2FMUstate)
-    fmi2FreeFMUstate(fmu2)
+    fmi2FreeFMUstate(fmu2, state)
 end
 """Returns the size of the byte vector the FMU can be stored in"""
 function fmiSerializedFMUstateSize(c::fmi2Struct, state::fmi2FMUstate)

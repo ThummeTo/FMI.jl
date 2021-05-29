@@ -12,6 +12,7 @@ import Random
     @testset "fmi2Component functions" begin
         include("getterSetterTest_comp.jl")
         include("independentFunctionsTest_comp.jl")
+        include("stateTest_comp.jl")
     end
     @testset "Tobi Tests" begin
         include("test_setter_getter.jl")

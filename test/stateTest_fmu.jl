@@ -1,10 +1,19 @@
+#
+# Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher
+# Licensed under the MIT license. See LICENSE file in the project root for details.
+#
+
+###############
+# Prepare FMU #
+###############
+
 cd(dirname(@__FILE__))
 
-pathToFMU = joinpath(pwd(), "../model/IO.fmu")
+pathToFMU = joinpath(pwd(), "../model/SpringPendulum1D.fmu")
 
 myFMU = fmiLoad(pathToFMU)
 
-c1 = fmiInstantiate!(myFMU; loggingOn=true)
+fmiInstantiate!(myFMU; loggingOn=true)
 
 fmiEnterInitializationMode(myFMU)
 fmiExitInitializationMode(myFMU)
@@ -12,29 +21,36 @@ fmiExitInitializationMode(myFMU)
 
 fmiSetupExperiment(myFMU, 0.0)
 
-@test fmiGetReal(myFMU, "p_real") == 0
+###########################
+# Testing state functions #
+###########################
+
+@test fmiGetReal(myFMU, "mass.s") == 0.5
 FMUstate = fmiGetFMUstate(myFMU)
 @test typeof(FMUstate) == FMI.fmi2FMUstate
 len = fmiSerializedFMUstateSize(myFMU, FMUstate)
 @test len > 0
-bytes = fmiSerializeFMUstate(myFMU, FMUstate)
-@test length(bytes) == len
-@test typeof(bytes) == Array{Char,1}
+serial = fmiSerializeFMUstate(myFMU, FMUstate)
+@test length(serial) == len
+@test typeof(serial) == Array{Char,1}
 
-
-fmiSetReal(myFMU, "p_real", 10.0)
+fmiSetReal(myFMU, "mass.s", 10.0)
 FMUstate = fmiGetFMUstate(myFMU)
-FMUstate2 = fmiDeSerializeFMUstate(myFMU, bytes)
+@test fmiGetReal(myFMU, "mass.s") == 10.0
+
+FMUstate2 = fmiDeSerializeFMUstate(myFMU, serial)
+@test typeof(FMUstate2) == FMI.fmi2FMUstate
 fmiSetFMUstate(myFMU, FMUstate2)
-fmiGetReal(myFMU, "p_real")
-fmi2FreeFMUstate(myFMU, FMUstate)
+@test fmiGetReal(myFMU, "mass.s") == 0.5
+fmiSetFMUstate(myFMU, FMUstate)
+@test fmiGetReal(myFMU, "mass.s") == 10.0
+fmiFreeFMUstate(myFMU, FMUstate)
+fmiFreeFMUstate(myFMU, FMUstate2)
 
+############
+# Clean up #
+############
 
-
-FMUstate = fmiGetFMUstate(c1)
-s = fmiSerializedFMUstateSize(c1, FMUstate)
-vyte = fmiSerializeFMUstate(c1, FMUstate)
-FMUstate2 = fmiDeSerializeFMUstate(c1, vyte)
 fmiReset(myFMU)
 fmiTerminate(myFMU)
 fmiUnload(myFMU)

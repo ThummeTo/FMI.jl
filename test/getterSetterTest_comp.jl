@@ -1,12 +1,16 @@
+#
+# Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher
+# Licensed under the MIT license. See LICENSE file in the project root for details.
+#
+
+###############
+# Prepare FMU #
+###############
+
 cd(dirname(@__FILE__))
 pathToFMU = joinpath(pwd(), "../model/IO.fmu")
 
 myFMU = fmiLoad(pathToFMU)
-
-# test reference conversion
-@test fmi2String2ValueReference(myFMU, "p_real") == 16777216
-@test fmi2String2ValueReference(myFMU, "p_integer") == 16777217
-@test fmi2ValueReference2String(myFMU, Cint(16777217)) == ["p_integer"]
 
 # create arrays for in place getter
 vR = zeros(Real, 3)
@@ -15,6 +19,10 @@ vB = [false, false, false]
 vS = ["test","test"]
 
 c1 = fmiInstantiate!(myFMU; loggingOn=true)
+
+#########################
+# Testing Setter/Getter #
+#########################
 
 fmiEnterInitializationMode(c1)
 @test fmiSetReal(c1, "p_real", 5.0) == 0
@@ -41,6 +49,10 @@ fmiGetString!(c1, ["p_string", "p_string"], vS)
 string = fmiGetString(c1, "p_string")
 @test string == "New String"
 fmiExitInitializationMode(c1)
+
+############
+# Clean up #
+############
 
 fmiReset(c1)
 fmiTerminate(c1)
