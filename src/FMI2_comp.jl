@@ -749,7 +749,9 @@ function fmi2Simulate(c::fmi2Component, dt::Real, t_start::Real = 0.0, t_stop::R
         error(unknownFMUType)
     end
 end
-
+"""
+Starts a simulation of the CoSimulation FMU instance
+"""
 function fmi2SimulateCS(c::fmi2Component, dt::Real, t_start::Real, t_stop::Real, recordValues::Array{fmi2ValueReference} = [])
 
     fmi2SetupExperiment(c, t_start, t_stop)
@@ -788,7 +790,9 @@ function fmi2SimulateCS(c::fmi2Component, dt::Real, t_start::Real, t_stop::Real,
 
     sd
 end
-
+"""
+Starts a simulation of the CoSimulation FMU instance
+"""
 function fmi2SimulateCS(c::fmi2Component, dt::Real, t_start::Real, t_stop::Real, recordValues::Array{String})
     vr = fmi2String2ValueReference(c.fmu, recordValues)
     fmi2SimulateCS(c, dt, t_start, t_stop, vr)

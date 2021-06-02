@@ -1,5 +1,3 @@
-# Library functions
-
 ## Simuation results
 
 ```@docs
@@ -21,12 +19,6 @@ fmi2ValueReference2String
 fmi2Unzip
 fmi2Load
 fmi2Unload
-fmi2readModelDescription
-getDerivativesIndex
-setScalarVariables
-parseFMI2Boolean
-setDatatypeVariables
-createEnum
 ```
 
 ## Simulate FMU
@@ -34,4 +26,5 @@ createEnum
 ```@docs
 fmi2Simulate
 fmi2SimulateCS
+fmi2SimulateME
 ```

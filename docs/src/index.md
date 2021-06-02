@@ -1,6 +1,7 @@
 # FMI.jl Documentation
 
 ```@contents
+Pages = ["index.md", "library.md", "fmu2.md", "parameterize.md", "simulateCS.md", "simulateME.md"]
 ```
 
 ## What is FMI.jl?
