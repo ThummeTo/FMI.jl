@@ -607,12 +607,13 @@ Get the values of an array of fmi2Real variables
 For more information call ?fmi2GetReal
 """
 function fmi2GetReal!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array{<:Real})
+    vars = zeros(fmi2Real, length(values))
     if length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
-        fmi2GetReal!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Real}(values))
+        fmi2GetReal!(fmu2.components[end], vr, Csize_t(length(values)), vars)
     end
-    values
+    values[:] = vars
 end
 """
 Get the values of an array of fmi2Real variables by variable name
@@ -621,13 +622,7 @@ For more information call ?fmi2GetReal
 """
 function fmi2GetReal!(fmu2::FMU2, vr_string::Array{String}, values::Array{<:Real})
     vr = fmi2String2ValueReference(fmu2, vr_string)
-    if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
-    elseif length(values) != length(vr)
-            display("[ERROR]: Number of value references and in place array doesn't match")
-    else
-            fmi2GetReal!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Real}(values))
-    end
+    fmi2GetReal!(fmu2, vr, values)
 end
 """
 Set the values of an array of fmi2Real variables
@@ -727,12 +722,13 @@ Get the values of an array of fmi2Integer variables
 For more information call ?fmi2GetInteger
 """
 function fmi2GetInteger!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array{<:Integer})
+    vars = zeros(fmi2Integer, length(values))
     if length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
-        fmi2GetInteger!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Integer}(values))
+        fmi2GetInteger!(fmu2.components[end], vr, Csize_t(length(values)), vars)
     end
-    values
+    values[:] = vars
 end
 """
 Get the values of an array of fmi2Integer variables by variable name
@@ -741,13 +737,7 @@ For more information call ?fmi2GetInteger
 """
 function fmi2GetInteger!(fmu2::FMU2, vr_string::Array{String}, values::Array{<:Integer})
     vr = fmi2String2ValueReference(fmu2, vr_string)
-    if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
-    elseif length(values) != length(vr)
-            display("[ERROR]: Number of value references and in place array doesn't match")
-    else
-            fmi2GetInteger!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Integer}(values))
-    end
+    fmi2GetInteger!(fmu2, vr, values)
 end
 """
 Set the values of an array of fmi2Integer variables
@@ -844,12 +834,13 @@ Get the values of an array of fmi2Boolean variables
 For more information call ?fmi2GetBoolean
 """
 function fmi2GetBoolean!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array{Bool})
+    vars = zeros(fmi2Boolean, length(values))
     if length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
-        fmi2GetBoolean!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Boolean}(values))
+        fmi2GetBoolean!(fmu2.components[end], vr, Csize_t(length(values)),vars)
     end
-    values
+    values[:]  = vars
 end
 """
 Get the values of an array of fmi2Boolean variables by variable name
@@ -858,13 +849,7 @@ For more information call ?fmi2GetBoolean
 """
 function fmi2GetBoolean!(fmu2::FMU2, vr_string::Array{String}, values::Array{Bool})
     vr = fmi2String2ValueReference(fmu2, vr_string)
-    if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
-    elseif length(values) != length(vr)
-            display("[ERROR]: Number of value references and in place array doesn't match")
-    else
-            fmi2GetBoolean!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2Boolean}(values))
-    end
+    fmi2GetBoolean!(fmu2, vr, values)
 end
 """
 Set the values of an array of fmi2Boolean variables
@@ -961,12 +946,14 @@ Get the values of an array of fmi2String variables
 For more information call ?fmi2GetString
 """
 function fmi2GetString!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array{String})
+    vars = Vector{Ptr{Cchar}}(undef, length(vr))
     if length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
-        fmi2GetString!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2String}(values))
+        fmi2GetString!(fmu2.components[end], vr, Csize_t(length(values)), vars)
+        values[:] = unsafe_string.(vars)
     end
-    values
+
 end
 """
 Get the values of an array of fmi2String variables by variable name
@@ -975,13 +962,7 @@ For more information call ?fmi2GetString
 """
 function fmi2GetString!(fmu2::FMU2, vr_string::Array{String}, values::Array{String})
     vr = fmi2String2ValueReference(fmu2, vr_string)
-    if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
-    elseif length(values) != length(vr)
-        display("[ERROR]: Number of value references and in place array doesn't match")
-    else
-        fmi2GetString!(fmu2.components[end], vr, Csize_t(length(values)), Array{fmi2String}(values))
-    end
+    fmi2GetString!(fmu2, vr, values)
 end
 """
 Set the values of an array of fmi2String variables
@@ -1034,9 +1015,9 @@ For more information call ?fmi2GetFMUstate
 """
 function fmi2GetFMUstate(fmu2::FMU2)
     state = fmi2FMUstate()
-    display(state)
-    fmi2GetFMUstate(fmu2.components[end], state)
-    display(state)
+    stateRef = Ref(state)
+    fmi2GetFMUstate(fmu2.components[end], stateRef)
+    state = stateRef[]
     state
 end
 
@@ -1054,8 +1035,10 @@ Free the allocated memory for the FMU state
 
 For more information call ?fmi2FreeFMUstate
 """
-function fmi2FreeFMUstate(fmu2::FMU2)
-    fmi2FreeFMUstate(fmu2.components[end], fmu2.fmi2FMUstate)
+function fmi2FreeFMUstate(fmu2::FMU2, state::fmi2FMUstate)
+    stateRef = Ref(state)
+    fmi2FreeFMUstate(fmu2.components[end], stateRef)
+    state = stateRef[]
 end
 
 """
@@ -1063,8 +1046,11 @@ Returns the size of a byte vector the FMU can be stored in
 
 For more information call ?fmi2SerzializedFMUstateSize
 """
-function fmi2SerializedFMUstateSize(fmu2::FMU2, size::Int64)
-    fmi2SerializedFMUstateSize(fmu2.components[end], fmu2.fmi2FMUstate, Csize_t(size))
+function fmi2SerializedFMUstateSize(fmu2::FMU2, state::fmi2FMUstate)
+    size = 0
+    sizeRef = Ref(Csize_t(size))
+    fmi2SerializedFMUstateSize(fmu2.components[end], state, sizeRef)
+    size = sizeRef[]
 end
 
 """
@@ -1072,8 +1058,11 @@ Serialize the data in the FMU state pointer
 
 For more information call ?fmi2SerzializeFMUstate
 """
-function fmi2SerializeFMUstate(fmu2::FMU2, serializedState::fmi2Byte, size::Int64)
-    fmi2SerializeFMUstate(fmu2.components[end], fmu2.fmi2FMUstate, serializedState, Csize_t(size))
+function fmi2SerializeFMUstate(fmu2::FMU2, state::fmi2FMUstate)
+    size = fmi2SerializedFMUstateSize(fmu2, state)
+    serializedState = Array{fmi2Byte}(undef, size)
+    fmi2SerializeFMUstate(fmu2.components[end], state, serializedState, size)
+    serializedState
 end
 
 """
@@ -1081,8 +1070,12 @@ Deserialize the data in the serializedState fmi2Byte field
 
 For more information call ?fmi2DeSerzializeFMUstate
 """
-function fmi2DeSerializeFMUstate(fmu2::FMU2, serializedState::fmi2Byte, size::Int64)
-    fmi2DeSerializeFMUstate(fmu2.components[end], serializedState, Csize_t(size), fmu2.fmi2FMUstate)
+function fmi2DeSerializeFMUstate(fmu2::FMU2, serializedState::Array{fmi2Byte})
+    size = length(serializedState)
+    state = fmi2FMUstate()
+    stateRef = Ref(state)
+    fmi2DeSerializeFMUstate(fmu2.components[end], serializedState, Csize_t(size), stateRef)
+    state = stateRef[]
 end
 
 """
