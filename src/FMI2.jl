@@ -1034,9 +1034,9 @@ For more information call ?fmi2GetFMUstate
 """
 function fmi2GetFMUstate(fmu2::FMU2)
     state = fmi2FMUstate()
-    display(state)
-    fmi2GetFMUstate(fmu2.components[end], state)
-    display(state)
+    stateRef = Ref(state)
+    fmi2GetFMUstate(fmu2.components[end], stateRef)
+    state = stateRef[]
     state
 end
 
@@ -1054,8 +1054,10 @@ Free the allocated memory for the FMU state
 
 For more information call ?fmi2FreeFMUstate
 """
-function fmi2FreeFMUstate(fmu2::FMU2)
-    fmi2FreeFMUstate(fmu2.components[end], fmu2.fmi2FMUstate)
+function fmi2FreeFMUstate(fmu2::FMU2, state::fmi2FMUstate)
+    stateRef = Ref(state)
+    fmi2FreeFMUstate(fmu2.components[end], stateRef)
+    state = stateRef[]
 end
 
 """
@@ -1063,8 +1065,11 @@ Returns the size of a byte vector the FMU can be stored in
 
 For more information call ?fmi2SerzializedFMUstateSize
 """
-function fmi2SerializedFMUstateSize(fmu2::FMU2, size::Int64)
-    fmi2SerializedFMUstateSize(fmu2.components[end], fmu2.fmi2FMUstate, Csize_t(size))
+function fmi2SerializedFMUstateSize(fmu2::FMU2, state::fmi2FMUstate)
+    size = 0
+    sizeRef = Ref(Csize_t(size))
+    fmi2SerializedFMUstateSize(fmu2.components[end], state, sizeRef)
+    size = sizeRef[]
 end
 
 """
@@ -1072,8 +1077,11 @@ Serialize the data in the FMU state pointer
 
 For more information call ?fmi2SerzializeFMUstate
 """
-function fmi2SerializeFMUstate(fmu2::FMU2, serializedState::fmi2Byte, size::Int64)
-    fmi2SerializeFMUstate(fmu2.components[end], fmu2.fmi2FMUstate, serializedState, Csize_t(size))
+function fmi2SerializeFMUstate(fmu2::FMU2, state::fmi2FMUstate)
+    size = fmi2SerializedFMUstateSize(fmu2, state)
+    serializedState = Array{fmi2Byte}(undef, size)
+    fmi2SerializeFMUstate(fmu2.components[end], state, serializedState, size)
+    serializedState
 end
 
 """
@@ -1081,8 +1089,12 @@ Deserialize the data in the serializedState fmi2Byte field
 
 For more information call ?fmi2DeSerzializeFMUstate
 """
-function fmi2DeSerializeFMUstate(fmu2::FMU2, serializedState::fmi2Byte, size::Int64)
-    fmi2DeSerializeFMUstate(fmu2.components[end], serializedState, Csize_t(size), fmu2.fmi2FMUstate)
+function fmi2DeSerializeFMUstate(fmu2::FMU2, serializedState::Array{fmi2Byte})
+    size = length(serializedState)
+    state = fmi2FMUstate()
+    stateRef = Ref(state)
+    fmi2DeSerializeFMUstate(fmu2.components[end], serializedState, Csize_t(size), stateRef)
+    state = stateRef[]
 end
 
 """
