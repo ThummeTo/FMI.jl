@@ -1,3 +1,4 @@
+
 # FMI.jl Documentation
 
 ```@contents
@@ -34,7 +35,7 @@ See [FMIFlux.jl](https://github.com/ThummeTo/FMIFlux.jl).
 
 
 
-## Index
+# FMI.jl Index
 
 ```@index
 ```
