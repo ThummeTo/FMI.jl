@@ -111,6 +111,7 @@ Get the values of an array of fmi2Real variables by variable name
 For more information call ?fmi2GetReal
 """
 function fmi2GetReal!(c::fmi2Component, vr_string::Array{String}, values::Array{<:Real})
+    vars = zeros(fmi2Real, length(values))
     vr = fmi2String2ValueReference(c.fmu, vr_string)
     fmi2GetReal!(c, vr, values)
 end
@@ -325,6 +326,7 @@ For more information call ?fmi2GetBoolean
 """
 function fmi2GetBoolean!(c::fmi2Component, vr::Array{fmi2ValueReference}, values::Array{Bool})
     vars = Array{fmi2Boolean}(undef, length(values))
+
     if length(values) != length(vr)
         display("[ERROR]: Number of value references and in place array doesn't match")
     else
@@ -392,6 +394,7 @@ For more information call ?fmi2GetString
 function fmi2GetString(c::fmi2Component, vr::Array{fmi2ValueReference})
     nvr = Csize_t(length(vr))
     value = Vector{Ptr{Cchar}}(undef, nvr)
+
     fmi2GetString!(c, vr, nvr, value)
     unsafe_string.(value)
 end
@@ -720,7 +723,9 @@ function fmi2Simulate(c::fmi2Component, dt::Real, t_start::Real = 0.0, t_stop::R
         error(unknownFMUType)
     end
 end
-
+"""
+Starts a simulation of the CoSimulation FMU instance
+"""
 function fmi2SimulateCS(c::fmi2Component, dt::Real, t_start::Real, t_stop::Real, recordValues::Array{fmi2ValueReference} = [])
 
     fmi2SetupExperiment(c, t_start, t_stop)
@@ -759,7 +764,9 @@ function fmi2SimulateCS(c::fmi2Component, dt::Real, t_start::Real, t_stop::Real,
 
     sd
 end
-
+"""
+Starts a simulation of the CoSimulation FMU instance
+"""
 function fmi2SimulateCS(c::fmi2Component, dt::Real, t_start::Real, t_stop::Real, recordValues::Array{String})
     vr = fmi2String2ValueReference(c.fmu, recordValues)
     fmi2SimulateCS(c, dt, t_start, t_stop, vr)

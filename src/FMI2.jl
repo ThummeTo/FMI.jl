@@ -353,6 +353,9 @@ function fmi2Simulate(fmu2::FMU2, dt::Real, t_start::Real = 0.0, t_stop::Real = 
     end
 end
 
+"""
+Starts a simulation of the CoSimulation FMU instance
+"""
 function fmi2SimulateCS(fmu2::FMU2, dt::Real, t_start::Real, t_stop::Real, recordValues::Array{fmi2ValueReference} = [], setup=true)
 
     if setup
@@ -394,6 +397,9 @@ function fmi2SimulateCS(fmu2::FMU2, dt::Real, t_start::Real, t_stop::Real, recor
     sd
 end
 
+"""
+Starts a simulation of the CoSimulation FMU instance
+"""
 function fmi2SimulateCS(fmu2::FMU2, dt::Real, t_start::Real, t_stop::Real, recordValues::Array{String}, setup=true)
     vr = fmi2String2ValueReference(fmu2, recordValues)
     fmi2SimulateCS(fmu2, dt, t_start, t_stop, vr, setup)
@@ -564,7 +570,6 @@ function fmi2GetReal(fmu2::FMU2, vr::Array{fmi2ValueReference})
     fmi2GetReal!(fmu2.components[end], vr, nvr, values)
     values
 end
-
 """
 Get the value of a fmi2Real variable
 

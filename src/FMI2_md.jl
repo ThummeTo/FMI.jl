@@ -7,7 +7,9 @@ using EzXML
 
 include("FMI2_c.jl")
 
-"""Extract the FMU variables and meta data from the ModelDescription"""
+"""
+Extract the FMU variables and meta data from the ModelDescription
+"""
 function fmi2readModelDescription(pathToModellDescription::String)
     md = fmi2ModelDescription()
     md.stringValueReferences = Dict{String, fmi2ValueReference}()
@@ -59,7 +61,9 @@ function fmi2readModelDescription(pathToModellDescription::String)
     md.modelVariables = setScalarVariables(modelvariables, md, derivatives)
     md
 end
-"""returns the indices of the state derivatives"""
+"""
+returns the indices of the state derivatives
+"""
 function getDerivativesIndex(node::EzXML.Node)
     indexes = Array{Int}(undef,0)
     for element in eachelement(node)
@@ -72,7 +76,9 @@ function getDerivativesIndex(node::EzXML.Node)
     sort!(indexes, rev=true)
 end
 
-"""read the model variables of the FMU and parse them"""
+"""
+read the model variables of the FMU and parse them
+"""
 function setScalarVariables(nodes::EzXML.Node, md::fmi2ModelDescription, derivatives::Array{Int})
     lastValueReference = fmi2ValueReference(0)
     derivative = nothing
@@ -129,7 +135,9 @@ function setScalarVariables(nodes::EzXML.Node, md::fmi2ModelDescription, derivat
     scalarVariables
 end
 
-"""parse a fmi2Boolean value represented by a string"""
+"""
+parse a fmi2Boolean value represented by a string
+"""
 function parseFMI2Boolean(s::String)
     if s == "true"
         return fmi2True
@@ -141,7 +149,9 @@ function parseFMI2Boolean(s::String)
     nothing
 end
 
-"""set the datatype and attributes of an model variable"""
+"""
+set the datatype and attributes of an model variable
+"""
 function setDatatypeVariables(node::EzXML.Node, md::fmi2ModelDescription)
     type = datatypeVariable()
     typenode = node.firstelement
