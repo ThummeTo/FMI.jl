@@ -10,19 +10,18 @@ FMI.jl is a free-to-use software library for the Julia programming language, whi
 ## How can I use FMI.jl?
 1. open a Julia-Command-Window, activate your prefered environment
 1. goto package manager using ```]```
-1. type ```add "https://github.com/ThummeTo/FMI.jl"```
+1. type ```add FMI``` or ```add "https://github.com/ThummeTo/FMI.jl"```
 
 ## What is currently supported in FMI.jl?
 - simulation / plotting of CS- and ME-FMUs
 - event-handling for discontinuous ME-FMUs
-- the full FMI command set (except ```getFMUState``` and ```setFMUState```)
+- the full FMI command set
 - ...
 
 ## What is under development in FMI.jl?
-- Linux support
+- Linux / MacOS support
 - documentation
 - more examples
-- support for ```getFMUState``` and ```setFMUState```
 - FMI 3.0 and SSP 1.0 support
 - ...
 
