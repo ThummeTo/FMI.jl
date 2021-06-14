@@ -4,6 +4,7 @@
 #
 
 using Libdl
+#using Base.Libc
 using ZipFile
 
 include("FMI2_md.jl")
@@ -458,14 +459,18 @@ Returns the instance of the fmu2
 For more information call ?fmi2Instantiate
 """
 function fmi2Instantiate!(fmu2::FMU2; visible::Bool = false, loggingOn::Bool = false)
-    fmu2.callbackFunctions = ccall(fmu2.cAllocateFmi2CallbackFunctions,
-                    Ptr{Cvoid},
-                    ())
+
+    ptrLogger = @cfunction(cbLogger, Cvoid, (Ptr{Cvoid}, Ptr{Cchar}, Cuint, Ptr{Cchar}, Ptr{Cchar}))
+    ptrAllocateMemory = @cfunction(cbAllocateMemory, Ptr{Cvoid}, (Csize_t, Csize_t))
+    ptrFreeMemory = @cfunction(cbFreeMemory, Cvoid, (Ptr{Cvoid},))
+    ptrStepFinished = C_NULL
+    fmu2.callbackFunctions = fmi2CallbackFunctions(ptrLogger, ptrAllocateMemory, ptrFreeMemory, ptrStepFinished, C_NULL)
 
     compAddr = fmi2Instantiate(fmu2.cInstantiate, fmu2.instanceName, fmu2.fmuType, fmu2.fmuGUID, fmu2.fmuResourceLocation, fmu2.callbackFunctions, fmi2Boolean(visible), fmi2Boolean(loggingOn))
 
     component = fmi2Component(compAddr, fmu2)
     push!(fmu2.components, component)
+
     component
 end
 
@@ -475,9 +480,6 @@ Free the allocated memory used for the looger and fmu2 instance and destroy the 
 For more information call ?fmi2FreeInstance
 """
 function fmi2FreeInstance!(fmu2::FMU2)
-    ccall(fmu2.cFreeFmi2CallbackFunctions, Cvoid, (Ptr{Cvoid},), fmu2.callbackFunctions)
-    fmu2.callbackFunctions = C_NULL
-
     for component in fmu2.components
         fmi2FreeInstance(component)
     end

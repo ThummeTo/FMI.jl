@@ -19,8 +19,47 @@ const fmi2Byte = Char
 const fmi2ValueReference = Cint
 const fmi2FMUstate = Ptr{Cvoid}
 const fmi2ComponentEnvironment = Ptr{Cvoid}
-const fmi2CallbackFunctions = Ptr{Cvoid}
+#const fmi2CallbackFunctions = Ptr{Cvoid}
 const fmi2Enum = Array{Array{String}}
+
+mutable struct fmi2CallbackFunctions
+    logger::Ptr{Cvoid}
+    allocateMemory::Ptr{Cvoid}
+    freeMemory::Ptr{Cvoid}
+    stepFinished::Ptr{Cvoid}
+    componentEnvironment::Ptr{Cvoid}
+end
+
+function cbLogger(componentEnvironment::Ptr{Cvoid},
+            instanceName::Ptr{Cchar},
+            status::Cuint,
+            category::Ptr{Cchar},
+            message::Ptr{Cchar})
+    _message = unsafe_string(message)
+    _category = unsafe_string(category)
+    _status = fmi2StatusString(status)
+    _instanceName = unsafe_string(instanceName)
+    display("[$_status][$_category][$_instanceName]: $_message")
+
+    nothing
+end
+
+function cbAllocateMemory(nobj::Csize_t, size::Csize_t)
+    ptr = Libc.calloc(nobj, size)
+    #display("$ptr: Allocated $nobj x $size bytes.")
+	ptr
+end
+
+function cbFreeMemory(obj::Ptr{Cvoid})
+    #display("$obj: Freed.")
+	Libc.free(obj)
+    nothing
+end
+
+function cbStepFinished(componentEnvironment::Ptr{Cvoid}, status::Csize_t)
+    #display("Step finished.")
+    nothing
+end
 
 """
 Source: FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
@@ -350,7 +389,7 @@ function fmi2Instantiate(cfunc::Ptr{Nothing},
                           (Cstring, Cint, Cstring, Cstring,
                           Ptr{Cvoid}, Cint, Cint),
                           instanceName, fmuType, fmuGUID, fmuResourceLocation,
-                          functions, visible, loggingOn)
+                          Ref(functions), visible, loggingOn) # Ref(functions)
 
     compAddr
 end
@@ -423,6 +462,9 @@ function fmi2SetupExperiment(c::fmi2Component,
     startTime::fmi2Real,
     stopTimeDefined::fmi2Boolean,
     stopTime::fmi2Real)
+
+    display("CBFun:")
+    display(Ref(c.fmu.callbackFunctions))
 
     status = ccall(c.fmu.cSetupExperiment,
                 Cuint,
