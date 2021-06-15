@@ -197,7 +197,7 @@ function setDatatypeVariables(node::EzXML.Node, md::fmi2ModelDescription)
                 end
             end
         else
-            display("[WARNING]: setDatatypeVariables(...) unimplemented start value type $typename")
+            @warn "setDatatypeVariables(...) unimplemented start value type $typename"
             type.start = typenode["start"]
         end
     end
