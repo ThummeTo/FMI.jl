@@ -230,16 +230,37 @@ function fmi2Load(pathTofmu2::String)
     pathToBinary = ""
 
     if Sys.iswindows()
-        directoryBinary = joinpath(fmu_2.fmu2Path, "binaries/win64")
-        pathToBinary = joinpath(directoryBinary, "$fmuName.dll")
+        directories = ["binaries/win64", "binaries/x86_64-windows"]
+        for directory in directories
+            directoryBinary = joinpath(fmu_2.fmu2Path, directory)
+            if isdir(directoryBinary)
+                pathToBinary = joinpath(directoryBinary, "$fmuName.dll")
+                break
+            end
+        end
+        @assert isfile(pathToBinary) "Target platform is Windows, but can't valid find FMU binary."
     elseif Sys.islinux()
-        directoryBinary = joinpath(fmu_2.fmu2Path, "binaries/linux64")
-        pathToBinary = joinpath(directoryBinary, "$fmuName.so")
+        directories = ["binaries/linux64", "binaries/x86_64-linux"]
+        for directory in directories
+            directoryBinary = joinpath(fmu_2.fmu2Path, directory)
+            if isdir(directoryBinary)
+                pathToBinary = joinpath(directoryBinary, "$fmuName.so")
+                break
+            end
+        end
+        @assert isfile(pathToBinary) "Target platform is Linux, but can't find valid FMU binary."
     elseif Sys.isapple()
-        directoryBinary = joinpath(fmu_2.fmu2Path, "binaries/darwin64")
-        pathToBinary = joinpath(directoryBinary, "$fmuName.dylib")
+        directories = ["binaries/darwin64", "binaries/x86_64-darwin"]
+        for directory in directories
+            directoryBinary = joinpath(fmu_2.fmu2Path, directory)
+            if isdir(directoryBinary)
+                pathToBinary = joinpath(directoryBinary, "$fmuName.dylib")
+                break
+            end
+        end
+        @assert isfile(pathToBinary) "Target platform is macOS, but can't find valid FMU binary."
     else
-        @assert false "Unknown system."
+        @assert false "Unknown target platform."
     end
 
     # parse modelDescription.xml
