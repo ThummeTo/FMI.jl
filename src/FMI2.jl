@@ -209,7 +209,7 @@ end
 
 """
 sets the properties of the fmu by reading the modelDescription.xml
-retrieve all the pointers of DLL functions for later @userplot
+retrieve all the pointers of binary functions for later @userplot
 
 returns the instance of the fmu struct
 """
@@ -221,12 +221,26 @@ function fmi2Load(pathTofmu2::String)
     # set paths for fmu handling
     (fmu_2.fmu2Path, fmu_2.zipPath) = fmi2Unzip(pathTofmu2)
 
-    # set paths for modelExchangeScripting and Dll
+    # set paths for modelExchangeScripting and binary
     tmpName = splitpath(fmu_2.fmu2Path)
     fmuName = tmpName[length(tmpName)]
     pathToModelDescription = joinpath(fmu_2.fmu2Path, "modelDescription.xml")
-    directoryDLL = joinpath(fmu_2.fmu2Path, "binaries/win64")
-    pathToDLL = joinpath(directoryDLL, "$fmuName.dll")
+
+    directoryBinary = ""
+    pathToBinary = ""
+
+    if Sys.iswindows()
+        directoryBinary = joinpath(fmu_2.fmu2Path, "binaries/win64")
+        pathToBinary = joinpath(directoryBinary, "$fmuName.dll")
+    elseif Sys.islinux()
+        directoryBinary = joinpath(fmu_2.fmu2Path, "binaries/linux64")
+        pathToBinary = joinpath(directoryBinary, "$fmuName.so")
+    elseif Sys.isapple()
+        directoryBinary = joinpath(fmu_2.fmu2Path, "binaries/darwin64")
+        pathToBinary = joinpath(directoryBinary, "$fmuName.dylib")
+    else
+        @assert false "Unknown system."
+    end
 
     # parse modelDescription.xml
     fmu_2.modelDescription = fmi2readModelDescription(pathToModelDescription)
@@ -234,10 +248,10 @@ function fmi2Load(pathTofmu2::String)
     fmu_2.instanceName = fmu_2.modelDescription.modelName
 
     lastDirectory = pwd()
-    cd(directoryDLL)
+    cd(directoryBinary)
 
-    # set FMU DLL handler
-    fmu_2.libHandle = dlopen(pathToDLL)
+    # set FMU binary handler
+    fmu_2.libHandle = dlopen(pathToBinary)
 
     cd(lastDirectory)
 
@@ -382,7 +396,7 @@ end
 """
 Unload a fmu under the FMI-Standard 2.0.2
 
-Free the allocated memory, close the DLLs and remove temporary zip and unziped fmu fmi2ModelDescription
+Free the allocated memory, close the binaries and remove temporary zip and unziped fmu fmi2ModelDescription
 """
 function fmi2Unload(fmu2::FMU2, cleanUp::Bool = true)
     fmi2FreeInstance!(fmu2)
