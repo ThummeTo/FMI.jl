@@ -9,6 +9,7 @@ pathToFMU = joinpath(dirname(@__FILE__), "../model/SpringPendulum1D.fmu")
 
 myFMU = fmiLoad(pathToFMU)
 
+#create an instance and simulate it
 comp1 = fmiInstantiate!(myFMU; loggingOn=true)
 fmiSetupExperiment(comp1, 0.0)
 fmiEnterInitializationMode(comp1)
@@ -21,6 +22,7 @@ t_stop = 8.0
 data1 = fmiSimulateCS(comp1, dt, t_start, t_stop, ["mass.s"])
 fmiPlot(data1)
 
+#create another instance, change the spring stiffness and simulate it
 comp2 = fmiInstantiate!(myFMU; loggingOn=true)
 fmiSetupExperiment(comp2, 0.0)
 fmiEnterInitializationMode(comp2)
