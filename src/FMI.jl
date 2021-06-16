@@ -28,7 +28,7 @@ export fmiEnterContinuousTimeMode, fmiCompletedIntegratorStep, fmiGetDerivatives
 
 # FMI2.jl
 export FMU2, fmi2True, fmi2False
-export fmi2SimulationResultGetValuesAtIndex, fmi2SimulationResultGetTime, fmi2SimulationResultGetValues
+export fmi2SimulationResult, fmi2SimulationResultGetValuesAtIndex, fmi2SimulationResultGetTime, fmi2SimulationResultGetValues
 export fmi2String2ValueReference, fmi2ValueReference2String
 export fmi2Unzip, fmi2Load, fmi2Unload
 export fmi2Simulate, fmi2SimulateCS, fmi2SimulateME

@@ -19,18 +19,15 @@ mutable struct FMU2
     instanceName::fmi2String
     fmuResourceLocation::fmi2String
     fmuGUID::fmi2String
-    # fmi2FMUstate::fmi2FMUstate
-    # eventInfo::fmi2EventInfo  currently not supported
 
     modelDescription::fmi2ModelDescription
 
-    # Other stuff
     fmuType::fmi2Type
     callbackFunctions::fmi2CallbackFunctions
     components::Array{fmi2Component}
 
-    t::Real # current time
-    next_t::Real
+    t::Real         # current time
+    next_t::Real    # next time
 
     # paths of ziped and unziped FMU folders
     fmu2Path::fmi2String
@@ -86,14 +83,10 @@ mutable struct FMU2
     cGetEventIndicators::Ptr{Cvoid}
     cGetNominalsOfContinuousStates::Ptr{Cvoid}
 
-    # c-function pointers (helpers)
+    # c-libraries
     libHandle::Ptr{Nothing}
-    cbLibHandle::Ptr{Nothing}
-    libLoggerHandle::Ptr{Nothing}
-    cAllocateFmi2CallbackFunctions::Ptr{Cvoid}
-    cFreeFmi2CallbackFunctions::Ptr{Cvoid}
 
-    # sensitivity logging for backward pass
+    # sensitivity logging for backward pass (under development)
     sensitivities
 
     # Constructor
@@ -216,7 +209,7 @@ end
 
 """
 sets the properties of the fmu by reading the modelDescription.xml
-retrieve all the pointers of DLL functions for later @userplot
+retrieve all the pointers of binary functions for later @userplot
 
 returns the instance of the fmu struct
 """
@@ -228,12 +221,47 @@ function fmi2Load(pathTofmu2::String)
     # set paths for fmu handling
     (fmu_2.fmu2Path, fmu_2.zipPath) = fmi2Unzip(pathTofmu2)
 
-    # set paths for modelExchangeScripting and Dll
+    # set paths for modelExchangeScripting and binary
     tmpName = splitpath(fmu_2.fmu2Path)
     fmuName = tmpName[length(tmpName)]
     pathToModelDescription = joinpath(fmu_2.fmu2Path, "modelDescription.xml")
-    directoryDLL = joinpath(fmu_2.fmu2Path, "binaries/win64")
-    pathToDLL = joinpath(directoryDLL, "$fmuName.dll")
+
+    directoryBinary = ""
+    pathToBinary = ""
+
+    if Sys.iswindows()
+        directories = ["binaries/win64", "binaries/x86_64-windows"]
+        for directory in directories
+            directoryBinary = joinpath(fmu_2.fmu2Path, directory)
+            if isdir(directoryBinary)
+                pathToBinary = joinpath(directoryBinary, "$fmuName.dll")
+                break
+            end
+        end
+        @assert isfile(pathToBinary) "Target platform is Windows, but can't valid find FMU binary."
+    elseif Sys.islinux()
+        directories = ["binaries/linux64", "binaries/x86_64-linux"]
+        for directory in directories
+            directoryBinary = joinpath(fmu_2.fmu2Path, directory)
+            if isdir(directoryBinary)
+                pathToBinary = joinpath(directoryBinary, "$fmuName.so")
+                break
+            end
+        end
+        @assert isfile(pathToBinary) "Target platform is Linux, but can't find valid FMU binary."
+    elseif Sys.isapple()
+        directories = ["binaries/darwin64", "binaries/x86_64-darwin"]
+        for directory in directories
+            directoryBinary = joinpath(fmu_2.fmu2Path, directory)
+            if isdir(directoryBinary)
+                pathToBinary = joinpath(directoryBinary, "$fmuName.dylib")
+                break
+            end
+        end
+        @assert isfile(pathToBinary) "Target platform is macOS, but can't find valid FMU binary."
+    else
+        @assert false "Unknown target platform."
+    end
 
     # parse modelDescription.xml
     fmu_2.modelDescription = fmi2readModelDescription(pathToModelDescription)
@@ -241,24 +269,10 @@ function fmi2Load(pathTofmu2::String)
     fmu_2.instanceName = fmu_2.modelDescription.modelName
 
     lastDirectory = pwd()
-    cd(directoryDLL)
+    cd(directoryBinary)
 
-    # set FMU DLL handler
-    fmu_2.libHandle = dlopen(pathToDLL)
-
-    cd(dirname(@__FILE__))
-
-    cbLibPath = joinpath(dirname(@__FILE__),"callbackFunctions/binaries/win64/callbackFunctions.dll")
-
-    # check permission to execute the DLL
-    perm = filemode(cbLibPath)
-    permRWX = 16895
-    if perm != permRWX
-        chmod(cbLibPath, permRWX; recursive=true)
-    end
-
-    # set helper function
-    fmu_2.cbLibHandle = dlopen(cbLibPath)
+    # set FMU binary handler
+    fmu_2.libHandle = dlopen(pathToBinary)
 
     cd(lastDirectory)
 
@@ -267,7 +281,7 @@ function fmi2Load(pathTofmu2::String)
 
     if fmu_2.modelDescription.isCoSimulation == fmi2True &&
         fmu_2.modelDescription.isModelExchange == fmi2True
-        display("[INFO]: fmi2Load: FMU supports both CS and ME, using CS as default if nothing specified.")
+        @info "fmi2Load: FMU supports both CS and ME, using CS as default if nothing specified."
     end
 
     if fmu_2.modelDescription.isCoSimulation == fmi2True
@@ -281,8 +295,7 @@ function fmi2Load(pathTofmu2::String)
     tmpResourceLocation = string("file:/", fmu_2.fmu2Path)
     tmpResourceLocation = joinpath(tmpResourceLocation, "resources")
     fmu_2.fmuResourceLocation = replace(tmpResourceLocation, "\\" => "/")
-    display("[INFO]: FMU ressource location: $(fmu_2.fmuResourceLocation)")
-    # fmu_2.eventInfo = EventInfo()
+    @info "FMU ressource location: $(fmu_2.fmuResourceLocation)"
 
     # retrieve functions
     fmu_2.cInstantiate                  = dlsym(fmu_2.libHandle, :fmi2Instantiate)
@@ -331,10 +344,6 @@ function fmi2Load(pathTofmu2::String)
     fmu_2.cNewDiscreteStates            = dlsym(fmu_2.libHandle, :fmi2NewDiscreteStates)
     fmu_2.cGetEventIndicators           = dlsym(fmu_2.libHandle, :fmi2GetEventIndicators)
     fmu_2.cGetNominalsOfContinuousStates= dlsym(fmu_2.libHandle, :fmi2GetNominalsOfContinuousStates)
-
-    # custom callback function calls
-    fmu_2.cAllocateFmi2CallbackFunctions = dlsym(fmu_2.cbLibHandle, :allocateFmi2CallbackFunctions)
-    fmu_2.cFreeFmi2CallbackFunctions = dlsym(fmu_2.cbLibHandle, :freeFmi2CallbackFunctions)
 
     fmu_2
 end
@@ -408,13 +417,12 @@ end
 """
 Unload a fmu under the FMI-Standard 2.0.2
 
-Free the allocated memory, close the DLLs and remove temporary zip and unziped fmu fmi2ModelDescription
+Free the allocated memory, close the binaries and remove temporary zip and unziped fmu fmi2ModelDescription
 """
 function fmi2Unload(fmu2::FMU2, cleanUp::Bool = true)
     fmi2FreeInstance!(fmu2)
 
     dlclose(fmu2.libHandle)
-    dlclose(fmu2.cbLibHandle)
 
     if cleanUp
         try
@@ -458,14 +466,18 @@ Returns the instance of the fmu2
 For more information call ?fmi2Instantiate
 """
 function fmi2Instantiate!(fmu2::FMU2; visible::Bool = false, loggingOn::Bool = false)
-    fmu2.callbackFunctions = ccall(fmu2.cAllocateFmi2CallbackFunctions,
-                    Ptr{Cvoid},
-                    ())
+
+    ptrLogger = @cfunction(cbLogger, Cvoid, (Ptr{Cvoid}, Ptr{Cchar}, Cuint, Ptr{Cchar}, Ptr{Cchar}))
+    ptrAllocateMemory = @cfunction(cbAllocateMemory, Ptr{Cvoid}, (Csize_t, Csize_t))
+    ptrFreeMemory = @cfunction(cbFreeMemory, Cvoid, (Ptr{Cvoid},))
+    ptrStepFinished = C_NULL
+    fmu2.callbackFunctions = fmi2CallbackFunctions(ptrLogger, ptrAllocateMemory, ptrFreeMemory, ptrStepFinished, C_NULL)
 
     compAddr = fmi2Instantiate(fmu2.cInstantiate, fmu2.instanceName, fmu2.fmuType, fmu2.fmuGUID, fmu2.fmuResourceLocation, fmu2.callbackFunctions, fmi2Boolean(visible), fmi2Boolean(loggingOn))
 
     component = fmi2Component(compAddr, fmu2)
     push!(fmu2.components, component)
+
     component
 end
 
@@ -475,9 +487,6 @@ Free the allocated memory used for the looger and fmu2 instance and destroy the 
 For more information call ?fmi2FreeInstance
 """
 function fmi2FreeInstance!(fmu2::FMU2)
-    ccall(fmu2.cFreeFmi2CallbackFunctions, Cvoid, (Ptr{Cvoid},), fmu2.callbackFunctions)
-    fmu2.callbackFunctions = C_NULL
-
     for component in fmu2.components
         fmi2FreeInstance(component)
     end

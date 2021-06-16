@@ -6,7 +6,7 @@ Pages = ["index.md", "library.md", "fmu2.md", "parameterize.md", "simulateCS.md"
 ```
 
 ## What is FMI.jl?
-FMI.jl is a free-to-use software library for the Julia programming language, which integrates FMI: load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
+FMI.jl is a free-to-use software library for the Julia programming language, which integrates FMI ([fmi-standard.org](http://fmi-standard.org/)): load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
 
 ## How can I use FMI.jl?
 1. open a Julia-Command-Window, activate your prefered environment
