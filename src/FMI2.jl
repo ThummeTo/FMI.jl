@@ -141,7 +141,7 @@ function fmi2String2ValueReference(fmu2::FMU2, name::String)
     if haskey(fmu2.modelDescription.stringValueReferences, name)
         reference = fmu2.modelDescription.stringValueReferences[name]
     else
-        display("[WARNING]: no variable with this name found")
+        @warn "no variable with this name found"
     end
     reference
 end
@@ -154,7 +154,7 @@ function fmi2String2ValueReference(fmu2::FMU2, names::Array{String})
     for string in names
         reference = fmi2String2ValueReference(fmu2, string)
         if reference == nothing
-            display("[ERROR]: valueReference not found")
+            @error "valueReference not found"
         else
             push!(vr, reference)
         end
@@ -205,6 +205,18 @@ function fmi2Unzip(pathTofmu::String)
     @assert isdir(unzipedfmuPath) ["Error:FMU not loaded"]
 
     (unzipedfmuPath, zipPath)
+end
+
+"""
+Checks with dlsym for available function in library.
+Prints an info text and returns C_NULL if not (soft-check).
+"""
+function dlsym_opt(libHandle, symbol)
+    addr = dlsym(libHandle, symbol; throw_error=false)
+    if addr == C_NULL
+        @info "This FMU does not support optional function '$symbol'."
+    end
+    addr
 end
 
 """
@@ -314,36 +326,43 @@ function fmi2Load(pathTofmu2::String)
     fmu_2.cSetInteger                   = dlsym(fmu_2.libHandle, :fmi2SetInteger)
     fmu_2.cGetBoolean                   = dlsym(fmu_2.libHandle, :fmi2GetBoolean)
     fmu_2.cSetBoolean                   = dlsym(fmu_2.libHandle, :fmi2SetBoolean)
-    fmu_2.cGetString                    = dlsym(fmu_2.libHandle, :fmi2GetString)
-    fmu_2.cSetString                    = dlsym(fmu_2.libHandle, :fmi2SetString)
-    fmu_2.cGetFMUstate                  = dlsym(fmu_2.libHandle, :fmi2GetFMUstate)
-    fmu_2.cSetFMUstate                  = dlsym(fmu_2.libHandle, :fmi2SetFMUstate)
-    fmu_2.cFreeFMUstate                 = dlsym(fmu_2.libHandle, :fmi2FreeFMUstate)
-    fmu_2.cSerializedFMUstateSize       = dlsym(fmu_2.libHandle, :fmi2SerializedFMUstateSize)
-    fmu_2.cSerializeFMUstate            = dlsym(fmu_2.libHandle, :fmi2SerializeFMUstate)
-    fmu_2.cDeSerializeFMUstate          = dlsym(fmu_2.libHandle, :fmi2DeSerializeFMUstate)
-    fmu_2.cGetDirectionalDerivative     = dlsym(fmu_2.libHandle, :fmi2GetDirectionalDerivative)
-    fmu_2.cSetRealInputDerivatives      = dlsym(fmu_2.libHandle, :fmi2SetRealInputDerivatives)
-    fmu_2.cGetRealOutputDerivatives     = dlsym(fmu_2.libHandle, :fmi2GetRealOutputDerivatives)
-    fmu_2.cDoStep                       = dlsym(fmu_2.libHandle, :fmi2DoStep)
-    fmu_2.cCancelStep                   = dlsym(fmu_2.libHandle, :fmi2CancelStep)
-    fmu_2.cGetStatus                    = dlsym(fmu_2.libHandle, :fmi2GetStatus)
-    fmu_2.cGetRealStatus                = dlsym(fmu_2.libHandle, :fmi2GetRealStatus)
-    fmu_2.cGetIntegerStatus             = dlsym(fmu_2.libHandle, :fmi2GetIntegerStatus)
-    fmu_2.cGetBooleanStatus             = dlsym(fmu_2.libHandle, :fmi2GetBooleanStatus)
-    fmu_2.cGetStringStatus              = dlsym(fmu_2.libHandle, :fmi2GetStringStatus)
 
-    # Model Exchange function calls
-    fmu_2.cEnterContinuousTimeMode      = dlsym(fmu_2.libHandle, :fmi2EnterContinuousTimeMode)
-    fmu_2.cGetContinuousStates          = dlsym(fmu_2.libHandle, :fmi2GetContinuousStates)
-    fmu_2.cGetDerivatives               = dlsym(fmu_2.libHandle, :fmi2GetDerivatives)
-    fmu_2.cSetTime                      = dlsym(fmu_2.libHandle, :fmi2SetTime)
-    fmu_2.cSetContinuousStates          = dlsym(fmu_2.libHandle, :fmi2SetContinuousStates)
-    fmu_2.cCompletedIntegratorStep      = dlsym(fmu_2.libHandle, :fmi2CompletedIntegratorStep)
-    fmu_2.cEnterEventMode               = dlsym(fmu_2.libHandle, :fmi2EnterEventMode)
-    fmu_2.cNewDiscreteStates            = dlsym(fmu_2.libHandle, :fmi2NewDiscreteStates)
-    fmu_2.cGetEventIndicators           = dlsym(fmu_2.libHandle, :fmi2GetEventIndicators)
-    fmu_2.cGetNominalsOfContinuousStates= dlsym(fmu_2.libHandle, :fmi2GetNominalsOfContinuousStates)
+    fmu_2.cGetString                    = dlsym_opt(fmu_2.libHandle, :fmi2GetString)
+    fmu_2.cSetString                    = dlsym_opt(fmu_2.libHandle, :fmi2SetString)
+    fmu_2.cGetFMUstate                  = dlsym_opt(fmu_2.libHandle, :fmi2GetFMUstate)
+    fmu_2.cSetFMUstate                  = dlsym_opt(fmu_2.libHandle, :fmi2SetFMUstate)
+    fmu_2.cFreeFMUstate                 = dlsym_opt(fmu_2.libHandle, :fmi2FreeFMUstate)
+    fmu_2.cSerializedFMUstateSize       = dlsym_opt(fmu_2.libHandle, :fmi2SerializedFMUstateSize)
+    fmu_2.cSerializeFMUstate            = dlsym_opt(fmu_2.libHandle, :fmi2SerializeFMUstate)
+    fmu_2.cDeSerializeFMUstate          = dlsym_opt(fmu_2.libHandle, :fmi2DeSerializeFMUstate)
+    fmu_2.cGetDirectionalDerivative     = dlsym_opt(fmu_2.libHandle, :fmi2GetDirectionalDerivative)
+
+    # CS specific function calls
+    if fmu_2.modelDescription.isCoSimulation == fmi2True
+        fmu_2.cSetRealInputDerivatives      = dlsym(fmu_2.libHandle, :fmi2SetRealInputDerivatives)
+        fmu_2.cGetRealOutputDerivatives     = dlsym(fmu_2.libHandle, :fmi2GetRealOutputDerivatives)
+        fmu_2.cDoStep                       = dlsym(fmu_2.libHandle, :fmi2DoStep)
+        fmu_2.cCancelStep                   = dlsym(fmu_2.libHandle, :fmi2CancelStep)
+        fmu_2.cGetStatus                    = dlsym(fmu_2.libHandle, :fmi2GetStatus)
+        fmu_2.cGetRealStatus                = dlsym(fmu_2.libHandle, :fmi2GetRealStatus)
+        fmu_2.cGetIntegerStatus             = dlsym(fmu_2.libHandle, :fmi2GetIntegerStatus)
+        fmu_2.cGetBooleanStatus             = dlsym(fmu_2.libHandle, :fmi2GetBooleanStatus)
+        fmu_2.cGetStringStatus              = dlsym(fmu_2.libHandle, :fmi2GetStringStatus)
+    end
+
+    # ME specific function calls
+    if fmu_2.modelDescription.isModelExchange == fmi2True
+        fmu_2.cEnterContinuousTimeMode      = dlsym(fmu_2.libHandle, :fmi2EnterContinuousTimeMode)
+        fmu_2.cGetContinuousStates          = dlsym(fmu_2.libHandle, :fmi2GetContinuousStates)
+        fmu_2.cGetDerivatives               = dlsym(fmu_2.libHandle, :fmi2GetDerivatives)
+        fmu_2.cSetTime                      = dlsym(fmu_2.libHandle, :fmi2SetTime)
+        fmu_2.cSetContinuousStates          = dlsym(fmu_2.libHandle, :fmi2SetContinuousStates)
+        fmu_2.cCompletedIntegratorStep      = dlsym(fmu_2.libHandle, :fmi2CompletedIntegratorStep)
+        fmu_2.cEnterEventMode               = dlsym(fmu_2.libHandle, :fmi2EnterEventMode)
+        fmu_2.cNewDiscreteStates            = dlsym(fmu_2.libHandle, :fmi2NewDiscreteStates)
+        fmu_2.cGetEventIndicators           = dlsym(fmu_2.libHandle, :fmi2GetEventIndicators)
+        fmu_2.cGetNominalsOfContinuousStates= dlsym(fmu_2.libHandle, :fmi2GetNominalsOfContinuousStates)
+    end
 
     fmu_2
 end
@@ -429,7 +448,7 @@ function fmi2Unload(fmu2::FMU2, cleanUp::Bool = true)
             rm(fmu2.fmu2Path; recursive = true, force = true)
             rm(fmu2.zipPath; recursive = true, force = true)
         catch e
-            display("[Warning]: Cannot delete unpacked data on disc.")
+            @warn "Cannot delete unpacked data on disc."
         end
     end
 end
@@ -596,7 +615,7 @@ For more information call ?fmi2GetReal
 function fmi2GetReal(fmu2::FMU2, vr_string::Array{String})
     vr = fmi2String2ValueReference(fmu2, vr_string)
     if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
+        @error "no valueReferences could be converted"
     else
         fmi2GetReal(fmu2, vr)
     end
@@ -609,7 +628,7 @@ For more information call ?fmi2GetReal
 function fmi2GetReal(fmu2::FMU2, vr_string::String)
     vr = fmi2String2ValueReference(fmu2, vr_string)
     if vr == nothing
-        display("[ERROR]: valueReference not found")
+        @error "valueReference not found"
     else
         fmi2GetReal(fmu2, vr)
     end
@@ -623,7 +642,7 @@ For more information call ?fmi2GetReal
 function fmi2GetReal!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array{<:Real})
     vars = zeros(fmi2Real, length(values))
     if length(values) != length(vr)
-        display("[ERROR]: Number of value references and in place array doesn't match")
+        @error "Number of value references and in place array doesn't match"
     else
         fmi2GetReal!(fmu2.components[end], vr, Csize_t(length(values)), vars)
     end
@@ -664,7 +683,7 @@ For more information call ?fmi2SetReal
 function fmi2SetReal(fmu2::FMU2, vr_string::Array{String}, value::Array{<:Real})
     vr = fmi2String2ValueReference(fmu2, vr_string)
     if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
+        @error "no valueReferences could be converted"
     else
         fmi2SetReal(fmu2, vr, value)
     end
@@ -677,7 +696,7 @@ For more information call ?fmi2SetReal
 function fmi2SetReal(fmu2::FMU2, vr_string::String, value::Real)
     vr = fmi2String2ValueReference(fmu2, vr_string)
     if vr == nothing
-        display("[ERROR]: valueReference not found")
+        @error "valueReference not found"
     else
         fmi2SetReal(fmu2, vr, value)
     end
@@ -712,7 +731,7 @@ For more information call ?fmi2GetInteger
 function fmi2GetInteger(fmu2::FMU2, vr_string::Array{String})
     vr = fmi2String2ValueReference(fmu2, vr_string)
     if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
+        @error "no valueReferences could be converted"
     else
         fmi2GetInteger(fmu2, vr)
     end
@@ -725,7 +744,7 @@ For more information call ?fmi2GetInteger
 function fmi2GetInteger(fmu2::FMU2, vr_string::String)
     vr = fmi2String2ValueReference(fmu2, vr_string)
     if vr == nothing
-        display("[ERROR]: valueReference not found")
+        @error "valueReference not found"
     else
         fmi2GetInteger(fmu2, vr)
     end
@@ -738,7 +757,7 @@ For more information call ?fmi2GetInteger
 function fmi2GetInteger!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array{<:Integer})
     vars = zeros(fmi2Integer, length(values))
     if length(values) != length(vr)
-        display("[ERROR]: Number of value references and in place array doesn't match")
+        @error "Number of value references and in place array doesn't match"
     else
         fmi2GetInteger!(fmu2.components[end], vr, Csize_t(length(values)), vars)
     end
@@ -778,7 +797,7 @@ For more information call ?fmi2SetInteger
 function fmi2SetInteger(fmu2::FMU2, vr_string::Array{String}, value::Array{<:Integer})
     vr = fmi2String2ValueReference(fmu2, vr_string)
     if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
+        @error "no valueReferences could be converted"
     else
         fmi2SetInteger(fmu2, vr, value)
     end
@@ -791,7 +810,7 @@ For more information call ?fmi2SetInteger
 function fmi2SetInteger(fmu2::FMU2, vr_string::String, value::Integer)
     vr = fmi2String2ValueReference(fmu2, vr_string)
     if vr == nothing
-        display("[ERROR]: valueReference not found")
+        @error "valueReference not found"
     else
         fmi2SetInteger(fmu2, vr, value)
     end
@@ -824,7 +843,7 @@ For more information call ?fmi2GetBoolean
 function fmi2GetBoolean(fmu2::FMU2, vr_string::Array{String})
     vr = fmi2String2ValueReference(fmu2, vr_string)
     if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
+        @error "no valueReferences could be converted"
     else
         fmi2GetBoolean(fmu2, vr)
     end
@@ -837,7 +856,7 @@ For more information call ?fmi2GetBoolean
 function fmi2GetBoolean(fmu2::FMU2, vr_string::String)
     vr = fmi2String2ValueReference(fmu2, vr_string)
     if vr == nothing
-        display("[ERROR]: valueReference not found")
+        @error "valueReference not found"
     else
         fmi2GetBoolean(fmu2, vr)
     end
@@ -850,7 +869,7 @@ For more information call ?fmi2GetBoolean
 function fmi2GetBoolean!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array{Bool})
     vars = zeros(fmi2Boolean, length(values))
     if length(values) != length(vr)
-        display("[ERROR]: Number of value references and in place array doesn't match")
+        @error "Number of value references and in place array doesn't match"
     else
         fmi2GetBoolean!(fmu2.components[end], vr, Csize_t(length(values)),vars)
     end
@@ -890,7 +909,7 @@ For more information call ?fmi2SetBoolean
 function fmi2SetBoolean(fmu2::FMU2, vr_string::Array{String}, value::Array{Bool})
     vr = fmi2String2ValueReference(fmu2, vr_string)
     if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
+        @error "no valueReferences could be converted"
     else
         fmi2SetBoolean(fmu2, vr, value)
     end
@@ -903,7 +922,7 @@ For more information call ?fmi2SetBoolean
 function fmi2SetBoolean(fmu2::FMU2, vr_string::String, value::Bool)
     vr = fmi2String2ValueReference(fmu2, vr_string)
     if vr == nothing
-        display("[ERROR]: valueReference not found")
+        @error "valueReference not found"
     else
         fmi2SetBoolean(fmu2, vr, value)
     end
@@ -936,7 +955,7 @@ For more information call ?fmi2GetString
 function fmi2GetString(fmu2::FMU2, vr_string::Array{String})
     vr = fmi2String2ValueReference(fmu2, vr_string)
     if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
+        @error "no valueReferences could be converted"
     else
         fmi2GetString(fmu2, vr)
     end
@@ -949,7 +968,7 @@ For more information call ?fmi2GetString
 function fmi2GetString(fmu2::FMU2, vr_string::String)
     vr = fmi2String2ValueReference(fmu2, vr_string)
     if vr == nothing
-        display("[ERROR]: valueReference not found")
+        @error "valueReference not found"
     else
         fmi2GetString(fmu2, vr)
     end
@@ -962,7 +981,7 @@ For more information call ?fmi2GetString
 function fmi2GetString!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array{String})
     vars = Vector{Ptr{Cchar}}(undef, length(vr))
     if length(values) != length(vr)
-        display("[ERROR]: Number of value references and in place array doesn't match")
+        @error "Number of value references and in place array doesn't match"
     else
         fmi2GetString!(fmu2.components[end], vr, Csize_t(length(values)), vars)
         values[:] = unsafe_string.(vars)
@@ -1004,7 +1023,7 @@ For more information call ?fmi2SetString
 function fmi2SetString(fmu2::FMU2, vr_string::Array{String}, value::Array{String})
     vr = fmi2String2ValueReference(fmu2, vr_string)
     if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
+        @error "no valueReferences could be converted"
     else
         fmi2SetString(fmu2, vr, value)
     end
@@ -1017,7 +1036,7 @@ For more information call ?fmi2SetString
 function fmi2SetString(fmu2::FMU2, vr_string::String, value::String)
     vr = fmi2String2ValueReference(fmu2, vr_string)
     if vr == nothing
-        display("[ERROR]: valueReference not found")
+        @error "valueReference not found"
     else
         fmi2SetString(fmu2, vr, value)
     end
@@ -1246,7 +1265,7 @@ end
 """
 Returns the next discrete states
 
-For more information call ?fmi2NewDiscretestates
+For more information call ?fmi2NewDiscreteStates
 """
 function fmi2NewDiscreteStates(fmu2::FMU2)
     eventInfo = fmi2EventInfo()
