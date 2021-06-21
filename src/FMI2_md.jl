@@ -45,6 +45,7 @@ function fmi2readModelDescription(pathToModellDescription::String)
         elseif node.name == "ModelExchange"
             md.isModelExchange = fmi2True
         end
+
         if node.name == "TypeDefinitions"
             typedefinitions = node
         end
@@ -56,11 +57,19 @@ function fmi2readModelDescription(pathToModellDescription::String)
             modelstructure = node
         end
     end
-    md.enumerations = createEnum(typedefinitions)
+
+    if typedefinitions == nothing
+        @warn "Found enum, but no type definition. Skipping enums."
+        md.enumerations = []
+    else
+        md.enumerations = createEnum(typedefinitions)
+    end
+
     derivatives = getDerivativesIndex(modelstructure)
     md.modelVariables = setScalarVariables(modelvariables, md, derivatives)
     md
 end
+
 """
 returns the indices of the state derivatives
 """
