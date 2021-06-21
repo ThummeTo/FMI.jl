@@ -165,7 +165,11 @@ end
 Returns an array of variable names matching a fmi2ValueReference
 """
 function fmi2ValueReference2String(fmu2::FMU2, reference::fmi2ValueReference)
-    variables = [k for (k,v) in fmu2.modelDescription.stringValueReferences if v == reference]
+    [k for (k,v) in fmu2.modelDescription.stringValueReferences if v == reference]
+end
+
+function fmi2ValueReference2String(fmu2::FMU2, integer::Int64)
+    fmi2ValueReference2String(fmu2, fmi2ValueReference(integer))
 end
 
 """
@@ -250,7 +254,7 @@ function fmi2Load(pathTofmu2::String)
                 break
             end
         end
-        @assert isfile(pathToBinary) "Target platform is Windows, but can't valid find FMU binary."
+        @assert isfile(pathToBinary) "Target platform is Windows, but can't find valid FMU binary."
     elseif Sys.islinux()
         directories = ["binaries/linux64", "binaries/x86_64-linux"]
         for directory in directories

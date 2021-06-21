@@ -7,8 +7,7 @@
 # Prepare FMU #
 ###############
 
-cd(dirname(@__FILE__))
-pathToFMU = joinpath(pwd(), "..", "model", ENV["EXPORTINGTOOL"], "IO.fmu")
+pathToFMU = joinpath(dirname(@__FILE__), "..", "model", ENV["EXPORTINGTOOL"], "IO.fmu")
 
 myFMU = fmiLoad(pathToFMU)
 
@@ -17,15 +16,19 @@ myFMU = fmiLoad(pathToFMU)
 #########################
 
 # test reference conversion
-@test fmi2String2ValueReference(myFMU, "p_real") == 16777216
-@test fmi2String2ValueReference(myFMU, "p_integer") == 16777217
-@test fmi2ValueReference2String(myFMU, Cint(16777217)) == ["p_integer"]
+# !!! different indexing between Dymola and OpenModelica
+valueReference = fmi2String2ValueReference(myFMU, "p_real")
+@test (valueReference == 16777216 || valueReference == 2)
+valueReference = fmi2String2ValueReference(myFMU, "p_integer")
+@test (valueReference == 16777217 || valueReference == 3)
+result = ["p_integer"]
+@test (fmi2ValueReference2String(myFMU, 16777217) == result || fmi2ValueReference2String(myFMU, 3) == result)
 
 # create arrays for in place getter
 vR = zeros(Real, 3)
 vI = zeros(Integer, 3)
 vB = zeros(Bool, 3)
-vS = ["test","test"]
+vS = ["test", "test"]
 
 c1 = fmiInstantiate!(myFMU; loggingOn=true)
 

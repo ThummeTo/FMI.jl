@@ -7,43 +7,47 @@ using FMI
 using Test
 import Random
 
+exportingToolsWindows = ["Dymola/2020x", "OpenModelica/v1.17.0"]
+exportingToolsLinux = ["OpenModelica/v1.17.0"]
+
 function runtests(exportingTool)
     ENV["EXPORTINGTOOL"] = exportingTool
 
-    @testset "FMU functions" begin
-        include("getterSetterTest_fmu.jl")
-        include("independentFunctionsTest_fmu.jl")
-        include("stateTest_fmu.jl")
-    end
-    @testset "fmi2Component functions" begin
-        include("getterSetterTest_comp.jl")
-        include("independentFunctionsTest_comp.jl")
-        include("stateTest_comp.jl")
-    end
-    @testset "Simulation Tests" begin
-        include("test_setter_getter.jl")
-        include("test_sim_CS.jl")
-        include("test_sim_ME.jl")
+    @testset "Testing FMUs exported from $exportingTool" begin
+        @testset "FMU functions" begin
+            include("getterSetterTest_fmu.jl")
+            include("independentFunctionsTest_fmu.jl")
+            if exportingTool != "OpenModelica/v1.17.0" # state manipulation (optional) is not supported by OpenModelica
+                include("stateTest_fmu.jl")
+            end
+        end
+        @testset "FMI-Component functions" begin
+            include("getterSetterTest_comp.jl")
+            include("independentFunctionsTest_comp.jl")
+            if exportingTool != "OpenModelica/v1.17.0" # state manipulation (optional) is not supported by OpenModelica
+                include("stateTest_comp.jl")
+            end
+        end
+        @testset "Simulation Tests" begin
+            include("test_setter_getter.jl")
+            include("test_sim_CS.jl")
+            include("test_sim_ME.jl")
+        end
     end
 end
 
 @testset "FMI.jl" begin
     if Sys.iswindows()
-        @testset "Dymola 2020x" begin
-            @info "Automated testing for Dymola 2020x FMUs"
-            runtests("Dymola/2020x")
-        end
-        @testset "OpenModelica v1.17.0" begin
-            @info "Automated testing for OpenModelica v1.17.0 FMUs"
-            runtests("OpenModelica/v1.17.0")
+        @info "Automated testing is supported on Windows."
+        for exportingTool in exportingToolsWindows
+            runtests(exportingTool)
         end
     elseif Sys.islinux()
-        @testset "OpenModelica v1.17.0" begin
-            @info "Automated testing for OpenModelica v1.17.0 FMUs"
-            ENV["EXPORTINGTOOL"] = "OpenModelica/v1.17.0"
-            runtests("OpenModelica/v1.17.0")
+        @info "Automated testing is supported on Linux."
+        for exportingTool in exportingToolsLinux
+            runtests(exportingTool)
         end
     elseif Sys.isapple()
-        @warn "Test-sets are currrently using Windows-FMUs, automated testing for macOS is currently not supported."
+        @warn "Test-sets are currrently using Windows- and Linux-FMUs, automated testing for macOS is currently not supported."
     end
 end
