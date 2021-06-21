@@ -7,26 +7,42 @@ using FMI
 using Test
 import Random
 
+function runtests(exportingTool)
+    ENV["EXPORTINGTOOL"] = exportingTool
+
+    @testset "FMU functions" begin
+        include("getterSetterTest_fmu.jl")
+        include("independentFunctionsTest_fmu.jl")
+        include("stateTest_fmu.jl")
+    end
+    @testset "fmi2Component functions" begin
+        include("getterSetterTest_comp.jl")
+        include("independentFunctionsTest_comp.jl")
+        include("stateTest_comp.jl")
+    end
+    @testset "Simulation Tests" begin
+        include("test_setter_getter.jl")
+        include("test_sim_CS.jl")
+        include("test_sim_ME.jl")
+    end
+end
+
 @testset "FMI.jl" begin
     if Sys.iswindows()
-        @info "Automated testing for Windows is supported."
-        @testset "FMU functions" begin
-            include("getterSetterTest_fmu.jl")
-            include("independentFunctionsTest_fmu.jl")
-            include("stateTest_fmu.jl")
+        @testset "Dymola 2020x" begin
+            @info "Automated testing for Dymola 2020x FMUs"
+            runtests("Dymola/2020x")
         end
-        @testset "fmi2Component functions" begin
-            include("getterSetterTest_comp.jl")
-            include("independentFunctionsTest_comp.jl")
-            include("stateTest_comp.jl")
-        end
-        @testset "Simulation Tests" begin
-            include("test_setter_getter.jl")
-            include("test_sim_cs.jl")
-            include("test_sim_me.jl")
+        @testset "OpenModelica v1.17.0" begin
+            @info "Automated testing for OpenModelica v1.17.0 FMUs"
+            runtests("OpenModelica/v1.17.0")
         end
     elseif Sys.islinux()
-        @warn "Test-sets are currrently using Windows-FMUs, automated testing for Linux is currently not supported."
+        @testset "OpenModelica v1.17.0" begin
+            @info "Automated testing for OpenModelica v1.17.0 FMUs"
+            ENV["EXPORTINGTOOL"] = "OpenModelica/v1.17.0"
+            runtests("OpenModelica/v1.17.0")
+        end
     elseif Sys.isapple()
         @warn "Test-sets are currrently using Windows-FMUs, automated testing for macOS is currently not supported."
     end
