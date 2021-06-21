@@ -1,0 +1,44 @@
+name: Run FMI.jl tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Don't cancel in-progress jobs if any matrix job fails
+      fail-fast: false
+      matrix:
+        julia-version: ['1.5', 'nightly']
+        julia-arch: [x64]
+        os: [ubuntu-latest, windows-latest]
+        experimental: [false]
+        include:
+          - os: ubuntu-18.04
+            julia-version: '1.0'
+            julia-arch: x64
+            experimental: true
+          - os: windows-latest
+            julia-version: '1.0'
+            julia-arch: x64
+            experimental: true
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      # Set up Julia
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@latest
+        with:
+          version: ${{ matrix.julia-version }}
+          arch: ${{ matrix.julia-arch }}
+
+      # Build JuliaFMI package
+      - name: "Build package"
+        uses: julia-actions/julia-buildpkg@latest
+
+      # Run the tests
+      - name: "Run tests"
+        uses: julia-actions/julia-runtest@latest
