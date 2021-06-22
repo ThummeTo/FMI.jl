@@ -5,7 +5,7 @@
 
 using FMI
 
-pathToFMU = joinpath(dirname(@__FILE__), "../model/SpringPendulum1D.fmu")
+pathToFMU = joinpath(dirname(@__FILE__), "../model/Dymola/2020x/SpringPendulum1D.fmu")
 
 myFMU = fmiLoad(pathToFMU)
 
