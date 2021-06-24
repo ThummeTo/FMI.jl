@@ -161,6 +161,7 @@ function fmi2String2ValueReference(fmu2::FMU2, names::Array{String})
     end
     vr
 end
+
 """
 Returns an array of variable names matching a fmi2ValueReference
 """
@@ -239,8 +240,13 @@ function fmi2Load(pathTofmu2::String)
 
     # set paths for modelExchangeScripting and binary
     tmpName = splitpath(fmu_2.fmu2Path)
-    fmuName = tmpName[length(tmpName)]
     pathToModelDescription = joinpath(fmu_2.fmu2Path, "modelDescription.xml")
+
+    # parse modelDescription.xml
+    fmu_2.modelDescription = fmi2readModelDescription(pathToModelDescription)
+    fmu_2.modelName = fmu_2.modelDescription.modelName
+    fmu_2.instanceName = fmu_2.modelDescription.modelName
+    fmuName = fmi2GetModelIdentifier(fmu_2.modelDescription) # tmpName[length(tmpName)]
 
     directoryBinary = ""
     pathToBinary = ""
@@ -278,11 +284,6 @@ function fmi2Load(pathTofmu2::String)
     else
         @assert false "Unknown target platform."
     end
-
-    # parse modelDescription.xml
-    fmu_2.modelDescription = fmi2readModelDescription(pathToModelDescription)
-    fmu_2.modelName = fmu_2.modelDescription.modelName
-    fmu_2.instanceName = fmu_2.modelDescription.modelName
 
     lastDirectory = pwd()
     cd(directoryBinary)

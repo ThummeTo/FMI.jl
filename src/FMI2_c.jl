@@ -384,6 +384,9 @@ mutable struct fmi2ModelDescription
     isCoSimulation::fmi2Boolean
     isModelExchange::fmi2Boolean
 
+    CSmodelIdentifier::String
+    MEmodelIdentifier::String
+
     # Model variables
     modelVariables::Array{fmi2ScalarVariable,1}
 
