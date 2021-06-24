@@ -7,7 +7,7 @@ dt = 0.01
 t_start = 0.0
 t_stop = 8.0
 
-pathToFMU = joinpath(dirname(@__FILE__), "../model/SpringFrictionPendulum1D.fmu")
+pathToFMU = joinpath(dirname(@__FILE__), "..", "model", ENV["EXPORTINGTOOL"], "SpringFrictionPendulum1D.fmu")
 
 myFMU = fmiLoad(pathToFMU)
 

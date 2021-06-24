@@ -7,9 +7,7 @@
 # Prepare FMU #
 ###############
 
-cd(dirname(@__FILE__))
-
-pathToFMU = joinpath(pwd(), "../model/SpringPendulum1D.fmu")
+pathToFMU = joinpath(dirname(@__FILE__), "..", "model", ENV["EXPORTINGTOOL"], "SpringPendulum1D.fmu")
 
 myFMU = fmiLoad(pathToFMU)
 

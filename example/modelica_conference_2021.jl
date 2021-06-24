@@ -85,22 +85,18 @@ end
 # NeuralFMU setup
 numStates = fmiGetNumberOfStates(myFMU)
 
-net = Chain(inputs -> NeuralFMUInputLayer(myFMU, inputs),
-            Dense(numStates, numStates, identity; initW = (out, in) -> [[1.0, 0.0] [0.0, 1.0]], initb = out -> zeros(out)),
-            inputs -> fmi2DoStepME(myFMU, 0.0, inputs),
+net = Chain(Dense(numStates, numStates, identity; initW = (out, in) -> [[1.0, 0.0] [0.0, 1.0]], initb = out -> zeros(out)),
+            inputs -> fmi2DoStepME(myFMU, inputs),
             Dense(numStates, 16, tanh),
             Dense(16, 16, tanh),
-            Dense(16, numStates),
-            inputs -> NeuralFMUOutputLayer(inputs))
+            Dense(16, numStates))
 
-problem = NeuralFMU(net, (t_start, t_stop), Tsit5(), tData)
-problem.fmu = myFMU
+problem = ME_NeuralFMU(myFMU, net, (t_start, t_stop), Tsit5(), tData)
 solutionBefore = problem(t_start, x0)
 fmiPlot(problem)
 
 # train it ...
 p_net = Flux.params(problem)
-
 optim = ADAM()
 for i in 1:3
     display("epoch: $i/3")

@@ -3,7 +3,7 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-pathToFMU = joinpath(dirname(@__FILE__), "../model/SpringPendulum1D.fmu")
+pathToFMU = joinpath(dirname(@__FILE__), "..", "model", ENV["EXPORTINGTOOL"], "SpringPendulum1D.fmu")
 
 myFMU = fmiLoad(pathToFMU)
 
