@@ -12,11 +12,15 @@ Extract the FMU variables and meta data from the ModelDescription
 """
 function fmi2readModelDescription(pathToModellDescription::String)
     md = fmi2ModelDescription()
+
     md.stringValueReferences = Dict{String, fmi2ValueReference}()
     md.outputValueReferences = Array{fmi2ValueReference}(undef, 0)
     md.inputValueReferences = Array{fmi2ValueReference}(undef, 0)
     md.stateValueReferences = Array{fmi2ValueReference}(undef, 0)
     md.derivativeValueReferences = Array{fmi2ValueReference}(undef, 0)
+    md.CSmodelIdentifier = ""
+    md.MEmodelIdentifier = ""
+
     md.enumerations = []
     typedefinitions = nothing
     modelvariables = nothing
@@ -35,15 +39,17 @@ function fmi2readModelDescription(pathToModellDescription::String)
     if haskey(root, "description")
         md.description = root["description"]
     else
-        md.description = "no Description"
+        md.description = "[No Description]"
     end
 
     for node in eachelement(root)
 
         if node.name == "CoSimulation"
             md.isCoSimulation = fmi2True
+            md.CSmodelIdentifier = node["modelIdentifier"]
         elseif node.name == "ModelExchange"
             md.isModelExchange = fmi2True
+            md.MEmodelIdentifier = node["modelIdentifier"]
         end
 
         if node.name == "TypeDefinitions"
@@ -68,6 +74,26 @@ function fmi2readModelDescription(pathToModellDescription::String)
     derivatives = getDerivativesIndex(modelstructure)
     md.modelVariables = setScalarVariables(modelvariables, md, derivatives)
     md
+end
+
+"""
+Returns the tag 'modelName' from the model description.
+"""
+function fmi2GetModelName(md::fmi2ModelDescription)#, escape::Bool = true)
+    md.modelName
+end
+
+"""
+Returns the tag 'modelIdentifier' from CS or ME section
+"""
+function fmi2GetModelIdentifier(md::fmi2ModelDescription)#, escape::Bool = true)
+    if md.isCoSimulation == fmi2True
+        return md.CSmodelIdentifier
+    elseif md.isModelExchange == fmi2True
+        return md.MEmodelIdentifier
+    else
+        @assert false "fmi2GetModelName(...): FMU does not support ME or CS!"
+    end
 end
 
 """
