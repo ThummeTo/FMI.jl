@@ -18,7 +18,11 @@ function fmi2readModelDescription(pathToModellDescription::String)
     md.inputValueReferences = Array{fmi2ValueReference}(undef, 0)
     md.stateValueReferences = Array{fmi2ValueReference}(undef, 0)
     md.derivativeValueReferences = Array{fmi2ValueReference}(undef, 0)
+
+    # CS specific entries
     md.CSmodelIdentifier = ""
+
+    # CS specific entries
     md.MEmodelIdentifier = ""
 
     md.enumerations = []
