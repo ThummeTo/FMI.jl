@@ -12,7 +12,7 @@ include("FMI2_md.jl")
 Source: FMISpec2.0.2[p.19]: 2.1.5 Creation, Destruction and Logging of FMU Instances
 
 The mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
-Also contains the paths to the FMU and ZIP folder as well als all the FMI 2.0.2 function pointers
+Also contains the paths to the FMU and ZIP folder as well als all the FMI 2.0.2 function pointers.
 """
 mutable struct FMU2
     modelName::fmi2String
@@ -30,7 +30,7 @@ mutable struct FMU2
     next_t::Real    # next time
 
     # paths of ziped and unziped FMU folders
-    fmu2Path::fmi2String
+    fmuPath::fmi2String
     zipPath::fmi2String
 
     # c-functions
@@ -86,14 +86,13 @@ mutable struct FMU2
     # c-libraries
     libHandle::Ptr{Nothing}
 
-    # sensitivity logging for backward pass (under development)
-    sensitivities
-
     # Constructor
     FMU2() = new()
 end
 
-""" struct to handle FMU simulation data / results """
+"""
+Struct to handle FMU simulation data / results.
+"""
 mutable struct fmi2SimulationResult
     valueReferences::Array{fmi2ValueReference}
     dataPoints::Array
@@ -102,19 +101,25 @@ mutable struct fmi2SimulationResult
     fmi2SimulationResult() = new()
 end
 
-""" collects all data points for variable save index ´i´ inside a fmi2SimulationResult ´sd´ """
+"""
+Collects all data points for variable save index ´i´ inside a fmi2SimulationResult ´sd´.
+"""
 function fmi2SimulationResultGetValuesAtIndex(sd::fmi2SimulationResult, i)
     collect(dataPoint[i] for dataPoint in sd.dataPoints)
 end
 
-""" collects all time data points inside a fmi2SimulationResult ´sd´ """
+"""
+Collects all time data points inside a fmi2SimulationResult ´sd´.
+"""
 function fmi2SimulationResultGetTime(sd::fmi2SimulationResult)
     fmi2SimulationResultGetValuesAtIndex(sd, 1)
 end
 
-""" collects all data points for variable with value reference ´tvr´ inside a fmi2SimulationResult ´sd´ """
+"""
+Collects all data points for variable with value reference ´tvr´ inside a fmi2SimulationResult ´sd´.
+"""
 function fmi2SimulationResultGetValues(sd::fmi2SimulationResult, tvr::fmi2ValueReference)
-    @assert tvr != nothing ["fmi2SimulationResultGetValues(...): value referrnce is nothing!"]
+    @assert tvr != nothing ["fmi2SimulationResultGetValues(...): value reference is nothing!"]
     @assert length(sd.dataPoints) > 0 ["fmi2SimulationResultGetValues(...): simulation results are empty!"]
 
     numVars = length(sd.dataPoints[1])-1
@@ -128,41 +133,44 @@ function fmi2SimulationResultGetValues(sd::fmi2SimulationResult, tvr::fmi2ValueR
     nothing
 end
 
-""" collects all data points for variable with value name ´s´ inside a fmi2SimulationResult ´sd´ """
+"""
+Collects all data points for variable with value name ´s´ inside a fmi2SimulationResult ´sd´.
+"""
 function fmi2SimulationResultGetValues(sd::fmi2SimulationResult, s::String)
     fmi2SimulationResultGetValues(sd, fmi2String2ValueReference(sd.fmu, s))
 end
 
 """
-Returns the ValueReference coresponding to the variable name
+Returns the ValueReference coresponding to the variable name.
 """
 function fmi2String2ValueReference(fmu2::FMU2, name::String)
     reference = nothing
     if haskey(fmu2.modelDescription.stringValueReferences, name)
         reference = fmu2.modelDescription.stringValueReferences[name]
     else
-        @warn "no variable with this name found"
+        @warn "No variable named '$name' found."
     end
     reference
 end
 
 """
-Returns an array of ValueReferences coresponding to the variable names
+Returns an array of ValueReferences coresponding to the variable names.
 """
 function fmi2String2ValueReference(fmu2::FMU2, names::Array{String})
     vr = Array{fmi2ValueReference}(undef,0)
     for string in names
         reference = fmi2String2ValueReference(fmu2, string)
         if reference == nothing
-            @error "valueReference not found"
+            @warn "Value reference for variable '$string' not found, skipping."
         else
             push!(vr, reference)
         end
     end
     vr
 end
+
 """
-Returns an array of variable names matching a fmi2ValueReference
+Returns an array of variable names matching a fmi2ValueReference.
 """
 function fmi2ValueReference2String(fmu2::FMU2, reference::fmi2ValueReference)
     [k for (k,v) in fmu2.modelDescription.stringValueReferences if v == reference]
@@ -173,8 +181,8 @@ function fmi2ValueReference2String(fmu2::FMU2, integer::Int64)
 end
 
 """
-create a copy of the .fmu file as a .zip folder and unzips it
-returns the paths to the ziped and ziped folders
+Create a copy of the .fmu file as a .zip folder and unzips it.
+Returns the paths to the zipped and unzipped folders.
 """
 function fmi2Unzip(pathTofmu::String)
     # set paths for fmu handling
@@ -217,17 +225,18 @@ Prints an info text and returns C_NULL if not (soft-check).
 """
 function dlsym_opt(libHandle, symbol)
     addr = dlsym(libHandle, symbol; throw_error=false)
-    if addr == C_NULL
+    if addr == nothing
         @info "This FMU does not support optional function '$symbol'."
+        addr = Ptr{Cvoid}(C_NULL)
     end
     addr
 end
 
 """
-sets the properties of the fmu by reading the modelDescription.xml
-retrieve all the pointers of binary functions for later @userplot
+Sets the properties of the fmu by reading the modelDescription.xml.
+Retrieves all the pointers of binary functions.
 
-returns the instance of the fmu struct
+Returns the instance of the FMU struct.
 """
 function fmi2Load(pathTofmu2::String)
     # Create uninitialized FMU
@@ -235,12 +244,17 @@ function fmi2Load(pathTofmu2::String)
     fmu_2.components = []
 
     # set paths for fmu handling
-    (fmu_2.fmu2Path, fmu_2.zipPath) = fmi2Unzip(pathTofmu2)
+    (fmu_2.fmuPath, fmu_2.zipPath) = fmi2Unzip(pathTofmu2)
 
     # set paths for modelExchangeScripting and binary
-    tmpName = splitpath(fmu_2.fmu2Path)
-    fmuName = tmpName[length(tmpName)]
-    pathToModelDescription = joinpath(fmu_2.fmu2Path, "modelDescription.xml")
+    tmpName = splitpath(fmu_2.fmuPath)
+    pathToModelDescription = joinpath(fmu_2.fmuPath, "modelDescription.xml")
+
+    # parse modelDescription.xml
+    fmu_2.modelDescription = fmi2readModelDescription(pathToModelDescription)
+    fmu_2.modelName = fmu_2.modelDescription.modelName
+    fmu_2.instanceName = fmu_2.modelDescription.modelName
+    fmuName = fmi2GetModelIdentifier(fmu_2.modelDescription) # tmpName[length(tmpName)]
 
     directoryBinary = ""
     pathToBinary = ""
@@ -248,7 +262,7 @@ function fmi2Load(pathTofmu2::String)
     if Sys.iswindows()
         directories = ["binaries/win64", "binaries/x86_64-windows"]
         for directory in directories
-            directoryBinary = joinpath(fmu_2.fmu2Path, directory)
+            directoryBinary = joinpath(fmu_2.fmuPath, directory)
             if isdir(directoryBinary)
                 pathToBinary = joinpath(directoryBinary, "$fmuName.dll")
                 break
@@ -258,7 +272,7 @@ function fmi2Load(pathTofmu2::String)
     elseif Sys.islinux()
         directories = ["binaries/linux64", "binaries/x86_64-linux"]
         for directory in directories
-            directoryBinary = joinpath(fmu_2.fmu2Path, directory)
+            directoryBinary = joinpath(fmu_2.fmuPath, directory)
             if isdir(directoryBinary)
                 pathToBinary = joinpath(directoryBinary, "$fmuName.so")
                 break
@@ -268,7 +282,7 @@ function fmi2Load(pathTofmu2::String)
     elseif Sys.isapple()
         directories = ["binaries/darwin64", "binaries/x86_64-darwin"]
         for directory in directories
-            directoryBinary = joinpath(fmu_2.fmu2Path, directory)
+            directoryBinary = joinpath(fmu_2.fmuPath, directory)
             if isdir(directoryBinary)
                 pathToBinary = joinpath(directoryBinary, "$fmuName.dylib")
                 break
@@ -278,11 +292,6 @@ function fmi2Load(pathTofmu2::String)
     else
         @assert false "Unknown target platform."
     end
-
-    # parse modelDescription.xml
-    fmu_2.modelDescription = fmi2readModelDescription(pathToModelDescription)
-    fmu_2.modelName = fmu_2.modelDescription.modelName
-    fmu_2.instanceName = fmu_2.modelDescription.modelName
 
     lastDirectory = pwd()
     cd(directoryBinary)
@@ -308,7 +317,7 @@ function fmi2Load(pathTofmu2::String)
         error(unknownFMUType)
     end
 
-    tmpResourceLocation = string("file:/", fmu_2.fmu2Path)
+    tmpResourceLocation = string("file:/", fmu_2.fmuPath)
     tmpResourceLocation = joinpath(tmpResourceLocation, "resources")
     fmu_2.fmuResourceLocation = replace(tmpResourceLocation, "\\" => "/")
     @info "FMU ressource location: $(fmu_2.fmuResourceLocation)"
@@ -449,17 +458,13 @@ function fmi2Unload(fmu2::FMU2, cleanUp::Bool = true)
 
     if cleanUp
         try
-            rm(fmu2.fmu2Path; recursive = true, force = true)
+            rm(fmu2.fmuPath; recursive = true, force = true)
             rm(fmu2.zipPath; recursive = true, force = true)
         catch e
             @warn "Cannot delete unpacked data on disc."
         end
     end
 end
-
-
-# Comfort functions for fmi2 functions
-
 
 """
 Returns a string representing the header file used to compile the fmi2 functions.function
@@ -583,7 +588,7 @@ function fmi2Terminate(fmu2::FMU2)
 end
 
 """
-Reset FMU
+Resets FMU.
 
 For more information call ?fmi2Reset
 """
@@ -602,6 +607,7 @@ function fmi2GetReal(fmu2::FMU2, vr::Array{fmi2ValueReference})
     fmi2GetReal!(fmu2.components[end], vr, nvr, values)
     values
 end
+
 """
 Get the value of a fmi2Real variable
 
@@ -611,6 +617,7 @@ function fmi2GetReal(fmu2::FMU2, vr::fmi2ValueReference)
     values = fmi2GetReal(fmu2, [vr])
     values[1]
 end
+
 """
 Get the values of an array of fmi2Real variables by variable name
 
@@ -624,6 +631,7 @@ function fmi2GetReal(fmu2::FMU2, vr_string::Array{String})
         fmi2GetReal(fmu2, vr)
     end
 end
+
 """
 Get the value of a fmi2Real variable by variable name
 
@@ -652,6 +660,7 @@ function fmi2GetReal!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array{<
     end
     values[:] = vars
 end
+
 """
 Get the values of an array of fmi2Real variables by variable name
 
@@ -661,6 +670,7 @@ function fmi2GetReal!(fmu2::FMU2, vr_string::Array{String}, values::Array{<:Real
     vr = fmi2String2ValueReference(fmu2, vr_string)
     fmi2GetReal!(fmu2, vr, values)
 end
+
 """
 Set the values of an array of fmi2Real variables
 
@@ -679,6 +689,7 @@ For more information call ?fmi2SetReal
 function fmi2SetReal(fmu2::FMU2, vr::fmi2ValueReference, value::Real)
     fmi2SetReal(fmu2, [vr], [value])
 end
+
 """
 Set the values of an array of fmi2Real variables by variable name
 
@@ -692,6 +703,7 @@ function fmi2SetReal(fmu2::FMU2, vr_string::Array{String}, value::Array{<:Real})
         fmi2SetReal(fmu2, vr, value)
     end
 end
+
 """
 Set the value of a fmi2Real variable by variable name
 
@@ -705,6 +717,7 @@ function fmi2SetReal(fmu2::FMU2, vr_string::String, value::Real)
         fmi2SetReal(fmu2, vr, value)
     end
 end
+
 """
 Get the values of an array of fmi2Integer variables
 
@@ -727,6 +740,7 @@ function fmi2GetInteger(fmu2::FMU2, vr::fmi2ValueReference)
     values = fmi2GetInteger(fmu2, [vr])
     values[1]
 end
+
 """
 Get the values of an array of fmi2Integer variables by variable name
 
@@ -740,6 +754,7 @@ function fmi2GetInteger(fmu2::FMU2, vr_string::Array{String})
         fmi2GetInteger(fmu2, vr)
     end
 end
+
 """
 Get the value of a fmi2Integer variable by variable name
 
@@ -753,6 +768,7 @@ function fmi2GetInteger(fmu2::FMU2, vr_string::String)
         fmi2GetInteger(fmu2, vr)
     end
 end
+
 """
 Get the values of an array of fmi2Integer variables
 
@@ -767,6 +783,7 @@ function fmi2GetInteger!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Arra
     end
     values[:] = vars
 end
+
 """
 Get the values of an array of fmi2Integer variables by variable name
 
@@ -776,6 +793,7 @@ function fmi2GetInteger!(fmu2::FMU2, vr_string::Array{String}, values::Array{<:I
     vr = fmi2String2ValueReference(fmu2, vr_string)
     fmi2GetInteger!(fmu2, vr, values)
 end
+
 """
 Set the values of an array of fmi2Integer variables
 
@@ -785,6 +803,7 @@ function fmi2SetInteger(fmu2::FMU2, vr::Array{fmi2ValueReference},value::Array{<
     nvr = Csize_t(length(vr))
     fmi2SetInteger(fmu2.components[end], vr, nvr, Array{fmi2Integer}(value))
 end
+
 """
 Get the value of a fmi2Integer variable
 
@@ -793,6 +812,7 @@ For more information call ?fmi2SetInteger
 function fmi2SetInteger(fmu2::FMU2, vr::fmi2ValueReference, value::Integer)
     fmi2SetInteger(fmu2,[vr], [value])
 end
+
 """
 Set the values of an array of fmi2Integer variables by variable name
 
@@ -806,6 +826,7 @@ function fmi2SetInteger(fmu2::FMU2, vr_string::Array{String}, value::Array{<:Int
         fmi2SetInteger(fmu2, vr, value)
     end
 end
+
 """
 Set the value of a fmi2Integer variable by variable name
 
@@ -819,6 +840,7 @@ function fmi2SetInteger(fmu2::FMU2, vr_string::String, value::Integer)
         fmi2SetInteger(fmu2, vr, value)
     end
 end
+
 """
 Get the values of an array of fmi2Boolean variables
 
@@ -830,6 +852,7 @@ function fmi2GetBoolean(fmu2::FMU2, vr::Array{fmi2ValueReference})
     fmi2GetBoolean!(fmu2.components[end], vr, nvr, values)
     values
 end
+
 """
 Get the value of a fmi2Boolean variable
 
@@ -839,6 +862,7 @@ function fmi2GetBoolean(fmu2::FMU2, vr::fmi2ValueReference)
     values = fmi2GetBoolean(fmu2, [vr])
     values[1]
 end
+
 """
 Get the values of an array of fmi2Boolean variables by variable name
 
@@ -852,6 +876,7 @@ function fmi2GetBoolean(fmu2::FMU2, vr_string::Array{String})
         fmi2GetBoolean(fmu2, vr)
     end
 end
+
 """
 Get the value of a fmi2Boolean variable by variable name
 
@@ -865,6 +890,7 @@ function fmi2GetBoolean(fmu2::FMU2, vr_string::String)
         fmi2GetBoolean(fmu2, vr)
     end
 end
+
 """
 Get the values of an array of fmi2Boolean variables
 
@@ -879,6 +905,7 @@ function fmi2GetBoolean!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Arra
     end
     values[:]  = vars
 end
+
 """
 Get the values of an array of fmi2Boolean variables by variable name
 
@@ -888,6 +915,7 @@ function fmi2GetBoolean!(fmu2::FMU2, vr_string::Array{String}, values::Array{Boo
     vr = fmi2String2ValueReference(fmu2, vr_string)
     fmi2GetBoolean!(fmu2, vr, values)
 end
+
 """
 Set the values of an array of fmi2Boolean variables
 
@@ -897,6 +925,7 @@ function fmi2SetBoolean(fmu2::FMU2, vr::Array{fmi2ValueReference}, value::Array{
     nvr = Csize_t(length(vr))
     fmi2SetBoolean(fmu2.components[end], vr, nvr, Array{fmi2Boolean}(value))
 end
+
 """
 Set the value of a fmi2Boolean variable
 
@@ -905,6 +934,7 @@ For more information call ?fmi2SetBoolean
 function fmi2SetBoolean(fmu2::FMU2, vr::fmi2ValueReference, value::Bool)
     fmi2SetBoolean(fmu2, [vr], [value])
 end
+
 """
 Set the values of an array of fmi2Boolean variables by variable name
 
@@ -918,6 +948,7 @@ function fmi2SetBoolean(fmu2::FMU2, vr_string::Array{String}, value::Array{Bool}
         fmi2SetBoolean(fmu2, vr, value)
     end
 end
+
 """
 Set the value of a fmi2Boolean variable by variable name
 
@@ -931,6 +962,7 @@ function fmi2SetBoolean(fmu2::FMU2, vr_string::String, value::Bool)
         fmi2SetBoolean(fmu2, vr, value)
     end
 end
+
 """
 Get the values of an array of fmi2String variables
 
@@ -942,6 +974,7 @@ function fmi2GetString(fmu2::FMU2, vr::Array{fmi2ValueReference})
     fmi2GetString!(fmu2.components[end], vr, nvr, value)
     unsafe_string.(value)
 end
+
 """
 Get the value of a fmi2String variable
 
@@ -951,6 +984,7 @@ function fmi2GetString(fmu2::FMU2, vr::fmi2ValueReference)
     values = fmi2GetString(fmu2, [vr])
     values[1]
 end
+
 """
 Get the values of an array of fmi2String variables by variable name
 
@@ -964,6 +998,7 @@ function fmi2GetString(fmu2::FMU2, vr_string::Array{String})
         fmi2GetString(fmu2, vr)
     end
 end
+
 """
 Get the value of a fmi2String variable by variable name
 
@@ -977,6 +1012,7 @@ function fmi2GetString(fmu2::FMU2, vr_string::String)
         fmi2GetString(fmu2, vr)
     end
 end
+
 """
 Get the values of an array of fmi2String variables
 
@@ -992,6 +1028,7 @@ function fmi2GetString!(fmu2::FMU2, vr::Array{fmi2ValueReference}, values::Array
     end
 
 end
+
 """
 Get the values of an array of fmi2String variables by variable name
 
@@ -1001,6 +1038,7 @@ function fmi2GetString!(fmu2::FMU2, vr_string::Array{String}, values::Array{Stri
     vr = fmi2String2ValueReference(fmu2, vr_string)
     fmi2GetString!(fmu2, vr, values)
 end
+
 """
 Set the values of an array of fmi2String variables
 
@@ -1011,6 +1049,7 @@ function fmi2SetString(fmu2::FMU2, vr::Array{fmi2ValueReference}, value::Array{S
     ptrs = pointer.(value)
     fmi2SetString(fmu2.components[end], vr, nvr, ptrs)
 end
+
 """
 Set the values of a fmi2String variable
 
@@ -1019,6 +1058,7 @@ For more information call ?fmi2SetString
 function fmi2SetString(fmu2::FMU2, vr::fmi2ValueReference, value::String)
     fmi2SetString(fmu2, [vr], [value])
 end
+
 """
 Set the values of an array of fmi2String variables by variable name
 
@@ -1032,6 +1072,7 @@ function fmi2SetString(fmu2::FMU2, vr_string::Array{String}, value::Array{String
         fmi2SetString(fmu2, vr, value)
     end
 end
+
 """
 Set the value of a fmi2String variable by variable name
 
@@ -1045,6 +1086,7 @@ function fmi2SetString(fmu2::FMU2, vr_string::String, value::String)
         fmi2SetString(fmu2, vr, value)
     end
 end
+
 """
 Get the pointer to the current FMU state
 
@@ -1138,6 +1180,7 @@ function fmi2GetDirectionalDerivative(fmu2::FMU2,
 
     dvUnknown
 end
+
 """
 Computes directional derivatives
 
@@ -1152,7 +1195,6 @@ function fmi2GetDirectionalDerivative(fmu::FMU2,
     fmi2GetDirectionalDerivative(fmu, [vUnknown_ref], [vKnown_ref], [dvKnown])[1]
 end
 
-# CoSimulation specific functions
 """
 Sets the n-th time derivative of real input variables.
 
@@ -1238,7 +1280,7 @@ For more information call ?fmi2GetStringStatus
 function fmi2GetStringStatus(fmu2::FMU2, s::fmi2StatusKind, value::String)
     fmi2GetStringStatus(fmu2.components[end], s, fmiString(value))
 end
-# Model Exchange specific functions
+
 """
 Set a new time instant
 
@@ -1266,6 +1308,7 @@ For more information call ?fmi2EnterEventMode
 function fmi2EnterEventMode(fmu2::FMU2)
     fmi2EnterEventMode(fmu2.components[end])
 end
+
 """
 Returns the next discrete states
 
@@ -1313,6 +1356,7 @@ function  fmi2GetDerivatives(fmu2::FMU2)
     fmi2GetDerivatives(fmu2.components[end], derivatives, nx)
     derivatives
 end
+
 """
 Returns the event indicators of the FMU
 
@@ -1324,6 +1368,7 @@ function fmi2GetEventIndicators(fmu2::FMU2)
     fmi2GetEventIndicators(fmu2.components[end], eventIndicators, ni)
     eventIndicators
 end
+
 """
 Return the new (continuous) state vector x
 
