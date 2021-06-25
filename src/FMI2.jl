@@ -141,7 +141,7 @@ function fmi2SimulationResultGetValues(sd::fmi2SimulationResult, s::String)
 end
 
 """
-Returns the ValueReference coresponding to the variable name.
+Returns the fmi2ValueReference coresponding to the variable name
 """
 function fmi2String2ValueReference(fmu2::FMU2, name::String)
     reference = nothing
@@ -154,7 +154,7 @@ function fmi2String2ValueReference(fmu2::FMU2, name::String)
 end
 
 """
-Returns an array of ValueReferences coresponding to the variable names.
+Returns an array of ValueReferences coresponding to the variable names
 """
 function fmi2String2ValueReference(fmu2::FMU2, names::Array{String})
     vr = Array{fmi2ValueReference}(undef,0)
@@ -170,7 +170,7 @@ function fmi2String2ValueReference(fmu2::FMU2, names::Array{String})
 end
 
 """
-Returns an array of variable names matching a fmi2ValueReference.
+Returns an array of variable names matching a fmi2ValueReference
 """
 function fmi2ValueReference2String(fmu2::FMU2, reference::fmi2ValueReference)
     [k for (k,v) in fmu2.modelDescription.stringValueReferences if v == reference]
@@ -510,7 +510,7 @@ function fmi2Instantiate!(fmu2::FMU2; visible::Bool = false, loggingOn::Bool = f
 end
 
 """
-Free the allocated memory used for the looger and fmu2 instance and destroy the instance
+Free the allocated memory used for the logger and fmu2 instance and destroy the instance
 
 For more information call ?fmi2FreeInstance
 """
@@ -588,7 +588,7 @@ function fmi2Terminate(fmu2::FMU2)
 end
 
 """
-Resets FMU.
+Resets FMU
 
 For more information call ?fmi2Reset
 """
@@ -1101,7 +1101,7 @@ function fmi2GetFMUstate(fmu2::FMU2)
 end
 
 """
-Set the FMU state to the given fmi2FMUstate
+Set the FMU to the given fmi2FMUstate
 
 For more information call ?fmi2SetFMUstate
 """
@@ -1198,6 +1198,9 @@ end
 """
 Sets the n-th time derivative of real input variables.
 
+vr defines the value references of the variables
+the array order specifies the corresponding order of derivation of the variables
+
 For more information call ?fmi2SetRealInputDerivatives
 """
 function fmi2SetRealInputDerivatives(fmu2::FMU2, vr::fmi2ValueReference, nvr::Cint, order::Integer, value::Real)
@@ -1206,6 +1209,8 @@ end
 
 """
 Retrieves the n-th derivative of output values.
+vr defines the value references of the variables
+the array order specifies the corresponding order of derivation of the variables
 
 For more information call ?fmi2GetRealOutputDerivatives
 """
@@ -1282,7 +1287,7 @@ function fmi2GetStringStatus(fmu2::FMU2, s::fmi2StatusKind, value::String)
 end
 
 """
-Set a new time instant
+Set independent variable time and reinitialize chaching of variables that depend on time
 
 For more information call ?fmi2SetTime
 """
@@ -1291,7 +1296,7 @@ function fmi2SetTime(fmu2::FMU2, time::Real)
 end
 
 """
-Set a new (continuous) state vector
+Set a new (continuous) state vector and reinitialize chaching of variables that depend on states
 
 For more information call ?fmi2SetContinuousStates
 """
@@ -1310,7 +1315,7 @@ function fmi2EnterEventMode(fmu2::FMU2)
 end
 
 """
-Returns the next discrete states
+Increment the super dense time in event mode
 
 For more information call ?fmi2NewDiscreteStates
 """
@@ -1331,6 +1336,8 @@ end
 
 """
 This function must be called by the environment after every completed step
+If enterEventMode == fmi2True, the event mode must be entered
+If terminateSimulation == fmi2True, the simulation shall be terminated
 
 For more information call ?fmi2CompletedIntegratorStep
 """
@@ -1382,7 +1389,7 @@ function fmi2GetContinuousStates(fmu2::FMU2)
 end
 
 """
-Return the new (continuous) state vector x
+Return the nominal values of the continuous states.
 
 For more information call ?fmi2GetNominalsOfContinuousStates
 """
