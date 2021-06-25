@@ -80,47 +80,47 @@ export fmiPlot
 fmi2Struct = Union{FMU2, fmi2Component}
 fmi2Reference = Union{String, Array{String}, fmi2ValueReference, Array{fmi2ValueReference}}
 
-""" Multiple Dispatch variants for FMUs with version 2.0.X """
+""" Load FMUs FMI version independently, currently supporting version 2.0.X """
 function fmiLoad(pathToFMU::String)
     fmi2Load(pathToFMU)
 end
 
-"""Simulate an fmu according to its standard from 0.0 to t_stop"""
+"""Simulate an fmu according to its FMI version from 0.0 to t_stop"""
 function fmiSimulate(fmu::fmi2Struct, dt::Real, t_start::Real = 0.0, t_stop::Real = 1.0, recordValues::Union{Array{fmi2ValueReference}, Array{String}} = [])
     fmi2Simulate(fmu, dt, t_start, t_stop, recordValues)
 end
 
-"""Simulate an CoSimulation fmu according to its standard from 0.0 to t_stop"""
+"""Simulate an CoSimulation fmu according to its FMI version from 0.0 to t_stop"""
 function fmiSimulateCS(fmu::fmi2Struct, dt::Real, t_start::Real = 0.0, t_stop::Real = 1.0, recordValues::Union{Array{fmi2ValueReference}, Array{String}} = [])
     fmi2SimulateCS(fmu, dt, t_start, t_stop, recordValues)
 end
 
-"""Simulate an ModelExchange fmu according to its standard from 0.0 to t_stop"""
+"""Simulate an ModelExchange fmu according to its FMI version from 0.0 to t_stop"""
 function fmiSimulateME(fmu::fmi2Struct, dt::Real, t_start::Real = 0.0, t_stop::Real = 1.0)
     fmi2SimulateME(fmu, dt, t_start, t_stop)
 end
 
-"""Unloads the FMU and all its instances and frees the allocated memory"""
+"""Unloads the FMU and all its instances and frees the allocated memory independent of its FMI version"""
 function fmiUnload(fmu::FMU2)
     fmi2Unload(fmu)
 end
 
-"""Returns the number of states of the FMU"""
+"""Returns the number of states of the FMU, version independent"""
 function fmiGetNumberOfStates(fmu::FMU2)
     length(fmu.modelDescription.stateValueReferences)
 end
 
-"""Returns the header file used to compile the FMU. By default returns "default" """
+"""Returns the header file used to compile the FMU. By default returns "default", version independent"""
 function fmiGetTypesPlatform(fmu::FMU2)
     fmi2GetTypesPlatform(fmu)
 end
 
-"""Returns the version of the FMU"""
+"""Returns the version of the FMU, version independent"""
 function fmiGetVersion(fmu::FMU2)
     fmi2GetVersion(fmu)
 end
 
-"""Creates a new instance of the FMU"""
+"""Creates a new instance of the FMU, version independent"""
 function fmiInstantiate!(fmu::FMU2; visible::Bool = false, loggingOn::Bool = false)
 
     version = fmiGetVersion(fmu)
@@ -134,17 +134,17 @@ function fmiInstantiate!(fmu::FMU2; visible::Bool = false, loggingOn::Bool = fal
     nothing
 end
 
-"""Frees the allocated memory of the last instance of the FMU"""
+"""Frees the allocated memory of all instances of the FMU, version independent"""
 function fmiFreeInstance!(fmu::FMU2)
     fmi2FreeInstance!(fmu)
 end
 
-"""Control the use of the logging callback function"""
+"""Control the use of the logging callback function, version independent"""
 function fmiSetDebugLogging(s::fmi2Struct)
     fmi2SetDebugLogging(s)
 end
 
-"""Initialize the Simulation boundries"""
+"""Initialize the Simulation boundries, version independent"""
 function fmiSetupExperiment(fmu::fmi2Struct,
     toleranceDefined::Bool,
                 tolerance::Real,
@@ -154,7 +154,7 @@ function fmiSetupExperiment(fmu::fmi2Struct,
 
     fmi2SetupExperiment(fmu, toleranceDefined, tolerance, startTime, stopTimeDefined, stopTime)
 end
-"""Initialize the Simulation boundries"""
+"""Initialize the Simulation boundries, version independent"""
 function fmiSetupExperiment(fmu::fmi2Struct, startTime::Real = 0.0, stopTime::Real = startTime; tolerance::Real = 0.0)
 
     toleranceDefined = (tolerance > 0.0)
@@ -163,127 +163,127 @@ function fmiSetupExperiment(fmu::fmi2Struct, startTime::Real = 0.0, stopTime::Re
     fmi2SetupExperiment(fmu, toleranceDefined, tolerance, startTime, stopTimeDefined, stopTime)
 end
 
-"""Informs the FMU to enter initializaton mode"""
+"""Informs the FMU to enter initializaton mode, version independent"""
 function fmiEnterInitializationMode(s::fmi2Struct)
     fmi2EnterInitializationMode(s)
 end
 
-"""Informs the FMU to exit initialization mode"""
+"""Informs the FMU to exit initialization mode, version independent"""
 function fmiExitInitializationMode(s::fmi2Struct)
     fmi2ExitInitializationMode(s)
 end
 
-"""Informs the FMU that the simulation run is terminated"""
+"""Informs the FMU that the simulation run is terminated, version independent"""
 function fmiTerminate(s::fmi2Struct)
     fmi2Terminate(s)
 end
 
-"""Resets the FMU after a simulation run"""
+"""Resets the FMU after a simulation run, version independent"""
 function fmiReset(s::fmi2Struct)
     fmi2Reset(s)
 end
 
-"""Returns the real values of an array of variables"""
+"""Returns the real values of an array of variables, version independent"""
 function fmiGetReal(fmu::fmi2Struct, vr::fmi2Reference)
     fmi2GetReal(fmu, vr)
 end
 
-"""Writes the real values of an array of variables in the given field"""
+"""Writes the real values of an array of variables in the given field, version independent"""
 function fmiGetReal!(fmu::fmi2Struct, vr::Union{Array{fmi2ValueReference}, Array{String}}, values::Array{<:Real})
     fmi2GetReal!(fmu, vr, values)
 end
 
-"""Set the values of an array of real variables"""
+"""Set the values of an array of real variables, version independent"""
 function fmiSetReal(fmu::fmi2Struct, vr::fmi2Reference, value::Array{<:Real})
     fmi2SetReal(fmu, vr, Array{Real}(value))
 end
 
-"""Set the value of a real variable"""
+"""Set the value of a real variable, version independent"""
 function fmiSetReal(fmu::fmi2Struct, vr::fmi2Reference, value::Real)
     fmi2SetReal(fmu, vr, Real(value))
 end
-"""Returns the integer values of an array of variables"""
+"""Returns the integer values of an array of variables, version independent"""
 function fmiGetInteger(fmu::fmi2Struct, vr::fmi2Reference)
     fmi2GetInteger(fmu, vr)
 end
 
-"""Writes the integer values of an array of variables in the given field"""
+"""Writes the integer values of an array of variables in the given field, version independent"""
 function fmiGetInteger!(fmu::fmi2Struct, vr::Union{Array{fmi2ValueReference}, Array{String}}, values::Array{<:Integer})
     fmi2GetInteger!(fmu, vr, values)
 end
 
-"""Set the values of an array of integer variables"""
+"""Set the values of an array of integer variables, version independent"""
 function fmiSetInteger(fmu::fmi2Struct, vr::fmi2Reference, value::Array{<:Integer})
     fmi2SetInteger(fmu, vr, Array{Integer}(value))
 end
 
-"""Set the value of a integer variable"""
+"""Set the value of a integer variable, version independent"""
 function fmiSetInteger(fmu::fmi2Struct, vr::fmi2Reference, value::Integer)
     fmi2SetInteger(fmu, vr, Integer(value))
 end
-"""Returns the boolean values of an array of variables"""
+"""Returns the boolean values of an array of variables, version independent"""
 function fmiGetBoolean(fmu::fmi2Struct, vr::fmi2Reference)
     fmi2GetBoolean(fmu, vr)
 end
 
-"""Writes the boolean values of an array of variables in the given field"""
+"""Writes the boolean values of an array of variables in the given field, version independent"""
 function fmiGetBoolean!(fmu::fmi2Struct, vr::Union{Array{fmi2ValueReference}, Array{String}}, values::Array{Bool})
     fmi2GetBoolean!(fmu, vr, values)
 end
 
-"""Set the values of an array of boolean variables"""
+"""Set the values of an array of boolean variables, version independent"""
 function fmiSetBoolean(fmu::fmi2Struct, vr::fmi2Reference, value::Array{Bool})
     fmi2SetBoolean(fmu, vr, value)
 end
 
-"""Set the value of a boolean variable"""
+"""Set the value of a boolean variable, version independent"""
 function fmiSetBoolean(fmu::fmi2Struct, vr::fmi2Reference, value::Bool)
     fmi2SetBoolean(fmu, vr, value)
 end
-"""Returns the string values of an array of variables"""
+"""Returns the string values of an array of variables, version independent"""
 function fmiGetString(fmu::fmi2Struct, vr::fmi2Reference)
     fmi2GetString(fmu, vr)
 end
 
-"""Writes the string values of an array of variables in the given field"""
+"""Writes the string values of an array of variables in the given field, version independent"""
 function fmiGetString!(fmu::fmi2Struct, vr::Union{Array{fmi2ValueReference}, Array{String}}, values::Array{String})
     fmi2GetString!(fmu, vr, values)
 end
 
-"""Set the values of an array of string variables"""
+"""Set the values of an array of string variables, version independent"""
 function fmiSetString(fmu::fmi2Struct, vr::fmi2Reference, value::Array{String})
     fmi2SetString(fmu, vr, value)
 end
 
-"""Set the value of a string variable"""
+"""Set the value of a string variable, version independent"""
 function fmiSetString(fmu::fmi2Struct, vr::fmi2Reference, value::String)
     fmi2SetString(fmu, vr, value)
 end
-"""Returns the FMU state of the fmu"""
+"""Returns the FMU state of the fmu, version independent"""
 function fmiGetFMUstate(fmu2::fmi2Struct)
     fmi2GetFMUstate(fmu2)
 end
-"""Sets the FMU to the given state"""
+"""Sets the FMU to the given state, version independent"""
 function fmiSetFMUstate(fmu2::fmi2Struct, state::fmi2FMUstate)
     fmi2SetFMUstate(fmu2, state)
 end
-"""Free the memory for the allocated FMU state"""
+"""Free the memory for the allocated FMU state, version independent"""
 function fmiFreeFMUstate(fmu2::fmi2Struct, state::fmi2FMUstate)
     fmi2FreeFMUstate(fmu2, state)
 end
-"""Returns the size of the byte vector the FMU can be stored in"""
+"""Returns the size of the byte vector the FMU can be stored in, version independent"""
 function fmiSerializedFMUstateSize(c::fmi2Struct, state::fmi2FMUstate)
     fmi2SerializedFMUstateSize(c, state)
 end
-"""Serialize the data in the FMU state pointer"""
+"""Serialize the data in the FMU state pointer, version independent"""
 function fmiSerializeFMUstate(c::fmi2Struct, state::fmi2FMUstate)
     fmi2SerializeFMUstate(c, state)
 end
-"""Deserialize the data in the FMU state pointer"""
+"""Deserialize the data in the FMU state pointer, version independent"""
 function fmiDeSerializeFMUstate(c::fmi2Struct, serializedState::Array{fmi2Byte})
     fmi2DeSerializeFMUstate(c, serializedState)
 end
-"""Returns the values of the directional derivatives"""
+"""Returns the values of the directional derivatives, version independent"""
 function fmiGetDirectionalDerivative(fmu::fmi2Struct,
                                      vUnknown_ref::Array{Cint},
                                      vKnown_ref::Array{Cint},
@@ -296,57 +296,57 @@ function fmiGetDirectionalDerivative(fmu::fmi2Struct,
                                  Array{Real}(dvUnknown))
 end
 
-""" Wrapper for single directional derivative """
+""" Wrapper for single directional derivative, version independent """
 function fmiGetDirectionalDerivative(fmu::fmi2Struct, vUnknown_ref::Cint, vKnown_ref::Cint, dvKnown::Real = 1.0, dvUnknown::Real = 1.0)
     fmi2GetDirectionalDerivative(fmu, vUnknown_ref, vKnown_ref, dvKnown, dvUnknown)
 end
 
-"""Does one step in the CoSimulation FMU"""
+"""Does one step in the CoSimulation FMU, version independent"""
 function fmiDoStep(fmu::fmi2Struct, currentCommunicationPoint::Real, communicationStepSize::Real, noSetFMUStatePriorToCurrentPoint::Bool = true)
     fmi2DoStep(fmu, currentCommunicationPoint, communicationStepSize, noSetFMUStatePriorToCurrentPoint)
 end
-"""Does one step in the CoSimulation FMU"""
+"""Does one step in the CoSimulation FMU, version independent"""
 function fmiDoStep(c::fmi2Struct, communicationStepSize::Real)
     fmi2DoStep(c, communicationStepSize)
 end
-"""Set a time instant"""
+"""Set a time instant, version independent"""
 function fmiSetTime(fmu2::fmi2Struct, time::Real)
     fmi2SetTime(fmu, time)
 end
-"""Set a new (continuous) state vector"""
+"""Set a new (continuous) state vector, version independent"""
 function fmiSetContinuousStates(c::fmi2Struct, x::Union{Array{Float32}, Array{Float64}})
     fmi2SetContinuousStates(c, x)
 end
-"""The model enters Event Mode"""
+"""The model enters Event Mode, version independent"""
 function fmi2EnterEventMode(fmu2::fmi2Struct)
     fmi2EnterEventMode(fmu2)
 end
-"""Returns the next discrete states"""
+"""Returns the next discrete states, version independent"""
 function fmiNewDiscreteStates(c::fmi2Struct)
     fmi2NewDiscreteStates(c)
 end
-"""The model enters Continuous-Time Mode"""
+"""The model enters Continuous-Time Mode, version independent"""
 function fmiEnterContinuousTimeMode(fmu2::fmi2Struct)
     fmi2EnterContinuousTimeMode(fmu2)
 end
-"""This function must be called by the environment after every completed step"""
+"""This function must be called by the environment after every completed step, version independent"""
 function fmiCompletedIntegratorStep(fmu2::fmi2Struct,
                                      noSetFMUStatePriorToCurrentPoint::fmi2Boolean)
     fmi2CompletedIntegratorStep(fmu2,noSetFMUStatePriorToCurrentPoint)
 end
-"""Compute state derivatives at the current time instant and for the current states"""
+"""Compute state derivatives at the current time instant and for the current states, version independent"""
 function  fmiGetDerivatives(c::fmi2Struct)
     fmi2GetDerivatives(c)
 end
-"""Returns the event indicators of the FMU"""
+"""Returns the event indicators of the FMU, version independent"""
 function fmiGetEventIndicators(fmu2::fmi2Struct)
     fmi2GetEventIndicators(fmu2)
 end
-"""Return the new (continuous) state vector x"""
+"""Return the new (continuous) state vector x, version independent"""
 function fmiGetContinuousStates(fmu2::fmi2Struct)
     fmi2GetContinuousStates(fmu2)
 end
-"""Return the new (continuous) state vector x"""
+"""Return the new (continuous) state vector x, version independent"""
 function fmiGetNominalsOfContinuousStates(fmu2::fmi2Struct)
     fmi2GetNominalsOfContinuousStates(fmu2)
 end

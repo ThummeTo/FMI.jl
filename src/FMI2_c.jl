@@ -241,7 +241,7 @@ end
 """
 Source: FMISpec2.0.2[p.106]: 4.2.3 Retrieving Status Information from the Slave
 
-CoSimulation specific Enum
+CoSimulation specific Enum representing state of fmu after fmi2DoStep returned fmi2Pending
 
 """
 @enum fmi2StatusKind begin
@@ -312,7 +312,7 @@ end
 """
 Source: FMISpec2.0.2[p.46]: 2.2.7 Definition of Model Variables (ModelVariables)
 
-The “ModelVariables” element of fmiModelDescription is the central part of the model description. It provides the static information of all exposed variables.
+The fmi2ScalarVariable specifies the type and argument of every exposed variable in the fmu
 """
 struct fmi2ScalarVariable
     #mandatory
@@ -690,7 +690,7 @@ end
 """
 Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
 
-fmi2SerializeFMUstate serializes the data which is referenced by pointer FMUstate and copies this data in to the byte vector serializedState of length size,
+fmi2SerializeFMUstate serializes the data which is referenced by pointer FMUstate and copies this data in to the byte vector serializedState of length size
 """
 function fmi2SerializeFMUstate(c::fmi2Component, FMUstate::fmi2FMUstate, serialzedState::Array{fmi2Byte}, size::Csize_t)
     status = ccall(c.fmu.cSerializeFMUstate,
@@ -732,6 +732,8 @@ end
 Source: FMISpec2.0.2[p.104]: 4.2.1 Transfer of Input / Output Values and Parameters
 
 Sets the n-th time derivative of real input variables.
+vr defines the value references of the variables
+the array order specifies the corresponding order of derivation of the variables
 """
 function fmi2SetRealInputDerivatives(c::fmi2Component,  vr::fmi2ValueReference, nvr::Unsigned, order::fmi2Integer, value::fmi2Real)
     status = ccall(c.fmu.cSetRealInputDerivatives,
@@ -743,6 +745,8 @@ end
 Source: FMISpec2.0.2[p.104]: 4.2.1 Transfer of Input / Output Values and Parameters
 
 Retrieves the n-th derivative of output values.
+vr defines the value references of the variables
+the array order specifies the corresponding order of derivation of the variables
 """
 function fmi2GetRealOutputDerivatives(c::fmi2Component,  vr::fmi2ValueReference, nvr::Unsigned, order::fmi2Integer, value::fmi2Real)
     status = ccall(c.fmu.cGetRealOutputDerivatives,
@@ -897,6 +901,8 @@ end
 Source: FMISpec2.0.2[p.85]: 3.2.2 Evaluation of Model Equations
 
 This function must be called by the environment after every completed step of the integrator provided the capability flag completedIntegratorStepNotNeeded = false.
+If enterEventMode == fmi2True, the event mode must be entered
+If terminateSimulation == fmi2True, the simulation shall be terminated
 """
 function fmi2CompletedIntegratorStep!(c::fmi2Component,
                                       noSetFMUStatePriorToCurrentPoint::fmi2Boolean,
