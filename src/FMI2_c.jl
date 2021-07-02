@@ -11,7 +11,7 @@ To simplify porting, no C types are used in the function interfaces, but the ali
 All definitions in this section are provided in the header file “fmi2TypesPlatform.h”.
 """
 const fmi2Char = Cchar
-const fmi2String = String
+const fmi2String = String # TODO: correct it
 const fmi2Boolean = Cint
 const fmi2Real = Float64
 const fmi2Integer = Cint
@@ -19,7 +19,10 @@ const fmi2Byte = Char
 const fmi2ValueReference = Cint
 const fmi2FMUstate = Ptr{Cvoid}
 const fmi2ComponentEnvironment = Ptr{Cvoid}
-const fmi2Enum = Array{Array{String}}
+const fmi2Enum = Array{Array{String}} # TODO: correct it
+
+# custom types
+fmi2ValueReferenceFormat = Union{Nothing, String, Array{String,1}, fmi2ValueReference, Array{fmi2ValueReference,1}, Int64, Array{Int64,1}} # wildcard how a user can pass a fmi2ValueReference
 
 """
 Source: FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
@@ -241,8 +244,7 @@ end
 """
 Source: FMISpec2.0.2[p.106]: 4.2.3 Retrieving Status Information from the Slave
 
-CoSimulation specific Enum representing state of fmu after fmi2DoStep returned fmi2Pending
-
+CoSimulation specific Enum representing state of fmu after fmi2DoStep returned fmi2Pending.
 """
 @enum fmi2StatusKind begin
     fmi2DoStepStatus
@@ -309,6 +311,7 @@ mutable struct datatypeVariable
     # Constructor
     datatypeVariable() = new()
 end
+
 """
 Source: FMISpec2.0.2[p.46]: 2.2.7 Definition of Model Variables (ModelVariables)
 
@@ -332,8 +335,7 @@ struct fmi2ScalarVariable
     end
 
     # Constructor for fully specified ScalarVariable
-    function fmi2ScalarVariable(name, fmi2valueReference, datatype, description, causalityString,
-        variabilityString, initialString)
+    function fmi2ScalarVariable(name, fmi2valueReference, datatype, description, causalityString, variabilityString, initialString)
 
         var = continuous::fmi2variability
         cau = _local::fmi2causality
@@ -342,8 +344,8 @@ struct fmi2ScalarVariable
         if !occursin(variabilityString, string(instances(fmi2variability)))
             display("Error: variability not known")
         else
-            for i = 0:length(instances(fmi2variability))-1
-                if(variabilityString == string(fmi2variability(i)))
+            for i in 0:(length(instances(fmi2variability))-1)
+                if variabilityString == string(fmi2variability(i))
                     var = fmi2variability(i)
                 end
             end
@@ -352,8 +354,8 @@ struct fmi2ScalarVariable
         if !occursin(causalityString, string(instances(fmi2causality)))
             display("Error: causality not known")
         else
-            for i = 0:length(instances(fmi2causality))-1
-                if(causalityString == string(fmi2causality(i)))
+            for i in 0:(length(instances(fmi2causality))-1)
+                if causalityString == string(fmi2causality(i))
                     cau = fmi2causality(i)
                 end
             end
@@ -362,14 +364,16 @@ struct fmi2ScalarVariable
         if !occursin(initialString, string(instances(fmi2initial)))
             display("Error: initial not known")
         else
-            for i = 0:length(instances(fmi2initial))-1
-                if(initialString == string(fmi2initial(i)))
+            for i in 0:(length(instances(fmi2initial))-1)
+                if initialString == string(fmi2initial(i))
                     init = fmi2initial(i)
                 end
             end
         end
         new(name, fmi2valueReference, datatype, description, cau, var, init)
-    end end
+    end
+end
+
 """
 Source: FMISpec2.0.2[p.34]: 2.2.1 Definition of an FMU (fmiModelDescription)
 
@@ -377,15 +381,31 @@ The “ModelVariables” element of fmiModelDescription is the central part of t
 """
 mutable struct fmi2ModelDescription
     # FMI model description
-    fmiVersion::fmi2String
-    modelName::fmi2String
-    guid::fmi2String
-    description::fmi2String
-    isCoSimulation::fmi2Boolean
-    isModelExchange::fmi2Boolean
+    fmiVersion::String
+    modelName::String
+    guid::String
+    generationTool::String
+    generationDateAndTime::String
+    variableNamingConvention::String
 
     CSmodelIdentifier::String
+    CScanHandleVariableCommunicationStepSize::Bool
+    CScanInterpolateInputs::Bool
+    CSmaxOutputDerivativeOrder::Int
+    CScanGetAndSetFMUstate::Bool
+    CScanSerializeFMUstate::Bool
+    CSprovidesDirectionalDerivative::Bool
+
     MEmodelIdentifier::String
+    MEcanGetAndSetFMUstate::Bool
+    MEcanSerializeFMUstate::Bool
+    MEprovidesDirectionalDerivative::Bool
+
+    # helpers
+    isCoSimulation::Bool
+    isModelExchange::Bool
+
+    description::String
 
     # Model variables
     modelVariables::Array{fmi2ScalarVariable,1}
@@ -396,17 +416,14 @@ mutable struct fmi2ModelDescription
 
     stateValueReferences::Array{fmi2ValueReference}
     derivativeValueReferences::Array{fmi2ValueReference}
-    numberOfContinuousStates::Csize_t
-    numberOfEventIndicators::Csize_t
+    numberOfContinuousStates::Int
+    numberOfEventIndicators::Int
     enumerations::fmi2Enum
 
     stringValueReferences
 
     # Constructor for uninitialized struct
-    function fmi2ModelDescription()
-        md = new()
-        md
-    end
+    fmi2ModelDescription() = new()
 end
 
 # Common function for ModelExchange & CoSimulation
@@ -433,17 +450,24 @@ function fmi2Instantiate(cfunc::Ptr{Nothing},
 
     compAddr
 end
+
 """
 Source: FMISpec2.0.2[p.22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
 
-Disposes the given instance, unloads the loaded model, and frees all the allocated memory and other resources that have been allocated by the functions of the FMU interface. If a null pointer is provided for “c”, the function call is ignored (does not have an effect).
-"""
-function fmi2FreeInstance(c::fmi2Component)
+Disposes the given instance, unloads the loaded model, and frees all the allocated memory and other resources that have been allocated by the functions of the FMU interface.
+If a null pointer is provided for “c”, the function call is ignored (does not have an effect).
 
+Removes the component from the FMUs component list.
+"""
+function fmi2FreeInstance!(c::fmi2Component)
+
+    ind = findall(x->x==c, c.fmu.components)
+    deleteat!(c.fmu.components, ind)
     ccall(c.fmu.cFreeInstance, Cvoid, (Ptr{Cvoid},), c.compAddr)
 
     nothing
 end
+
 """
 Source: FMISpec2.0.2[p.22]: 2.1.4 Inquire Platform and Version Number of Header Files
 
@@ -458,6 +482,7 @@ function fmi2GetTypesPlatform(cfunc::Ptr{Nothing})
 
     unsafe_string(typesPlatform)
 end
+
 """
 Source: FMISpec2.0.2[p.22]: 2.1.4 Inquire Platform and Version Number of Header Files
 
@@ -471,6 +496,7 @@ function fmi2GetVersion(cfunc::Ptr{Nothing})
 
     unsafe_string(fmi2Version)
 end
+
 """
 Source: FMISpec2.0.2[p.22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
 
@@ -507,6 +533,7 @@ function fmi2SetupExperiment(c::fmi2Component,
 
     status
 end
+
 """
 Source: FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
 
@@ -518,6 +545,7 @@ function fmi2EnterInitializationMode(c::fmi2Component)
           (Ptr{Nothing},),
           c.compAddr)
 end
+
 """
 Source: FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
 
@@ -529,6 +557,7 @@ function fmi2ExitInitializationMode(c::fmi2Component)
           (Ptr{Nothing},),
           c.compAddr)
 end
+
 """
 Source: FMISpec2.0.2[p.24]: 2.1.6 Initialization, Termination, and Resetting an FMU
 
@@ -537,6 +566,7 @@ Informs the FMU that the simulation run is terminated.
 function fmi2Terminate(c::fmi2Component)
     ccall(c.fmu.cTerminate, Cuint, (Ptr{Nothing},), c.compAddr)
 end
+
 """
 Source: FMISpec2.0.2[p.24]: 2.1.6 Initialization, Termination, and Resetting an FMU
 
@@ -545,6 +575,7 @@ Is called by the environment to reset the FMU after a simulation run. The FMU go
 function fmi2Reset(c::fmi2Component)
     ccall(c.fmu.cReset, Cuint, (Ptr{Nothing},), c.compAddr)
 end
+
 """
 Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
@@ -556,6 +587,7 @@ function fmi2GetReal!(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Csiz
           (Ptr{Nothing}, Ptr{fmi2ValueReference}, Csize_t, Ptr{fmi2Real}),
           c.compAddr, vr, nvr, value)
 end
+
 """
 Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
@@ -568,6 +600,7 @@ function fmi2SetReal(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Csize
                 c.compAddr, vr, nvr, value)
     status
 end
+
 """
 Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
@@ -580,6 +613,7 @@ function fmi2GetInteger!(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::C
                 c.compAddr, vr, nvr, value)
     status
 end
+
 """
 Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
@@ -592,6 +626,7 @@ function fmi2SetInteger(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Cs
                 c.compAddr, vr, nvr, value)
     status
 end
+
 """
 Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
@@ -604,6 +639,7 @@ function fmi2GetBoolean!(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::C
                 c.compAddr, vr, nvr, value)
     status
 end
+
 """
 Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
@@ -616,6 +652,7 @@ function fmi2SetBoolean(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Cs
                 c.compAddr, vr, nvr, value)
     status
 end
+
 """
 Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
@@ -628,6 +665,7 @@ function fmi2GetString!(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Cs
                 c.compAddr, vr, nvr, value)
     status
 end
+
 """
 Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
@@ -640,6 +678,7 @@ function fmi2SetString(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Csi
                 c.compAddr, vr, nvr, value)
     status
 end
+
 """
 Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
 
@@ -652,6 +691,7 @@ function fmi2GetFMUstate(c::fmi2Component, FMUstate::Ref{fmi2FMUstate})
                 c.compAddr, FMUstate)
     status
 end
+
 """
 Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
 
@@ -664,6 +704,7 @@ function fmi2SetFMUstate(c::fmi2Component, FMUstate::fmi2FMUstate)
                 c.compAddr, FMUstate)
     status
 end
+
 """
 Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
 
@@ -676,6 +717,7 @@ function fmi2FreeFMUstate(c::fmi2Component, FMUstate::Ref{fmi2FMUstate})
                 c.compAddr, FMUstate)
     status
 end
+
 """
 Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
 
@@ -687,6 +729,7 @@ function fmi2SerializedFMUstateSize(c::fmi2Component, FMUstate::fmi2FMUstate, si
                 (Ptr{Nothing}, Ptr{Cvoid}, Ptr{Csize_t}),
                 c.compAddr, FMUstate, size)
 end
+
 """
 Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
 
@@ -698,6 +741,7 @@ function fmi2SerializeFMUstate(c::fmi2Component, FMUstate::fmi2FMUstate, serialz
                 (Ptr{Nothing}, Ptr{Cvoid}, Ptr{Cchar}, Csize_t),
                 c.compAddr, FMUstate, serialzedState, size)
 end
+
 """
 Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
 
@@ -709,6 +753,7 @@ function fmi2DeSerializeFMUstate(c::fmi2Component, serialzedState::Array{fmi2Byt
                 (Ptr{Nothing}, Ptr{Cchar}, Csize_t, Ptr{fmi2FMUstate}),
                 c.compAddr, serialzedState, size, FMUstate)
 end
+
 """
 Source: FMISpec2.0.2[p.26]: 2.1.9 Getting Partial Derivatives
 
@@ -741,6 +786,7 @@ function fmi2SetRealInputDerivatives(c::fmi2Component,  vr::fmi2ValueReference, 
                 (Ptr{Nothing}, Ptr{Cint}, Csize_t, Ptr{Cint}, Ptr{Cdouble}),
                 c.compAddr, Ref(vr), nvr, Ref(order), Ref(value))
 end
+
 """
 Source: FMISpec2.0.2[p.104]: 4.2.1 Transfer of Input / Output Values and Parameters
 
@@ -754,6 +800,7 @@ function fmi2GetRealOutputDerivatives(c::fmi2Component,  vr::fmi2ValueReference,
                 (Ptr{Nothing}, Ptr{Cint}, Csize_t, Ptr{Cint}, Ptr{Cdouble}),
                 c.compAddr, Ref(vr), nvr, Ref(order), Ref(value))
 end
+
 """
 Source: FMISpec2.0.2[p.104]: 4.2.2 Computation
 
@@ -764,6 +811,7 @@ function fmi2DoStep(c::fmi2Component, currentCommunicationPoint::fmi2Real, commu
           (Ptr{Nothing}, Cdouble, Cdouble, Cint),
           c.compAddr, currentCommunicationPoint, communicationStepSize, noSetFMUStatePriorToCurrentPoint)
 end
+
 """
 Source: FMISpec2.0.2[p.105]: 4.2.2 Computation
 
@@ -772,6 +820,7 @@ Can be called if fmi2DoStep returned fmi2Pending in order to stop the current as
 function fmi2CancelStep(c::fmi2Component)
     ccall(c.fmu.cCancelStep, Cuint, (Ptr{Nothing},), c.compAddr)
 end
+
 """
 Source: FMISpec2.0.2[p.106]: 4.2.3 Retrieving Status Information from the Slave
 
@@ -784,6 +833,7 @@ function fmi2GetStatus(c::fmi2Component, s::fmi2StatusKind, value::fmi2Status)
                 c.compAddr, s, Ref(value))
     status
 end
+
 """
 Source: FMISpec2.0.2[p.106]: 4.2.3 Retrieving Status Information from the Slave
 
@@ -796,6 +846,7 @@ function fmi2GetRealStatus(c::fmi2Component, s::fmi2StatusKind, value::fmi2Real)
                 c.compAddr, s, Ref(value))
     status
 end
+
 """
 Source: FMISpec2.0.2[p.106]: 4.2.3 Retrieving Status Information from the Slave
 
@@ -808,6 +859,7 @@ function fmi2GetIntegerStatus(c::fmi2Component, s::fmi2StatusKind, value::fmi2In
                 c.compAddr, s, Ref(value))
     status
 end
+
 """
 Source: FMISpec2.0.2[p.106]: 4.2.3 Retrieving Status Information from the Slave
 
@@ -820,6 +872,7 @@ function fmi2GetBooleanStatus(c::fmi2Component, s::fmi2StatusKind, value::fmi2Bo
                 c.compAddr, s, Ref(value))
     status
 end
+
 """
 Source: FMISpec2.0.2[p.106]: 4.2.3 Retrieving Status Information from the Slave
 
@@ -872,6 +925,7 @@ function fmi2EnterEventMode(c::fmi2Component)
           (Ptr{Nothing},),
           c.compAddr)
 end
+
 """
 Source: FMISpec2.0.2[p.84]: 3.2.2 Evaluation of Model Equations
 
@@ -914,7 +968,6 @@ function fmi2CompletedIntegratorStep!(c::fmi2Component,
           c.compAddr, noSetFMUStatePriorToCurrentPoint, Ref(enterEventMode), Ref(terminateSimulation))
 end
 
-
 """
 Source: FMISpec2.0.2[p.86]: 3.2.2 Evaluation of Model Equations
 
@@ -928,6 +981,7 @@ function fmi2GetDerivatives(c::fmi2Component,
           (Ptr{Nothing}, Ptr{fmi2Real}, Csize_t),
           c.compAddr, derivatives, nx)
 end
+
 """
 Source: FMISpec2.0.2[p.86]: 3.2.2 Evaluation of Model Equations
 
@@ -953,6 +1007,7 @@ function fmi2GetContinuousStates(c::fmi2Component,
           (Ptr{Nothing}, Ptr{fmi2Real}, Csize_t),
           c.compAddr, x, nx)
 end
+
 """
 Source: FMISpec2.0.2[p.86]: 3.2.2 Evaluation of Model Equations
 
