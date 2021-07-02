@@ -15,11 +15,10 @@ fmiSetupExperiment(comp1, 0.0)
 fmiEnterInitializationMode(comp1)
 fmiExitInitializationMode(comp1)
 
-dt = 0.01
 t_start = 0.0
 t_stop = 8.0
 
-data1 = fmiSimulateCS(comp1, dt, t_start, t_stop, ["mass.s"])
+data1 = fmiSimulateCS(comp1, t_start, t_stop; recordValues=["mass.s"])
 fmiPlot(data1)
 
 #create another instance, change the spring stiffness and simulate it
@@ -29,7 +28,7 @@ fmiEnterInitializationMode(comp2)
 springConstant = fmiGetReal(comp2, "spring.c") * 0.1
 fmiSetReal(comp2, "spring.c", springConstant)
 fmiExitInitializationMode(comp2)
-data2 = fmiSimulateCS(comp2, dt, t_start, t_stop, ["mass.s"])
+data2 = fmiSimulateCS(comp2, t_start, t_stop; recordValues=["mass.s"])
 fmiPlot(data2)
 
 

@@ -9,29 +9,32 @@ import Random
 
 exportingToolsWindows = ["Dymola/2020x", "OpenModelica/v1.17.0"]
 exportingToolsLinux = ["OpenModelica/v1.17.0"]
+fmuStructs = ["FMU", "FMUCOMPONENT"]
 
 function runtests(exportingTool)
     ENV["EXPORTINGTOOL"] = exportingTool
 
     @testset "Testing FMUs exported from $exportingTool" begin
-        @testset "FMU functions" begin
-            include("getterSetterTest_fmu.jl")
-            include("independentFunctionsTest_fmu.jl")
-            if exportingTool != "OpenModelica/v1.17.0" # state manipulation (optional) is not supported by OpenModelica
-                include("stateTest_fmu.jl")
+        for str in fmuStructs
+            @testset "Functions for $str" begin
+                ENV["FMUSTRUCT"] = str
+                @testset "Variable Getters / Setters" begin
+                    include("getter_setter.jl")
+                end
+                @testset "State Manipulation" begin
+                    include("state.jl")
+                end
+                @testset "CS Simulation" begin
+                    include("sim_CS.jl")
+                end
+                @testset "ME Simulation" begin
+                    include("sim_ME.jl")
+                end
             end
         end
-        @testset "FMI-Component functions" begin
-            include("getterSetterTest_comp.jl")
-            include("independentFunctionsTest_comp.jl")
-            if exportingTool != "OpenModelica/v1.17.0" # state manipulation (optional) is not supported by OpenModelica
-                include("stateTest_comp.jl")
-            end
-        end
-        @testset "Simulation Tests" begin
-            include("test_setter_getter.jl")
-            include("test_sim_CS.jl")
-            include("test_sim_ME.jl")
+
+        @testset "Model Description Parsing" begin
+            include("model_description.jl")
         end
     end
 end
