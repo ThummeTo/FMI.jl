@@ -3,8 +3,6 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-include("FMI2.jl")
-
 # Comfort functions for fmi2 functions using fmi2Components
 
 """
@@ -17,22 +15,6 @@ function fmi2SetDebugLogging(c::fmi2Component)
 end
 
 """
-Set the start and end time for a simulation, can only be called after fmi2Instantiate and before fmi2EnterInitializationMode
-
-For more information call ?fmi2SetupExperiment
-"""
-function fmi2SetupExperiment(c::fmi2Component,
-    toleranceDefined::Bool,
-                tolerance::Real,
-                startTime::Real,
-                stopTimeDefined::Bool,
-                stopTime::Real)
-    c.fmu.t = startTime
-    fmi2SetupExperiment(c, fmi2Boolean(toleranceDefined), fmi2Real(tolerance),
-                            fmi2Real(startTime), fmi2Boolean(stopTimeDefined), fmi2Real(stopTime))
-end
-
-"""
 Setup the simulation but without defining all of the parameters
 
 For more information call ?fmi2SetupExperiment
@@ -42,464 +24,241 @@ function fmi2SetupExperiment(c::fmi2Component, startTime::Real = 0.0, stopTime::
     toleranceDefined = (tolerance > 0.0)
     stopTimeDefined = (stopTime > startTime)
 
-    fmi2SetupExperiment(c, toleranceDefined, tolerance, startTime, stopTimeDefined, stopTime)
+    fmi2SetupExperiment(c, fmi2Boolean(toleranceDefined), fmi2Real(tolerance), fmi2Real(startTime), fmi2Boolean(stopTimeDefined), fmi2Real(stopTime))
 end
+
 """
 Get the values of an array of fmi2Real variables
 
 For more information call ?fmi2GetReal
 """
-function fmi2GetReal(c::fmi2Component, vr::Array{fmi2ValueReference})
+function fmi2GetReal(c::fmi2Component, vr::fmi2ValueReferenceFormat)
+
+    vr = prepareValueReference(c, vr)
+
     nvr = Csize_t(length(vr))
     values = zeros(fmi2Real, nvr)
     fmi2GetReal!(c, vr, nvr, values)
-    values
-end
 
-"""
-Get the value of a fmi2Real variable
-
-For more information call ?fmi2GetReal
-"""
-function fmi2GetReal(c::fmi2Component, vr::fmi2ValueReference)
-    values = fmi2GetReal(c, [vr])
-    values[1]
-end
-"""
-Get the values of an array of fmi2Real variables by variable name
-
-For more information call ?fmi2GetReal
-"""
-function fmi2GetReal(c::fmi2Component, vr_string::Array{String})
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
+    if length(values) == 1
+        return values[1]
     else
-        fmi2GetReal(c, vr)
+        return values
     end
 end
-"""
-Get the value of a fmi2Real variable by variable name
 
-For more information call ?fmi2GetReal
-"""
-function fmi2GetReal(c::fmi2Component, vr_string::String)
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    if vr == nothing
-        display("[ERROR]: valueReference not found")
-    else
-        fmi2GetReal(c, vr)
-    end
-end
 """
 Get the values of an array of fmi2Real variables
 
 For more information call ?fmi2GetReal
 """
-function fmi2GetReal!(c::fmi2Component, vr::Array{fmi2ValueReference}, values::Array{<:Real})
-    vars = zeros(fmi2Real, length(values))
-    if length(values) != length(vr)
-        display("[ERROR]: Number of value references and in place array doesn't match")
-    else
-        fmi2GetReal!(c, vr, Csize_t(length(values)), vars)
-    end
-    values[:] = vars
-end
-"""
-Get the values of an array of fmi2Real variables by variable name
+function fmi2GetReal!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Array{<:Real})
 
-For more information call ?fmi2GetReal
-"""
-function fmi2GetReal!(c::fmi2Component, vr_string::Array{String}, values::Array{<:Real})
-    vars = zeros(fmi2Real, length(values))
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    fmi2GetReal!(c, vr, values)
+    vr = prepareValueReference(c, vr)
+    values = prepareValue(values)
+    @assert length(vr) == length(values) "fmi2GetReal!(...): `vr` and `values` need to be the same length."
+
+    nvr = Csize_t(length(values))
+    vars = zeros(fmi2Real, nvr)
+    fmi2GetReal!(c, vr, nvr, vars)
+
+    values[:] = vars
+
+    nothing
 end
+function fmi2GetReal!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Real)
+    @assert false "fmi2GetReal! is only possible for arrays of values, please use an array instead of a scalar."
+end
+
 """
 Set the values of an array of fmi2Real variables
 
 For more information call ?fmi2SetReal
 """
-function fmi2SetReal(c::fmi2Component, vr::Array{fmi2ValueReference}, value::Array{<:Real})
+function fmi2SetReal(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Union{Array{<:Real}, <:Real})
+
+    vr = prepareValueReference(c, vr)
+    values = prepareValue(values)
+    @assert length(vr) == length(values) "fmi2SetReal(...): `vr` and `values` need to be the same length."
+
     nvr = Csize_t(length(vr))
-    fmi2SetReal(c, vr, nvr, Array{fmi2Real}(value))
+    fmi2SetReal(c, vr, nvr, Array{fmi2Real}(values))
 end
 
-"""
-Set the value of a fmi2Real variable
-
-For more information call ?fmi2SetReal
-"""
-function fmi2SetReal(c::fmi2Component, vr::fmi2ValueReference, value::Real)
-    fmi2SetReal(c, [vr], [value])
-end
-"""
-Set the values of an array of fmi2Real variables by variable name
-
-For more information call ?fmi2SetReal
-"""
-function fmi2SetReal(c::fmi2Component, vr_string::Array{String}, value::Array{<:Real})
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
-    else
-        fmi2SetReal(c, vr, value)
-    end
-end
-"""
-Set the value of a fmi2Real variable by variable name
-
-For more information call ?fmi2SetReal
-"""
-function fmi2SetReal(c::fmi2Component, vr_string::String, value::Real)
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    if vr == nothing
-        display("[ERROR]: valueReference not found")
-    else
-        fmi2SetReal(c, vr, value)
-    end
-end
 """
 Get the values of an array of fmi2Integer variables
 
 For more information call ?fmi2GetInteger
 """
-function fmi2GetInteger(c::fmi2Component, vr::Array{fmi2ValueReference})
+function fmi2GetInteger(c::fmi2Component, vr::fmi2ValueReferenceFormat)
+
+    vr = prepareValueReference(c, vr)
+
     nvr = Csize_t(length(vr))
     values = zeros(fmi2Integer, nvr)
-
     fmi2GetInteger!(c, vr, nvr, values)
-    values
-end
 
-"""
-Get the value of a fmi2Integer variable
-
-For more information call ?fmi2GetInteger
-"""
-function fmi2GetInteger(c::fmi2Component, vr::fmi2ValueReference)
-    values = fmi2GetInteger(c, [vr])
-    values[1]
-end
-"""
-Get the values of an array of fmi2Integer variables by variable name
-
-For more information call ?fmi2GetInteger
-"""
-function fmi2GetInteger(c::fmi2Component, vr_string::Array{String})
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
+    if length(values) == 1
+        return values[1]
     else
-        fmi2GetInteger(c, vr)
+        return values
     end
 end
-"""
-Get the value of a fmi2Integer variable by variable name
 
-For more information call ?fmi2GetInteger
-"""
-function fmi2GetInteger(c::fmi2Component, vr_string::String)
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    if vr == nothing
-        display("[ERROR]: valueReference not found")
-    else
-        fmi2GetInteger(c, vr)
-    end
-end
 """
 Get the values of an array of fmi2Integer variables
 
 For more information call ?fmi2GetInteger
 """
-function fmi2GetInteger!(c::fmi2Component, vr::Array{fmi2ValueReference}, values::Array{<:Integer})
-    vars = zeros(fmi2Integer, length(values))
-    if length(values) != length(vr)
-        display("[ERROR]: Number of value references and in place array doesn't match")
-    else
-        fmi2GetInteger!(c, vr, Csize_t(length(values)), vars)
-    end
-    values[:] = vars
-end
-"""
-Get the values of an array of fmi2Integer variables by variable name
+function fmi2GetInteger!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Array{<:Integer})
 
-For more information call ?fmi2GetInteger
-"""
-function fmi2GetInteger!(c::fmi2Component, vr_string::Array{String}, values::Array{<:Integer})
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    fmi2GetInteger!(c, vr, values)
+    vr = prepareValueReference(c, vr)
+    values = prepareValue(values)
+    @assert length(vr) == length(values) "fmi2GetInteger!(...): `vr` and `values` need to be the same length."
+
+    nvr = Csize_t(length(values))
+    vars = zeros(fmi2Integer, nvr)
+    fmi2GetInteger!(c, vr, nvr, vars)
+    values[:] = vars
+
+    nothing
 end
+function fmi2GetInteger!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Integer)
+    @assert false "fmi2GetInteger! is only possible for arrays of values, please use an array instead of a scalar."
+end
+
 """
 Set the values of an array of fmi2Integer variables
 
 For more information call ?fmi2SetInteger
 """
-function fmi2SetInteger(c::fmi2Component, vr::Array{fmi2ValueReference},value::Array{<:Integer})
+function fmi2SetInteger(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Union{Array{<:Integer}, <:Integer})
+
+    vr = prepareValueReference(c, vr)
+    values = prepareValue(values)
+    @assert length(vr) == length(values) "fmi2SetInteger(...): `vr` and `values` need to be the same length."
+
     nvr = Csize_t(length(vr))
-    fmi2SetInteger(c, vr, nvr, Array{fmi2Integer}(value))
+    fmi2SetInteger(c, vr, nvr, Array{fmi2Integer}(values))
 end
-"""
-Get the value of a fmi2Integer variable
 
-For more information call ?fmi2SetInteger
-"""
-function fmi2SetInteger(c::fmi2Component, vr::fmi2ValueReference, value::Integer)
-    fmi2SetInteger(c,[vr], [value])
-end
-"""
-Set the values of an array of fmi2Integer variables by variable name
-
-For more information call ?fmi2SetInteger
-"""
-function fmi2SetInteger(c::fmi2Component, vr_string::Array{String}, value::Array{<:Integer})
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
-    else
-        fmi2SetInteger(c, vr, value)
-    end
-end
-"""
-Set the value of a fmi2Integer variable by variable name
-
-For more information call ?fmi2SetInteger
-"""
-function fmi2SetInteger(c::fmi2Component, vr_string::String, value::Integer)
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    if vr == nothing
-        display("[ERROR]: valueReference not found")
-    else
-        fmi2SetInteger(c, vr, value)
-    end
-end
 """
 Get the values of an array of fmi2Boolean variables
 
 For more information call ?fmi2GetBoolean
 """
-function fmi2GetBoolean(c::fmi2Component, vr::Array{fmi2ValueReference})
+function fmi2GetBoolean(c::fmi2Component, vr::fmi2ValueReferenceFormat)
+
+    vr = prepareValueReference(c, vr)
+
     nvr = Csize_t(length(vr))
-    value = Array{fmi2Boolean}(undef, nvr)
-    fmi2GetBoolean!(c, vr, nvr, value)
-    value
-end
-"""
-Get the value of a fmi2Boolean variable
+    values = Array{fmi2Boolean}(undef, nvr)
+    fmi2GetBoolean!(c, vr, nvr, values)
 
-For more information call ?fmi2GetBoolean
-"""
-function fmi2GetBoolean(c::fmi2Component, vr::fmi2ValueReference)
-    values = fmi2GetBoolean(c, [vr])
-    values[1]
-end
-"""
-Get the values of an array of fmi2Boolean variables by variable name
-
-For more information call ?fmi2GetBoolean
-"""
-function fmi2GetBoolean(c::fmi2Component, vr_string::Array{String})
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
+    if length(values) == 1
+        return values[1]
     else
-        fmi2GetBoolean(c, vr)
+        return values
     end
 end
-"""
-Get the value of a fmi2Boolean variable by variable name
 
-For more information call ?fmi2GetBoolean
-"""
-function fmi2GetBoolean(c::fmi2Component, vr_string::String)
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    if vr == nothing
-        display("[ERROR]: valueReference not found")
-    else
-        fmi2GetBoolean(c, vr)
-    end
-end
 """
 Get the values of an array of fmi2Boolean variables
 
 For more information call ?fmi2GetBoolean
 """
-function fmi2GetBoolean!(c::fmi2Component, vr::Array{fmi2ValueReference}, values::Array{Bool})
-    vars = Array{fmi2Boolean}(undef, length(values))
+function fmi2GetBoolean!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Array{Bool})
 
-    if length(values) != length(vr)
-        display("[ERROR]: Number of value references and in place array doesn't match")
-    else
-        fmi2GetBoolean!(c, vr, Csize_t(length(values)), vars)
-    end
+    vr = prepareValueReference(c, vr)
+    values = prepareValue(values)
+    @assert length(vr) == length(values) "fmi2GetBoolean!(...): `vr` and `values` need to be the same length."
+
+    nvr = Csize_t(length(values))
+    vars = Array{fmi2Boolean}(undef, nvr)
+    fmi2GetBoolean!(c, vr, nvr, vars)
     values[:] = vars
-end
-"""
-Get the values of an array of fmi2Boolean variables by variable name
 
-For more information call ?fmi2GetBoolean
-"""
-function fmi2GetBoolean!(c::fmi2Component, vr_string::Array{String}, values::Array{Bool})
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    fmi2GetBoolean!(c, vr, values)
+    nothing
 end
+function fmi2GetBoolean!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Bool)
+    @assert false "fmi2GetBoolean! is only possible for arrays of values, please use an array instead of a scalar."
+end
+
 """
 Set the values of an array of fmi2Boolean variables
 
 For more information call ?fmi2SetBoolean
 """
-function fmi2SetBoolean(c::fmi2Component, vr::Array{fmi2ValueReference}, value::Array{Bool})
+function fmi2SetBoolean(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Union{Array{Bool}, Bool})
+
+    vr = prepareValueReference(c, vr)
+    values = prepareValue(values)
+    @assert length(vr) == length(values) "fmi2SetBoolean(...): `vr` and `values` need to be the same length."
+
     nvr = Csize_t(length(vr))
-    fmi2SetBoolean(c, vr, nvr, Array{fmi2Boolean}(value))
+    fmi2SetBoolean(c, vr, nvr, Array{fmi2Boolean}(values))
 end
-"""
-Set the value of a fmi2Boolean variable
 
-For more information call ?fmi2SetBoolean
-"""
-function fmi2SetBoolean(c::fmi2Component, vr::fmi2ValueReference, value::Bool)
-    fmi2SetBoolean(c, [vr], [value])
-end
-"""
-Set the values of an array of fmi2Boolean variables by variable name
-
-For more information call ?fmi2SetBoolean
-"""
-function fmi2SetBoolean(c::fmi2Component, vr_string::Array{String}, value::Array{Bool})
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
-    else
-        fmi2SetBoolean(c, vr, value)
-    end
-end
-"""
-Set the value of a fmi2Boolean variable by variable name
-
-For more information call ?fmi2SetBoolean
-"""
-function fmi2SetBoolean(c::fmi2Component, vr_string::String, value::Bool)
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    if vr == nothing
-        display("[ERROR]: valueReference not found")
-    else
-        fmi2SetBoolean(c, vr, value)
-    end
-end
 """
 Get the values of an array of fmi2String variables
 
 For more information call ?fmi2GetString
 """
-function fmi2GetString(c::fmi2Component, vr::Array{fmi2ValueReference})
+function fmi2GetString(c::fmi2Component, vr::fmi2ValueReferenceFormat)
+
+    vr = prepareValueReference(c, vr)
+
     nvr = Csize_t(length(vr))
-    value = Vector{Ptr{Cchar}}(undef, nvr)
+    vars = Vector{Ptr{Cchar}}(undef, nvr)
+    values = string.(zeros(nvr))
+    fmi2GetString!(c, vr, nvr, vars)
+    values[:] = unsafe_string.(vars)
 
-    fmi2GetString!(c, vr, nvr, value)
-    unsafe_string.(value)
-end
-"""
-Get the value of a fmi2String variable
-
-For more information call ?fmi2GetString
-"""
-function fmi2GetString(c::fmi2Component, vr::fmi2ValueReference)
-    values = fmi2GetString(c, [vr])
-    values[1]
-end
-"""
-Get the values of an array of fmi2String variables by variable name
-
-For more information call ?fmi2GetString
-"""
-function fmi2GetString(c::fmi2Component, vr_string::Array{String})
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
+    if length(values) == 1
+        return values[1]
     else
-        fmi2GetString(c, vr)
+        return values
     end
 end
-"""
-Get the value of a fmi2String variable by variable name
 
-For more information call ?fmi2GetString
-"""
-function fmi2GetString(c::fmi2Component, vr_string::String)
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    if vr == nothing
-        display("[ERROR]: valueReference not found")
-    else
-        fmi2GetString(c, vr)
-    end
-end
 """
 Get the values of an array of fmi2String variables
 
 For more information call ?fmi2GetString
 """
-function fmi2GetString!(c::fmi2Component, vr::Array{fmi2ValueReference}, values::Array{String})
-    vars = Vector{Ptr{Cchar}}(undef, length(vr))
-    if length(values) != length(vr)
-        display("[ERROR]: Number of value references and in place array doesn't match")
-    else
-        fmi2GetString!(c, vr, Csize_t(length(values)), vars)
-        values[:] = unsafe_string.(vars)
-    end
-end
-"""
-Get the values of an array of fmi2String variables by variable name
+function fmi2GetString!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Array{String})
 
-For more information call ?fmi2GetString
-"""
-function fmi2GetString!(c::fmi2Component, vr_string::Array{String}, values::Array{String})
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    fmi2GetString!(c, vr, values)
+    vr = prepareValueReference(c, vr)
+    values = prepareValue(values)
+    @assert length(vr) == length(values) "fmi2GetString!(...): `vr` and `values` need to be the same length."
+
+    nvr = Csize_t(length(vr))
+    vars = Vector{Ptr{Cchar}}(undef, nvr)
+    fmi2GetString!(c, vr, nvr, vars)
+    values[:] = unsafe_string.(vars)
+
+    nothing
 end
+function fmi2GetString!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::String)
+    @assert false "fmi2GetString! is only possible for arrays of values, please use an array instead of a scalar."
+end
+
 """
 Set the values of an array of fmi2String variables
 
 For more information call ?fmi2SetString
 """
-function fmi2SetString(c::fmi2Component, vr::Array{fmi2ValueReference}, value::Array{String})
+function fmi2SetString(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Union{Array{String}, String})
+
+    vr = prepareValueReference(c, vr)
+    values = prepareValue(values)
+    @assert length(vr) == length(values) "fmi2SetReal(...): `vr` and `values` need to be the same length."
+
     nvr = Csize_t(length(vr))
-    ptrs = pointer.(value)
+    ptrs = pointer.(values)
     fmi2SetString(c, vr, nvr, ptrs)
 end
-"""
-Set the values of a fmi2String variable
 
-For more information call ?fmi2SetString
-"""
-function fmi2SetString(c::fmi2Component, vr::fmi2ValueReference, value::String)
-    fmi2SetString(c, [vr], [value])
-end
-"""
-Set the values of an array of fmi2String variables by variable name
-
-For more information call ?fmi2SetString
-"""
-function fmi2SetString(c::fmi2Component, vr_string::Array{String}, value::Array{String})
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    if length(vr) == 0
-        display("[Error]: no valueReferences could be converted")
-    else
-        fmi2SetString(c, vr, value)
-    end
-end
-"""
-Set the value of a fmi2String variable by variable name
-
-For more information call ?fmi2SetString
-"""
-function fmi2SetString(c::fmi2Component, vr_string::String, value::String)
-    vr = fmi2String2ValueReference(c.fmu, vr_string)
-    if vr == nothing
-        display("[ERROR]: valueReference not found")
-    else
-        fmi2SetString(c, vr, value)
-    end
-end
 """
 Get the pointer to the current FMU state
 
@@ -512,6 +271,7 @@ function fmi2GetFMUstate(c::fmi2Component)
     state = stateRef[]
     state
 end
+
 """
 Free the allocated memory for the FMU state
 
@@ -583,6 +343,7 @@ function fmi2GetDirectionalDerivative(c::fmi2Component,
 
     dvUnknown
 end
+
 """
 Computes directional derivatives
 
@@ -607,6 +368,7 @@ For more information call ?fmi2DoStep
 function fmi2DoStep(c::fmi2Component, currentCommunicationPoint::Real, communicationStepSize::Real, noSetFMUStatePriorToCurrentPoint::Bool = true)
     fmi2DoStep(c, fmi2Real(currentCommunicationPoint), fmi2Real(communicationStepSize), fmi2Boolean(noSetFMUStatePriorToCurrentPoint))
 end
+
 """
 The computation of a time step is started.
 
@@ -614,7 +376,7 @@ For more information call ?fmi2DoStep
 """
 function fmi2DoStep(c::fmi2Component, communicationStepSize::Real)
     fmi2DoStep(c, fmi2Real(c.fmu.t), fmi2Real(communicationStepSize), fmi2True)
-    fmu2.t += communicationStepSize
+    c.fmu.t += communicationStepSize
 end
 
 # Model Exchange specific functions
@@ -636,6 +398,7 @@ function fmi2SetContinuousStates(c::fmi2Component, x::Union{Array{Float32}, Arra
     nx = Csize_t(length(x))
     fmi2SetContinuousStates(c, Array{fmi2Real}(x), nx)
 end
+
 """
 Returns the next discrete states
 
@@ -646,6 +409,7 @@ function fmi2NewDiscreteStates(c::fmi2Component)
     fmi2NewDiscreteStates(c, eventInfo)
     eventInfo
 end
+
 """
 This function must be called by the environment after every completed step
 
@@ -673,6 +437,7 @@ function  fmi2GetDerivatives(c::fmi2Component)
     fmi2GetDerivatives(c, derivatives, nx)
     derivatives
 end
+
 """
 Returns the event indicators of the FMU
 
@@ -684,6 +449,7 @@ function fmi2GetEventIndicators(c::fmi2Component)
     fmi2GetEventIndicators(c, eventIndicators, ni)
     eventIndicators
 end
+
 """
 Return the new (continuous) state vector x
 
@@ -706,68 +472,4 @@ function fmi2GetNominalsOfContinuousStates(c::fmi2Component)
     x = zeros(fmi2Real, nx)
     fmi2GetNominalsOfContinuousStates(c, x, nx)
     x
-end
-
-
-
-"""
-Starts a simulation of the fmu instance for the matching fmu type, if both types are available the CoSimulation Simulation is started
-"""
-function fmi2Simulate(c::fmi2Component, dt::Real, t_start::Real = 0.0, t_stop::Real = 1.0, recordValues::Union{Array{fmi2ValueReference}, Array{String}} = [])
-
-    if c.fmu.fmuType == fmi2CoSimulation::fmi2Type
-        fmi2SimulateCS(c, dt, t_start, t_stop, recordValues)
-    elseif c.fmu.fmuType == fmi2ModelExchange::fmi2Type
-        fmi2SimulateME(c, dt, t_start, t_stop)
-    else
-        error(unknownFMUType)
-    end
-end
-"""
-Starts a simulation of the CoSimulation FMU instance
-"""
-function fmi2SimulateCS(c::fmi2Component, dt::Real, t_start::Real, t_stop::Real, recordValues::Array{fmi2ValueReference} = [])
-
-    fmi2SetupExperiment(c, t_start, t_stop)
-    fmiEnterInitializationMode(c)
-    fmiExitInitializationMode(c)
-
-    t = t_start
-
-    sd = nothing
-    record = length(recordValues) > 0
-
-    numDigits = length(string(round(Integer, 1/dt)))
-
-    if record
-        sd = fmi2SimulationResult()
-        sd.valueReferences = recordValues
-        sd.dataPoints = []
-        sd.fmu = c.fmu
-
-        values = fmi2GetReal(c, sd.valueReferences)
-        push!(sd.dataPoints, (t, values...))
-
-        while t < t_stop
-            fmiDoStep(c, t, dt)
-            t = round(t + dt, digits=numDigits)
-
-            values = fmi2GetReal(c, sd.valueReferences)
-            push!(sd.dataPoints, (t, values...))
-        end
-    else
-        while t < t_stop
-            fmiDoStep(c, t, dt)
-            t = round(t + dt, digits=numDigits)
-        end
-    end
-
-    sd
-end
-"""
-Starts a simulation of the CoSimulation FMU instance
-"""
-function fmi2SimulateCS(c::fmi2Component, dt::Real, t_start::Real, t_stop::Real, recordValues::Array{String})
-    vr = fmi2String2ValueReference(c.fmu, recordValues)
-    fmi2SimulateCS(c, dt, t_start, t_stop, vr)
 end

@@ -5,7 +5,11 @@
 
 using DifferentialEquations, DiffEqCallbacks, Zygote
 
-"""Handle events and return the values and nominals of the changed continuous states"""
+############ Model-Exchange ############
+
+"""
+Handles events and returns the values and nominals of the changed continuous states.
+"""
 function handleEvents(c::fmi2Component, initialEventMode)
 
     if initialEventMode == false
@@ -28,7 +32,7 @@ function handleEvents(c::fmi2Component, initialEventMode)
         nominalsOfContinuousStatesChanged = eventInfo.nominalsOfContinuousStatesChanged
 
         if eventInfo.terminateSimulation == fmi2True
-            error("Event info returned an error")
+            @error "Event info returned error!"
         end
     end
 
@@ -38,7 +42,9 @@ function handleEvents(c::fmi2Component, initialEventMode)
 
 end
 
-"""Returns the event indicators for an FMU"""
+"""
+Returns the event indicators for an FMU.
+"""
 function condition(c::fmi2Component, out, x, t, integrator) # Event when event_f(u,t) == 0
 
     fmi2SetTime(c, t)
@@ -49,9 +55,10 @@ function condition(c::fmi2Component, out, x, t, integrator) # Event when event_f
 
 end
 
-"""Handles the upcoming events"""
+"""
+Handles the upcoming events.
+"""
 function affect!(c::fmi2Component, integrator, idx)
-
     # Event found - handle it
     continuousStatesChanged, nominalsChanged = handleEvents(c, false)
 
@@ -64,7 +71,9 @@ function affect!(c::fmi2Component, integrator, idx)
     end
 end
 
-"""Does one step in the simulation"""
+"""
+Does one step in the simulation.
+"""
 function stepCompleted(c::fmi2Component, x, t, integrator)
 
      (status, enterEventMode, terminateSimulation) = fmi2CompletedIntegratorStep(c, fmi2True)
@@ -74,21 +83,48 @@ function stepCompleted(c::fmi2Component, x, t, integrator)
 
 end
 
-"""Returns the derivatives of the FMU"""
+"""
+Returns the state derivatives of the FMU.
+"""
 function fx(c::fmi2Component, x, p, t)
-
     fmi2SetTime(c, t)
     fmi2SetContinuousStates(c, x)
     dx = fmi2GetDerivatives(c)
-
 end
 
-""" Source: FMISpec2.0.2[p.90 ff]: 3.2.4 Pseudocode Example
-    simulates an fmu instance for the set simulation time """
-function fmi2SimulateME(c::fmi2Component, dt::Real, t_start::Real = 0.0, t_stop::Real = 1.0, solver = Tsit5(), customFx = nothing)
+"""
+Source: FMISpec2.0.2[p.90 ff]: 3.2.4 Pseudocode Example
+
+Simulates an fmu instance for the set simulation time.
+Events are handled correctly.
+
+Returns an ODESolution.
+"""
+function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.0;
+                        solver = nothing,
+                        customFx = nothing,
+                        recordValues::fmi2ValueReferenceFormat = nothing,
+                        saveat = [],
+                        setup = true)
+
+    recordValues = prepareValueReference(c, recordValues)
+
+    if length(recordValues) > 0
+        @warn "fmi2SimulateME(...): Recording values via `recordValues` not implemented, yet."
+    end
+
+    if solver == nothing
+        solver = Tsit5()
+    end
 
     if customFx == nothing
         customFx = (x, p, t) -> fx(c, x, p, t)
+    end
+
+    if setup
+        fmi2SetupExperiment(c, t_start, t_stop)
+        fmiEnterInitializationMode(c)
+        fmiExitInitializationMode(c)
     end
 
     eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator),
@@ -112,10 +148,86 @@ function fmi2SimulateME(c::fmi2Component, dt::Real, t_start::Real = 0.0, t_stop:
 
      p = []
      problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
-     solution = solve(problem, solver, callback=CallbackSet(eventCb, stepCb))
-     #data = solution(ts)
+     solution = solve(problem, solver, callback=CallbackSet(eventCb, stepCb), saveat=saveat)
 end
 
-function fmi2SimulateME(fmu::FMU2, dt::Real, t_start::Real = 0.0, t_stop::Real = 1.0, solver = Tsit5(), customFx = nothing)
-    fmi2SimulateME(fmu.components[end], dt, t_start, t_stop, solver, customFx)
+############ Co-Simulation ############
+
+"""
+Starts a simulation of the Co-Simulation FMU instance.
+"""
+function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
+                        recordValues::fmi2ValueReferenceFormat = nothing,
+                        saveat = [],
+                        setup = true)
+
+    recordValues = prepareValueReference(c, recordValues)
+
+    if length(saveat) == 0
+        saveat = LinRange(t_start, t_stop, 100)
+    end
+
+    if setup
+        fmi2SetupExperiment(c, t_start, t_stop)
+        fmiEnterInitializationMode(c)
+        fmiExitInitializationMode(c)
+    end
+
+    t = t_start
+
+    sd = nothing
+    record = length(recordValues) > 0
+
+    #numDigits = length(string(round(Integer, 1/dt)))
+
+    if record
+        sd = fmi2SimulationResult()
+        sd.valueReferences = recordValues
+        sd.dataPoints = []
+        sd.fmu = c.fmu
+
+        values = fmi2GetReal(c, sd.valueReferences)
+        push!(sd.dataPoints, (t, values...))
+
+        i = 1
+        while t < t_stop
+            dt = saveat[i+1] - saveat[i]
+
+            fmiDoStep(c, t, dt)
+            t = t + dt #round(t + dt, digits=numDigits)
+            i += 1
+
+            values = fmi2GetReal(c, sd.valueReferences)
+            push!(sd.dataPoints, (t, values...))
+        end
+    else
+        while t < t_stop
+            dt = saveat[i+1] - saveat[i]
+
+            fmiDoStep(c, t, dt)
+            t = t + dt #round(t + dt, digits=numDigits)
+            i += 1
+        end
+    end
+
+    sd
+end
+
+###############
+
+"""
+Starts a simulation of the fmu instance for the matching fmu type, if both types are available the CoSimulation Simulation is started.
+"""
+function fmi2Simulate(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.0;
+                      recordValues::fmi2ValueReferenceFormat = nothing,
+                      saveat = [],
+                      setup = true)
+
+    if fmi2IsCoSimulation(c.fmu)
+        return fmi2SimulateCS(c, t_start, t_stop; recordValues=recordValues, saveat=saveat, setup=setup)
+    elseif fmi2IsModelExchange(c.fmu)
+        return fmi2SimulateME(c, t_start, t_stop; recordValues=recordValues, saveat=saveat, setup=setup)
+    else
+        error(unknownFMUType)
+    end
 end

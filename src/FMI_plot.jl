@@ -6,6 +6,11 @@
 using Plots
 using OrdinaryDiffEq: ODESolution
 
+"""
+Plots ODE-Solution from FMU (ODE states are interpreted as the FMU states).
+
+Optional `t_in_solution` controls if the first state in the solution is interpreted as t(ime).
+"""
 function fmiPlot(fmu::FMU2, solution::ODESolution, t_in_solution = false)
     t = nothing
     offset = 0
@@ -30,10 +35,15 @@ function fmiPlot(fmu::FMU2, solution::ODESolution, t_in_solution = false)
     end
     fig
 end
-function Plots.plot(fmu::FMU2, solution::ODESolution, t_in_solution)
+
+# extend the original plot-command by plotting FMUs
+function Plots.plot(fmu::FMU2, solution::ODESolution, t_in_solution = false)
     fmiPlot(fmu, solution, t_in_solution)
 end
 
+"""
+Plots fmi2SimulationResult.
+"""
 function fmiPlot(sd::fmi2SimulationResult)
     ts = fmi2SimulationResultGetTime(sd)
 
@@ -48,6 +58,8 @@ function fmiPlot(sd::fmi2SimulationResult)
     end
     fig
 end
+
+# extend the original plot-command by plotting FMUs 
 function Plots.plot(sd::fmi2SimulationResult)
     fmiPlot(sd)
 end
