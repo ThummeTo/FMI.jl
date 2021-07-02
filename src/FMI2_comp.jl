@@ -381,7 +381,7 @@ end
 
 # Model Exchange specific functions
 """
-Set a new time instant
+Set independent variable time and reinitialize chaching of variables that depend on time
 
 For more information call ?fmi2SetTime
 """
@@ -390,7 +390,7 @@ function fmi2SetTime(c::fmi2Component, time::Real)
 end
 
 """
-Set a new (continuous) state vector
+Set a new (continuous) state vector and reinitialize chaching of variables that depend on states
 
 For more information call ?fmi2SetContinuousStates
 """
@@ -400,7 +400,7 @@ function fmi2SetContinuousStates(c::fmi2Component, x::Union{Array{Float32}, Arra
 end
 
 """
-Returns the next discrete states
+Increment the super dense time in event mode
 
 For more information call ?fmi2NewDiscretestates
 """
@@ -412,6 +412,8 @@ end
 
 """
 This function must be called by the environment after every completed step
+If enterEventMode == fmi2True, the event mode must be entered
+If terminateSimulation == fmi2True, the simulation shall be terminated
 
 For more information call ?fmi2CompletedIntegratorStep
 """

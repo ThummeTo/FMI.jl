@@ -177,8 +177,8 @@ end
 
 # Multiple Dispatch variants for FMUs with version 2.0.X
 
-"""
-TODO
+""" 
+Load FMUs FMI version independently, currently supporting version 2.0.X.
 """
 function fmiLoad(pathToFMU::String)
     fmi2Load(pathToFMU)
@@ -219,21 +219,22 @@ function fmiUnload(fmu::FMU2)
 end
 
 """
-Returns the number of states of the FMU
+Returns the number of states of the FMU.
 """
+
 function fmiGetNumberOfStates(fmu::FMU2)
     length(fmu.modelDescription.stateValueReferences)
 end
 
 """
-Returns the header file used to compile the FMU. By default returns `default`
+Returns the header file used to compile the FMU. By default returns `default`, version independent.
 """
 function fmiGetTypesPlatform(fmu::FMU2)
     fmi2GetTypesPlatform(fmu)
 end
 
 """
-Returns the version of the FMU
+Returns the version of the FMU, version independent.
 """
 function fmiGetVersion(fmu::FMU2)
     fmi2GetVersion(fmu)
@@ -247,7 +248,7 @@ function fmiInfo(fmu::FMU2)
 end
 
 """
-Creates a new instance of the FMU
+Creates a new instance of the FMU, version independent.
 """
 function fmiInstantiate!(fmu::FMU2; visible::Bool = false, loggingOn::Bool = false)
 
@@ -263,15 +264,16 @@ function fmiInstantiate!(fmu::FMU2; visible::Bool = false, loggingOn::Bool = fal
 end
 
 """
-Frees the allocated memory of the last instance of the FMU
+Frees the allocated memory of the last instance of the FMU.
 """
 function fmiFreeInstance!(s::fmi2Struct)
     fmi2FreeInstance!(s)
 end
 
+
 """
-Control the use of the logging callback function
-    """
+Control the use of the logging callback function, version independent.
+"""
 function fmiSetDebugLogging(s::fmi2Struct)
     fmi2SetDebugLogging(s)
 end
@@ -283,29 +285,31 @@ function fmiSetupExperiment(fmu::fmi2Struct, startTime::Real = 0.0, stopTime::Re
     fmi2SetupExperiment(fmu, startTime, stopTime; tolerance=tolerance)
 end
 
+
 """
-Informs the FMU to enter initializaton mode
+Informs the FMU to enter initializaton mode, version independent.
 """
 function fmiEnterInitializationMode(s::fmi2Struct)
     fmi2EnterInitializationMode(s)
 end
 
+
 """
-Informs the FMU to exit initialization mode
+Informs the FMU to exit initialization mode, version independent.
 """
 function fmiExitInitializationMode(s::fmi2Struct)
     fmi2ExitInitializationMode(s)
 end
 
 """
-Informs the FMU that the simulation run is terminated
+Informs the FMU that the simulation run is terminated, version independent.
 """
 function fmiTerminate(s::fmi2Struct)
     fmi2Terminate(s)
 end
 
 """
-Resets the FMU after a simulation run
+Resets the FMU after a simulation run, version independent.
 """
 function fmiReset(s::fmi2Struct)
     fmi2Reset(s)
@@ -452,8 +456,8 @@ function fmiGetDirectionalDerivative(fmu::fmi2Struct,
                                  Array{Real}(dvUnknown))
 end
 
-"""
-Wrapper for single directional derivative
+""" 
+Wrapper for single directional derivative, version independent. 
 """
 function fmiGetDirectionalDerivative(fmu::fmi2Struct, vUnknown_ref::Cint, vKnown_ref::Cint, dvKnown::Real = 1.0, dvUnknown::Real = 1.0)
     fmi2GetDirectionalDerivative(fmu, vUnknown_ref, vKnown_ref, dvKnown, dvUnknown)
@@ -511,6 +515,7 @@ end
 """
 This function must be called by the environment after every completed step
 """
+
 function fmiCompletedIntegratorStep(fmu2::fmi2Struct,
                                      noSetFMUStatePriorToCurrentPoint::fmi2Boolean)
     fmi2CompletedIntegratorStep(fmu2,noSetFMUStatePriorToCurrentPoint)
