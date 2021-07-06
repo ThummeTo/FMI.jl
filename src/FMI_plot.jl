@@ -67,7 +67,7 @@ function fmiPlot(sd::fmi2SimulationResult)
     fig
 end
 
-# extend the original plot-command by plotting FMUs
+# extend the original plot-command by plotting FMUs.
 function Plots.plot(sd::fmi2SimulationResult)
     fmiPlot(sd)
 end
