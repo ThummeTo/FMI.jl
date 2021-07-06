@@ -489,9 +489,9 @@ end
 Starts a simulation of the fmu instance for the matching fmu type, if both types are available the CoSimulation Simulation is started
 """
 function fmi2Simulate(fmu::FMU2, t_start::Real = 0.0, t_stop::Real = 1.0;
-                      recordValues::fmi2ValueReferenceFormat = nothing, saveat=[])
+                      recordValues::fmi2ValueReferenceFormat = nothing, saveat=[], setup=true)
     fmi2Simulate(fmu.components[end], t_start, t_stop;
-                 recordValues=recordValues, saveat=saveat)
+                 recordValues=recordValues, saveat=saveat, setup=setup)
 end
 
 """
@@ -509,7 +509,7 @@ TODO
 function fmi2SimulateME(fmu::FMU2, t_start::Real, t_stop::Real;
                         recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true, solver = nothing)
     fmi2SimulateME(fmu.components[end], t_start, t_stop;
-                   recordValues=recordValues, saveat=saveat, setup=true, solver=solver)
+                   recordValues=recordValues, saveat=saveat, setup=setup, solver=solver)
 end
 
 """
