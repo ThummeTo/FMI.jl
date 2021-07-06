@@ -28,16 +28,16 @@ fmiInfo(myFMU)
 # make an instance from the FMU
 fmiInstantiate!(myFMU; loggingOn=true)
 
-# setup the experiment, start time = 0.0
-fmiSetupExperiment(myFMU, t_start)
+# setup the experiment, start time = 0.0 (optional for setup=true)
+#fmiSetupExperiment(myFMU, t_start)
 
-# enter and exit initialization
-fmiEnterInitializationMode(myFMU)
-fmiExitInitializationMode(myFMU)
+# enter and exit initialization (optional for setup=true)
+#fmiEnterInitializationMode(myFMU)
+#fmiExitInitializationMode(myFMU)
 
 # run the FMU in mode Co-Simulation (CS) with adaptive step size (CVODE) but fixed save points dt,
 # result values are stored in `data`
-data = fmiSimulateCS(myFMU, t_start, t_stop; recordValues=["mass.s", "mass.v"])
+data = fmiSimulateCS(myFMU, t_start, t_stop; recordValues=["mass.s", "mass.v"], setup=true)
 
 # plot the results
 fmiPlot(data)
