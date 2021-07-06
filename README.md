@@ -2,20 +2,37 @@
 # FMI.jl
 
 ## What is FMI.jl?
-FMI.jl is a free-to-use software library for the Julia programming language, which integrates FMI ([fmi-standard.org](http://fmi-standard.org/)): load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
+FMI.jl is a free-to-use software library for the Julia programming language which integrates FMI ([fmi-standard.org](http://fmi-standard.org/)): load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
 
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) [![](https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg)]() 
 <!--- [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://ThummeTo.github.io/FMI.jl/stable) --->
-[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev)
 
 ## How can I use FMI.jl?
 1. open a Julia-Command-Window, activate your prefered environment
 1. goto package manager using ```]```
 1. type ```add FMI``` or ```add "https://github.com/ThummeTo/FMI.jl"```
+1. have a look inside the ```example``` folder
+
+## How can I simulate a FMU and plot values?
+```julia
+# load and instantiate a FMU
+myFMU = fmiLoad(pathToFMU)
+fmiInstantiate!(myFMU)
+
+# simulate from t=0.0s until t=10.0s and record the FMU variable named "mass.s"
+simData = fmiSimulate(myFMU, 0.0, 10.0; recordValues=["mass.s"])
+
+# plot it!
+fmiPlot(simData)
+
+# free memory
+fmiUnload(myFMU)
+```
 
 ## What is currently supported in FMI.jl?
-- simulation / plotting of CS- and ME-FMUs
+- the full FMI command set, including optional specials like getState, setState and getDirectionalDerivative
+- parameterization, simulation & plotting of CS- and ME-FMUs
 - event-handling for discontinuous ME-FMUs
-- the full FMI command set
 - ...
 
 ## What is under development in FMI.jl?
@@ -25,7 +42,8 @@ FMI.jl is a free-to-use software library for the Julia programming language, whi
 - ...
 
 ## What Platforms are supported?
-FMI.jl is tested under Julia 1.5.4 on Windows 10 and Linux (macOS 11.4 untested).
+FMI.jl is tested (and testing) under Julia Version 1.5, 1.6 and latest on Windows (latest) and Ubuntu (latest). Mac should work, but untested.
+
 
 ## Interested in Hybrid Modelling in Julia using FMUs?
 See [FMIFlux.jl](https://github.com/ThummeTo/FMIFlux.jl).

@@ -15,3 +15,5 @@ modelDescription.xml
 *.zip
 *.svg
 *.pdf
+*.obj
+*.fmu
