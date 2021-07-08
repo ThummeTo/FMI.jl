@@ -6,6 +6,8 @@
 using Libdl
 using ZipFile
 
+using Base.Filesystem: mktempdir
+
 include("FMI2_c.jl")
 include("FMI2_comp.jl")
 include("FMI2_md.jl")
@@ -234,37 +236,49 @@ end
 Create a copy of the .fmu file as a .zip folder and unzips it.
 Returns the paths to the zipped and unzipped folders.
 """
-function fmi2Unzip(pathTofmu::String)
-    # set paths for fmu handling
-    zipname = splitext(pathTofmu)
-    zipPath = string(zipname[1], ".zip")
-    unzipedfmuPath = string(zipname[1], "/")
+function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
 
-    if !isdir(unzipedfmuPath)
-        cp(pathTofmu, zipPath; force = true)
-        mkdir(unzipedfmuPath)
+    fileNameExt = basename(pathToFMU)
+    (fileName, fileExt) = splitext(fileNameExt)
 
-        fileFullPath = isabspath(zipPath) ?  zipPath : joinpath(pwd(),zipPath)
-        basePath = dirname(fileFullPath)
-        outPath = (unzipedfmuPath == "" ? basePath : (isabspath(unzipedfmuPath) ? unzipedfmuPath : joinpath(pwd(),unzipedfmuPath)))
-        isdir(outPath) ? "" : mkdir(outPath)
-        zarchive = ZipFile.Reader(fileFullPath)
+    if unpackPath == nothing 
+        unpackPath = mktempdir(; prefix="fmifluxjl_", cleanup=true)
+    end
+        
+    zipPath = joinpath(unpackPath, fileName * ".zip")
+    unzippedPath = joinpath(unpackPath, fileName)
+
+    # only copy ZIP if not already there
+    if !isfile(zipPath)
+        cp(pathToFMU, zipPath; force=true)
+    end
+
+    @assert isfile(zipPath) ["fmi2Unzip(...): ZIP-Archive couldn't be copied to `$zipPath`."]
+
+    zipAbsPath = isabspath(zipPath) ?  zipPath : joinpath(pwd(), zipPath)
+    unzippedAbsPath = isabspath(unzippedPath) ? unzippedPath : joinpath(pwd(), unzippedPath)
+
+    # only unzip if not already done
+    if !isdir(unzippedAbsPath)
+        mkdir(unzippedAbsPath)
+
+        zarchive = ZipFile.Reader(zipAbsPath)
         for f in zarchive.files
-            fullFilePath = joinpath(outPath,f.name)
-            if (endswith(f.name,"/") || endswith(f.name,"\\"))
-                #mkdir(fullFilePath)
-                mkpath(fullFilePath)
+            fileAbsPath = joinpath(unzippedAbsPath, f.name)
+
+            if endswith(f.name,"/") || endswith(f.name,"\\")
+                mkpath(fileAbsPath)
             else
-                mkpath(dirname(fullFilePath))
-                write(fullFilePath, read(f))
+                mkpath(dirname(fileAbsPath))
+                write(fileAbsPath, read(f))
             end
         end
         close(zarchive)
     end
 
-    @assert isdir(unzipedfmuPath) ["Error:FMU not loaded"]
+    @assert isdir(unzippedAbsPath) ["fmi2Unzip(...): ZIP-Archive couldn't be unzipped at `$unzippedPath`."]
 
-    (unzipedfmuPath, zipPath)
+    (unzippedPath, zipPath)
 end
 
 """
@@ -286,13 +300,13 @@ Retrieves all the pointers of binary functions.
 
 Returns the instance of the FMU struct.
 """
-function fmi2Load(pathTofmu::String)
+function fmi2Load(pathToFMU::String; unpackPath=nothing)
     # Create uninitialized FMU
     fmu = FMU2()
     fmu.components = []
 
     # set paths for fmu handling
-    (fmu.path, fmu.zipPath) = fmi2Unzip(pathTofmu)
+    (fmu.path, fmu.zipPath) = fmi2Unzip(pathToFMU; unpackPath=unpackPath)
 
     # set paths for modelExchangeScripting and binary
     tmpName = splitpath(fmu.path)

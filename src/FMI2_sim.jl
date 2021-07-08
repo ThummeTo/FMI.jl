@@ -122,6 +122,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     end
 
     if setup
+        fmi2Reset(c)
         fmi2SetupExperiment(c, t_start, t_stop)
         fmiEnterInitializationMode(c)
         fmiExitInitializationMode(c)
@@ -168,9 +169,10 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
     end
 
     if setup
+        fmi2Reset(c)
         fmi2SetupExperiment(c, t_start, t_stop)
-        fmiEnterInitializationMode(c)
-        fmiExitInitializationMode(c)
+        fmi2EnterInitializationMode(c)
+        fmi2ExitInitializationMode(c)
     end
 
     t = t_start
@@ -201,6 +203,7 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
             push!(sd.dataPoints, (t, values...))
         end
     else
+        i = 1
         while t < t_stop
             dt = saveat[i+1] - saveat[i]
 

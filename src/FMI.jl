@@ -181,8 +181,8 @@ end
 """
 Load FMUs FMI version independently, currently supporting version 2.0.X.
 """
-function fmiLoad(pathToFMU::String)
-    fmi2Load(pathToFMU)
+function fmiLoad(pathToFMU::String; unpackPath=nothing)
+    fmi2Load(pathToFMU; unpackPath=unpackPath)
 end
 
 """
