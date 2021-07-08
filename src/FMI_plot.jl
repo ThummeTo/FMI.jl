@@ -13,7 +13,9 @@ Optional `t_in_solution` controls if the first state in the solution is interpre
 Optional keyword argument `maxLabelLength` controls the maximum length for legend labels (too long labels are cut from front).
 """
 function fmiPlot(fmu::FMU2, solution::ODESolution, t_in_solution = false; maxLabelLength=64)
+  
     t = []
+
     offset = 0
     if t_in_solution
         t = collect(data[1] for data in solution.u)
