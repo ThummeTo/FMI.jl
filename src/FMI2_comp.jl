@@ -59,11 +59,8 @@ function fmi2GetReal!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Ar
     @assert length(vr) == length(values) "fmi2GetReal!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
-    vars = zeros(fmi2Real, nvr)
-    fmi2GetReal!(c, vr, nvr, vars)
-
-    values[:] = vars
-
+    values[:] = fmi2Real.(values)
+    fmi2GetReal!(c, vr, nvr, values)
     nothing
 end
 function fmi2GetReal!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Real)
@@ -117,10 +114,9 @@ function fmi2GetInteger!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values:
     @assert length(vr) == length(values) "fmi2GetInteger!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
-    vars = zeros(fmi2Integer, nvr)
-    fmi2GetInteger!(c, vr, nvr, vars)
-    values[:] = vars
-
+    values[:] = Cint.(values)
+    display(typeof(values))
+    fmi2GetInteger!(c, vr, nvr, values)
     nothing
 end
 function fmi2GetInteger!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Integer)
@@ -174,9 +170,8 @@ function fmi2GetBoolean!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values:
     @assert length(vr) == length(values) "fmi2GetBoolean!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
-    vars = Array{fmi2Boolean}(undef, nvr)
-    fmi2GetBoolean!(c, vr, nvr, vars)
-    values[:] = vars
+    #values = fmi2Boolean.(values)
+    fmi2GetBoolean!(c, vr, nvr, values)
 
     nothing
 end
@@ -233,9 +228,8 @@ function fmi2GetString!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::
     @assert length(vr) == length(values) "fmi2GetString!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(vr))
-    vars = Vector{Ptr{Cchar}}(undef, nvr)
-    fmi2GetString!(c, vr, nvr, vars)
-    values[:] = unsafe_string.(vars)
+    #values = Vector{Ptr{Cchar}}.(values)
+    fmi2GetString!(c, vr, nvr, values)
 
     nothing
 end
