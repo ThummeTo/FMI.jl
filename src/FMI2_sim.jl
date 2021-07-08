@@ -124,8 +124,8 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     if setup
         fmi2Reset(c)
         fmi2SetupExperiment(c, t_start, t_stop)
-        fmiEnterInitializationMode(c)
-        fmiExitInitializationMode(c)
+        fmi2EnterInitializationMode(c)
+        fmi2ExitInitializationMode(c)
     end
 
     eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator),
@@ -195,7 +195,7 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
         while t < t_stop
             dt = saveat[i+1] - saveat[i]
 
-            fmiDoStep(c, t, dt)
+            fmi2DoStep(c, t, dt)
             t = t + dt #round(t + dt, digits=numDigits)
             i += 1
 
@@ -207,7 +207,7 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
         while t < t_stop
             dt = saveat[i+1] - saveat[i]
 
-            fmiDoStep(c, t, dt)
+            fmi2DoStep(c, t, dt)
             t = t + dt #round(t + dt, digits=numDigits)
             i += 1
         end

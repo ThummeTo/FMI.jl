@@ -305,6 +305,8 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
     fmu = FMU2()
     fmu.components = []
 
+    pathToFMU = realpath(pathToFMU)
+
     # set paths for fmu handling
     (fmu.path, fmu.zipPath) = fmi2Unzip(pathToFMU; unpackPath=unpackPath)
 
