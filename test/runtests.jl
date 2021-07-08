@@ -24,6 +24,9 @@ function runtests(exportingTool)
                 @testset "State Manipulation" begin
                     include("state.jl")
                 end
+                @testset "Automatic Simulation (CS or ME)" begin
+                    include("sim_auto.jl")
+                end
                 @testset "CS Simulation" begin
                     include("sim_CS.jl")
                 end
