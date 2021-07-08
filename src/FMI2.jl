@@ -261,18 +261,25 @@ function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
 
     # only unzip if not already done
     if !isdir(unzippedAbsPath)
-        mkpath(unzippedAbsPath) # mkdir(unzippedAbsPath)
-
+        mkpath(unzippedAbsPath)
+        
         zarchive = ZipFile.Reader(zipAbsPath)
         for f in zarchive.files
-            fileAbsPath = joinpath(unzippedAbsPath, f.name)
+            fileAbsPath = normpath(joinpath(unzippedAbsPath, f.name))
 
             if endswith(f.name,"/") || endswith(f.name,"\\")
-                mkpath(dirname(fileAbsPath))
-                # mkdir(dirname(fileAbsPath))
+                mkpath(fileAbsPath) # mkdir(fileAbsPath)
+
+                @assert isdir(fileAbsPath) ["fmi2Unzip(...): Can't create directory `$(f.name)` at `$(fileAbsPath)`."]
             else
+                # create directory if not forced by zip file folder
                 mkpath(dirname(fileAbsPath))
-                write(fileAbsPath, read(f))
+                
+                numBytes = write(fileAbsPath, read(f))
+                
+                if numBytes == 0
+                    @info "fmi2Unzip(...): Written file `$(f.name)`, but file is empty."
+                end
 
                 @assert isfile(fileAbsPath) ["fmi2Unzip(...): Can't unzip file `$(f.name)` at `$(fileAbsPath)`."]
             end
@@ -280,7 +287,7 @@ function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
         close(zarchive)
     end
 
-    @assert isdir(unzippedAbsPath) ["fmi2Unzip(...): ZIP-Archive couldn't be unzipped at `$unzippedPath`."]
+    @assert isdir(unzippedAbsPath) ["fmi2Unzip(...): ZIP-Archive couldn't be unzipped at `$(unzippedPath)`."]
 
     (unzippedAbsPath, zipAbsPath)
 end
@@ -309,7 +316,7 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
     fmu = FMU2()
     fmu.components = []
 
-    pathToFMU = realpath(pathToFMU)
+    pathToFMU = normpath(pathToFMU)
 
     # set paths for fmu handling
     (fmu.path, fmu.zipPath) = fmi2Unzip(pathToFMU; unpackPath=unpackPath)

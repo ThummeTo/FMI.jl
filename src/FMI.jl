@@ -37,6 +37,7 @@ export fmiGetVariableNamingConvention, fmiGetNumberOfEventIndicators
 export fmiCanGetSetState, fmiCanSerializeFMUstate
 export fmiProvidesDirectionalDerivative
 export fmiIsCoSimulation, fmiIsModelExchange
+export fmiString2ValueReference
 
 # FMI2.jl
 export FMU2, fmi2True, fmi2False
@@ -138,6 +139,13 @@ function prepareValue(value)
     end
 
     @assert false "prepareValue(...): Unknown dimension of structure `$dim`."
+end
+
+""" 
+Returns the ValueReference coresponding to the variable name.
+""" 
+function fmiString2ValueReference(dataStruct::Union{FMU2, fmi2ModelDescription}, identifier::Union{String, Array{String}})
+    fmi2String2ValueReference(dataStruct, identifier)
 end
 
 # Wrapping modelDescription Functions
