@@ -99,7 +99,7 @@ export fmi2IsCoSimulation, fmi2IsModelExchange
 fmi2Struct = Union{FMU2, fmi2Component}
 
 """
-TODO
+Receives one or an array of value references in an arbitrary format (see fmi2ValueReferenceFormat) and converts it into an Array{fmi2ValueReference} (if not already).
 """
 function prepareValueReference(md::fmi2ModelDescription, vr::fmi2ValueReferenceFormat)
     tvr = typeof(vr)
@@ -129,7 +129,7 @@ function prepareValueReference(comp::fmi2Component, vr::fmi2ValueReferenceFormat
 end
 
 """
-TODO
+Receives one or an array of values and converts it into an Array{typeof(value)} (if not already).
 """
 function prepareValue(value)
     if isa(value, Array) && length(size(value)) == 1
@@ -187,7 +187,7 @@ end
 # Multiple Dispatch variants for FMUs with version 2.0.X
 
 """
-Load FMUs FMI version independently, currently supporting version 2.0.X.
+Load FMUs independent of the FMI version, currently supporting version 2.0.X.
 """
 function fmiLoad(pathToFMU::String; unpackPath=nothing)
     fmi2Load(pathToFMU; unpackPath=unpackPath)

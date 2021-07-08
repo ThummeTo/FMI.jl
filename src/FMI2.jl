@@ -261,6 +261,8 @@ function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
 
     @assert isfile(zipAbsPath) ["fmi2Unzip(...): Can't deploy ZIP-Archive at `$(zipAbsPath)`."]
 
+    numFiles = 0
+
     # only unzip if not already done
     if !isdir(unzippedAbsPath)
         mkpath(unzippedAbsPath)
@@ -284,12 +286,14 @@ function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
                 end
 
                 @assert isfile(fileAbsPath) ["fmi2Unzip(...): Can't unzip file `$(f.name)` at `$(fileAbsPath)`."]
+                numFiles += 1
             end
         end
         close(zarchive)
     end
 
     @assert isdir(unzippedAbsPath) ["fmi2Unzip(...): ZIP-Archive couldn't be unzipped at `$(unzippedPath)`."]
+    @info "fmi2Unzip(...): Successfully unzipped $numFiles files at `$unzippedAbsPath`."
 
     (unzippedAbsPath, zipAbsPath)
 end
