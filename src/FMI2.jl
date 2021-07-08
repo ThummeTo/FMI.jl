@@ -242,7 +242,8 @@ function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
     (fileName, fileExt) = splitext(fileNameExt)
 
     if unpackPath == nothing 
-        unpackPath = mktempdir(; prefix="fmifluxjl_", cleanup=true)
+        # cleanup=true leads to issues with automatic testing on linux server.
+        unpackPath = mktempdir(; prefix="fmifluxjl_", cleanup=false)        
     end
         
     zipPath = joinpath(unpackPath, fileName * ".zip")
@@ -260,7 +261,7 @@ function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
 
     # only unzip if not already done
     if !isdir(unzippedAbsPath)
-        mkdir(unzippedAbsPath)
+        mkpath(unzippedAbsPath) # mkdir(unzippedAbsPath)
 
         zarchive = ZipFile.Reader(zipAbsPath)
         for f in zarchive.files
@@ -273,7 +274,7 @@ function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
                 mkpath(dirname(fileAbsPath))
                 write(fileAbsPath, read(f))
 
-                @assert isfile(fileAbsPath) ["fmi2Unzip(...): Can't unzip file `$fileAbsPath`."]
+                @assert isfile(fileAbsPath) ["fmi2Unzip(...): Can't unzip file `$(f.name)` at `$(fileAbsPath)`."]
             end
         end
         close(zarchive)
@@ -327,7 +328,7 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
     pathToBinary = ""
 
     if Sys.iswindows()
-        directories = ["binaries/win64", "binaries/x86_64-windows"]
+        directories = [joinpath("binaries", "win64"), joinpath("binaries","x86_64-windows")]
         for directory in directories
             directoryBinary = joinpath(fmu.path, directory)
             if isdir(directoryBinary)
@@ -335,9 +336,9 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
                 break
             end
         end
-        @assert isfile(pathToBinary) "Target platform is Windows, but can't find valid FMU binary."
+        @assert isfile(pathToBinary) "Target platform is Windows, but can't find valid FMU binary at `$(fmu.path)`."
     elseif Sys.islinux()
-        directories = ["binaries/linux64", "binaries/x86_64-linux"]
+        directories = [joinpath("binaries", "linux64"), joinpath("binaries", "x86_64-linux")]
         for directory in directories
             directoryBinary = joinpath(fmu.path, directory)
             if isdir(directoryBinary)
@@ -345,9 +346,9 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
                 break
             end
         end
-        @assert isfile(pathToBinary) "Target platform is Linux, but can't find valid FMU binary."
+        @assert isfile(pathToBinary) "Target platform is Linux, but can't find valid FMU binary at `$(fmu.path)`."
     elseif Sys.isapple()
-        directories = ["binaries/darwin64", "binaries/x86_64-darwin"]
+        directories = [joinpath("binaries", "darwin64"), joinpath("binaries", "x86_64-darwin")]
         for directory in directories
             directoryBinary = joinpath(fmu.path, directory)
             if isdir(directoryBinary)
@@ -355,9 +356,9 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
                 break
             end
         end
-        @assert isfile(pathToBinary) "Target platform is macOS, but can't find valid FMU binary."
+        @assert isfile(pathToBinary) "Target platform is macOS, but can't find valid FMU binary at `$(fmu.path)`."
     else
-        @assert false "Unknown target platform."
+        @assert false "Unsupported target platform. Supporting Windows64, Linux64 and Mac64."
     end
 
     lastDirectory = pwd()
