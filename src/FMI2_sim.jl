@@ -163,9 +163,19 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
                         setup = true)
 
     recordValues = prepareValueReference(c, recordValues)
+    variableSteps = c.fmu.modelDescription.CScanHandleVariableCommunicationStepSize 
 
+    # default setup
     if length(saveat) == 0
         saveat = LinRange(t_start, t_stop, 100)
+    end
+    dt = (t_stop - t_start) / length(saveat)
+
+    # setup if no variable steps
+    if variableSteps == false 
+        if length(saveat) >= 2 
+            dt = saveat[2] - saveat[1]
+        end
     end
 
     if setup
@@ -193,7 +203,9 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
 
         i = 1
         while t < t_stop
-            dt = saveat[i+1] - saveat[i]
+            if variableSteps
+                dt = saveat[i+1] - saveat[i]
+            end
 
             fmi2DoStep(c, t, dt)
             t = t + dt #round(t + dt, digits=numDigits)
@@ -205,7 +217,9 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
     else
         i = 1
         while t < t_stop
-            dt = saveat[i+1] - saveat[i]
+            if variableSteps
+                dt = saveat[i+1] - saveat[i]
+            end
 
             fmi2DoStep(c, t, dt)
             t = t + dt #round(t + dt, digits=numDigits)
