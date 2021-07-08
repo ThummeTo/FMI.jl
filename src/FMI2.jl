@@ -267,10 +267,13 @@ function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
             fileAbsPath = joinpath(unzippedAbsPath, f.name)
 
             if endswith(f.name,"/") || endswith(f.name,"\\")
-                mkpath(fileAbsPath)
+                mkpath(dirname(fileAbsPath))
+                # mkdir(dirname(fileAbsPath))
             else
                 mkpath(dirname(fileAbsPath))
                 write(fileAbsPath, read(f))
+
+                @assert isfile(fileAbsPath) ["fmi2Unzip(...): Can't unzip file `$fileAbsPath`."]
             end
         end
         close(zarchive)
@@ -278,7 +281,7 @@ function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
 
     @assert isdir(unzippedAbsPath) ["fmi2Unzip(...): ZIP-Archive couldn't be unzipped at `$unzippedPath`."]
 
-    (unzippedPath, zipPath)
+    (unzippedAbsPath, zipAbsPath)
 end
 
 """
@@ -328,7 +331,7 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
         for directory in directories
             directoryBinary = joinpath(fmu.path, directory)
             if isdir(directoryBinary)
-                pathToBinary = joinpath(directoryBinary, "$fmuName.dll")
+                pathToBinary = joinpath(directoryBinary, "$(fmuName).dll")
                 break
             end
         end
@@ -338,7 +341,7 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
         for directory in directories
             directoryBinary = joinpath(fmu.path, directory)
             if isdir(directoryBinary)
-                pathToBinary = joinpath(directoryBinary, "$fmuName.so")
+                pathToBinary = joinpath(directoryBinary, "$(fmuName).so")
                 break
             end
         end
@@ -348,7 +351,7 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
         for directory in directories
             directoryBinary = joinpath(fmu.path, directory)
             if isdir(directoryBinary)
-                pathToBinary = joinpath(directoryBinary, "$fmuName.dylib")
+                pathToBinary = joinpath(directoryBinary, "$(fmuName).dylib")
                 break
             end
         end
