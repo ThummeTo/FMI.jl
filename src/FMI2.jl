@@ -259,6 +259,8 @@ function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
     zipAbsPath = isabspath(zipPath) ?  zipPath : joinpath(pwd(), zipPath)
     unzippedAbsPath = isabspath(unzippedPath) ? unzippedPath : joinpath(pwd(), unzippedPath)
 
+    @assert isfile(zipAbsPath) ["fmi2Unzip(...): Can't deploy ZIP-Archive at `$(zipAbsPath)`."]
+
     # only unzip if not already done
     if !isdir(unzippedAbsPath)
         mkpath(unzippedAbsPath)
@@ -343,7 +345,7 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
                 break
             end
         end
-        @assert isfile(pathToBinary) "Target platform is Windows, but can't find valid FMU binary at `$(fmu.path)`."
+        @assert isfile(pathToBinary) "Target platform is Windows, but can't find valid FMU binary at `$(pathToBinary)` for path `$(fmu.path)`."
     elseif Sys.islinux()
         directories = [joinpath("binaries", "linux64"), joinpath("binaries", "x86_64-linux")]
         for directory in directories
@@ -353,7 +355,7 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
                 break
             end
         end
-        @assert isfile(pathToBinary) "Target platform is Linux, but can't find valid FMU binary at `$(fmu.path)`."
+        @assert isfile(pathToBinary) "Target platform is Linux, but can't find valid FMU binary at `$(pathToBinary)` for path `$(fmu.path)`."
     elseif Sys.isapple()
         directories = [joinpath("binaries", "darwin64"), joinpath("binaries", "x86_64-darwin")]
         for directory in directories
@@ -363,7 +365,7 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
                 break
             end
         end
-        @assert isfile(pathToBinary) "Target platform is macOS, but can't find valid FMU binary at `$(fmu.path)`."
+        @assert isfile(pathToBinary) "Target platform is macOS, but can't find valid FMU binary at `$(pathToBinary)` for path `$(fmu.path)`."
     else
         @assert false "Unsupported target platform. Supporting Windows64, Linux64 and Mac64."
     end
