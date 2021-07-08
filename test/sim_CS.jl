@@ -3,10 +3,6 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-using FMI, Test
-ENV["EXPORTINGTOOL"] = "Dymola/2020x"
-ENV["FMUSTRUCT"] = "FMUCOMPONENT"
-
 pathToFMU = joinpath(dirname(@__FILE__), "..", "model", ENV["EXPORTINGTOOL"], "SpringPendulum1D.fmu")
 
 myFMU = fmiLoad(pathToFMU)

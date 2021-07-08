@@ -394,10 +394,11 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
         @info "fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified."
     end
 
+    # make URI ressource location
     tmpResourceLocation = string("file:/", fmu.path)
     tmpResourceLocation = joinpath(tmpResourceLocation, "resources")
-    fmu.fmuResourceLocation = replace(tmpResourceLocation, "\\" => "/") # URIs.escapeuri(tmpResourceLocation) # replace(tmpResourceLocation, "\\" => "/")
-    @info "FMU ressource location: $(fmu.fmuResourceLocation)"
+    fmu.fmuResourceLocation = replace(tmpResourceLocation, "\\" => "/") # URIs.escapeuri(tmpResourceLocation) 
+    @info "fmi2Load(...): FMU resources location is `$(fmu.fmuResourceLocation)`"
 
     # retrieve functions
     fmu.cInstantiate                  = dlsym(fmu.libHandle, :fmi2Instantiate)
@@ -537,7 +538,7 @@ function fmi2SimulateCS(fmu::FMU2, t_start::Real, t_stop::Real;
 end
 
 """
-TODO
+Starts a simulation of a ME-FMU instance.
 """
 function fmi2SimulateME(fmu::FMU2, t_start::Real, t_stop::Real;
                         recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true, solver = nothing)
@@ -548,7 +549,7 @@ end
 """
 Unload a FMU.
 
-Free the allocated memory, close the binaries and remove temporary zip and unziped fmu model description.
+Free the allocated memory, close the binaries and remove temporary zip and unziped FMU model description.
 """
 function fmi2Unload(fmu::FMU2, cleanUp::Bool = true)
 
@@ -572,9 +573,9 @@ function fmi2Unload(fmu::FMU2, cleanUp::Bool = true)
 end
 
 """
-Returns a string representing the header file used to compile the fmi2 functions.function
+Returns a string representing the header file used to compile the fmi2 functions.function.
 
-Returns "default" by default
+Returns "default" by default.
 
 For more information call ?fmi2GetTypesPlatform
 """
