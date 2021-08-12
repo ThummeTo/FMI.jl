@@ -75,7 +75,7 @@ tmp = Random.randstring(8)
 rndString = [tmp, tmp]
 
 cacheReal = [0.0, 0.0]
-cacheInteger =  [0, 0]
+cacheInteger =  [fmi2Integer(0), fmi2Integer(0)]
 cacheBoolean = [false, false]
 cacheString = ["", ""]
 
