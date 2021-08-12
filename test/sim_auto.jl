@@ -5,7 +5,17 @@
 
 pathToFMU = joinpath(dirname(@__FILE__), "..", "model", ENV["EXPORTINGTOOL"], "SpringPendulum1D.fmu")
 
+# load FMU in temporary directory
 myFMU = fmiLoad(pathToFMU)
+@test isfile(myFMU.zipPath) == true
+@test isdir(splitext(myFMU.zipPath)[1]) == true
+fmiUnload(myFMU)
+
+# load FMU in source directory 
+fmuDir = joinpath(splitpath(pathToFMU)[1:end-1]...)
+myFMU = fmiLoad(pathToFMU; unpackPath=fmuDir)
+@test isfile(splitext(pathToFMU)[1] * ".zip") == true
+@test isdir(splitext(pathToFMU)[1]) == true
 
 comp = fmiInstantiate!(myFMU; loggingOn=false)
 @test comp != 0
@@ -23,7 +33,7 @@ end
 t_start = 0.0
 t_stop = 8.0
 
-data = fmiSimulateCS(fmuStruct, t_start, t_stop; recordValues=["mass.s", "mass.v"])
+data = fmiSimulate(fmuStruct, t_start, t_stop; recordValues=["mass.s", "mass.v"], setup=true)
 @test length(data.dataPoints) == 100
 @test length(data.dataPoints[1]) == 3
 
@@ -39,8 +49,7 @@ v = collect(d[3] for d in data.dataPoints)
 #@test abs(s[end] - 0.509219) < 0.01
 #@test abs(v[end] - 0.314074) < 0.01
 
-data = fmiSimulateCS(fmuStruct, t_start, t_stop)
+data = fmiSimulate(fmuStruct, t_start, t_stop; setup=true)
 @test data == nothing   # nothing was recorded, recordValues=[]
 
 fmiUnload(myFMU)
-
