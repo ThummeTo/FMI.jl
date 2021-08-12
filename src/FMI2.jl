@@ -6,6 +6,8 @@
 using Libdl
 using ZipFile
 
+using Base.Filesystem: mktempdir
+
 include("FMI2_c.jl")
 include("FMI2_comp.jl")
 include("FMI2_md.jl")
@@ -234,37 +236,66 @@ end
 Create a copy of the .fmu file as a .zip folder and unzips it.
 Returns the paths to the zipped and unzipped folders.
 """
-function fmi2Unzip(pathTofmu::String)
-    # set paths for fmu handling
-    zipname = splitext(pathTofmu)
-    zipPath = string(zipname[1], ".zip")
-    unzipedfmuPath = string(zipname[1], "/")
+function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
 
-    if !isdir(unzipedfmuPath)
-        cp(pathTofmu, zipPath; force = true)
-        mkdir(unzipedfmuPath)
+    fileNameExt = basename(pathToFMU)
+    (fileName, fileExt) = splitext(fileNameExt)
 
-        fileFullPath = isabspath(zipPath) ?  zipPath : joinpath(pwd(),zipPath)
-        basePath = dirname(fileFullPath)
-        outPath = (unzipedfmuPath == "" ? basePath : (isabspath(unzipedfmuPath) ? unzipedfmuPath : joinpath(pwd(),unzipedfmuPath)))
-        isdir(outPath) ? "" : mkdir(outPath)
-        zarchive = ZipFile.Reader(fileFullPath)
+    if unpackPath == nothing 
+        # cleanup=true leads to issues with automatic testing on linux server.
+        unpackPath = mktempdir(; prefix="fmifluxjl_", cleanup=false)        
+    end
+        
+    zipPath = joinpath(unpackPath, fileName * ".zip")
+    unzippedPath = joinpath(unpackPath, fileName)
+
+    # only copy ZIP if not already there
+    if !isfile(zipPath)
+        cp(pathToFMU, zipPath; force=true)
+    end
+
+    @assert isfile(zipPath) ["fmi2Unzip(...): ZIP-Archive couldn't be copied to `$zipPath`."]
+
+    zipAbsPath = isabspath(zipPath) ?  zipPath : joinpath(pwd(), zipPath)
+    unzippedAbsPath = isabspath(unzippedPath) ? unzippedPath : joinpath(pwd(), unzippedPath)
+
+    @assert isfile(zipAbsPath) ["fmi2Unzip(...): Can't deploy ZIP-Archive at `$(zipAbsPath)`."]
+
+    numFiles = 0
+
+    # only unzip if not already done
+    if !isdir(unzippedAbsPath)
+        mkpath(unzippedAbsPath)
+        
+        zarchive = ZipFile.Reader(zipAbsPath)
         for f in zarchive.files
-            fullFilePath = joinpath(outPath,f.name)
-            if (endswith(f.name,"/") || endswith(f.name,"\\"))
-                #mkdir(fullFilePath)
-                mkpath(fullFilePath)
+            fileAbsPath = normpath(joinpath(unzippedAbsPath, f.name))
+
+            if endswith(f.name,"/") || endswith(f.name,"\\")
+                mkpath(fileAbsPath) # mkdir(fileAbsPath)
+
+                @assert isdir(fileAbsPath) ["fmi2Unzip(...): Can't create directory `$(f.name)` at `$(fileAbsPath)`."]
             else
-                mkpath(dirname(fullFilePath))
-                write(fullFilePath, read(f))
+                # create directory if not forced by zip file folder
+                mkpath(dirname(fileAbsPath))
+                
+                numBytes = write(fileAbsPath, read(f))
+                
+                if numBytes == 0
+                    @info "fmi2Unzip(...): Written file `$(f.name)`, but file is empty."
+                end
+
+                @assert isfile(fileAbsPath) ["fmi2Unzip(...): Can't unzip file `$(f.name)` at `$(fileAbsPath)`."]
+                numFiles += 1
             end
         end
         close(zarchive)
     end
 
-    @assert isdir(unzipedfmuPath) ["Error:FMU not loaded"]
+    @assert isdir(unzippedAbsPath) ["fmi2Unzip(...): ZIP-Archive couldn't be unzipped at `$(unzippedPath)`."]
+    @info "fmi2Unzip(...): Successfully unzipped $numFiles files at `$unzippedAbsPath`."
 
-    (unzipedfmuPath, zipPath)
+    (unzippedAbsPath, zipAbsPath)
 end
 
 """
@@ -286,13 +317,15 @@ Retrieves all the pointers of binary functions.
 
 Returns the instance of the FMU struct.
 """
-function fmi2Load(pathTofmu::String)
+function fmi2Load(pathToFMU::String; unpackPath=nothing)
     # Create uninitialized FMU
     fmu = FMU2()
     fmu.components = []
 
+    pathToFMU = normpath(pathToFMU)
+
     # set paths for fmu handling
-    (fmu.path, fmu.zipPath) = fmi2Unzip(pathTofmu)
+    (fmu.path, fmu.zipPath) = fmi2Unzip(pathToFMU; unpackPath=unpackPath)
 
     # set paths for modelExchangeScripting and binary
     tmpName = splitpath(fmu.path)
@@ -308,37 +341,37 @@ function fmi2Load(pathTofmu::String)
     pathToBinary = ""
 
     if Sys.iswindows()
-        directories = ["binaries/win64", "binaries/x86_64-windows"]
+        directories = [joinpath("binaries", "win64"), joinpath("binaries","x86_64-windows")]
         for directory in directories
             directoryBinary = joinpath(fmu.path, directory)
             if isdir(directoryBinary)
-                pathToBinary = joinpath(directoryBinary, "$fmuName.dll")
+                pathToBinary = joinpath(directoryBinary, "$(fmuName).dll")
                 break
             end
         end
-        @assert isfile(pathToBinary) "Target platform is Windows, but can't find valid FMU binary."
+        @assert isfile(pathToBinary) "Target platform is Windows, but can't find valid FMU binary at `$(pathToBinary)` for path `$(fmu.path)`."
     elseif Sys.islinux()
-        directories = ["binaries/linux64", "binaries/x86_64-linux"]
+        directories = [joinpath("binaries", "linux64"), joinpath("binaries", "x86_64-linux")]
         for directory in directories
             directoryBinary = joinpath(fmu.path, directory)
             if isdir(directoryBinary)
-                pathToBinary = joinpath(directoryBinary, "$fmuName.so")
+                pathToBinary = joinpath(directoryBinary, "$(fmuName).so")
                 break
             end
         end
-        @assert isfile(pathToBinary) "Target platform is Linux, but can't find valid FMU binary."
+        @assert isfile(pathToBinary) "Target platform is Linux, but can't find valid FMU binary at `$(pathToBinary)` for path `$(fmu.path)`."
     elseif Sys.isapple()
-        directories = ["binaries/darwin64", "binaries/x86_64-darwin"]
+        directories = [joinpath("binaries", "darwin64"), joinpath("binaries", "x86_64-darwin")]
         for directory in directories
             directoryBinary = joinpath(fmu.path, directory)
             if isdir(directoryBinary)
-                pathToBinary = joinpath(directoryBinary, "$fmuName.dylib")
+                pathToBinary = joinpath(directoryBinary, "$(fmuName).dylib")
                 break
             end
         end
-        @assert isfile(pathToBinary) "Target platform is macOS, but can't find valid FMU binary."
+        @assert isfile(pathToBinary) "Target platform is macOS, but can't find valid FMU binary at `$(pathToBinary)` for path `$(fmu.path)`."
     else
-        @assert false "Unknown target platform."
+        @assert false "Unsupported target platform. Supporting Windows64, Linux64 and Mac64."
     end
 
     lastDirectory = pwd()
@@ -361,10 +394,11 @@ function fmi2Load(pathTofmu::String)
         @info "fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified."
     end
 
+    # make URI ressource location
     tmpResourceLocation = string("file:/", fmu.path)
     tmpResourceLocation = joinpath(tmpResourceLocation, "resources")
-    fmu.fmuResourceLocation = replace(tmpResourceLocation, "\\" => "/") # URIs.escapeuri(tmpResourceLocation) # replace(tmpResourceLocation, "\\" => "/")
-    @info "FMU ressource location: $(fmu.fmuResourceLocation)"
+    fmu.fmuResourceLocation = replace(tmpResourceLocation, "\\" => "/") # URIs.escapeuri(tmpResourceLocation) 
+    @info "fmi2Load(...): FMU resources location is `$(fmu.fmuResourceLocation)`"
 
     # retrieve functions
     fmu.cInstantiate                  = dlsym(fmu.libHandle, :fmi2Instantiate)
@@ -489,9 +523,9 @@ end
 Starts a simulation of the fmu instance for the matching fmu type, if both types are available the CoSimulation Simulation is started
 """
 function fmi2Simulate(fmu::FMU2, t_start::Real = 0.0, t_stop::Real = 1.0;
-                      recordValues::fmi2ValueReferenceFormat = nothing, saveat=[])
+                      recordValues::fmi2ValueReferenceFormat = nothing, saveat=[], setup=true)
     fmi2Simulate(fmu.components[end], t_start, t_stop;
-                 recordValues=recordValues, saveat=saveat)
+                 recordValues=recordValues, saveat=saveat, setup=setup)
 end
 
 """
@@ -504,18 +538,18 @@ function fmi2SimulateCS(fmu::FMU2, t_start::Real, t_stop::Real;
 end
 
 """
-TODO
+Starts a simulation of a ME-FMU instance.
 """
 function fmi2SimulateME(fmu::FMU2, t_start::Real, t_stop::Real;
                         recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true, solver = nothing)
     fmi2SimulateME(fmu.components[end], t_start, t_stop;
-                   recordValues=recordValues, saveat=saveat, setup=true, solver=solver)
+                   recordValues=recordValues, saveat=saveat, setup=setup, solver=solver)
 end
 
 """
 Unload a FMU.
 
-Free the allocated memory, close the binaries and remove temporary zip and unziped fmu model description.
+Free the allocated memory, close the binaries and remove temporary zip and unziped FMU model description.
 """
 function fmi2Unload(fmu::FMU2, cleanUp::Bool = true)
 
@@ -539,9 +573,9 @@ function fmi2Unload(fmu::FMU2, cleanUp::Bool = true)
 end
 
 """
-Returns a string representing the header file used to compile the fmi2 functions.function
+Returns a string representing the header file used to compile the fmi2 functions.function.
 
-Returns "default" by default
+Returns "default" by default.
 
 For more information call ?fmi2GetTypesPlatform
 """

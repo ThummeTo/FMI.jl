@@ -10,9 +10,12 @@ using OrdinaryDiffEq: ODESolution
 Plots ODE-Solution from FMU (ODE states are interpreted as the FMU states).
 
 Optional `t_in_solution` controls if the first state in the solution is interpreted as t(ime).
+Optional keyword argument `maxLabelLength` controls the maximum length for legend labels (too long labels are cut from front).
 """
-function fmiPlot(fmu::FMU2, solution::ODESolution, t_in_solution = false)
-    t = nothing
+function fmiPlot(fmu::FMU2, solution::ODESolution, t_in_solution = false; maxLabelLength=64)
+  
+    t = []
+
     offset = 0
     if t_in_solution
         t = collect(data[1] for data in solution.u)
@@ -31,7 +34,14 @@ function fmiPlot(fmu::FMU2, solution::ODESolution, t_in_solution = false)
 
         values = collect(data[s+offset] for data in solution.u)
 
-        Plots.plot!(fig, t, values, label="$vrName ($vr)")
+        # prevent legend labels from getting too long
+        label = "$vrName ($vr)"
+        labelLength = length(label)
+        if labelLength > maxLabelLength
+            label = "..." * label[labelLength-maxLabelLength:end]
+        end
+
+        Plots.plot!(fig, t, values, label=label)
     end
     fig
 end
@@ -45,6 +55,9 @@ end
 Plots fmi2SimulationResult.
 """
 function fmiPlot(sd::fmi2SimulationResult)
+
+    @assert sd != nothing ["fmiPlot(...): Simulation result is nothing, maybe you started a simulation without keyword `recordValues` or with `recordValues=[]` ?"]
+
     ts = fmi2SimulationResultGetTime(sd)
 
     numVars = length(sd.dataPoints[1])-1
@@ -59,7 +72,7 @@ function fmiPlot(sd::fmi2SimulationResult)
     fig
 end
 
-# extend the original plot-command by plotting FMUs 
+# extend the original plot-command by plotting FMUs.
 function Plots.plot(sd::fmi2SimulationResult)
     fmiPlot(sd)
 end

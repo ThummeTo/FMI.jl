@@ -26,6 +26,12 @@ end
 solution = fmiSimulateME(fmuStruct, t_start, t_stop)
 @test length(solution.u) > 0
 @test length(solution.t) > 0
-# TODO: Time series comparision
+
+@test solution.t[1] == t_start 
+@test solution.t[end] == t_stop 
+
+# reference values from Simulation in Dymola2020x (Dassl)
+@test solution.u[1] == [0.5, 0.0]
+@test sum(abs.(solution.u[end] - [1.06736, -1.03552e-10])) < 0.01
 
 fmiUnload(myFMU)

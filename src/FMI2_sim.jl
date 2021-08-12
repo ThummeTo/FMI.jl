@@ -122,9 +122,10 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     end
 
     if setup
+        fmi2Reset(c)
         fmi2SetupExperiment(c, t_start, t_stop)
-        fmiEnterInitializationMode(c)
-        fmiExitInitializationMode(c)
+        fmi2EnterInitializationMode(c)
+        fmi2ExitInitializationMode(c)
     end
 
     eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator),
@@ -162,15 +163,26 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
                         setup = true)
 
     recordValues = prepareValueReference(c, recordValues)
+    variableSteps = c.fmu.modelDescription.CScanHandleVariableCommunicationStepSize 
 
+    # default setup
     if length(saveat) == 0
         saveat = LinRange(t_start, t_stop, 100)
     end
+    dt = (t_stop - t_start) / length(saveat)
+
+    # setup if no variable steps
+    if variableSteps == false 
+        if length(saveat) >= 2 
+            dt = saveat[2] - saveat[1]
+        end
+    end
 
     if setup
+        fmi2Reset(c)
         fmi2SetupExperiment(c, t_start, t_stop)
-        fmiEnterInitializationMode(c)
-        fmiExitInitializationMode(c)
+        fmi2EnterInitializationMode(c)
+        fmi2ExitInitializationMode(c)
     end
 
     t = t_start
@@ -191,9 +203,11 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
 
         i = 1
         while t < t_stop
-            dt = saveat[i+1] - saveat[i]
+            if variableSteps
+                dt = saveat[i+1] - saveat[i]
+            end
 
-            fmiDoStep(c, t, dt)
+            fmi2DoStep(c, t, dt)
             t = t + dt #round(t + dt, digits=numDigits)
             i += 1
 
@@ -201,10 +215,13 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
             push!(sd.dataPoints, (t, values...))
         end
     else
+        i = 1
         while t < t_stop
-            dt = saveat[i+1] - saveat[i]
+            if variableSteps
+                dt = saveat[i+1] - saveat[i]
+            end
 
-            fmiDoStep(c, t, dt)
+            fmi2DoStep(c, t, dt)
             t = t + dt #round(t + dt, digits=numDigits)
             i += 1
         end

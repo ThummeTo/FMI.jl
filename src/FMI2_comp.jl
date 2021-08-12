@@ -21,6 +21,8 @@ For more information call ?fmi2SetupExperiment
 """
 function fmi2SetupExperiment(c::fmi2Component, startTime::Real = 0.0, stopTime::Real = startTime; tolerance::Real = 0.0)
 
+    c.fmu.t = startTime
+
     toleranceDefined = (tolerance > 0.0)
     stopTimeDefined = (stopTime > startTime)
 

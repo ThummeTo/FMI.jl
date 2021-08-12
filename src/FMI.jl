@@ -37,6 +37,7 @@ export fmiGetVariableNamingConvention, fmiGetNumberOfEventIndicators
 export fmiCanGetSetState, fmiCanSerializeFMUstate
 export fmiProvidesDirectionalDerivative
 export fmiIsCoSimulation, fmiIsModelExchange
+export fmiString2ValueReference
 
 # FMI2.jl
 export FMU2, fmi2True, fmi2False
@@ -66,6 +67,7 @@ export fmi2SetTime, fmi2SetContinuousStates
 export fmi2NewDiscreteStates, fmi2CompletedIntegratorStep, fmi2GetDerivatives, fmi2GetEventIndicators, fmi2GetContinuousStates, fmi2GetNominalsOfContinuousStates
 
 # FMI2_c.jl
+export fmi2Component
 export fmi2Instantiate, fmi2SetDebugLogging # fmi2FreeInstance!
 export fmi2GetTypesPlatform, fmi2GetVersion
 export fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2Terminate, fmi2Reset
@@ -97,7 +99,7 @@ export fmi2IsCoSimulation, fmi2IsModelExchange
 fmi2Struct = Union{FMU2, fmi2Component}
 
 """
-TODO
+Receives one or an array of value references in an arbitrary format (see fmi2ValueReferenceFormat) and converts it into an Array{fmi2ValueReference} (if not already).
 """
 function prepareValueReference(md::fmi2ModelDescription, vr::fmi2ValueReferenceFormat)
     tvr = typeof(vr)
@@ -127,7 +129,7 @@ function prepareValueReference(comp::fmi2Component, vr::fmi2ValueReferenceFormat
 end
 
 """
-TODO
+Receives one or an array of values and converts it into an Array{typeof(value)} (if not already).
 """
 function prepareValue(value)
     if isa(value, Array) && length(size(value)) == 1
@@ -137,6 +139,13 @@ function prepareValue(value)
     end
 
     @assert false "prepareValue(...): Unknown dimension of structure `$dim`."
+end
+
+""" 
+Returns the ValueReference coresponding to the variable name.
+""" 
+function fmiString2ValueReference(dataStruct::Union{FMU2, fmi2ModelDescription}, identifier::Union{String, Array{String}})
+    fmi2String2ValueReference(dataStruct, identifier)
 end
 
 # Wrapping modelDescription Functions
@@ -177,29 +186,29 @@ end
 
 # Multiple Dispatch variants for FMUs with version 2.0.X
 
-""" 
-Load FMUs FMI version independently, currently supporting version 2.0.X.
 """
-function fmiLoad(pathToFMU::String)
-    fmi2Load(pathToFMU)
+Load FMUs independent of the FMI version, currently supporting version 2.0.X.
+"""
+function fmiLoad(pathToFMU::String; unpackPath=nothing)
+    fmi2Load(pathToFMU; unpackPath=unpackPath)
 end
 
 """
 Simulate an fmu according to its standard from 0.0 to t_stop.
 """
 function fmiSimulate(str::fmi2Struct, t_start::Real = 0.0, t_stop::Real = 1.0;
-                     recordValues::fmi2ValueReferenceFormat = nothing, saveat = [])
+                     recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true)
     fmi2Simulate(str, t_start, t_stop;
-                 recordValues=recordValues, saveat=saveat)
+                 recordValues=recordValues, saveat=saveat, setup=setup)
 end
 
 """
 Simulate an CoSimulation fmu according to its standard from 0.0 to t_stop.
 """
 function fmiSimulateCS(str::fmi2Struct, t_start::Real = 0.0, t_stop::Real = 1.0;
-                       recordValues::fmi2ValueReferenceFormat = nothing, saveat = [])
+                       recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true)
     fmi2SimulateCS(str, t_start, t_stop;
-                   recordValues=recordValues, saveat=saveat)
+                   recordValues=recordValues, saveat=saveat, setup=setup)
 end
 
 """
@@ -208,7 +217,7 @@ Simulate an ModelExchange fmu according to its standard from 0.0 to t_stop.
 function fmiSimulateME(str::fmi2Struct, t_start::Real = 0.0, t_stop::Real = 1.0;
                        recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true, solver = nothing)
     fmi2SimulateME(str, t_start, t_stop;
-                   recordValues=recordValues, saveat=saveat, setup = true, solver=solver)
+                   recordValues=recordValues, saveat=saveat, setup=setup, solver=solver)
 end
 
 """
@@ -456,8 +465,8 @@ function fmiGetDirectionalDerivative(fmu::fmi2Struct,
                                  Array{Real}(dvUnknown))
 end
 
-""" 
-Wrapper for single directional derivative, version independent. 
+"""
+Wrapper for single directional derivative, version independent.
 """
 function fmiGetDirectionalDerivative(fmu::fmi2Struct, vUnknown_ref::Cint, vKnown_ref::Cint, dvKnown::Real = 1.0, dvUnknown::Real = 1.0)
     fmi2GetDirectionalDerivative(fmu, vUnknown_ref, vKnown_ref, dvKnown, dvUnknown)
