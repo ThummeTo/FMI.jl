@@ -231,8 +231,9 @@ function fmi2GetString!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::
 
     nvr = Csize_t(length(vr))
     # values = Vector{Ptr{Cchar}}.(values)
+    vars = Vector{Ptr{Cchar}}(undef, nvr)
     fmi2GetString!(c, vr, nvr, values)
-
+    values[:] = unsafe_string.(vars)
     nothing
 end
 function fmi2GetString!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::String)
