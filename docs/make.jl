@@ -8,10 +8,10 @@ using Documenter, FMI
 makedocs(sitename="FMI.jl",
          format = Documenter.HTML(
             collapselevel = 1,
-            sidebar_sitename = false        
+            sidebar_sitename = false
          ),
          pages= Any[
-            "Home" => "index.md"
+            "Introduction" => "index.md"
             "Examples" => [
                 "Parameterize" => "parameterize.md"
                 "Simulate CoSimulation" => "simulateCS.md"
@@ -21,7 +21,9 @@ makedocs(sitename="FMI.jl",
                 "FMI library functions" => "library.md",
                 "FMU2 functions" => "fmu2.md"
             ]
-         ]
+            "Contents" => "contents.md"
+            "Index" => "indices.md"
+            ]
          )
 
 deploydocs(repo = "github.com/ThummeTo/FMI.jl.git", devbranch = "main")
