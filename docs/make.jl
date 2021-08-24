@@ -6,17 +6,21 @@
 using Documenter, FMI
 
 makedocs(sitename="FMI.jl",
-          pages= Any[
-                "Home" => "index.md"
-                "Examples" => [
-                    "Parameterize" => "parameterize.md"
-                    "Simulate CoSimulation" => "simulateCS.md"
-                    "Simulate ModelExchange" => "simulateME.md"
-                ]
-                "Library Functions" => Any[
-                    "FMI library functions" => "library.md",
-                    "FMU2 functions" => "fmu2.md"
-                ]
+         format = Documenter.HTML(
+            collapselevel = 1,
+            sidebar_sitename = false        
+         ),
+         pages= Any[
+            "Home" => "index.md"
+            "Examples" => [
+                "Parameterize" => "parameterize.md"
+                "Simulate CoSimulation" => "simulateCS.md"
+                "Simulate ModelExchange" => "simulateME.md"
+            ]
+            "Library Functions" => Any[
+                "FMI library functions" => "library.md",
+                "FMU2 functions" => "fmu2.md"
+            ]
          ]
          )
 
