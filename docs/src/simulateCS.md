@@ -1,4 +1,4 @@
-## Simualte CoSimulation
+## Simualte a FMU
 
 ```
 #
