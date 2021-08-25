@@ -4,7 +4,7 @@
 
 ```@docs
 fmi2Instantiate
-fmi2FreeInstance
+fmi2FreeInstance!
 ```
 
 ## Platform and Version number
