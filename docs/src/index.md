@@ -7,27 +7,29 @@ FMI.jl is a free-to-use software library for the Julia programming language, whi
 ## How can I install FMI.jl?
 1. open a Julia-Command-Window, activate your preferred environment
 1. go to package manager using ```]``` and type ```add FMI```
-```@repl
-']'
-add FMI
+```
+julia> ]
+
+(v.1.5.4)> add FMI
 ```
 
 If you want to check that everything works correctly, you can run the tests bundled with FMI.jl:
-```@repl
-using Pkg
-Pkg.test("FMI") # hide
+```
+julia> using Pkg
+
+julia> Pkg.test("FMI")
 ```
 
 Additionally, you can check the version of FMI.jl that you have installed with the ```status``` command.
-```@repl
-]
-status FMI
+```
+julia> ]
+(v.1.5.4)> status FMI
 ```
 
 Throughout the rest of the tutorial we assume that you have installed the FMI.jl package and have typed ```using FMI``` which loads the package:
 
-```@repl
-using FMI
+```
+julia> using FMI
 ```
 
 ## How the documentation is structured?
@@ -39,9 +41,9 @@ Having a high-level overview of how this documentation is structured will help y
 - simulation / plotting of CS- and ME-FMUs
 - event-handling for discontinuous ME-FMUs
 - the full FMI command set (except ```getFMUState``` and ```setFMUState```)
+- Linux and iOS
 
 ## What is under development in FMI.jl?
-- Linux support
 - documentation
 - more examples
 - support for ```getFMUState``` and ```setFMUState```
