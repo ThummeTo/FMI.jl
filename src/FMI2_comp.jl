@@ -54,18 +54,15 @@ Get the values of an array of fmi2Real variables
 
 For more information call ?fmi2GetReal
 """
-function fmi2GetReal!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Array{<:Real})
+function fmi2GetReal!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Array{fmi2Real})
 
     vr = prepareValueReference(c, vr)
-    values = prepareValue(values)
+    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi2GetReal!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
-    vars = zeros(fmi2Real, nvr)
-    fmi2GetReal!(c, vr, nvr, vars)
-
-    values[:] = vars
-
+    # values[:] = fmi2Real.(values)
+    fmi2GetReal!(c, vr, nvr, values)
     nothing
 end
 function fmi2GetReal!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Real)
@@ -112,17 +109,16 @@ Get the values of an array of fmi2Integer variables
 
 For more information call ?fmi2GetInteger
 """
-function fmi2GetInteger!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Array{<:Integer})
+function fmi2GetInteger!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Array{fmi2Integer})
 
     vr = prepareValueReference(c, vr)
-    values = prepareValue(values)
+    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi2GetInteger!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
-    vars = zeros(fmi2Integer, nvr)
-    fmi2GetInteger!(c, vr, nvr, vars)
-    values[:] = vars
-
+    # values[:] = Cint.(values)
+    # display(typeof(values))
+    fmi2GetInteger!(c, vr, nvr, values)
     nothing
 end
 function fmi2GetInteger!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Integer)
@@ -169,16 +165,15 @@ Get the values of an array of fmi2Boolean variables
 
 For more information call ?fmi2GetBoolean
 """
-function fmi2GetBoolean!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Array{Bool})
+function fmi2GetBoolean!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Array{fmi2Boolean})
 
     vr = prepareValueReference(c, vr)
-    values = prepareValue(values)
+    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi2GetBoolean!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
-    vars = Array{fmi2Boolean}(undef, nvr)
-    fmi2GetBoolean!(c, vr, nvr, vars)
-    values[:] = vars
+    #values = fmi2Boolean.(values)
+    fmi2GetBoolean!(c, vr, nvr, values)
 
     nothing
 end
@@ -228,17 +223,17 @@ Get the values of an array of fmi2String variables
 
 For more information call ?fmi2GetString
 """
-function fmi2GetString!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Array{String})
+function fmi2GetString!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Array{fmi2String})
 
     vr = prepareValueReference(c, vr)
-    values = prepareValue(values)
+    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi2GetString!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(vr))
+    # values = Vector{Ptr{Cchar}}.(values)
     vars = Vector{Ptr{Cchar}}(undef, nvr)
     fmi2GetString!(c, vr, nvr, vars)
     values[:] = unsafe_string.(vars)
-
     nothing
 end
 function fmi2GetString!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::String)
