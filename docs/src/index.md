@@ -4,10 +4,31 @@
 ## What is FMI.jl?
 FMI.jl is a free-to-use software library for the Julia programming language, which integrates FMI ([fmi-standard.org](http://fmi-standard.org/)): load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
 
-## How can I use FMI.jl?
-1. open a Julia-Command-Window, activate your prefered environment
-1. goto package manager using ```]```
-1. type ```add "https://github.com/ThummeTo/FMI.jl"```
+## How can I install FMI.jl?
+1. open a Julia-Command-Window, activate your preferred environment
+1. go to package manager using ```]``` and type ```add FMI```
+```@repl
+']'
+add FMI
+```
+
+If you want to check that everything works correctly, you can run the tests bundled with FMI.jl:
+```@repl
+using Pkg
+Pkg.test("FMI") # hide
+```
+
+Additionally, you can check the version of FMI.jl that you have installed with the ```status``` command.
+```@repl
+]
+status FMI
+```
+
+Throughout the rest of the tutorial we assume that you have installed the FMI.jl package and have typed ```using FMI``` which loads the package:
+
+```@repl
+using FMI
+```
 
 ## How the documentation is structured?
 Having a high-level overview of how this documentation is structured will help you know where to look for certain things. The xxx main parts of the documentation are :
@@ -18,7 +39,6 @@ Having a high-level overview of how this documentation is structured will help y
 - simulation / plotting of CS- and ME-FMUs
 - event-handling for discontinuous ME-FMUs
 - the full FMI command set (except ```getFMUState``` and ```setFMUState```)
-- ...
 
 ## What is under development in FMI.jl?
 - Linux support
@@ -26,10 +46,9 @@ Having a high-level overview of how this documentation is structured will help y
 - more examples
 - support for ```getFMUState``` and ```setFMUState```
 - FMI 3.0 and SSP 1.0 support
-- ...
 
 ## What Platforms are supported?
-FMI.jl is tested under Julia 1.5.4 on Windows.
+FMI.jl is tested under Julia 1.5.4 on Windows and Linux.
 
 ## Interested in Hybrid Modelling in Julia using FMUs?
 See [FMIFlux.jl](https://github.com/ThummeTo/FMIFlux.jl).
