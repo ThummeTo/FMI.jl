@@ -141,9 +141,9 @@ function prepareValue(value)
     @assert false "prepareValue(...): Unknown dimension of structure `$dim`."
 end
 
-""" 
+"""
 Returns the ValueReference coresponding to the variable name.
-""" 
+"""
 function fmiString2ValueReference(dataStruct::Union{FMU2, fmi2ModelDescription}, identifier::Union{String, Array{String}})
     fmi2String2ValueReference(dataStruct, identifier)
 end
@@ -376,7 +376,7 @@ end
 """
 Writes the boolean values of an array of variables in the given field
 """
-function fmiGetBoolean!(fmu::fmi2Struct, vr::fmi2ValueReferenceFormat, values::Union{Array{Bool}, Bool})
+function fmiGetBoolean!(fmu::fmi2Struct, vr::fmi2ValueReferenceFormat, values::Union{Array{Bool}, Bool, Array{fmi2Boolean}})
     fmi2GetBoolean!(fmu, vr, values)
 end
 

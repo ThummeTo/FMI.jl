@@ -75,9 +75,9 @@ tmp = Random.randstring(8)
 rndString = [tmp, tmp]
 
 cacheReal = [0.0, 0.0]
-cacheInteger =  [0, 0]
-cacheBoolean = [false, false]
-cacheString = ["", ""]
+cacheInteger =  [FMI.fmi2Integer(0), FMI.fmi2Integer(0)]
+cacheBoolean = [FMI.fmi2Boolean(false), FMI.fmi2Boolean(false)]
+cacheString = [FMI.fmi2String(""), FMI.fmi2String("")]
 
 @test fmiSetReal(fmuStruct, realValueReferences, rndReal) == 0
 @test fmiGetReal(fmuStruct, realValueReferences) == rndReal
