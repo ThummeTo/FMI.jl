@@ -134,7 +134,7 @@ end
 function fmi2IsModelExchange(fmu::FMU2)
     fmi2IsModelExchange(fmu.modelDescription)
 end
-
+# TODO: add to documentation and export list, if not already done
 """
 Struct to handle FMU simulation data / results.
 """
