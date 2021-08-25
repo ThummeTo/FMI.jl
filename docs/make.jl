@@ -13,6 +13,7 @@ makedocs(sitename="FMI.jl",
          pages= Any[
             "Introduction" => "index.md"
             "Examples" => [
+                "Load/Unload a FMU" => "load_unload.md"
                 "Parameterize" => "parameterize.md"
                 "Simulate CoSimulation" => "simulateCS.md"
                 "Simulate ModelExchange" => "simulateME.md"

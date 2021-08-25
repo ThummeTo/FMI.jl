@@ -10,7 +10,7 @@
 using FMI
 using Plots
 
-pathToFMU = joinpath(dirname(@__FILE__), "../model/IO.fmu")
+pathToFMU = joinpath(dirname(@__FILE__), "../model/Dymola/2020x/IO/IO.fmu")
 
 myFMU = fmiLoad(pathToFMU)
 fmiInstantiate!(myFMU; loggingOn=true)
@@ -42,3 +42,5 @@ fmiExitInitializationMode(myFMU)
 
 fmiUnload(myFMU)
 ```
+
+## Instance
