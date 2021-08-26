@@ -1,12 +1,13 @@
-## Load a FMU
+## [Load a FMU](@id loading)
 
 Loading a FMU in FMI.jl is fairly easy, you only have to call the ```fmiLoad``` function with the path to your FMU.
 
 ```
 julia> myFMU = fmiLoad("path/to/myFMU.fmu")
+julia> myFMU = fmiLoad("path/to/myFMU.fmu"; unpackPath = "path/to/unpacked/fmu/")
 ```
 
-The unpacked FMU is stored into a temporary directory. There you have access to the model description and resources of the FMU. Additionally the information of the model description is parsed into a Julia struct.
+By default, the unpacked FMU is stored into a temporary directory. Optionally you can provide a path where the FMU should be unpacked. There you have access to the model description and resources of the FMU. Additionally the information of the model description is parsed into a Julia struct.
 
 The most important function to access those informations are are:
 
@@ -28,6 +29,6 @@ Similiar to the ```fmiLoad``` function the ```fmiUnload``` unloads a FMU.
 julia> fmiUnload(myFMU)
 ```
 
-The connection to the shared library is closed all instances of the FMU are destroyed (read more about instances [here](@ref Instance)) and the temporary files are deleted.
+The connection to the shared library is closed all instances of the FMU are destroyed (read more about instances [here](@ref Instantiation)) and the temporary files are deleted.
 
 <!--Vlt Doku zu der Stelle wo was erklärt wird-->

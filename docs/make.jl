@@ -15,9 +15,7 @@ makedocs(sitename="FMI.jl",
             "Examples" => [
                 "overview.md"
                 "Load/Unload a FMU" => "load_unload.md"
-                "Parameterize" => "parameterize.md"
-                "Simulate CoSimulation" => "simulateCS.md"
-                "Simulate ModelExchange" => "simulateME.md"
+                "Simulate a FMU" => "simulateCS.md"
             ]
             "Library Functions" => Any[
                 "FMI library functions" => "library.md",
