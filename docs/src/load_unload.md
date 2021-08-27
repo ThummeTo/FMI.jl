@@ -21,7 +21,7 @@ While ```fmiGetModelName``` and ```fmiGetGUID``` return the name and GUID of the
 
 Also a connection to the shared library is estabished and depending on the provided FMU, the necessary function pointers are loaded to access the need FMI functions.
 
-## Unload a FMU
+## [Unload a FMU](@id unload)
 
 Similiar to the ```fmiLoad``` function the ```fmiUnload``` unloads a FMU.
 

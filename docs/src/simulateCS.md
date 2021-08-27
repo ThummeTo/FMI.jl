@@ -56,7 +56,7 @@ t_stop = 8.0
 
 ### Easy Simulation
 
-FMI.jl can identify what type of FMU you want to simulate and adjust the simulation accordingly. If the FMU supports both model exchange and co simulation, the FMU is always as a co simulation FMU simulated. If you want to simulate it as a model exchange FMU, you have to use the specific ```fmiSimulateME``` function call. Additionally to the needed start and stop time, you can also provide an array of variable names that you want keep track of. The function returns the values of those variables for the whole simulation time. Those can be plotted using the ```fmiPlot``` function.
+FMI.jl can identify what type of FMU you want to simulate and adjust the simulation accordingly. If the FMU supports both model exchange and co simulation, the FMU is always as a co simulation FMU simulated. If you want to simulate it as a model exchange FMU, you have to use the specific ```fmiSimulateME``` function call. Additionally to the needed start and stop time, you can also provide an array of variable names that you want keep track of. The function returns the values of those variables for the whole simulation time. Those can be plotted using the ```fmiPlot``` function. Please note that ```fmiSimulate``` has the option ```setup``` which is ```true``` by default. So the initialization can be ommited unless you want to change the values of parameters before the simulation.
 
 ```
 data = fmiSimulate(myFMU, t_start, t_stop, ["mass.s", "mass.v"])
@@ -66,8 +66,19 @@ fmiPlot(data)
 
 ### Simulation close to FMI Standard
 
+This is only recommend for co simulation FMUs or experienced users due to the complexity of event handling for model exchange FMUs. The following code gives a short example on how to simulate a co simulation FMU without the variable tracking.
 
-
-
-fmiUnload(myFMU)
 ```
+dt = 0.1
+ts = 0.0:dt:10.0
+for t in ts
+    fmiDoStep(fmuComp, t, dt)
+end
+fmiTerminate(fmuComp)
+```
+
+The ```fmiTerminate``` function resets the FMU after the simulation finished. So you can run another one with the same or changed parameters again.
+
+### Finishing the simulation
+
+After finishing all your simulations you can free the allocated memory of your simulation runs and the temporary data of the FMU with the ```fmiUnload``` function. For more information see [Load/Unload a FMU](@ref unload)
