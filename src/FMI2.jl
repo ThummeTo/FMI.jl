@@ -687,7 +687,7 @@ end
 """
 Get the values of an array of fmi2Real variables
 
-For more information call ?fmi2GetReal
+For more information call ?fmi2GetReal!
 """
 function fmi2GetReal(fmu::FMU2, vr::fmi2ValueReferenceFormat)
     fmi2GetReal(fmu.components[end], vr)
@@ -696,7 +696,7 @@ end
 """
 Get the values of an array of fmi2Real variables
 
-For more information call ?fmi2GetReal
+For more information call ?fmi2GetReal!
 """
 function fmi2GetReal!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{<:Real}, <:Real})
     fmi2GetReal!(fmu.components[end], vr, values)
@@ -714,7 +714,7 @@ end
 """
 Get the values of an array of fmi2Integer variables
 
-For more information call ?fmi2GetInteger
+For more information call ?fmi2GetInteger!
 """
 function fmi2GetInteger(fmu::FMU2, vr::fmi2ValueReferenceFormat)
     fmi2GetInteger(fmu.components[end], vr)
@@ -723,7 +723,7 @@ end
 """
 Get the values of an array of fmi2Integer variables
 
-For more information call ?fmi2GetInteger
+For more information call ?fmi2GetInteger!
 """
 function fmi2GetInteger!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{<:Integer}, <:Integer})
     fmi2GetInteger!(fmu.components[end], vr, values)
@@ -741,7 +741,7 @@ end
 """
 Get the values of an array of fmi2Boolean variables
 
-For more information call ?fmi2GetBoolean
+For more information call ?fmi2GetBoolean!
 """
 function fmi2GetBoolean(fmu::FMU2, vr::fmi2ValueReferenceFormat)
     fmi2GetBoolean(fmu.components[end], vr)
@@ -750,7 +750,7 @@ end
 """
 Get the values of an array of fmi2Boolean variables
 
-For more information call ?fmi2GetBoolean
+For more information call ?fmi2GetBoolean!
 """
 function fmi2GetBoolean!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{Bool}, Bool, Array{fmi2Boolean}})
     fmi2GetBoolean!(fmu.components[end], vr, values)
@@ -768,7 +768,7 @@ end
 """
 Get the values of an array of fmi2String variables
 
-For more information call ?fmi2GetString
+For more information call ?fmi2GetString!
 """
 function fmi2GetString(fmu::FMU2, vr::fmi2ValueReferenceFormat)
     fmi2GetString(fmu.components[end], vr)
@@ -777,7 +777,7 @@ end
 """
 Get the values of an array of fmi2String variables
 
-For more information call ?fmi2GetString
+For more information call ?fmi2GetString!
 """
 function fmi2GetString!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{String}, String})
     fmi2GetString!(fmu.components[end], vr, values)
