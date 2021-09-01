@@ -1,4 +1,4 @@
-## Simulation of a CS FMU
+# Simulation of a CS FMU
 
 This first command loads the FMI.jl library, so you could work with it.
 
@@ -29,7 +29,7 @@ if Sys.iswindows()
     pathToFMU = joinpath(dirname(@__FILE__), "../model/Dymola/2020x/SpringFrictionPendulum1D.fmu")
 end
 ```
-````fmiLoad``` unpacks the FMU, reads the model description and stores all the necessary information of the FMU in ```myFMU```. You can read a useful part of the informations with ```fmiInfo```. With ```fmiInstatiate!``` am instance of the FMU is created.
+```fmiLoad``` unpacks the FMU, reads the model description and stores all the necessary information of the FMU in ```myFMU```. You can read a useful part of the informations with ```fmiInfo```. With ```fmiInstatiate!``` am instance of the FMU is created.
 ```
 # load the FMU container
 myFMU = fmiLoad(pathToFMU)
@@ -40,7 +40,7 @@ fmiInfo(myFMU)
 # make an instance from the FMU
 fmiInstantiate!(myFMU; loggingOn=true)
 ```
-To simulate the instance of the FMU you have to setup the experiment and enter and leave the initialisation mode to prepare the FMU. This part is optional if you use the option ```setup=true``` in ```fmiSimulateCS```.
+To simulate the instance of the FMU you have to setup the experiment and enter and leave the initialization mode to prepare the FMU. This part is optional if you use the option ```setup=true``` in ```fmiSimulateCS```.
 ```
 # setup the experiment, start time = 0.0 (optional for setup=true)
 #fmiSetupExperiment(myFMU, t_start)

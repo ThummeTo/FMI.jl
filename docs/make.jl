@@ -19,7 +19,9 @@ makedocs(sitename="FMI.jl",
             ]
             "Examples" => [
                 "examples/examples.md"
-                "Simulate CS" => "examples/CS_simulation.md"
+                "examples/CS_simulation.md"
+                "examples/simulateME.md"
+                "examples/parameterize.md"
             ]
             "Library Functions" => Any[
                 "FMI library functions" => "library/library.md",
