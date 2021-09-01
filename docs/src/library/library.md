@@ -1,4 +1,4 @@
-# Library functions
+# [Library functions](@id library)
 
 ## Creation, Destruction FMU
 

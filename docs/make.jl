@@ -12,14 +12,17 @@ makedocs(sitename="FMI.jl",
          ),
          pages= Any[
             "Introduction" => "index.md"
+            "Tutorials" => [
+                "tutorials/overview.md"
+                "Load/Unload a FMU" => "tutorials/load_unload.md"
+                "Simulate a FMU" => "tutorials/simulateCS.md"
+            ]
             "Examples" => [
-                "overview.md"
-                "Load/Unload a FMU" => "load_unload.md"
-                "Simulate a FMU" => "simulateCS.md"
+                "examples/examples.md"
             ]
             "Library Functions" => Any[
-                "FMI library functions" => "library.md",
-                "FMU2 functions" => "fmu2.md"
+                "FMI library functions" => "library/library.md",
+                "FMU2 functions" => "library/fmu2.md"
             ]
             "Contents" => "contents.md"
             "Index" => "indices.md"

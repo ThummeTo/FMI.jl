@@ -1,4 +1,4 @@
-## Simuation results
+## [Simulation results](@id fmu2)
 
 ```@docs
 fmi2SimulationResultGetValuesAtIndex
