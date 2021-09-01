@@ -9,16 +9,9 @@ julia> fmucomponent = fmiInstantiate!(myFMU)
 
 Additionally it is stored in the Julia struct representing the FMU. All functions in the FMI.jl library support function calls using a ```fmiXComponent``` or a ```fmiXStruct```. Please note that if you instantiate a FMU multiple times, the function calls using the ```fmiXStruct``` will always use the lastly created instance of the FMU.
 
-```@repl
-using FMI # hide
-
-pathToFMU = joinpath(dirname(@__FILE__), "../../model/Dymola/2020x/SpringFrictionPendulum1D.fmu") # hide
-
-myFMU = fmiLoad(pathToFMU) # hide
-
-fmucomponent = fmiInstantiate!(myFMU)
-fmiInstantiate!(myFMU; loggingOn = true)
-myFMU.components
+```
+julia> fmucomponent = fmiInstantiate!(myFMU)
+julia> fmiInstantiate!(myFMU; loggingOn = true)
 ```
 Optionally you can activate the logging of the replies of the FMU by ```logginOn = true```. By default this feature is deactivated.
 
