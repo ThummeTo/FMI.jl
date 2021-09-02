@@ -1,4 +1,6 @@
-# Simulation of a ME FMU
+# [Simulation of a ME FMU](@id me)
+
+This small example shows a fast and easy way to simulate a model exchange FMU.
 
 This first command loads the FMI.jl library, so you could work with it.
 

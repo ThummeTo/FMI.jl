@@ -1,4 +1,6 @@
-# Simulation of a CS FMU
+# [Simulation of a CS FMU](@id cs)
+
+This small example shows a fast and easy way to simulate a co simulation FMU.
 
 This first command loads the FMI.jl library, so you could work with it.
 
