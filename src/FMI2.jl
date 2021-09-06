@@ -395,7 +395,7 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
     end
 
     # make URI ressource location
-    tmpResourceLocation = string("file:/", fmu.path)
+    tmpResourceLocation = string("file:///", fmu.path)
     tmpResourceLocation = joinpath(tmpResourceLocation, "resources")
     fmu.fmuResourceLocation = replace(tmpResourceLocation, "\\" => "/") # URIs.escapeuri(tmpResourceLocation)
     @info "fmi2Load(...): FMU resources location is `$(fmu.fmuResourceLocation)`"
