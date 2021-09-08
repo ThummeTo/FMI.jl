@@ -28,7 +28,7 @@ if Sys.iswindows()
     pathToFMU = joinpath(dirname(@__FILE__), "../model/Dymola/2020x/SpringFrictionPendulum1D.fmu")
 end
 ```
-[`fmiLoad`](@ref) unpacks the FMU, reads the model description and stores all the necessary information of the FMU in ```myFMU```. You can read a useful part of the informations with [`fmiInfo`](@ref). With [`fmiInstatiate!`](@ref) am instance of the FMU is created.
+[`fmiLoad`](@ref) unpacks the FMU, reads the model description and stores all the necessary information of the FMU in ```myFMU```. You can read a useful part of the informations with [`fmiInfo`](@ref). With [`fmiInstantiate!`](@ref) am instance of the FMU is created.
 ```
 # load the FMU container
 myFMU = fmiLoad(pathToFMU)

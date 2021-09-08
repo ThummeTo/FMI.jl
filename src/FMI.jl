@@ -562,7 +562,6 @@ end
 """
 This function must be called by the environment after every completed step
 """
-
 function fmiCompletedIntegratorStep(fmu2::fmi2Struct,
                                      noSetFMUStatePriorToCurrentPoint::fmi2Boolean)
     fmi2CompletedIntegratorStep(fmu2,noSetFMUStatePriorToCurrentPoint)

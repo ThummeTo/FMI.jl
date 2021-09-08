@@ -12,7 +12,7 @@ This first command loads the FMI.jl library, so you could work with it.
 using FMI
 using Plots
 ```
-The path to the FMU which we want to parameterize is created. [`fmiLoad`](@ref) unpacks the FMU, reads the model description and stores all the necessary information of the FMU in ```myFMU```. With [`fmiInstatiate!`](@ref) an instance of the FMU is created.
+The path to the FMU which we want to parameterize is created. [`fmiLoad`](@ref) unpacks the FMU, reads the model description and stores all the necessary information of the FMU in ```myFMU```. With [`fmiInstantiate!`](@ref) an instance of the FMU is created.
 ```
 pathToFMU = joinpath(dirname(@__FILE__), "../model/Dymola/2020x/IO.fmu")
 

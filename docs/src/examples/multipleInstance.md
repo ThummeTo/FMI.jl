@@ -11,7 +11,7 @@ This first command loads the FMI.jl library, so you could work with it.
 
 using FMI
 ```
-The path to the FMU which we want to create multiple instances of is set. [`fmiLoad`](@ref) unpacks the FMU, reads the model description and stores all the necessary information of the FMU in ```myFMU```. With [`fmiInstatiate!`](@ref) a first instance of the FMU is created.
+The path to the FMU which we want to create multiple instances of is set. [`fmiLoad`](@ref) unpacks the FMU, reads the model description and stores all the necessary information of the FMU in ```myFMU```. With [`fmiInstantiate!`](@ref) a first instance of the FMU is created.
 ```
 pathToFMU = joinpath(dirname(@__FILE__), "../model/Dymola/2020x/SpringPendulum1D.fmu")
 

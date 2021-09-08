@@ -24,7 +24,7 @@ Also a connection to the shared library is estabished and depending on the provi
 
 ## [Unload a FMU](@id unload)
 
-Similiar to the [`fmiLoad`](@ref) function the [`fmiUnload`](@ ref) unloads a FMU.
+Similiar to the [`fmiLoad`](@ref) function the [`fmiUnload`](@ref) unloads a FMU.
 
 ```
 julia> fmiUnload(myFMU)

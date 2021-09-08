@@ -26,8 +26,9 @@ makedocs(sitename="FMI.jl",
             ]
             "Library Functions" => Any[
                 "FMI 2 library functions" => "library/library.md",
+                "FMI version independent functions" => "library/library_ind.md",
                 "FMU 2 functions" => "library/fmu2.md",
-                "FMU functions" => "library/fmu.md"
+                "FMU version independent functions" => "library/fmu.md"
             ]
             "Contents" => "contents.md"
             "Library Index" => "indices.md"
