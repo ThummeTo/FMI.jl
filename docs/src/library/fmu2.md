@@ -1,3 +1,5 @@
+# FMU Standard 2 functions
+
 ## [Simulation results](@id fmu2)
 
 ```@docs
@@ -16,7 +18,6 @@ fmi2ValueReference2String
 ## Opening and closing FMUs
 
 ```@docs
-fmi2Unzip
 fmi2Load
 fmi2Unload
 ```
@@ -34,6 +35,7 @@ fmi2CanSerializeFMUstate
 fmi2ProvidesDirectionalDerivative
 fmi2IsCoSimulation
 fmi2IsModelExchange
+fmi2Info
 ```
 ## Simulate FMU
 

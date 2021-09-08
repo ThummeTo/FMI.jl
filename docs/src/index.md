@@ -34,23 +34,21 @@ julia> using FMI
 
 ## How the documentation is structured?
 Having a high-level overview of how this documentation is structured will help you know where to look for certain things. The xxx main parts of the documentation are :
+- The __Tutorials__ section explains all the necessary steps to work with the library.
 - The __examples__ section gives insight in what is possible with this Library while using short and easily understandable code snippets
 - The __library functions__ sections contains all the documentation to the functions provided by this library
 
 ## What is currently supported in FMI.jl?
 - simulation / plotting of CS- and ME-FMUs
 - event-handling for discontinuous ME-FMUs
-- the full FMI command set (except ```getFMUState``` and ```setFMUState```)
-- Linux and iOS
+- the full FMI command set
 
 ## What is under development in FMI.jl?
-- documentation
 - more examples
-- support for ```getFMUState``` and ```setFMUState```
 - FMI 3.0 and SSP 1.0 support
 
 ## What Platforms are supported?
-FMI.jl is tested under Julia 1.5.4 on Windows and Linux.
+FMI.jl is tested under Julia 1.5.4 on Windows, Linux and MacOS.
 
-## Interested in Hybrid Modelling in Julia using FMUs?
+## Interested in Hybrid Modeling in Julia using FMUs?
 See [FMIFlux.jl](https://github.com/ThummeTo/FMIFlux.jl).

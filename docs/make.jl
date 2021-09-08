@@ -15,7 +15,7 @@ makedocs(sitename="FMI.jl",
             "Tutorials" => [
                 "tutorials/overview.md"
                 "Load/Unload a FMU" => "tutorials/load_unload.md"
-                "Simulate a FMU" => "tutorials/simulateCS.md"
+                "Simulate a FMU" => "tutorials/simulate.md"
             ]
             "Examples" => [
                 "examples/examples.md"
@@ -25,11 +25,12 @@ makedocs(sitename="FMI.jl",
                 "examples/multipleInstance.md"
             ]
             "Library Functions" => Any[
-                "FMI library functions" => "library/library.md",
-                "FMU2 functions" => "library/fmu2.md"
+                "FMI 2 library functions" => "library/library.md",
+                "FMU 2 functions" => "library/fmu2.md",
+                "FMU functions" => "library/fmu.md"
             ]
             "Contents" => "contents.md"
-            "Index" => "indices.md"
+            "Library Index" => "indices.md"
             ]
          )
 

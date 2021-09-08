@@ -11,7 +11,7 @@ This first command loads the FMI.jl library, so you could work with it.
 
 using FMI
 ```
-The path to the FMU which we want to create multiple instances of is set. ```fmiLoad``` unpacks the FMU, reads the model description and stores all the necessary information of the FMU in ```myFMU```. With ```fmiInstatiate!``` a first instance of the FMU is created.
+The path to the FMU which we want to create multiple instances of is set. [`fmiLoad`](@ref) unpacks the FMU, reads the model description and stores all the necessary information of the FMU in ```myFMU```. With [`fmiInstatiate!`](@ref) a first instance of the FMU is created.
 ```
 pathToFMU = joinpath(dirname(@__FILE__), "../model/Dymola/2020x/SpringPendulum1D.fmu")
 
@@ -20,7 +20,7 @@ myFMU = fmiLoad(pathToFMU)
 #create an instance and simulate it
 comp1 = fmiInstantiate!(myFMU; loggingOn=true)
 ```
-To simulate the instance of the FMU you have to setup the experiment and enter and leave the initialization mode to prepare the FMU. This part is optional if you use the option ```setup=true``` in ```fmiSimulateCS```.
+To simulate the instance of the FMU you have to setup the experiment and enter and leave the initialization mode to prepare the FMU. This part is optional if you use the option ```setup=true``` in [`fmiSimulateCS`](@ref).
 ```
 fmiSetupExperiment(comp1, 0.0)
 fmiEnterInitializationMode(comp1)
@@ -36,7 +36,7 @@ The next part is the actual simulation. You can provide an array of variable nam
 ```
 data1 = fmiSimulateCS(comp1, t_start, t_stop; recordValues=["mass.s"])
 ```
-The result of the simulation can be visualized using the ```fmiPlot``` function.
+The result of the simulation can be visualized using the [`fmiPlot`](@ref) function.
 ```
 fmiPlot(data1)
 ```

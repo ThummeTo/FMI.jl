@@ -7,4 +7,5 @@ The examples are:
 - __CS simulate__: Showing how you can simulate a CS FMU.
 - __ME simulate__: Showing how you can simulate a ME FMU.
 - __Parameterize__: A short example explaining how to parameterize a FMU before simulation.
+- __Multiple instances__: Showing the use of multiple instances.
 

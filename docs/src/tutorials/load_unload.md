@@ -1,6 +1,6 @@
 ## [Load a FMU](@id loading)
 
-Loading a FMU in FMI.jl is fairly easy, you only have to call the ```fmiLoad``` function with the path to your FMU.
+Loading a FMU in FMI.jl is fairly easy, you only have to call the [`fmiLoad`](@ref) function with the path to your FMU.
 
 ```
 julia> myFMU = fmiLoad("path/to/myFMU.fmu")
@@ -14,21 +14,20 @@ The most important function to access those informations are are:
 ```
 julia> fmiGetModelName(myFMU)
 julia> fmiGetGUID(myFMU)
-julia> fmi2String2ValueReference(myFMU, "ModelVariable")
+julia> fmiString2ValueReference(myFMU, "ModelVariable")
+julia> fmiInfo(myFMU)
 ```
 
-While ```fmiGetModelName``` and ```fmiGetGUID``` return the name and GUID of the FMU, ```fmi2String2ValueReference``` returns the corresponding value reference of a model variable.
+While [`fmiGetModelName`](@ref) and [`fmiGetGUID`](@ref) return the name and GUID of the FMU, [`fmi2String2ValueReference`](@ref) returns the corresponding value reference of a model variable. While [`fmiInfo`](@ref) prints the same information as the functions mentioned before and also additional ones.
 
 Also a connection to the shared library is estabished and depending on the provided FMU, the necessary function pointers are loaded to access the need FMI functions.
 
 ## [Unload a FMU](@id unload)
 
-Similiar to the ```fmiLoad``` function the ```fmiUnload``` unloads a FMU.
+Similiar to the [`fmiLoad`](@ref) function the [`fmiUnload`](@ ref) unloads a FMU.
 
 ```
 julia> fmiUnload(myFMU)
 ```
 
 The connection to the shared library is closed all instances of the FMU are destroyed (read more about instances [here](@ref Instantiation)) and the temporary files are deleted.
-
-<!--Vlt Doku zu der Stelle wo was erklärt wird-->

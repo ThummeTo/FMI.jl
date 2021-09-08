@@ -17,7 +17,7 @@ Optionally you can activate the logging of the replies of the FMU by ```logginOn
 
 ## Initialization
 
-To be able to simulate a FMU, you first have to initialize it. With ```fmiSetupExperiment``` you are able to set the start and stop time for which the simulation should be valid. If no stop time is provided, the start time is used.
+To be able to simulate a FMU, you first have to initialize it. With [`fmiSetupExperiment`](@ref) you are able to set the start and stop time for which the simulation should be valid. If no stop time is provided, the start time is used.
 ```
 julia> fmiSetupExperiment(myFMU, 0.0, 10.0)
 ```
@@ -49,7 +49,7 @@ t_stop = 8.0
 
 ### Easy Simulation
 
-FMI.jl can identify what type of FMU you want to simulate and adjust the simulation accordingly. If the FMU supports both model exchange and co simulation, the FMU is always as a co simulation FMU simulated. If you want to simulate it as a model exchange FMU, you have to use the specific ```fmiSimulateME``` function call. Additionally to the needed start and stop time, you can also provide an array of variable names that you want keep track of. The function returns the values of those variables for the whole simulation time. Those can be plotted using the ```fmiPlot``` function. Please note that ```fmiSimulate``` has the option ```setup``` which is ```true``` by default. So the initialization can be ommited unless you want to change the values of parameters before the simulation.
+FMI.jl can identify what type of FMU you want to simulate and adjust the simulation accordingly. If the FMU supports both model exchange and co simulation, the FMU is always as a co simulation FMU simulated. If you want to simulate it as a model exchange FMU, you have to use the specific [`fmiSimulateME`](@ref) function call. Additionally to the needed start and stop time, you can also provide an array of variable names that you want keep track of. The function returns the values of those variables for the whole simulation time. Those can be plotted using the [`fmiPlot`](@ref) function. Please note that [`fmiSimulate`](@ref) has the option ```setup``` which is ```true``` by default. So the initialization can be ommited unless you want to change the values of parameters before the simulation.
 
 ```
 data = fmiSimulate(myFMU, t_start, t_stop, ["mass.s", "mass.v"])
@@ -70,8 +70,8 @@ end
 fmiTerminate(fmuComp)
 ```
 
-The ```fmiTerminate``` function resets the FMU after the simulation finished. So you can run another one with the same or changed parameters again.
+The [`fmiTerminate`](@ref) function resets the FMU after the simulation finished. So you can run another one with the same or changed parameters again.
 
 ### Finishing the simulation
 
-After finishing all your simulations you can free the allocated memory of your simulation runs and the temporary data of the FMU with the ```fmiUnload``` function. For more information see [Load/Unload a FMU](@ref unload)
+After finishing all your simulations you can free the allocated memory of your simulation runs and the temporary data of the FMU with the [`fmiUnload`](@ref) function. For more information see [Load/Unload a FMU](@ref unload)

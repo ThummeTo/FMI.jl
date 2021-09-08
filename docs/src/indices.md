@@ -1,3 +1,3 @@
-# FMI.jl Index
+# FMI.jl Library Index
 ```@index
 ```
