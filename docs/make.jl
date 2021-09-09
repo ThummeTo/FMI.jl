@@ -30,6 +30,7 @@ makedocs(sitename="FMI.jl",
                 "FMU 2 functions" => "library/fmu2.md",
                 "FMU version independent functions" => "library/fmu.md"
             ]
+            "related.md"
             "Contents" => "contents.md"
             "Library Index" => "indices.md"
             ]
