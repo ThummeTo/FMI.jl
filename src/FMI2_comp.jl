@@ -32,7 +32,7 @@ end
 """
 Get the values of an array of fmi2Real variables
 
-For more information call ?fmi2GetReal
+For more information call ?fmi2GetReal!
 """
 function fmi2GetReal(c::fmi2Component, vr::fmi2ValueReferenceFormat)
 
@@ -52,7 +52,7 @@ end
 """
 Get the values of an array of fmi2Real variables
 
-For more information call ?fmi2GetReal
+For more information call ?fmi2GetReal!
 """
 function fmi2GetReal!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Array{fmi2Real})
 
@@ -87,7 +87,7 @@ end
 """
 Get the values of an array of fmi2Integer variables
 
-For more information call ?fmi2GetInteger
+For more information call ?fmi2GetInteger!
 """
 function fmi2GetInteger(c::fmi2Component, vr::fmi2ValueReferenceFormat)
 
@@ -107,7 +107,7 @@ end
 """
 Get the values of an array of fmi2Integer variables
 
-For more information call ?fmi2GetInteger
+For more information call ?fmi2GetInteger!
 """
 function fmi2GetInteger!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Array{fmi2Integer})
 
@@ -143,7 +143,7 @@ end
 """
 Get the values of an array of fmi2Boolean variables
 
-For more information call ?fmi2GetBoolean
+For more information call ?fmi2GetBoolean!
 """
 function fmi2GetBoolean(c::fmi2Component, vr::fmi2ValueReferenceFormat)
 
@@ -163,7 +163,7 @@ end
 """
 Get the values of an array of fmi2Boolean variables
 
-For more information call ?fmi2GetBoolean
+For more information call ?fmi2GetBoolean!
 """
 function fmi2GetBoolean!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Array{fmi2Boolean})
 
@@ -199,7 +199,7 @@ end
 """
 Get the values of an array of fmi2String variables
 
-For more information call ?fmi2GetString
+For more information call ?fmi2GetString!
 """
 function fmi2GetString(c::fmi2Component, vr::fmi2ValueReferenceFormat)
 
@@ -221,7 +221,7 @@ end
 """
 Get the values of an array of fmi2String variables
 
-For more information call ?fmi2GetString
+For more information call ?fmi2GetString!
 """
 function fmi2GetString!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Array{fmi2String})
 

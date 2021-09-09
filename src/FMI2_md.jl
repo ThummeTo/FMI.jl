@@ -150,7 +150,7 @@ function fmi2GetModelIdentifier(md::fmi2ModelDescription)
 end
 
 """
-ToDo
+Returns true, if the FMU supports the getting/setting of states
 """
 function fmi2CanGetSetState(md::fmi2ModelDescription)
     if md.CScanGetAndSetFMUstate || md.MEcanGetAndSetFMUstate
@@ -161,7 +161,7 @@ function fmi2CanGetSetState(md::fmi2ModelDescription)
 end
 
 """
-ToDo
+Returns true, if the FMU state can be serialized
 """
 function fmi2CanSerializeFMUstate(md::fmi2ModelDescription)
     if md.CScanSerializeFMUstate || md.MEcanSerializeFMUstate
@@ -172,7 +172,7 @@ function fmi2CanSerializeFMUstate(md::fmi2ModelDescription)
 end
 
 """
-ToDo
+Returns true, if the FMU provides directional derivatives
 """
 function fmi2ProvidesDirectionalDerivative(md::fmi2ModelDescription)
     if md.CSprovidesDirectionalDerivative || md.MEprovidesDirectionalDerivative
@@ -183,14 +183,14 @@ function fmi2ProvidesDirectionalDerivative(md::fmi2ModelDescription)
 end
 
 """
-ToDo
+Returns true, if the FMU supports co simulation
 """
 function fmi2IsCoSimulation(md::fmi2ModelDescription)
     md.isCoSimulation
 end
 
 """
-ToDo
+Returns true, if the FMU supports model exchange
 """
 function fmi2IsModelExchange(md::fmi2ModelDescription)
     md.isModelExchange
