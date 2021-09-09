@@ -2,7 +2,7 @@
 
 Loading a FMU in FMI.jl is fairly easy, you only have to call the [`fmiLoad`](@ref) function with the path to your FMU.
 
-```
+```julia
 julia> myFMU = fmiLoad("path/to/myFMU.fmu")
 julia> myFMU = fmiLoad("path/to/myFMU.fmu"; unpackPath = "path/to/unpacked/fmu/")
 ```
@@ -11,7 +11,7 @@ By default, the unpacked FMU is stored into a temporary directory. Optionally yo
 
 The most important function to access those informations are are:
 
-```
+```julia
 julia> fmiGetModelName(myFMU)
 julia> fmiGetGUID(myFMU)
 julia> fmiString2ValueReference(myFMU, "ModelVariable")
@@ -26,7 +26,7 @@ Also a connection to the shared library is estabished and depending on the provi
 
 Similiar to the [`fmiLoad`](@ref) function the [`fmiUnload`](@ref) unloads a FMU.
 
-```
+```julia
 julia> fmiUnload(myFMU)
 ```
 
