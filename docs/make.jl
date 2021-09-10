@@ -6,18 +6,34 @@
 using Documenter, FMI
 
 makedocs(sitename="FMI.jl",
-          pages= Any[
-                "Home" => "index.md"
-                "Examples" => [
-                    "Parameterize" => "parameterize.md"
-                    "Simulate CoSimulation" => "simulateCS.md"
-                    "Simulate ModelExchange" => "simulateME.md"
-                ]
-                "Library Functions" => Any[
-                    "FMI library functions" => "library.md",
-                    "FMU2 functions" => "fmu2.md"
-                ]
-         ]
+         format = Documenter.HTML(
+            collapselevel = 1,
+            sidebar_sitename = false
+         ),
+         pages= Any[
+            "Introduction" => "index.md"
+            "Tutorials" => [
+                "tutorials/overview.md"
+                "Load/Unload a FMU" => "tutorials/load_unload.md"
+                "Simulate a FMU" => "tutorials/simulate.md"
+            ]
+            "Examples" => [
+                "examples/examples.md"
+                "examples/CS_simulation.md"
+                "examples/simulateME.md"
+                "examples/parameterize.md"
+                "examples/multipleInstance.md"
+            ]
+            "Library Functions" => Any[
+                "FMI 2 library functions" => "library/library.md",
+                "FMI version independent functions" => "library/library_ind.md",
+                "FMU 2 functions" => "library/fmu2.md",
+                "FMU version independent functions" => "library/fmu.md"
+            ]
+            "related.md"
+            "Contents" => "contents.md"
+            "Library Index" => "indices.md"
+            ]
          )
 
 deploydocs(repo = "github.com/ThummeTo/FMI.jl.git", devbranch = "main")

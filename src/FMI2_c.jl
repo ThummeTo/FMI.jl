@@ -791,7 +791,7 @@ Sets the n-th time derivative of real input variables.
 vr defines the value references of the variables
 the array order specifies the corresponding order of derivation of the variables
 """
-function fmi2SetRealInputDerivatives(c::fmi2Component,  vr::fmi2ValueReference, nvr::Unsigned, order::fmi2Integer, value::fmi2Real)
+function fmi2SetRealInputDerivatives(c::fmi2Component, vr::fmi2ValueReference, nvr::Unsigned, order::fmi2Integer, value::fmi2Real)
     status = ccall(c.fmu.cSetRealInputDerivatives,
                 Cuint,
                 (Ptr{Nothing}, Ptr{Cint}, Csize_t, Ptr{Cint}, Ptr{Cdouble}),

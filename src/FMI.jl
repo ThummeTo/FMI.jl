@@ -126,45 +126,83 @@ function prepareValue(value)
     @assert false "prepareValue(...): Unknown dimension of structure `$dim`."
 end
 
-""" 
+"""
 Returns the ValueReference coresponding to the variable name.
-""" 
+"""
 function fmiString2ValueReference(dataStruct::Union{FMU2, fmi2ModelDescription}, identifier::Union{String, Array{String}})
     fmi2String2ValueReference(dataStruct, identifier)
 end
 
 # Wrapping modelDescription Functions
-
+"""
+Returns the tag 'modelName' from the model description.
+"""
 function fmiGetModelName(fmu::FMU2)
     fmi2GetModelName(fmu)
 end
+"""
+Returns the tag 'guid' from the model description.
+"""
 function fmiGetGUID(fmu::FMU2)
     fmi2GetGUID(fmu)
 end
+"""
+Returns the tag 'generationtool' from the model description.
+"""
 function fmiGetGenerationTool(fmu::FMU2)
     fmi2GetGenerationTool(fmu)
 end
+"""
+Returns the tag 'generationdateandtime' from the model description.
+"""
 function fmiGetGenerationDateAndTime(fmu::FMU2)
     fmi2GetGenerationDateAndTime(fmu)
 end
+"""
+Returns the tag 'varaiblenamingconvention' from the model description.
+"""
 function fmiGetVariableNamingConvention(fmu::FMU2)
     fmi2GetVariableNamingConvention(fmu)
 end
+"""
+Returns the tag 'numberOfEventIndicators' from the model description.
+"""
 function fmiGetNumberOfEventIndicators(fmu::FMU2)
     fmi2GetNumberOfEventIndicators(fmu)
 end
+"""
+Returns the tag 'modelIdentifier' from CS or ME section.
+"""
+function fmiGetModelIdentifier(fmu::FMU2)
+    fmi2GetModelIdentifier(fmu)
+end
+"""
+Returns true, if the FMU supports the getting/setting of states
+"""
 function fmiCanGetSetState(fmu::FMU2)
     fmi2CanGetSetState(fmu)
 end
+"""
+Returns true, if the FMU state can be serialized
+"""
 function fmiCanSerializeFMUstate(fmu::FMU2)
     fmi2CanSerializeFMUstate(fmu)
 end
+"""
+Returns true, if the FMU provides directional derivatives
+"""
 function fmiProvidesDirectionalDerivative(fmu::FMU2)
     fmi2ProvidesDirectionalDerivative(fmu)
 end
+"""
+Returns true, if the FMU supports co simulation
+"""
 function fmiIsCoSimulation(fmu::FMU2)
     fmi2IsCoSimulation(fmu)
 end
+"""
+Returns true, if the FMU supports model exchange
+"""
 function fmiIsModelExchange(fmu::FMU2)
     fmi2IsModelExchange(fmu)
 end
@@ -361,7 +399,7 @@ end
 """
 Writes the boolean values of an array of variables in the given field
 """
-function fmiGetBoolean!(fmu::fmi2Struct, vr::fmi2ValueReferenceFormat, values::Union{Array{Bool}, Bool})
+function fmiGetBoolean!(fmu::fmi2Struct, vr::fmi2ValueReferenceFormat, values::Union{Array{Bool}, Bool, Array{fmi2Boolean}})
     fmi2GetBoolean!(fmu, vr, values)
 end
 
@@ -509,7 +547,6 @@ end
 """
 This function must be called by the environment after every completed step
 """
-
 function fmiCompletedIntegratorStep(fmu2::fmi2Struct,
                                      noSetFMUStatePriorToCurrentPoint::fmi2Boolean)
     fmi2CompletedIntegratorStep(fmu2,noSetFMUStatePriorToCurrentPoint)

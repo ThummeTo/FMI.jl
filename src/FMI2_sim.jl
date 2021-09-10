@@ -18,9 +18,8 @@ function handleEvents(c::fmi2Component, initialEventMode)
 
     eventInfo = fmi2NewDiscreteStates(c)
 
-    eventInfo.newDiscreteStatesNeeded = fmi2True
-    valuesOfContinuousStatesChanged = fmi2False
-    nominalsOfContinuousStatesChanged = fmi2False
+    valuesOfContinuousStatesChanged = eventInfo.valuesOfContinuousStatesChanged
+    nominalsOfContinuousStatesChanged = eventInfo.nominalsOfContinuousStatesChanged
 
     #set inputs here
     #fmiSetReal(myFMU, InputRef, Value)
@@ -130,7 +129,8 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
 
     eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator),
                                        (integrator, idx) -> affect!(c, integrator, idx),
-                                       Int64(c.fmu.modelDescription.numberOfEventIndicators))
+                                       Int64(c.fmu.modelDescription.numberOfEventIndicators);
+                                       rootfind=DiffEqBase.RightRootFind)
 
     stepCb = FunctionCallingCallback((x, t, integrator) -> stepCompleted(c, x, t, integrator);
                                      func_everystep=true,

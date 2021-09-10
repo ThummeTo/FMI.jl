@@ -151,7 +151,7 @@ end
 function fmi2IsModelExchange(fmu::FMU2)
     fmi2IsModelExchange(fmu.modelDescription)
 end
-
+# TODO: add to documentation and export list, if not already done
 """
 Struct to handle FMU simulation data / results.
 """
@@ -257,12 +257,12 @@ function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
 
     fileNameExt = basename(pathToFMU)
     (fileName, fileExt) = splitext(fileNameExt)
-
-    if unpackPath == nothing 
-        # cleanup=true leads to issues with automatic testing on linux server.
-        unpackPath = mktempdir(; prefix="fmifluxjl_", cleanup=false)        
-    end
         
+    if unpackPath == nothing
+        # cleanup=true leads to issues with automatic testing on linux server.
+        unpackPath = mktempdir(; prefix="fmifluxjl_", cleanup=false)
+    end
+
     zipPath = joinpath(unpackPath, fileName * ".zip")
     unzippedPath = joinpath(unpackPath, fileName)
 
@@ -283,7 +283,7 @@ function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
     # only unzip if not already done
     if !isdir(unzippedAbsPath)
         mkpath(unzippedAbsPath)
-        
+
         zarchive = ZipFile.Reader(zipAbsPath)
         for f in zarchive.files
             fileAbsPath = normpath(joinpath(unzippedAbsPath, f.name))
@@ -295,7 +295,7 @@ function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
             else
                 # create directory if not forced by zip file folder
                 mkpath(dirname(fileAbsPath))
-                
+
                 numBytes = write(fileAbsPath, read(f))
                 
                 if numBytes == 0
@@ -412,9 +412,10 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
     end
 
     # make URI ressource location
-    tmpResourceLocation = string("file:/", fmu.path)
+    tmpResourceLocation = string("file:///", fmu.path)
     tmpResourceLocation = joinpath(tmpResourceLocation, "resources")
-    fmu.fmuResourceLocation = replace(tmpResourceLocation, "\\" => "/") # URIs.escapeuri(tmpResourceLocation) 
+    fmu.fmuResourceLocation = replace(tmpResourceLocation, "\\" => "/") # URIs.escapeuri(tmpResourceLocation)
+
     @info "fmi2Load(...): FMU resources location is `$(fmu.fmuResourceLocation)`"
 
     # retrieve functions
@@ -725,7 +726,7 @@ end
 """
 Get the values of an array of fmi2Real variables
 
-For more information call ?fmi2GetReal
+For more information call ?fmi2GetReal!
 """
 function fmi2GetReal(fmu::FMU2, vr::fmi2ValueReferenceFormat)
     fmi2GetReal(fmu.components[end], vr)
@@ -734,7 +735,7 @@ end
 """
 Get the values of an array of fmi2Real variables
 
-For more information call ?fmi2GetReal
+For more information call ?fmi2GetReal!
 """
 function fmi2GetReal!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{<:Real}, <:Real})
     fmi2GetReal!(fmu.components[end], vr, values)
@@ -752,7 +753,7 @@ end
 """
 Get the values of an array of fmi2Integer variables
 
-For more information call ?fmi2GetInteger
+For more information call ?fmi2GetInteger!
 """
 function fmi2GetInteger(fmu::FMU2, vr::fmi2ValueReferenceFormat)
     fmi2GetInteger(fmu.components[end], vr)
@@ -761,7 +762,7 @@ end
 """
 Get the values of an array of fmi2Integer variables
 
-For more information call ?fmi2GetInteger
+For more information call ?fmi2GetInteger!
 """
 function fmi2GetInteger!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{<:Integer}, <:Integer})
     fmi2GetInteger!(fmu.components[end], vr, values)
@@ -779,7 +780,7 @@ end
 """
 Get the values of an array of fmi2Boolean variables
 
-For more information call ?fmi2GetBoolean
+For more information call ?fmi2GetBoolean!
 """
 function fmi2GetBoolean(fmu::FMU2, vr::fmi2ValueReferenceFormat)
     fmi2GetBoolean(fmu.components[end], vr)
@@ -788,9 +789,9 @@ end
 """
 Get the values of an array of fmi2Boolean variables
 
-For more information call ?fmi2GetBoolean
+For more information call ?fmi2GetBoolean!
 """
-function fmi2GetBoolean!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{Bool}, Bool})
+function fmi2GetBoolean!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{Bool}, Bool, Array{fmi2Boolean}})
     fmi2GetBoolean!(fmu.components[end], vr, values)
 end
 
@@ -806,7 +807,7 @@ end
 """
 Get the values of an array of fmi2String variables
 
-For more information call ?fmi2GetString
+For more information call ?fmi2GetString!
 """
 function fmi2GetString(fmu::FMU2, vr::fmi2ValueReferenceFormat)
     fmi2GetString(fmu.components[end], vr)
@@ -815,7 +816,7 @@ end
 """
 Get the values of an array of fmi2String variables
 
-For more information call ?fmi2GetString
+For more information call ?fmi2GetString!
 """
 function fmi2GetString!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{String}, String})
     fmi2GetString!(fmu.components[end], vr, values)
