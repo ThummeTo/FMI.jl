@@ -411,7 +411,7 @@ function setDatatypeVariables(node::EzXML.Node, md::fmi2ModelDescription)
         type.displayUnit = typenode["displayUnit"]
     end
     if haskey(typenode, "relativeQuantity") && type.datatype == fmi2Real
-        type.relativeQuantity = parse(fmi2Boolean, typenode["relativeQuantity"])
+        type.relativeQuantity = convert(fmi2Boolean, parse(Bool, typenode["relativeQuantity"]))
     end
     if haskey(typenode, "nominal") && type.datatype == fmi2Real
         type.nominal = parse(fmi2Real, typenode["nominal"])

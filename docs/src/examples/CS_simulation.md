@@ -45,11 +45,11 @@ fmiInstantiate!(myFMU; loggingOn=true)
 To simulate the instance of the FMU you have to setup the experiment and enter and leave the initialization mode to prepare the FMU. This part is optional if you use the option ```setup=true``` in [`fmiSimulateCS`](@ref).
 ```julia
 # setup the experiment, start time = 0.0 (optional for setup=true)
-#fmiSetupExperiment(myFMU, t_start)
+fmiSetupExperiment(myFMU, t_start)
 
 # enter and exit initialization (optional for setup=true)
-#fmiEnterInitializationMode(myFMU)
-#fmiExitInitializationMode(myFMU)
+fmiEnterInitializationMode(myFMU)
+fmiExitInitializationMode(myFMU)
 ```
 The next part is the actual simulation. FMI.jl provides you with an easy way to do it. The [`fmiSimulateCS`](@ref) function expects the FMU or instance of an FMU you want to simulate, the start and stop time of the simulation. Additionally you can give an array of variable names which you want to track. The return value of the function is that data. You can also facilitate the setup of the simulation with the second option.
 ```julia
