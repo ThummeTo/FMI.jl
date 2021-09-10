@@ -200,11 +200,29 @@ end
 Returns the indices of the state derivatives.
 """
 function getDerivativeIndices(node::EzXML.Node)
-    indices = Array{Int}(undef,0)
+    indices = []
     for element in eachelement(node)
         if element.name == "Derivatives"
             for derivative in eachelement(element)
-                push!(indices, parse(Int, derivative["index"]))
+                ind = parse(Int, derivative["index"])
+                der = nothing 
+                derKind = nothing 
+
+                if haskey(derivative, "dependencies")
+                    der = split(derivative["dependencies"], " ")
+
+                    if der[1] == ""
+                        der = fmi2Integer[]
+                    else
+                        der = collect(parse(fmi2Integer, e) for e in der)
+                    end
+                end 
+
+                if haskey(derivative, "dependenciesKind")
+                    derKind = split(derivative["dependenciesKind"], " ")
+                end 
+
+                push!(indices, (ind, der, derKind))
             end
         end
     end
@@ -214,7 +232,7 @@ end
 """
 Parses the model variables of the FMU model description.
 """
-function parseModelVariables(nodes::EzXML.Node, md::fmi2ModelDescription, derivativeIndices::Array{Int})
+function parseModelVariables(nodes::EzXML.Node, md::fmi2ModelDescription, derivativeIndices)
     lastValueReference = fmi2ValueReference(0)
     derivativeIndex = nothing
     if derivativeIndices != []
@@ -247,7 +265,21 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi2ModelDescription, deriva
             initial = node["initial"]
         end
         datatype = setDatatypeVariables(node, md)
-        scalarVariables[index] = fmi2ScalarVariable(name, ValueReference, datatype, description, causality, variability, initial)
+
+        dependencies = nothing
+        dependenciesKind = nothing
+
+        if index == derivativeIndex[1]
+            push!(md.stateValueReferences, lastValueReference)
+            push!(md.derivativeValueReferences, ValueReference)
+            dependencies = derivativeIndex[2]
+            dependenciesKind = derivativeIndex[3]
+            if derivativeIndices != []
+                derivativeIndex = pop!(derivativeIndices)
+            end
+        end
+
+        scalarVariables[index] = fmi2ScalarVariable(name, ValueReference, datatype, description, causality, variability, initial, dependencies, dependenciesKind)
 
         if causality == "output"
             push!(md.outputValueReferences, ValueReference)
@@ -256,13 +288,6 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi2ModelDescription, deriva
         end
         md.stringValueReferences[name] = ValueReference
 
-        if index == derivativeIndex
-            push!(md.stateValueReferences, lastValueReference)
-            push!(md.derivativeValueReferences, ValueReference)
-            if derivativeIndices != []
-                derivativeIndex = pop!(derivativeIndices)
-            end
-        end
         lastValueReference = ValueReference
         index += 1
     end

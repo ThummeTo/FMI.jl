@@ -347,6 +347,36 @@ function fmi2GetDirectionalDerivative(c::fmi2Component,
 end
 
 """
+This function samples the directional derivative by manipulating corresponding values (central differences).
+"""
+function fmi2SampleDirectionalDerivative(c::fmi2Component,
+                                       vUnknown_ref::Array{fmi2ValueReference},
+                                       vKnown_ref::Array{fmi2ValueReference},
+                                       steps::Array{fmi2Real} = ones(fmi2Real, length(vKnown_ref)).*1e-5)
+    ret = zeros(fmi2Real, length(vUnknown_ref), length(vKnown_ref))
+    for i in 1:length(vKnown_ref)
+        vKnown = vKnown_ref[i]
+        origValue = fmi2GetReal(c, vKnown)
+
+        fmi2SetReal(c, vKnown, origValue - steps[i]*0.5)
+        negValues = fmi2GetReal(c, vUnknown_ref)
+
+        fmi2SetReal(c, vKnown, origValue + steps[i]*0.5)
+        posValues = fmi2GetReal(c, vUnknown_ref)
+
+        fmi2SetReal(c, vKnown, origValue)
+
+        if length(vUnknown_ref) == 1
+            ret[1,i] = (posValues-negValues) ./ steps[i]
+        else
+            ret[:,i] = (posValues-negValues) ./ steps[i]
+        end
+    end
+
+    ret
+end
+
+"""
 Computes directional derivatives
 
 For more information call ?fmi2GetDirectionalDerivatives

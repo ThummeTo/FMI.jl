@@ -12,6 +12,15 @@ include("FMI2_c.jl")
 include("FMI2_comp.jl")
 include("FMI2_md.jl")
 
+""" 
+ToDo 
+"""
+@enum fmi2Dependency begin
+    fmi2DependencyUnknown
+    fmi2DependencyDependent
+    fmi2DependencyIndependent
+end
+
 """
 Source: FMISpec2.0.2[p.19]: 2.1.5 Creation, Destruction and Logging of FMU Instances
 
@@ -37,6 +46,11 @@ mutable struct FMU2 <: FMU
 
     dx      # current state derivative
     simulationResult
+
+    jac_dxy_x 
+    jac_dxy_u
+    jac_x::Array{Float64}
+    jac_t::Float64
 
     # paths of ziped and unziped FMU folders
     path::String
@@ -94,6 +108,9 @@ mutable struct FMU2 <: FMU
 
     # c-libraries
     libHandle::Ptr{Nothing}
+
+    #
+    dependencies::Matrix{fmi2Dependency}
 
     # Constructor
     FMU2() = new()
@@ -463,6 +480,27 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
         fmu.cGetEventIndicators           = dlsym(fmu.libHandle, :fmi2GetEventIndicators)
         fmu.cGetNominalsOfContinuousStates= dlsym(fmu.libHandle, :fmi2GetNominalsOfContinuousStates)
     end
+
+    # initialize further variables 
+
+    fmu.jac_x = zeros(Float64, fmu.modelDescription.numberOfContinuousStates)
+    fmu.jac_t = -1.0
+
+    # dependency matrix 
+    dim = length(fmu.modelDescription.modelVariables)
+    fmu.dependencies = fill(fmi2DependencyUnknown::fmi2Dependency, dim, dim)
+    for i in 1:dim
+        if fmu.modelDescription.modelVariables[i].dependencies != nothing
+            indicies = fmu.modelDescription.modelVariables[i].dependencies
+            for j in 1:dim 
+                if j in indicies
+                    fmu.dependencies[i,indicies] .= fmi2DependencyDependent::fmi2Dependency 
+                else 
+                    fmu.dependencies[i,indicies] .= fmi2DependencyIndependent::fmi2Dependency 
+                end 
+            end
+        end
+    end 
 
     fmu
 end
@@ -863,7 +901,7 @@ function fmi2DeSerializeFMUstate(fmu::FMU2, serializedState::Array{fmi2Byte})
 end
 
 """
-Computes directional derivatives
+Retrieves directional derivatives.
 
 For more information call ?fmi2GetDirectionalDerivatives
 """
@@ -887,7 +925,7 @@ function fmi2GetDirectionalDerivative(fmu::FMU2,
 end
 
 """
-Computes directional derivatives
+Retrieves directional derivatives.
 
 For more information call ?fmi2GetDirectionalDerivatives
 """
@@ -898,6 +936,26 @@ function fmi2GetDirectionalDerivative(fmu::FMU2,
                                       dvUnknown::fmi2Real = 1.0)
 
     fmi2GetDirectionalDerivative(fmu, [vUnknown_ref], [vKnown_ref], [dvKnown])[1]
+end
+
+"""
+This function samples the directional derivative by manipulating corresponding values (central differences).
+"""
+function fmi2SampleDirectionalDerivative(fmu::FMU2,
+                                       vUnknown_ref::Array{fmi2ValueReference},
+                                       vKnown_ref::Array{fmi2ValueReference},
+                                       steps::Array{fmi2Real} = ones(fmi2Real, length(vKnown_ref)).*1e-5)
+    fmi2SampleDirectionalDerivative(fmu.components[end], vUnknown_ref, vKnown_ref, steps)
+end
+
+"""
+This function samples the directional derivative by manipulating corresponding values (central differences).
+"""
+function fmi2SampleDirectionalDerivative(fmu::FMU2,
+                                       vUnknown_ref::fmi2ValueReference,
+                                       vKnown_ref::fmi2ValueReference,
+                                       steps::fmi2Real = 1e-5)
+    fmi2SampleDirectionalDerivative(fmu, [vUnknown_ref], [vKnown_ref], [steps])[1]
 end
 
 """

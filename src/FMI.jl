@@ -29,7 +29,7 @@ export fmiGetNumberOfStates, fmiGetTypesPlatform, fmiGetVersion, fmiInstantiate!
 export fmiSetDebugLogging, fmiSetupExperiment, fmiEnterInitializationMode, fmiExitInitializationMode, fmiTerminate , fmiReset
 export fmiGetReal, fmiSetReal, fmiGetInteger, fmiSetInteger, fmiGetBoolean, fmiSetBoolean, fmiGetString, fmiSetString, fmiGetReal!, fmiGetInteger!, fmiGetBoolean!, fmiGetString!
 export fmiGetFMUstate, fmiSetFMUstate, fmiFreeFMUstate, fmiSerializedFMUstateSize, fmiSerializeFMUstate, fmiDeSerializeFMUstate
-export fmiGetDirectionalDerivative, fmiDoStep, fmiSetTime, fmiSetContinuousStates, fmi2EnterEventMode, fmiNewDiscreteStates
+export fmiGetDirectionalDerivative, fmiSampleDirectionalDerivative, fmiDoStep, fmiSetTime, fmiSetContinuousStates, fmi2EnterEventMode, fmiNewDiscreteStates
 export fmiEnterContinuousTimeMode, fmiCompletedIntegratorStep, fmiGetDerivatives, fmiGetEventIndicators, fmiGetContinuousStates, fmiGetNominalsOfContinuousStates
 export fmiInfo
 export fmiGetModelName, fmiGetGUID, fmiGetGenerationTool, fmiGetGenerationDateAndTime
@@ -40,6 +40,7 @@ export fmiIsCoSimulation, fmiIsModelExchange
 export fmiString2ValueReference
 
 # FMI2.jl
+export fmi2Dependency, fmi2DependencyDependent, fmi2DependencyIndependent, fmi2DependencyUnknown
 export FMU2, fmi2True, fmi2False
 export fmi2SimulationResult, fmi2SimulationResultGetValuesAtIndex, fmi2SimulationResultGetTime, fmi2SimulationResultGetValues
 export fmi2ValueReference, fmi2String2ValueReference, fmi2ValueReference2String
@@ -49,7 +50,7 @@ export fmi2Instantiate!, fmi2FreeInstance!, fmi2SetDebugLogging
 export fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2Terminate, fmi2Reset
 export fmi2GetReal, fmi2SetReal, fmi2GetInteger, fmi2SetInteger, fmi2GetBoolean, fmi2SetBoolean, fmi2GetString, fmi2SetString
 export fmi2GetFMUstate, fmi2SetFMUstate, fmi2FreeFMUstate, fmi2SerializedFMUstateSize, fmi2SerializeFMUstate, fmi2DeSerializeFMUstate
-export fmi2GetDirectionalDerivative
+export fmi2GetDirectionalDerivative, fmi2SampleDirectionalDerivative
 export fmi2SetRealInputDerivatives, fmi2GetRealOutputDerivatives
 export fmi2DoStep, fmi2CancelStep
 export fmi2GetStatus, fmi2GetRealStatus, fmi2GetIntegerStatus, fmi2GetBooleanStatus, fmi2GetStringStatus
@@ -58,27 +59,11 @@ export fmi2EnterEventMode, fmi2NewDiscreteStates, fmi2EnterContinuousTimeMode, f
 export fmi2Info
 
 # FMI2_comp.jl
-export fmi2SetDebugLogging, fmi2SetupExperiment
-export fmi2GetReal, fmi2SetReal, fmi2GetInteger, fmi2SetInteger, fmi2GetBoolean, fmi2SetBoolean, fmi2GetString, fmi2SetString
-export fmi2GetFMUstate, fmi2FreeFMUstate, fmi2SerializedFMUstateSize, fmi2SerializeFMUstate, fmi2DeSerializeFMUstate
-export fmi2GetDirectionalDerivative
-export fmi2DoStep
-export fmi2SetTime, fmi2SetContinuousStates
-export fmi2NewDiscreteStates, fmi2CompletedIntegratorStep, fmi2GetDerivatives, fmi2GetEventIndicators, fmi2GetContinuousStates, fmi2GetNominalsOfContinuousStates
+# already exported above
 
 # FMI2_c.jl
 export fmi2Component
-export fmi2Instantiate, fmi2SetDebugLogging # fmi2FreeInstance!
-export fmi2GetTypesPlatform, fmi2GetVersion
-export fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2Terminate, fmi2Reset
-export fmi2GetReal!, fmi2SetReal, fmi2GetInteger!, fmi2SetInteger, fmi2GetBoolean!, fmi2SetBoolean, fmi2GetString!, fmi2SetString
-export fmi2GetFMUstate, fmi2SetFMUstate, fmi2FreeFMUstate, fmi2SerializedFMUstateSize, fmi2SerializeFMUstate, fmi2DeSerializeFMUstate
-export fmi2GetDirectionalDerivative!
-export fmi2SetRealInputDerivatives, fmi2GetRealOutputDerivatives
-export fmi2DoStep, fmi2CancelStep
-export fmi2GetStatus, fmi2GetRealStatus, fmi2GetIntegerStatus, fmi2GetBooleanStatus, fmi2GetStringStatus
-export fmi2SetTime, fmi2SetContinuousStates
-export fmi2EnterEventMode, fmi2NewDiscreteStates, fmi2EnterContinuousTimeMode, fmi2CompletedIntegratorStep!, fmi2GetDerivatives, fmi2GetEventIndicators, fmi2GetContinuousStates, fmi2GetNominalsOfContinuousStates
+# already exported above
 
 # FMI2_sim.jl
 export fmi2Simulate, fmi2SimulateCS, fmi2SimulateME

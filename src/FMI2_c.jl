@@ -308,6 +308,11 @@ mutable struct datatypeVariable
     derivative::Union{Unsigned, Nothing}
     reinit::Union{fmi2Boolean, Nothing}
 
+    # additional (not in spec)
+    #unknownIndex::Intger 
+    #dependencies::Array{Intger}
+    #dependenciesValueReferences::Array{fmi2ValueReference}
+
     # Constructor
     datatypeVariable() = new()
 end
@@ -329,13 +334,17 @@ struct fmi2ScalarVariable
     variability::fmi2variability
     initial::fmi2initial
 
+    # dependencies 
+    dependencies #::Array{fmi2Integer}
+    dependenciesKind #::Array{fmi2String}
+
     # Constructor for not further specified ScalarVariables
     function fmi2ScalarVariable(name, fmi2valueReference)
         new(name, Cint(fmi2valueReference), datatypeVariable(), "", _local::fmi2causality, continuous::fmi2variability, calculated::fmi2initial)
     end
 
     # Constructor for fully specified ScalarVariable
-    function fmi2ScalarVariable(name, fmi2valueReference, datatype, description, causalityString, variabilityString, initialString)
+    function fmi2ScalarVariable(name, fmi2valueReference, datatype, description, causalityString, variabilityString, initialString, dependencies, dependenciesKind)
 
         var = continuous::fmi2variability
         cau = _local::fmi2causality
@@ -370,7 +379,7 @@ struct fmi2ScalarVariable
                 end
             end
         end
-        new(name, fmi2valueReference, datatype, description, cau, var, init)
+        new(name, fmi2valueReference, datatype, description, cau, var, init, dependencies, dependenciesKind)
     end
 end
 
@@ -766,10 +775,12 @@ function fmi2GetDirectionalDerivative!(c::fmi2Component,
                                        nKnown::Csize_t,
                                        dvKnown::Array{fmi2Real},
                                        dvUnknown::Array{fmi2Real})
+    @assert fmi2ProvidesDirectionalDerivative(c.fmu) ["fmi2GetDirectionalDerivative!(...): This FMU does not support build-in directional derivatives!"]
     ccall(c.fmu.cGetDirectionalDerivative,
           Cuint,
           (Ptr{Nothing}, Ptr{fmi2ValueReference}, Csize_t, Ptr{fmi2ValueReference}, Csize_t, Ptr{Cdouble}, Ptr{Cdouble}),
           c.compAddr, vUnknown_ref, nUnknown, vKnown_ref, nKnown, dvKnown, dvUnknown)
+    
 end
 
 # Functions specificly for isCoSimulation
@@ -807,6 +818,7 @@ Source: FMISpec2.0.2[p.104]: 4.2.2 Computation
 The computation of a time step is started.
 """
 function fmi2DoStep(c::fmi2Component, currentCommunicationPoint::fmi2Real, communicationStepSize::fmi2Real, noSetFMUStatePriorToCurrentPoint::fmi2Boolean)
+    @assert c.fmu.cDoStep != C_NULL ["fmi2DoStep(...): This FMU does not support fmi2DoStep, probably it's a ME-FMU with no CS-support?"]
     ccall(c.fmu.cDoStep, Cuint,
           (Ptr{Nothing}, Cdouble, Cdouble, Cint),
           c.compAddr, currentCommunicationPoint, communicationStepSize, noSetFMUStatePriorToCurrentPoint)

@@ -204,7 +204,11 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
         i = 1
         while t < t_stop
             if variableSteps
-                dt = saveat[i+1] - saveat[i]
+                if length(saveat) > i
+                    dt = saveat[i+1] - saveat[i]
+                else 
+                    dt = t_stop - saveat[i]
+                end
             end
 
             fmi2DoStep(c, t, dt)
@@ -218,7 +222,11 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
         i = 1
         while t < t_stop
             if variableSteps
-                dt = saveat[i+1] - saveat[i]
+                if length(saveat) > i
+                    dt = saveat[i+1] - saveat[i]
+                else 
+                    dt = t_stop - saveat[i]
+                end
             end
 
             fmi2DoStep(c, t, dt)
