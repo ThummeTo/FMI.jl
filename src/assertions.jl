@@ -21,13 +21,13 @@ function errorTypeString(type::errorType)
         return "Unknown FMU type in $fname(), is neigther CS nor ME."
     end
 
-    "Unknwon Assertion in $fname()."
+    "Unknown Assertion in $fname()."
 end
 
-function assert(cond::Bool, type::errorType = unknwon)
+function assert(cond::Bool, type::errorType = unknown)
     @assert cond [errorTypeString(type)]
 end
 
-function error(type::errorType = unknwon)
+function error(type::errorType = unknown)
     @assert false [errorTypeString(type)]
 end
