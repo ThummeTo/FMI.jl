@@ -66,7 +66,7 @@ function fmi2StatusString(status::fmi2Status)
     elseif status == fmi2Pending
         return "Pending"
     else
-        return "Unknwon"
+        return "Unknown"
     end
 end
 
@@ -84,7 +84,7 @@ function fmi2StatusString(status::Integer)
     elseif status == Integer(fmi2Pending)
         return "Pending"
     else
-        return "Unknwon"
+        return "Unknown"
     end
 end
 

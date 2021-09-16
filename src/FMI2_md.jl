@@ -46,9 +46,9 @@ function fmi2readModelDescription(pathToModellDescription::String)
     md.guid = root["guid"]
     md.isModelExchange = false
     md.isCoSimulation = false
-    md.generationTool = parseNodeString(root, "generationTool"; onfail="[Unknwon generation tool]")
-    md.generationDateAndTime = parseNodeString(root, "generationDateAndTime"; onfail="[Unknwon generation date and time]")
-    md.variableNamingConvention = parseNodeString(root, "variableNamingConvention"; onfail="[Unknwon variable naming convention]")
+    md.generationTool = parseNodeString(root, "generationTool"; onfail="[Unknown generation tool]")
+    md.generationDateAndTime = parseNodeString(root, "generationDateAndTime"; onfail="[Unknown generation date and time]")
+    md.variableNamingConvention = parseNodeString(root, "variableNamingConvention"; onfail="[Unknown variable naming convention]")
     md.numberOfEventIndicators = parseNodeInteger(root, "numberOfEventIndicators"; onfail=0)
     md.description = parseNodeString(root, "description"; onfail="[Unknown Description]")
 
@@ -279,7 +279,7 @@ function parseBoolean(s::String; onfail=nothing)
     elseif s == "false"
         return false
     else
-        @assert onfail != nothing ["parseBoolean(...) unknwon boolean value '$s'."]
+        @assert onfail != nothing ["parseBoolean(...) unknown boolean value '$s'."]
         return onfail
     end
 end

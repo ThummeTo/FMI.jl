@@ -21,7 +21,7 @@ if envFMUSTRUCT == "FMU"
 elseif envFMUSTRUCT == "FMUCOMPONENT"
     fmuStruct = comp
 end
-@assert fmuStruct != nothing "Unknwon fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+@assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
 solution = fmiSimulateME(fmuStruct, t_start, t_stop)
 @test length(solution.u) > 0

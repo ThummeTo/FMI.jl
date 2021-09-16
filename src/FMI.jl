@@ -304,7 +304,7 @@ function fmiInstantiate!(fmu::FMU2; visible::Bool = false, loggingOn::Bool = fal
     if version == "2.0"
         return fmi2Instantiate!(fmu; visible, loggingOn)
     else
-        @assert false ["fmiInstantiate!(...): Unknwon FMI version $version !"]
+        @assert false ["fmiInstantiate!(...): Unknown FMI version $version !"]
     end
 
     nothing
