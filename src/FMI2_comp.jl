@@ -6,16 +6,18 @@
 # Comfort functions for fmi2 functions using fmi2Components
 
 """
-Set the DebugLogger for the FMU
+TODO: FMI specification reference.
 
-For more information call ?fmi2SetDebugLogging
+Set the DebugLogger for the FMU.
 """
 function fmi2SetDebugLogging(c::fmi2Component)
     fmi2SetDebugLogging(c, fmi2False, Unsigned(0), C_NULL)
 end
 
 """
-Setup the simulation but without defining all of the parameters
+TODO: FMI specification reference.
+
+Setup the simulation but without defining all of the parameters.
 
 For more information call ?fmi2SetupExperiment
 """
@@ -30,7 +32,9 @@ function fmi2SetupExperiment(c::fmi2Component, startTime::Real = 0.0, stopTime::
 end
 
 """
-Get the values of an array of fmi2Real variables
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
 
 For more information call ?fmi2GetReal!
 """
@@ -50,7 +54,9 @@ function fmi2GetReal(c::fmi2Component, vr::fmi2ValueReferenceFormat)
 end
 
 """
-Get the values of an array of fmi2Real variables
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
 
 For more information call ?fmi2GetReal!
 """
@@ -70,7 +76,9 @@ function fmi2GetReal!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Re
 end
 
 """
-Set the values of an array of fmi2Real variables
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Real variables.
 
 For more information call ?fmi2SetReal
 """
@@ -85,7 +93,9 @@ function fmi2SetReal(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::Uni
 end
 
 """
-Get the values of an array of fmi2Integer variables
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Integer variables.
 
 For more information call ?fmi2GetInteger!
 """
@@ -105,7 +115,9 @@ function fmi2GetInteger(c::fmi2Component, vr::fmi2ValueReferenceFormat)
 end
 
 """
-Get the values of an array of fmi2Integer variables
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Integer variables.
 
 For more information call ?fmi2GetInteger!
 """
@@ -126,7 +138,9 @@ function fmi2GetInteger!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values:
 end
 
 """
-Set the values of an array of fmi2Integer variables
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Integer variables.
 
 For more information call ?fmi2SetInteger
 """
@@ -141,7 +155,9 @@ function fmi2SetInteger(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::
 end
 
 """
-Get the values of an array of fmi2Boolean variables
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Boolean variables.
 
 For more information call ?fmi2GetBoolean!
 """
@@ -161,7 +177,9 @@ function fmi2GetBoolean(c::fmi2Component, vr::fmi2ValueReferenceFormat)
 end
 
 """
-Get the values of an array of fmi2Boolean variables
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Boolean variables.
 
 For more information call ?fmi2GetBoolean!
 """
@@ -182,7 +200,9 @@ function fmi2GetBoolean!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values:
 end
 
 """
-Set the values of an array of fmi2Boolean variables
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Boolean variables.
 
 For more information call ?fmi2SetBoolean
 """
@@ -197,7 +217,9 @@ function fmi2SetBoolean(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::
 end
 
 """
-Get the values of an array of fmi2String variables
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2String variables.
 
 For more information call ?fmi2GetString!
 """
@@ -219,7 +241,9 @@ function fmi2GetString(c::fmi2Component, vr::fmi2ValueReferenceFormat)
 end
 
 """
-Get the values of an array of fmi2String variables
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2String variables.
 
 For more information call ?fmi2GetString!
 """
@@ -241,7 +265,9 @@ function fmi2GetString!(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::
 end
 
 """
-Set the values of an array of fmi2String variables
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2String variables.
 
 For more information call ?fmi2SetString
 """
@@ -257,7 +283,9 @@ function fmi2SetString(c::fmi2Component, vr::fmi2ValueReferenceFormat, values::U
 end
 
 """
-Get the pointer to the current FMU state
+TODO: FMI specification reference.
+
+Get the pointer to the current FMU state.
 
 For more information call ?fmi2GetFMUstate
 """
@@ -270,7 +298,9 @@ function fmi2GetFMUstate(c::fmi2Component)
 end
 
 """
-Free the allocated memory for the FMU state
+TODO: FMI specification reference.
+
+Free the allocated memory for the FMU state.
 
 For more information call ?fmi2FreeFMUstate
 """
@@ -281,7 +311,9 @@ function fmi2FreeFMUstate(c::fmi2Component, state::fmi2FMUstate)
 end
 
 """
-Returns the size of a byte vector the FMU can be stored in
+TODO: FMI specification reference.
+
+Returns the size of a byte vector the FMU can be stored in.
 
 For more information call ?fmi2SerzializedFMUstateSize
 """
@@ -293,7 +325,9 @@ function fmi2SerializedFMUstateSize(c::fmi2Component, state::fmi2FMUstate)
 end
 
 """
-Serialize the data in the FMU state pointer
+TODO: FMI specification reference.
+
+Serialize the data in the FMU state pointer.
 
 For more information call ?fmi2SerzializeFMUstate
 """
@@ -305,7 +339,9 @@ function fmi2SerializeFMUstate(c::fmi2Component, state::fmi2FMUstate)
 end
 
 """
-Deserialize the data in the serializedState fmi2Byte field
+TODO: FMI specification reference.
+
+Deserialize the data in the serializedState fmi2Byte field.
 
 For more information call ?fmi2DeSerzializeFMUstate
 """
@@ -318,7 +354,9 @@ function fmi2DeSerializeFMUstate(c::fmi2Component, serializedState::Array{fmi2By
 end
 
 """
-Computes directional derivatives
+TODO: FMI specification reference.
+
+Computes directional derivatives.
 
 For more information call ?fmi2GetDirectionalDerivatives
 """
@@ -326,15 +364,32 @@ function fmi2GetDirectionalDerivative(c::fmi2Component,
                                       vUnknown_ref::Array{fmi2ValueReference},
                                       vKnown_ref::Array{fmi2ValueReference},
                                       dvKnown::Array{fmi2Real} = Array{fmi2Real}([]))
+    dvUnknown = zeros(fmi2Real, length(vUnknown_ref))
+
+    fmi2GetDirectionalDerivative!(c, vUnknown_ref, vKnown_ref, dvUnknown, dvKnown)
+
+    dvUnknown
+end
+
+"""
+TODO: FMI specification reference.
+
+Computes directional derivatives.
+
+For more information call ?fmi2GetDirectionalDerivatives
+"""
+function fmi2GetDirectionalDerivative!(c::fmi2Component,
+                                      vUnknown_ref::Array{fmi2ValueReference},
+                                      vKnown_ref::Array{fmi2ValueReference},
+                                      dvUnknown::Array{fmi2Real},
+                                      dvKnown::Array{fmi2Real} = Array{fmi2Real}([]))
 
     nKnown = Csize_t(length(vKnown_ref))
     nUnknown = Csize_t(length(vUnknown_ref))
 
-    if length(dvKnown) < nKnown
+    if length(dvKnown) == 0
         dvKnown = ones(fmi2Real, nKnown)
     end
-
-    dvUnknown = zeros(fmi2Real, nUnknown)
 
     fmi2GetDirectionalDerivative!(c, vUnknown_ref, nUnknown, vKnown_ref, nKnown, dvKnown, dvUnknown)
 
@@ -342,7 +397,55 @@ function fmi2GetDirectionalDerivative(c::fmi2Component,
 end
 
 """
-Computes directional derivatives
+This function samples the directional derivative by manipulating corresponding values (central differences).
+"""
+function fmi2SampleDirectionalDerivative(c::fmi2Component,
+                                       vUnknown_ref::Array{fmi2ValueReference},
+                                       vKnown_ref::Array{fmi2ValueReference},
+                                       steps::Array{fmi2Real} = ones(fmi2Real, length(vKnown_ref)).*1e-5)
+
+    dvUnknown = zeros(fmi2Real, length(vUnknown_ref), length(vKnown_ref))
+
+    fmi2SampleDirectionalDerivative!(c, vUnknown_ref, vKnown_ref, dvUnknown, steps)
+
+    dvUnknown
+end
+
+"""
+This function samples the directional derivative by manipulating corresponding values (central differences) and saves in-place.
+"""
+function fmi2SampleDirectionalDerivative!(c::fmi2Component,
+                                          vUnknown_ref::Array{fmi2ValueReference},
+                                          vKnown_ref::Array{fmi2ValueReference},
+                                          dvUnknown::Array{fmi2Real, 2},
+                                          steps::Array{fmi2Real} = ones(fmi2Real, length(vKnown_ref)).*1e-5)
+    
+    for i in 1:length(vKnown_ref)
+        vKnown = vKnown_ref[i]
+        origValue = fmi2GetReal(c, vKnown)
+
+        fmi2SetReal(c, vKnown, origValue - steps[i]*0.5)
+        negValues = fmi2GetReal(c, vUnknown_ref)
+
+        fmi2SetReal(c, vKnown, origValue + steps[i]*0.5)
+        posValues = fmi2GetReal(c, vUnknown_ref)
+
+        fmi2SetReal(c, vKnown, origValue)
+
+        if length(vUnknown_ref) == 1
+            dvUnknown[1,i] = (posValues-negValues) ./ steps[i]
+        else
+            dvUnknown[:,i] = (posValues-negValues) ./ steps[i]
+        end
+    end
+
+    nothing
+end
+
+"""
+TODO: FMI specification reference.
+
+Computes directional derivatives.
 
 For more information call ?fmi2GetDirectionalDerivatives
 """
@@ -358,6 +461,8 @@ end
 # CoSimulation specific functions
 
 """
+TODO: FMI specification reference.
+
 The computation of a time step is started.
 
 For more information call ?fmi2DoStep
@@ -365,12 +470,6 @@ For more information call ?fmi2DoStep
 function fmi2DoStep(c::fmi2Component, currentCommunicationPoint::Real, communicationStepSize::Real, noSetFMUStatePriorToCurrentPoint::Bool = true)
     fmi2DoStep(c, fmi2Real(currentCommunicationPoint), fmi2Real(communicationStepSize), fmi2Boolean(noSetFMUStatePriorToCurrentPoint))
 end
-
-"""
-The computation of a time step is started.
-
-For more information call ?fmi2DoStep
-"""
 function fmi2DoStep(c::fmi2Component, communicationStepSize::Real)
     fmi2DoStep(c, fmi2Real(c.fmu.t), fmi2Real(communicationStepSize), fmi2True)
     c.fmu.t += communicationStepSize
@@ -378,7 +477,9 @@ end
 
 # Model Exchange specific functions
 """
-Set independent variable time and reinitialize chaching of variables that depend on time
+TODO: FMI specification reference.
+
+Set independent variable time and reinitialize chaching of variables that depend on time.
 
 For more information call ?fmi2SetTime
 """
@@ -387,7 +488,9 @@ function fmi2SetTime(c::fmi2Component, time::Real)
 end
 
 """
-Set a new (continuous) state vector and reinitialize chaching of variables that depend on states
+TODO: FMI specification reference.
+
+Set a new (continuous) state vector and reinitialize chaching of variables that depend on states.
 
 For more information call ?fmi2SetContinuousStates
 """
@@ -397,7 +500,9 @@ function fmi2SetContinuousStates(c::fmi2Component, x::Union{Array{Float32}, Arra
 end
 
 """
-Increment the super dense time in event mode
+TODO: FMI specification reference.
+
+Increment the super dense time in event mode.
 
 For more information call ?fmi2NewDiscretestates
 """
@@ -408,6 +513,8 @@ function fmi2NewDiscreteStates(c::fmi2Component)
 end
 
 """
+TODO: FMI specification reference.
+
 This function must be called by the environment after every completed step
 If enterEventMode == fmi2True, the event mode must be entered
 If terminateSimulation == fmi2True, the simulation shall be terminated
@@ -426,6 +533,8 @@ function fmi2CompletedIntegratorStep(c::fmi2Component,
 end
 
 """
+TODO: FMI specification reference.
+
 Compute state derivatives at the current time instant and for the current states.
 
 For more information call ?fmi2GetDerivatives
@@ -438,7 +547,9 @@ function  fmi2GetDerivatives(c::fmi2Component)
 end
 
 """
-Returns the event indicators of the FMU
+TODO: FMI specification reference.
+
+Returns the event indicators of the FMU.
 
 For more information call ?fmi2GetEventIndicators
 """
@@ -450,7 +561,9 @@ function fmi2GetEventIndicators(c::fmi2Component)
 end
 
 """
-Return the new (continuous) state vector x
+TODO: FMI specification reference.
+
+Return the new (continuous) state vector x.
 
 For more information call ?fmi2GetContinuousStates
 """
@@ -462,7 +575,9 @@ function fmi2GetContinuousStates(c::fmi2Component)
 end
 
 """
-Return the new (continuous) state vector x
+TODO: FMI specification reference.
+
+Return the new (continuous) state vector x.
 
 For more information call ?fmi2GetNominalsOfContinuousStates
 """

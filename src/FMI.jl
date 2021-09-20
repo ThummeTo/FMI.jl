@@ -29,7 +29,8 @@ export fmiGetNumberOfStates, fmiGetTypesPlatform, fmiGetVersion, fmiInstantiate!
 export fmiSetDebugLogging, fmiSetupExperiment, fmiEnterInitializationMode, fmiExitInitializationMode, fmiTerminate , fmiReset
 export fmiGetReal, fmiSetReal, fmiGetInteger, fmiSetInteger, fmiGetBoolean, fmiSetBoolean, fmiGetString, fmiSetString, fmiGetReal!, fmiGetInteger!, fmiGetBoolean!, fmiGetString!
 export fmiGetFMUstate, fmiSetFMUstate, fmiFreeFMUstate, fmiSerializedFMUstateSize, fmiSerializeFMUstate, fmiDeSerializeFMUstate
-export fmiGetDirectionalDerivative, fmiDoStep, fmiSetTime, fmiSetContinuousStates, fmi2EnterEventMode, fmiNewDiscreteStates
+export fmiGetDirectionalDerivative, fmiSampleDirectionalDerivative, fmiGetDirectionalDerivative!, fmiSampleDirectionalDerivative! 
+export fmiDoStep, fmiSetTime, fmiSetContinuousStates, fmi2EnterEventMode, fmiNewDiscreteStates
 export fmiEnterContinuousTimeMode, fmiCompletedIntegratorStep, fmiGetDerivatives, fmiGetEventIndicators, fmiGetContinuousStates, fmiGetNominalsOfContinuousStates
 export fmiInfo
 export fmiGetModelName, fmiGetGUID, fmiGetGenerationTool, fmiGetGenerationDateAndTime
@@ -40,6 +41,7 @@ export fmiIsCoSimulation, fmiIsModelExchange
 export fmiString2ValueReference
 
 # FMI2.jl
+export fmi2Dependency, fmi2DependencyDependent, fmi2DependencyIndependent, fmi2DependencyUnknown
 export FMU2, fmi2True, fmi2False
 export fmi2SimulationResult, fmi2SimulationResultGetValuesAtIndex, fmi2SimulationResultGetTime, fmi2SimulationResultGetValues
 export fmi2ValueReference, fmi2String2ValueReference, fmi2ValueReference2String
@@ -49,7 +51,7 @@ export fmi2Instantiate!, fmi2FreeInstance!, fmi2SetDebugLogging
 export fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2Terminate, fmi2Reset
 export fmi2GetReal, fmi2SetReal, fmi2GetInteger, fmi2SetInteger, fmi2GetBoolean, fmi2SetBoolean, fmi2GetString, fmi2SetString
 export fmi2GetFMUstate, fmi2SetFMUstate, fmi2FreeFMUstate, fmi2SerializedFMUstateSize, fmi2SerializeFMUstate, fmi2DeSerializeFMUstate
-export fmi2GetDirectionalDerivative
+export fmi2GetDirectionalDerivative, fmi2SampleDirectionalDerivative, fmi2GetDirectionalDerivative!, fmi2SampleDirectionalDerivative!
 export fmi2SetRealInputDerivatives, fmi2GetRealOutputDerivatives
 export fmi2DoStep, fmi2CancelStep
 export fmi2GetStatus, fmi2GetRealStatus, fmi2GetIntegerStatus, fmi2GetBooleanStatus, fmi2GetStringStatus
@@ -58,27 +60,11 @@ export fmi2EnterEventMode, fmi2NewDiscreteStates, fmi2EnterContinuousTimeMode, f
 export fmi2Info
 
 # FMI2_comp.jl
-export fmi2SetDebugLogging, fmi2SetupExperiment
-export fmi2GetReal, fmi2SetReal, fmi2GetInteger, fmi2SetInteger, fmi2GetBoolean, fmi2SetBoolean, fmi2GetString, fmi2SetString
-export fmi2GetFMUstate, fmi2FreeFMUstate, fmi2SerializedFMUstateSize, fmi2SerializeFMUstate, fmi2DeSerializeFMUstate
-export fmi2GetDirectionalDerivative
-export fmi2DoStep
-export fmi2SetTime, fmi2SetContinuousStates
-export fmi2NewDiscreteStates, fmi2CompletedIntegratorStep, fmi2GetDerivatives, fmi2GetEventIndicators, fmi2GetContinuousStates, fmi2GetNominalsOfContinuousStates
+# already exported above
 
 # FMI2_c.jl
 export fmi2Component
-export fmi2Instantiate, fmi2SetDebugLogging # fmi2FreeInstance!
-export fmi2GetTypesPlatform, fmi2GetVersion
-export fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2Terminate, fmi2Reset
-export fmi2GetReal!, fmi2SetReal, fmi2GetInteger!, fmi2SetInteger, fmi2GetBoolean!, fmi2SetBoolean, fmi2GetString!, fmi2SetString
-export fmi2GetFMUstate, fmi2SetFMUstate, fmi2FreeFMUstate, fmi2SerializedFMUstateSize, fmi2SerializeFMUstate, fmi2DeSerializeFMUstate
-export fmi2GetDirectionalDerivative!
-export fmi2SetRealInputDerivatives, fmi2GetRealOutputDerivatives
-export fmi2DoStep, fmi2CancelStep
-export fmi2GetStatus, fmi2GetRealStatus, fmi2GetIntegerStatus, fmi2GetBooleanStatus, fmi2GetStringStatus
-export fmi2SetTime, fmi2SetContinuousStates
-export fmi2EnterEventMode, fmi2NewDiscreteStates, fmi2EnterContinuousTimeMode, fmi2CompletedIntegratorStep!, fmi2GetDerivatives, fmi2GetEventIndicators, fmi2GetContinuousStates, fmi2GetNominalsOfContinuousStates
+export fmi2Char, fmi2String, fmi2Boolean, fmi2Real, fmi2Integer, fmi2Byte, fmi2FMUstate, fmi2ComponentEnvironment, fmi2Enum
 
 # FMI2_sim.jl
 export fmi2Simulate, fmi2SimulateCS, fmi2SimulateME
@@ -98,9 +84,7 @@ export fmi2IsCoSimulation, fmi2IsModelExchange
 
 fmi2Struct = Union{FMU2, fmi2Component}
 
-"""
-Receives one or an array of value references in an arbitrary format (see fmi2ValueReferenceFormat) and converts it into an Array{fmi2ValueReference} (if not already).
-"""
+# Receives one or an array of value references in an arbitrary format (see fmi2ValueReferenceFormat) and converts it into an Array{fmi2ValueReference} (if not already).
 function prepareValueReference(md::fmi2ModelDescription, vr::fmi2ValueReferenceFormat)
     tvr = typeof(vr)
     if tvr == Array{fmi2ValueReference,1}
@@ -128,9 +112,7 @@ function prepareValueReference(comp::fmi2Component, vr::fmi2ValueReferenceFormat
     prepareValueReference(comp.fmu.modelDescription, vr)
 end
 
-"""
-Receives one or an array of values and converts it into an Array{typeof(value)} (if not already).
-"""
+# Receives one or an array of values and converts it into an Array{typeof(value)} (if not already).
 function prepareValue(value)
     if isa(value, Array) && length(size(value)) == 1
         return value
@@ -155,66 +137,77 @@ Returns the tag 'modelName' from the model description.
 function fmiGetModelName(fmu::FMU2)
     fmi2GetModelName(fmu)
 end
+
 """
 Returns the tag 'guid' from the model description.
 """
 function fmiGetGUID(fmu::FMU2)
     fmi2GetGUID(fmu)
 end
+
 """
 Returns the tag 'generationtool' from the model description.
 """
 function fmiGetGenerationTool(fmu::FMU2)
     fmi2GetGenerationTool(fmu)
 end
+
 """
 Returns the tag 'generationdateandtime' from the model description.
 """
 function fmiGetGenerationDateAndTime(fmu::FMU2)
     fmi2GetGenerationDateAndTime(fmu)
 end
+
 """
 Returns the tag 'varaiblenamingconvention' from the model description.
 """
 function fmiGetVariableNamingConvention(fmu::FMU2)
     fmi2GetVariableNamingConvention(fmu)
 end
+
 """
 Returns the tag 'numberOfEventIndicators' from the model description.
 """
 function fmiGetNumberOfEventIndicators(fmu::FMU2)
     fmi2GetNumberOfEventIndicators(fmu)
 end
+
 """
 Returns the tag 'modelIdentifier' from CS or ME section.
 """
 function fmiGetModelIdentifier(fmu::FMU2)
     fmi2GetModelIdentifier(fmu)
 end
+
 """
 Returns true, if the FMU supports the getting/setting of states
 """
 function fmiCanGetSetState(fmu::FMU2)
     fmi2CanGetSetState(fmu)
 end
+
 """
 Returns true, if the FMU state can be serialized
 """
 function fmiCanSerializeFMUstate(fmu::FMU2)
     fmi2CanSerializeFMUstate(fmu)
 end
+
 """
 Returns true, if the FMU provides directional derivatives
 """
 function fmiProvidesDirectionalDerivative(fmu::FMU2)
     fmi2ProvidesDirectionalDerivative(fmu)
 end
+
 """
 Returns true, if the FMU supports co simulation
 """
 function fmiIsCoSimulation(fmu::FMU2)
     fmi2IsCoSimulation(fmu)
 end
+
 """
 Returns true, if the FMU supports model exchange
 """
@@ -268,9 +261,8 @@ end
 """
 Returns the number of states of the FMU.
 """
-
 function fmiGetNumberOfStates(fmu::FMU2)
-    length(fmu.modelDescription.stateValueReferences)
+    fmi2GetNumberOfStates(fmu)
 end
 
 """
@@ -489,25 +481,31 @@ function fmiDeSerializeFMUstate(c::fmi2Struct, serializedState::Array{fmi2Byte})
 end
 
 """
-Returns the values of the directional derivatives
+Returns the values of the directional derivatives.
 """
-function fmiGetDirectionalDerivative(fmu::fmi2Struct,
-                                     vUnknown_ref::Array{Cint},
-                                     vKnown_ref::Array{Cint},
-                                     dvKnown::Array{Real} = nothing,
-                                     dvUnknown::Array{Real} = nothing)
-    fmi2GetDirectionalDerivative(fmu,
+function fmiGetDirectionalDerivative(str::fmi2Struct,
+                                     vUnknown_ref::Array{<:Integer},
+                                     vKnown_ref::Array{<:Integer},
+                                     dvKnown::Array{<:Real} = Array{Real}([]))
+    fmi2GetDirectionalDerivative(str,
                                  Array{fmi2ValueReference}(vUnknown_ref),
                                  Array{fmi2ValueReference}(vKnown_ref),
-                                 Array{Real}(dvKnown),
-                                 Array{Real}(dvUnknown))
+                                 Array{fmi2Real}(dvKnown))
 end
 
 """
-Wrapper for single directional derivative, version independent.
+Returns the values of the directional derivatives (in-place).
 """
-function fmiGetDirectionalDerivative(fmu::fmi2Struct, vUnknown_ref::Cint, vKnown_ref::Cint, dvKnown::Real = 1.0, dvUnknown::Real = 1.0)
-    fmi2GetDirectionalDerivative(fmu, vUnknown_ref, vKnown_ref, dvKnown, dvUnknown)
+function fmiGetDirectionalDerivative!(str::fmi2Struct,
+                                     vUnknown_ref::Array{<:Integer},
+                                     vKnown_ref::Array{<:Integer},
+                                     dvUnknown::Array{fmi2Real},
+                                     dvKnown::Array{<:Real} = Array{Real}([]))
+    fmi2GetDirectionalDerivative!(str,
+                                 Array{fmi2ValueReference}(vUnknown_ref),
+                                 Array{fmi2ValueReference}(vKnown_ref),
+                                 dvUnknown,
+                                 Array{fmi2Real}(dvKnown))
 end
 
 """
@@ -515,6 +513,34 @@ Does one step in the CoSimulation FMU
 """
 function fmiDoStep(fmu::fmi2Struct, currentCommunicationPoint::Real, communicationStepSize::Real, noSetFMUStatePriorToCurrentPoint::Bool = true)
     fmi2DoStep(fmu, currentCommunicationPoint, communicationStepSize, noSetFMUStatePriorToCurrentPoint)
+end
+
+"""
+Samples the values of the directional derivatives.
+"""
+function fmiSampleDirectionalDerivative(str::fmi2Struct,
+                                     vUnknown_ref::Array{<:Integer},
+                                     vKnown_ref::Array{<:Integer},
+                                     steps::Array{<:Real} = ones(Real, length(vKnown_ref)).*1e-5)
+    fmi2SampleDirectionalDerivative(str,
+                                    Array{fmi2ValueReference}(vUnknown_ref),
+                                    Array{fmi2ValueReference}(vKnown_ref),
+                                    steps)
+end
+
+"""
+Samples the values of the directional derivatives (in-place).
+"""
+function fmiSampleDirectionalDerivative!(str::fmi2Struct,
+                                     vUnknown_ref::Array{<:Integer},
+                                     vKnown_ref::Array{<:Integer},
+                                     dvUnknown::Array{fmi2Real, 2},
+                                     steps::Array{<:Real} = ones(Real, length(vKnown_ref)).*1e-5)
+    fmi2SampleDirectionalDerivative!(str,
+                                     Array{fmi2ValueReference}(vUnknown_ref),
+                                     Array{fmi2ValueReference}(vKnown_ref),
+                                     dvUnknown,
+                                     steps)
 end
 
 """

@@ -1,6 +1,7 @@
 within ;
 model SpringPendulum1D
   parameter Modelica.SIunits.Position mass_s0 = 0.5;
+  parameter Modelica.SIunits.Velocity mass_v0 = 0.0;
   Modelica.Mechanics.Translational.Components.Fixed fixed(s0=0.1)
                                                           annotation (Placement(
         transformation(
@@ -14,7 +15,7 @@ model SpringPendulum1D
         origin={0,0})));
   Modelica.Mechanics.Translational.Components.Mass mass(m=1,
     s(fixed=true, start=mass_s0),
-    v(fixed=true, start=0))                                  annotation (
+    v(fixed=true, start=mass_v0))                            annotation (
       Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=0,

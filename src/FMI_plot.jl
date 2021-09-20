@@ -46,13 +46,15 @@ function fmiPlot(fmu::FMU2, solution::ODESolution, t_in_solution = false; maxLab
     fig
 end
 
-# extend the original plot-command by plotting FMUs
+"""
+Extended the original plot-command by plotting FMUs.
+"""
 function Plots.plot(fmu::FMU2, solution::ODESolution, t_in_solution = false)
     fmiPlot(fmu, solution, t_in_solution)
 end
 
 """
-Plots fmi2SimulationResult.
+Plots a fmi2SimulationResult.
 """
 function fmiPlot(sd::fmi2SimulationResult)
 
@@ -72,7 +74,9 @@ function fmiPlot(sd::fmi2SimulationResult)
     fig
 end
 
-# extend the original plot-command by plotting FMUs.
+"""
+Extended the original plot-command by plotting FMUs.
+"""
 function Plots.plot(sd::fmi2SimulationResult)
     fmiPlot(sd)
 end

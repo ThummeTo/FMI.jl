@@ -200,21 +200,37 @@ end
 Returns the indices of the state derivatives.
 """
 function getDerivativeIndices(node::EzXML.Node)
-    indices = Array{Int}(undef,0)
+    indices = []
     for element in eachelement(node)
         if element.name == "Derivatives"
             for derivative in eachelement(element)
-                push!(indices, parse(Int, derivative["index"]))
+                ind = parse(Int, derivative["index"])
+                der = nothing 
+                derKind = nothing 
+
+                if haskey(derivative, "dependencies")
+                    der = split(derivative["dependencies"], " ")
+
+                    if der[1] == ""
+                        der = fmi2Integer[]
+                    else
+                        der = collect(parse(fmi2Integer, e) for e in der)
+                    end
+                end 
+
+                if haskey(derivative, "dependenciesKind")
+                    derKind = split(derivative["dependenciesKind"], " ")
+                end 
+
+                push!(indices, (ind, der, derKind))
             end
         end
     end
     sort!(indices, rev=true)
 end
 
-"""
-Parses the model variables of the FMU model description.
-"""
-function parseModelVariables(nodes::EzXML.Node, md::fmi2ModelDescription, derivativeIndices::Array{Int})
+# Parses the model variables of the FMU model description.
+function parseModelVariables(nodes::EzXML.Node, md::fmi2ModelDescription, derivativeIndices)
     lastValueReference = fmi2ValueReference(0)
     derivativeIndex = nothing
     if derivativeIndices != []
@@ -247,7 +263,23 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi2ModelDescription, deriva
             initial = node["initial"]
         end
         datatype = setDatatypeVariables(node, md)
-        scalarVariables[index] = fmi2ScalarVariable(name, ValueReference, datatype, description, causality, variability, initial)
+
+        dependencies = nothing
+        dependenciesKind = nothing
+
+        if derivativeIndex != nothing
+            if index == derivativeIndex[1]
+                push!(md.stateValueReferences, lastValueReference)
+                push!(md.derivativeValueReferences, ValueReference)
+                dependencies = derivativeIndex[2]
+                dependenciesKind = derivativeIndex[3]
+                if derivativeIndices != []
+                    derivativeIndex = pop!(derivativeIndices)
+                end
+            end
+        end
+
+        scalarVariables[index] = fmi2ScalarVariable(name, ValueReference, datatype, description, causality, variability, initial, dependencies, dependenciesKind)
 
         if causality == "output"
             push!(md.outputValueReferences, ValueReference)
@@ -256,13 +288,6 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi2ModelDescription, deriva
         end
         md.stringValueReferences[name] = ValueReference
 
-        if index == derivativeIndex
-            push!(md.stateValueReferences, lastValueReference)
-            push!(md.derivativeValueReferences, ValueReference)
-            if derivativeIndices != []
-                derivativeIndex = pop!(derivativeIndices)
-            end
-        end
         lastValueReference = ValueReference
         index += 1
     end
@@ -270,9 +295,7 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi2ModelDescription, deriva
     scalarVariables
 end
 
-"""
-Parses a Bool value represented by a string.
-"""
+# Parses a Bool value represented by a string.
 function parseBoolean(s::String; onfail=nothing)
     if s == "true"
         return true
@@ -292,9 +315,7 @@ function parseNodeBoolean(node, key; onfail=nothing)
     end
 end
 
-"""
-Parses an Integer value represented by a string.
-"""
+# Parses an Integer value represented by a string.
 function parseInteger(s::String; onfail=nothing)
     if onfail == nothing
         return parse(Int, s)
@@ -323,9 +344,7 @@ function parseNodeString(node, key; onfail=nothing)
     end
 end
 
-"""
-Parses a fmi2Boolean value represented by a string.
-"""
+# Parses a fmi2Boolean value represented by a string.
 function parseFMI2Boolean(s::String)
     if parseBoolean(s)
         return fmi2True
@@ -334,9 +353,7 @@ function parseFMI2Boolean(s::String)
     end
 end
 
-"""
-set the datatype and attributes of an model variable
-"""
+# set the datatype and attributes of an model variable
 function setDatatypeVariables(node::EzXML.Node, md::fmi2ModelDescription)
     type = datatypeVariable()
     typenode = node.firstelement
@@ -428,13 +445,13 @@ function setDatatypeVariables(node::EzXML.Node, md::fmi2ModelDescription)
     type
 end
 
-"""
+#=
 Read all enumerations from the modeldescription and store them in a matrix. First entries are the enum names
 -------------------------------------------
 Example:
 "enum1name" "value1"    "value2"
 "enum2name" "value1"    "value2"
-"""
+=#
 function createEnum(node::EzXML.Node)
     enum = 1
     idx = 1
