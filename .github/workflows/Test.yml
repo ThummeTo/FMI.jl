@@ -9,7 +9,7 @@ jobs:
       # Don't cancel in-progress jobs if any matrix job fails
       fail-fast: false
       matrix:
-        julia-version: ['1.5', '1.6', 'nightly']
+        julia-version: ['1.6', 'nightly']
         julia-arch: [x64]
         os: [ubuntu-latest, windows-latest]
         experimental: [false]
