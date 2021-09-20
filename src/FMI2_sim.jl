@@ -3,13 +3,11 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-using DifferentialEquations, DiffEqCallbacks, Zygote
+using DifferentialEquations, DiffEqCallbacks
 
 ############ Model-Exchange ############
 
-"""
-Handles events and returns the values and nominals of the changed continuous states.
-"""
+# Handles events and returns the values and nominals of the changed continuous states.
 function handleEvents(c::fmi2Component, initialEventMode)
 
     if initialEventMode == false
@@ -41,9 +39,7 @@ function handleEvents(c::fmi2Component, initialEventMode)
 
 end
 
-"""
-Returns the event indicators for an FMU.
-"""
+# Returns the event indicators for an FMU.
 function condition(c::fmi2Component, out, x, t, integrator) # Event when event_f(u,t) == 0
 
     fmi2SetTime(c, t)
@@ -54,9 +50,7 @@ function condition(c::fmi2Component, out, x, t, integrator) # Event when event_f
 
 end
 
-"""
-Handles the upcoming events.
-"""
+# Handles the upcoming events.
 function affect!(c::fmi2Component, integrator, idx)
     # Event found - handle it
     continuousStatesChanged, nominalsChanged = handleEvents(c, false)
@@ -70,9 +64,7 @@ function affect!(c::fmi2Component, integrator, idx)
     end
 end
 
-"""
-Does one step in the simulation.
-"""
+# Does one step in the simulation.
 function stepCompleted(c::fmi2Component, x, t, integrator)
 
      (status, enterEventMode, terminateSimulation) = fmi2CompletedIntegratorStep(c, fmi2True)
@@ -82,9 +74,7 @@ function stepCompleted(c::fmi2Component, x, t, integrator)
 
 end
 
-"""
-Returns the state derivatives of the FMU.
-"""
+# Returns the state derivatives of the FMU.
 function fx(c::fmi2Component, x, p, t)
     fmi2SetTime(c, t)
     fmi2SetContinuousStates(c, x)
@@ -94,7 +84,7 @@ end
 """
 Source: FMISpec2.0.2[p.90 ff]: 3.2.4 Pseudocode Example
 
-Simulates an fmu instance for the set simulation time.
+Simulates a FMU instance for the set simulation time.
 Events are handled correctly.
 
 Returns an ODESolution.
@@ -241,7 +231,7 @@ end
 ###############
 
 """
-Starts a simulation of the fmu instance for the matching fmu type, if both types are available the CoSimulation Simulation is started.
+Starts a simulation of the fmu instance for the matching fmu type, if both types are available, CS is preferred.
 """
 function fmi2Simulate(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.0;
                       recordValues::fmi2ValueReferenceFormat = nothing,

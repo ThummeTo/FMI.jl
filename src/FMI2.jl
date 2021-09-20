@@ -38,20 +38,6 @@ mutable struct FMU2 <: FMU
     callbackFunctions::fmi2CallbackFunctions
     components::Array{fmi2Component}
 
-    t::Real         # current time
-    next_t::Real    # next time
-
-    x       # current state
-    next_x  # next state
-
-    dx      # current state derivative
-    simulationResult
-
-    jac_dxy_x 
-    jac_dxy_u
-    jac_x::Array{Float64}
-    jac_t::Float64
-
     # paths of ziped and unziped FMU folders
     path::String
     zipPath::String
@@ -109,8 +95,23 @@ mutable struct FMU2 <: FMU
     # c-libraries
     libHandle::Ptr{Nothing}
 
-    #
+    # START: experimental section (to FMIFlux.jl)
     dependencies::Matrix{fmi2Dependency}
+
+    t::Real         # current time
+    next_t::Real    # next time
+
+    x       # current state
+    next_x  # next state
+
+    dx      # current state derivative
+    simulationResult
+
+    jac_dxy_x 
+    jac_dxy_u
+    jac_x::Array{Float64}
+    jac_t::Float64
+    # END: experimental section
 
     # Constructor
     FMU2() = new()
@@ -151,7 +152,9 @@ end
 function fmi2IsModelExchange(fmu::FMU2)
     fmi2IsModelExchange(fmu.modelDescription)
 end
+
 # TODO: add to documentation and export list, if not already done
+
 """
 Struct to handle FMU simulation data / results.
 """
@@ -252,6 +255,8 @@ end
 """
 Create a copy of the .fmu file as a .zip folder and unzips it.
 Returns the paths to the zipped and unzipped folders.
+
+Via optional argument ```unpackPath```, a path to unpack the FMU can be specified (default: system temporary directory).
 """
 function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
 
@@ -260,7 +265,7 @@ function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
         
     if unpackPath == nothing
         # cleanup=true leads to issues with automatic testing on linux server.
-        unpackPath = mktempdir(; prefix="fmifluxjl_", cleanup=false)
+        unpackPath = mktempdir(; prefix="fmijl_", cleanup=false)
     end
 
     zipPath = joinpath(unpackPath, fileName * ".zip")
@@ -315,10 +320,8 @@ function fmi2Unzip(pathToFMU::String; unpackPath=nothing)
     (unzippedAbsPath, zipAbsPath)
 end
 
-"""
-Checks with dlsym for available function in library.
-Prints an info text and returns C_NULL if not (soft-check).
-"""
+# Checks with dlsym for available function in library.
+# Prints an info text and returns C_NULL if not (soft-check).
 function dlsym_opt(libHandle, symbol)
     addr = dlsym(libHandle, symbol; throw_error=false)
     if addr == nothing
@@ -333,6 +336,8 @@ Sets the properties of the fmu by reading the modelDescription.xml.
 Retrieves all the pointers of binary functions.
 
 Returns the instance of the FMU struct.
+
+Via optional argument ```unpackPath```, a path to unpack the FMU can be specified (default: system temporary directory).
 """
 function fmi2Load(pathToFMU::String; unpackPath=nothing)
     # Create uninitialized FMU
@@ -559,7 +564,7 @@ function fmi2Info(fmu::FMU2)
 end
 
 """
-Starts a simulation of the fmu instance for the matching fmu type, if both types are available the CoSimulation Simulation is started
+Starts a simulation of the fmu instance for the matching fmu type. If both types are available, CS is preferred over ME.
 """
 function fmi2Simulate(fmu::FMU2, t_start::Real = 0.0, t_stop::Real = 1.0;
                       recordValues::fmi2ValueReferenceFormat = nothing, saveat=[], setup=true)
@@ -568,7 +573,7 @@ function fmi2Simulate(fmu::FMU2, t_start::Real = 0.0, t_stop::Real = 1.0;
 end
 
 """
-Starts a simulation of a CS-FMU instance.
+Starts a simulation of a FMU in CS-mode.
 """
 function fmi2SimulateCS(fmu::FMU2, t_start::Real, t_stop::Real;
                         recordValues::fmi2ValueReferenceFormat = nothing, saveat=[], setup=true)
@@ -577,7 +582,7 @@ function fmi2SimulateCS(fmu::FMU2, t_start::Real, t_stop::Real;
 end
 
 """
-Starts a simulation of a ME-FMU instance.
+Starts a simulation of a FMU in ME-mode.
 """
 function fmi2SimulateME(fmu::FMU2, t_start::Real, t_stop::Real;
                         recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true, solver = nothing)
@@ -612,7 +617,9 @@ function fmi2Unload(fmu::FMU2, cleanUp::Bool = true)
 end
 
 """
-Returns a string representing the header file used to compile the fmi2 functions.function.
+TODO: FMI specification reference.
+
+Returns a string representing the header file used to compile the FMU.
 
 Returns "default" by default.
 
@@ -623,7 +630,16 @@ function fmi2GetTypesPlatform(fmu::FMU2)
 end
 
 """
-Returns the version of the FMI Standard used in this FMU
+Returns the number of states of the FMU.
+"""
+function fmi2GetNumberOfStates(fmu::FMU2)
+    length(fmu.modelDescription.stateValueReferences)
+end
+
+"""
+TODO: FMI specification reference.
+
+Returns the version of the FMI Standard used in this FMU.
 
 For more information call ?fmi2GetVersion
 """
@@ -632,6 +648,8 @@ function fmi2GetVersion(fmu::FMU2)
 end
 
 """
+TODO: FMI specification reference.
+
 Create a new instance of the given fmu, adds a logger if logginOn == true.
 
 Returns the instance of a new FMU component.
@@ -659,6 +677,8 @@ function fmi2Instantiate!(fmu::FMU2; visible::Bool = false, loggingOn::Bool = fa
 end
 
 """
+TODO: FMI specification reference.
+
 Free the allocated memory used for the logger and fmu2 instance and destroy the instance.
 
 For more information call ?fmi2FreeInstance
@@ -670,7 +690,9 @@ function fmi2FreeInstance!(fmu::FMU2)
 end
 
 """
-Set the DebugLogger for the FMU
+TODO: FMI specification reference.
+
+Sets debug logging for the FMU.
 
 For more information call ?fmi2SetDebugLogging
 """
@@ -679,7 +701,9 @@ function fmi2SetDebugLogging(fmu::FMU2)
 end
 
 """
-Setup the simulation but without defining all of the parameters
+TODO: FMI specification reference.
+
+Setup the simulation.
 
 For more information call ?fmi2SetupExperiment
 """
@@ -688,7 +712,9 @@ function fmi2SetupExperiment(fmu::FMU2, startTime::Real = 0.0, stopTime::Real = 
 end
 
 """
-FMU enters Initialization mode
+TODO: FMI specification reference.
+
+FMU enters Initialization mode.
 
 For more information call ?fmi2EnterInitializationMode
 """
@@ -697,7 +723,9 @@ function fmi2EnterInitializationMode(fmu::FMU2)
 end
 
 """
-FMU exits Initialization mode
+TODO: FMI specification reference.
+
+FMU exits Initialization mode.
 
 For more information call ?fmi2ExitInitializationMode
 """
@@ -706,7 +734,9 @@ function fmi2ExitInitializationMode(fmu::FMU2)
 end
 
 """
-Informs FMU that simulation run is terminated
+TODO: FMI specification reference.
+
+Informs FMU that simulation run is terminated.
 
 For more information call ?fmi2Terminate
 """
@@ -715,7 +745,9 @@ function fmi2Terminate(fmu::FMU2)
 end
 
 """
-Resets FMU
+TODO: FMI specification reference.
+
+Resets FMU.
 
 For more information call ?fmi2Reset
 """
@@ -724,7 +756,9 @@ function fmi2Reset(fmu::FMU2)
 end
 
 """
-Get the values of an array of fmi2Real variables
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
 
 For more information call ?fmi2GetReal!
 """
@@ -733,7 +767,9 @@ function fmi2GetReal(fmu::FMU2, vr::fmi2ValueReferenceFormat)
 end
 
 """
-Get the values of an array of fmi2Real variables
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
 
 For more information call ?fmi2GetReal!
 """
@@ -742,7 +778,9 @@ function fmi2GetReal!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Arr
 end
 
 """
-Set the values of an array of fmi2Real variables
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Real variables.
 
 For more information call ?fmi2SetReal
 """
@@ -751,7 +789,9 @@ function fmi2SetReal(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Arra
 end
 
 """
-Get the values of an array of fmi2Integer variables
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Integer variables.
 
 For more information call ?fmi2GetInteger!
 """
@@ -760,7 +800,9 @@ function fmi2GetInteger(fmu::FMU2, vr::fmi2ValueReferenceFormat)
 end
 
 """
-Get the values of an array of fmi2Integer variables
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Integer variables.
 
 For more information call ?fmi2GetInteger!
 """
@@ -769,7 +811,9 @@ function fmi2GetInteger!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{
 end
 
 """
-Set the values of an array of fmi2Integer variables
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Integer variables.
 
 For more information call ?fmi2SetInteger
 """
@@ -778,7 +822,9 @@ function fmi2SetInteger(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{A
 end
 
 """
-Get the values of an array of fmi2Boolean variables
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Boolean variables.
 
 For more information call ?fmi2GetBoolean!
 """
@@ -787,7 +833,9 @@ function fmi2GetBoolean(fmu::FMU2, vr::fmi2ValueReferenceFormat)
 end
 
 """
-Get the values of an array of fmi2Boolean variables
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Boolean variables.
 
 For more information call ?fmi2GetBoolean!
 """
@@ -796,7 +844,9 @@ function fmi2GetBoolean!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{
 end
 
 """
-Set the values of an array of fmi2Boolean variables
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Boolean variables.
 
 For more information call ?fmi2SetBoolean
 """
@@ -805,7 +855,9 @@ function fmi2SetBoolean(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{A
 end
 
 """
-Get the values of an array of fmi2String variables
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2String variables.
 
 For more information call ?fmi2GetString!
 """
@@ -814,7 +866,9 @@ function fmi2GetString(fmu::FMU2, vr::fmi2ValueReferenceFormat)
 end
 
 """
-Get the values of an array of fmi2String variables
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2String variables.
 
 For more information call ?fmi2GetString!
 """
@@ -823,7 +877,9 @@ function fmi2GetString!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{A
 end
 
 """
-Set the values of an array of fmi2String variables
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2String variables.
 
 For more information call ?fmi2SetString
 """
@@ -832,7 +888,9 @@ function fmi2SetString(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Ar
 end
 
 """
-Get the pointer to the current FMU state
+TODO: FMI specification reference.
+
+Get the pointer to the current FMU state.
 
 For more information call ?fmi2GetFMUstate
 """
@@ -845,7 +903,9 @@ function fmi2GetFMUstate(fmu::FMU2)
 end
 
 """
-Set the FMU to the given fmi2FMUstate
+TODO: FMI specification reference.
+
+Set the FMU to the given fmi2FMUstate.
 
 For more information call ?fmi2SetFMUstate
 """
@@ -854,7 +914,9 @@ function fmi2SetFMUstate(fmu::FMU2, state::fmi2FMUstate)
 end
 
 """
-Free the allocated memory for the FMU state
+TODO: FMI specification reference.
+
+Free the allocated memory for the FMU state.
 
 For more information call ?fmi2FreeFMUstate
 """
@@ -865,7 +927,9 @@ function fmi2FreeFMUstate(fmu::FMU2, state::fmi2FMUstate)
 end
 
 """
-Returns the size of a byte vector the FMU can be stored in
+TODO: FMI specification reference.
+
+Returns the size of a byte vector the FMU can be stored in.
 
 For more information call ?fmi2SerzializedFMUstateSize
 """
@@ -877,7 +941,9 @@ function fmi2SerializedFMUstateSize(fmu::FMU2, state::fmi2FMUstate)
 end
 
 """
-Serialize the data in the FMU state pointer
+TODO: FMI specification reference.
+
+Serialize the data in the FMU state pointer.
 
 For more information call ?fmi2SerzializeFMUstate
 """
@@ -889,7 +955,9 @@ function fmi2SerializeFMUstate(fmu::FMU2, state::fmi2FMUstate)
 end
 
 """
-Deserialize the data in the serializedState fmi2Byte field
+TODO: FMI specification reference.
+
+Deserialize the data in the serializedState fmi2Byte field.
 
 For more information call ?fmi2DeSerzializeFMUstate
 """
@@ -902,6 +970,8 @@ function fmi2DeSerializeFMUstate(fmu::FMU2, serializedState::Array{fmi2Byte})
 end
 
 """
+TODO: FMI specification reference.
+
 Retrieves directional derivatives.
 
 For more information call ?fmi2GetDirectionalDerivatives
@@ -911,36 +981,27 @@ function fmi2GetDirectionalDerivative(fmu::FMU2,
                                       vKnown_ref::Array{fmi2ValueReference},
                                       dvKnown::Array{fmi2Real} = Array{fmi2Real}([]))
 
-    nKnown = Csize_t(length(vKnown_ref))
-    nUnknown = Csize_t(length(vUnknown_ref))
-
-    if length(dvKnown) < nKnown
-        dvKnown = ones(fmi2Real, nKnown)
-    end
-
-    dvUnknown = zeros(fmi2Real, nUnknown)
-
-    fmi2GetDirectionalDerivative!(fmu.components[end], vUnknown_ref, nUnknown, vKnown_ref, nKnown, dvKnown, dvUnknown)
-
-    dvUnknown
+    fmi2GetDirectionalDerivative(fmu.components[end], vUnknown_ref, vKnown_ref, dvKnown)
 end
 
 """
-Retrieves directional derivatives.
+TODO: FMI specification reference.
+
+Retrieves directional derivatives in-place.
 
 For more information call ?fmi2GetDirectionalDerivatives
 """
-function fmi2GetDirectionalDerivative(fmu::FMU2,
-                                      vUnknown_ref::fmi2ValueReference,
-                                      vKnown_ref::fmi2ValueReference,
-                                      dvKnown::fmi2Real = 1.0,
-                                      dvUnknown::fmi2Real = 1.0)
+function fmi2GetDirectionalDerivative!(fmu::FMU2,
+    vUnknown_ref::Array{fmi2ValueReference},
+    vKnown_ref::Array{fmi2ValueReference},
+    dvUnknown::Array{fmi2Real},
+    dvKnown::Array{fmi2Real} = Array{fmi2Real}([]))
 
-    fmi2GetDirectionalDerivative(fmu, [vUnknown_ref], [vKnown_ref], [dvKnown])[1]
+    fmi2GetDirectionalDerivative!(fmu.components[end], vUnknown_ref, vKnown_ref, dvUnknown, dvKnown)
 end
 
 """
-This function samples the directional derivative by manipulating corresponding values (central differences).
+This function approximates the directional derivative by sampling corresponding values (1st order, central differences).
 """
 function fmi2SampleDirectionalDerivative(fmu::FMU2,
                                        vUnknown_ref::Array{fmi2ValueReference},
@@ -948,18 +1009,23 @@ function fmi2SampleDirectionalDerivative(fmu::FMU2,
                                        steps::Array{fmi2Real} = ones(fmi2Real, length(vKnown_ref)).*1e-5)
     fmi2SampleDirectionalDerivative(fmu.components[end], vUnknown_ref, vKnown_ref, steps)
 end
-
-"""
-This function samples the directional derivative by manipulating corresponding values (central differences).
-"""
+function fmi2SampleDirectionalDerivative!(fmu::FMU2,
+                                          vUnknown_ref::Array{fmi2ValueReference},
+                                          vKnown_ref::Array{fmi2ValueReference},
+                                          dvUnknown::Array{fmi2Real, 2},
+                                          steps::Array{fmi2Real} = ones(fmi2Real, length(vKnown_ref)).*1e-5)
+    fmi2SampleDirectionalDerivative!(fmu.components[end], vUnknown_ref, vKnown_ref, dvUnknown, steps)
+end
 function fmi2SampleDirectionalDerivative(fmu::FMU2,
                                        vUnknown_ref::fmi2ValueReference,
                                        vKnown_ref::fmi2ValueReference,
                                        steps::fmi2Real = 1e-5)
-    fmi2SampleDirectionalDerivative(fmu, [vUnknown_ref], [vKnown_ref], [steps])[1]
+    fmi2SampleDirectionalDerivative(fmu.components[end], [vUnknown_ref], [vKnown_ref], [steps])[1]
 end
 
 """
+TODO: FMI specification reference.
+
 Sets the n-th time derivative of real input variables.
 
 vr defines the value references of the variables
@@ -972,7 +1038,10 @@ function fmi2SetRealInputDerivatives(fmu::FMU2, vr::fmi2ValueReference, nvr::Cin
 end
 
 """
+TODO: FMI specification reference.
+
 Retrieves the n-th derivative of output values.
+
 vr defines the value references of the variables
 the array order specifies the corresponding order of derivation of the variables
 
@@ -983,6 +1052,8 @@ function fmi2GetRealOutputDerivatives(fmu::FMU2, vr::fmi2ValueReference, nvr::Ci
 end
 
 """
+TODO: FMI specification reference.
+
 The computation of a time step is started.
 
 For more information call ?fmi2DoStep
@@ -990,14 +1061,15 @@ For more information call ?fmi2DoStep
 function fmi2DoStep(fmu::FMU2, currentCommunicationPoint::Real, communicationStepSize::Real, noSetFMUStatePriorToCurrentPoint::Bool = true)
     fmi2DoStep(fmu.components[end], fmi2Real(currentCommunicationPoint), fmi2Real(communicationStepSize), fmi2Boolean(noSetFMUStatePriorToCurrentPoint))
 end
-
 function fmi2DoStep(fmu::FMU2, communicationStepSize::Real)
     fmi2DoStep(fmu.components[end], fmi2Real(fmu.t), fmi2Real(communicationStepSize), fmi2True)
     fmu.t += communicationStepSize
 end
 
 """
-Cancels a DoStep that didn't finish correctly
+TODO: FMI specification reference.
+
+Cancels a DoStep operation.
 
 For more information call ?fmi2CancelStep
 """
@@ -1006,7 +1078,9 @@ function fmi2CancelStep(fmu::FMU2)
 end
 
 """
-Informs Master of fmi2Status
+TODO: FMI specification reference.
+
+Informs Master of fmi2Status.
 
 For more information call ?fmi2GetStatus
 """
@@ -1015,7 +1089,9 @@ function fmi2GetStatus(fmu::FMU2, s::fmi2StatusKind, value::fmi2Status)
 end
 
 """
-Informs Master of fmi2Status of fmi2Real
+TODO: FMI specification reference.
+
+Informs Master of fmi2Status of fmi2Real.
 
 For more information call ?fmi2GetRealStatus
 """
@@ -1024,7 +1100,9 @@ function fmi2GetRealStatus(fmu::FMU2, s::fmi2StatusKind, value::Real)
 end
 
 """
-Informs Master of fmi2Status of fmi2Integer
+TODO: FMI specification reference.
+
+Informs Master of fmi2Status of fmi2Integer.
 
 For more information call ?fmi2GetIntegerStatus
 """
@@ -1033,7 +1111,9 @@ function fmi2GetIntegerStatus(fmu::FMU2, s::fmi2StatusKind, value::Integer)
 end
 
 """
-Informs Master of fmi2Status of fmi2Boolean
+TODO: FMI specification reference.
+
+Informs Master of fmi2Status of fmi2Boolean.
 
 For more information call ?fmi2GetBooleanStatus
 """
@@ -1042,7 +1122,9 @@ function fmi2GetBooleanStatus(fmu::FMU2, s::fmi2StatusKind, value::Bool)
 end
 
 """
-Informs Master of fmi2Status of fmi2String
+TODO: FMI specification reference.
+
+Informs Master of fmi2Status of fmi2String.
 
 For more information call ?fmi2GetStringStatus
 """
@@ -1051,7 +1133,9 @@ function fmi2GetStringStatus(fmu::FMU2, s::fmi2StatusKind, value::String)
 end
 
 """
-Set independent variable time and reinitialize chaching of variables that depend on time
+TODO: FMI specification reference.
+
+Set independent variable time and reinitialize chaching of variables that depend on time.
 
 For more information call ?fmi2SetTime
 """
@@ -1061,7 +1145,9 @@ function fmi2SetTime(fmu::FMU2, time::Real)
 end
 
 """
-Set a new (continuous) state vector and reinitialize chaching of variables that depend on states
+TODO: FMI specification reference.
+
+Set a new (continuous) state vector and reinitialize chaching of variables that depend on states.
 
 For more information call ?fmi2SetContinuousStates
 """
@@ -1072,7 +1158,9 @@ function fmi2SetContinuousStates(fmu::FMU2, x::Union{Array{Float32}, Array{Float
 end
 
 """
-The model enters Event Mode
+TODO: FMI specification reference.
+
+The model enters Event Mode.
 
 For more information call ?fmi2EnterEventMode
 """
@@ -1081,7 +1169,9 @@ function fmi2EnterEventMode(fmu::FMU2)
 end
 
 """
-Increment the super dense time in event mode
+TODO: FMI specification reference.
+
+Increment the super dense time in event mode.
 
 For more information call ?fmi2NewDiscreteStates
 """
@@ -1092,7 +1182,9 @@ function fmi2NewDiscreteStates(fmu::FMU2)
 end
 
 """
-The model enters Continuous-Time Mode
+TODO: FMI specification reference.
+
+The model enters Continuous-Time Mode.
 
 For more information call ?fmi2EnterContinuousTimeMode
 """
@@ -1101,6 +1193,8 @@ function fmi2EnterContinuousTimeMode(fmu::FMU2)
 end
 
 """
+TODO: FMI specification reference.
+
 This function must be called by the environment after every completed step
 If enterEventMode == fmi2True, the event mode must be entered
 If terminateSimulation == fmi2True, the simulation shall be terminated
@@ -1119,6 +1213,8 @@ function fmi2CompletedIntegratorStep(fmu::FMU2,
 end
 
 """
+TODO: FMI specification reference.
+
 Compute state derivatives at the current time instant and for the current states.
 
 For more information call ?fmi2GetDerivatives
@@ -1131,7 +1227,9 @@ function  fmi2GetDerivatives(fmu::FMU2)
 end
 
 """
-Returns the event indicators of the FMU
+TODO: FMI specification reference.
+
+Returns the event indicators of the FMU.
 
 For more information call ?fmi2GetEventIndicators
 """
@@ -1143,7 +1241,9 @@ function fmi2GetEventIndicators(fmu::FMU2)
 end
 
 """
-Return the new (continuous) state vector x
+TODO: FMI specification reference.
+
+Return the new (continuous) state vector x.
 
 For more information call ?fmi2GetContinuousStates
 """
@@ -1155,6 +1255,8 @@ function fmi2GetContinuousStates(fmu::FMU2)
 end
 
 """
+TODO: FMI specification reference.
+
 Return the nominal values of the continuous states.
 
 For more information call ?fmi2GetNominalsOfContinuousStates

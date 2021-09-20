@@ -9,9 +9,7 @@
     unknown
 end
 
-"""
-Format the fmi2Status into a String
-"""
+# Format the fmi2Status into a String
 function errorTypeString(type::errorType)
     fname = StackTraces.stacktrace()[3].func    # index 3 to step into calling function!
 
