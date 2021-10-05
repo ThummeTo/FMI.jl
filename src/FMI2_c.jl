@@ -322,10 +322,10 @@ Source: FMISpec2.0.2[p.46]: 2.2.7 Definition of Model Variables (ModelVariables)
 
 The fmi2ScalarVariable specifies the type and argument of every exposed variable in the fmu
 """
-struct fmi2ScalarVariable
+mutable struct fmi2ScalarVariable
     #mandatory
     name::fmi2String
-    fmi2valueReference::fmi2ValueReference
+    valueReference::fmi2ValueReference
     datatype::datatypeVariable
 
     # Optional
@@ -339,12 +339,12 @@ struct fmi2ScalarVariable
     dependenciesKind #::Array{fmi2String}
 
     # Constructor for not further specified ScalarVariables
-    function fmi2ScalarVariable(name, fmi2valueReference)
-        new(name, Cint(fmi2valueReference), datatypeVariable(), "", _local::fmi2causality, continuous::fmi2variability, calculated::fmi2initial)
+    function fmi2ScalarVariable(name, valueReference)
+        new(name, Cint(valueReference), datatypeVariable(), "", _local::fmi2causality, continuous::fmi2variability, calculated::fmi2initial)
     end
 
     # Constructor for fully specified ScalarVariable
-    function fmi2ScalarVariable(name, fmi2valueReference, datatype, description, causalityString, variabilityString, initialString, dependencies, dependenciesKind)
+    function fmi2ScalarVariable(name, valueReference, datatype, description, causalityString, variabilityString, initialString, dependencies, dependenciesKind)
 
         var = continuous::fmi2variability
         cau = _local::fmi2causality
@@ -379,7 +379,7 @@ struct fmi2ScalarVariable
                 end
             end
         end
-        new(name, fmi2valueReference, datatype, description, cau, var, init, dependencies, dependenciesKind)
+        new(name, valueReference, datatype, description, cau, var, init, dependencies, dependenciesKind)
     end
 end
 
@@ -420,11 +420,13 @@ mutable struct fmi2ModelDescription
     modelVariables::Array{fmi2ScalarVariable,1}
 
     # additionals
+    valueReferences::Array{fmi2ValueReference}
+
     inputValueReferences::Array{fmi2ValueReference}
     outputValueReferences::Array{fmi2ValueReference}
-
     stateValueReferences::Array{fmi2ValueReference}
     derivativeValueReferences::Array{fmi2ValueReference}
+
     numberOfContinuousStates::Int
     numberOfEventIndicators::Int
     enumerations::fmi2Enum
@@ -433,6 +435,9 @@ mutable struct fmi2ModelDescription
 
     # Constructor for uninitialized struct
     fmi2ModelDescription() = new()
+
+    # additional fields (non-FMI-specific)
+    valueReferenceIndicies::Dict{Integer,Integer}
 end
 
 # Common function for ModelExchange & CoSimulation
@@ -588,7 +593,7 @@ end
 """
 Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their fmi2valueReference
+Functions to get and set values of variables idetified by their valueReference
 """
 function fmi2GetReal!(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Array{fmi2Real})
     ccall(c.fmu.cGetReal,
@@ -600,7 +605,7 @@ end
 """
 Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their fmi2valueReference
+Functions to get and set values of variables idetified by their valueReference
 """
 function fmi2SetReal(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Array{fmi2Real})
     status = ccall(c.fmu.cSetReal,
@@ -613,7 +618,7 @@ end
 """
 Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their fmi2valueReference
+Functions to get and set values of variables idetified by their valueReference
 """
 function fmi2GetInteger!(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Array{fmi2Integer})
     status = ccall(c.fmu.cGetInteger,
@@ -626,7 +631,7 @@ end
 """
 Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their fmi2valueReference
+Functions to get and set values of variables idetified by their valueReference
 """
 function fmi2SetInteger(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Array{fmi2Integer})
     status = ccall(c.fmu.cSetInteger,
@@ -639,7 +644,7 @@ end
 """
 Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their fmi2valueReference
+Functions to get and set values of variables idetified by their valueReference
 """
 function fmi2GetBoolean!(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Array{fmi2Boolean})
     status = ccall(c.fmu.cGetBoolean,
@@ -652,7 +657,7 @@ end
 """
 Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their fmi2valueReference
+Functions to get and set values of variables idetified by their valueReference
 """
 function fmi2SetBoolean(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Array{fmi2Boolean})
     status = ccall(c.fmu.cSetBoolean,
@@ -665,7 +670,7 @@ end
 """
 Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their fmi2valueReference
+Functions to get and set values of variables idetified by their valueReference
 """
 function fmi2GetString!(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Vector{Ptr{Cchar}})
     status = ccall(c.fmu.cGetString,
@@ -678,7 +683,7 @@ end
 """
 Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their fmi2valueReference
+Functions to get and set values of variables idetified by their valueReference
 """
 function fmi2SetString(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Union{Array{Ptr{Cchar}}, Array{Ptr{UInt8}}})
     status = ccall(c.fmu.cSetString,

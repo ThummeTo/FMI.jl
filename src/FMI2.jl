@@ -19,6 +19,7 @@ ToDo
     fmi2DependencyUnknown
     fmi2DependencyDependent
     fmi2DependencyIndependent
+    fmi2DependencyFixed
 end
 
 """
@@ -107,10 +108,10 @@ mutable struct FMU2 <: FMU
     dx      # current state derivative
     simulationResult
 
-    jac_dxy_x 
-    jac_dxy_u
-    jac_x::Array{Float64}
-    jac_t::Float64
+    jac_dxy_x::Matrix{fmi2Real}
+    jac_dxy_u::Matrix{fmi2Real}
+    jac_x::Array{fmi2Real}
+    jac_t::fmi2Real
     # END: experimental section
 
     # Constructor
@@ -354,7 +355,7 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
     pathToModelDescription = joinpath(fmu.path, "modelDescription.xml")
 
     # parse modelDescription.xml
-    fmu.modelDescription = fmi2readModelDescription(pathToModelDescription)
+    fmu.modelDescription = fmi2ReadModelDescription(pathToModelDescription)
     fmu.modelName = fmu.modelDescription.modelName
     fmu.instanceName = fmu.modelDescription.modelName
     fmuName = fmi2GetModelIdentifier(fmu.modelDescription) # tmpName[length(tmpName)]
@@ -488,27 +489,82 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
     end
 
     # initialize further variables 
-
     fmu.jac_x = zeros(Float64, fmu.modelDescription.numberOfContinuousStates)
     fmu.jac_t = -1.0
-
+    fmu.jac_dxy_x = zeros(fmi2Real,0,0)
+    fmu.jac_dxy_u = zeros(fmi2Real,0,0)
+   
     # dependency matrix 
-    dim = length(fmu.modelDescription.modelVariables)
-    fmu.dependencies = fill(fmi2DependencyUnknown::fmi2Dependency, dim, dim)
-    for i in 1:dim
-        if fmu.modelDescription.modelVariables[i].dependencies != nothing
-            indicies = fmu.modelDescription.modelVariables[i].dependencies
-            for j in 1:dim 
-                if j in indicies
-                    fmu.dependencies[i,indicies] .= fmi2DependencyDependent::fmi2Dependency 
-                else 
-                    fmu.dependencies[i,indicies] .= fmi2DependencyIndependent::fmi2Dependency 
-                end 
-            end
-        end
-    end 
+    # fmu.dependencies
 
     fmu
+end
+
+""" 
+Returns how a variable depends on another variable based on the model description.
+"""
+function fmi2VariableDependsOnVariable(fmu::FMU2, vr1::fmi2ValueReference, vr2::fmi2ValueReference) 
+    i1 = fmu.modelDescription.valueReferenceIndicies[vr1]
+    i2 = fmu.modelDescription.valueReferenceIndicies[vr2]
+    return fmi2GetDependencies(fmu, i1, i2)
+end
+
+"""
+Returns the FMU's dependency-matrix for fast look-ups on dependencies between value references.
+
+Entries are from type fmi2Dependency, possible values are "Dependent", "Independent" and "Unknown".
+"""
+function fmi2GetDependencies(fmu::FMU2)
+    if !isdefined(fmu, :dependencies)
+        dim = length(fmu.modelDescription.valueReferences)
+        @info "fmi2GetDependencies: Started building dependency matrix $(dim) x $(dim) ..."
+
+        if fmi2DependenciesSupported(fmu.modelDescription)
+            fmu.dependencies = fill(fmi2DependencyIndependent::fmi2Dependency, dim, dim)
+
+            for i in 1:dim
+                modelVariable = fmi2ModelVariablesForValueReference(fmu.modelDescription, fmu.modelDescription.valueReferences[i])[1]
+    
+                if modelVariable.dependencies != nothing
+                    indicies = collect(fmu.modelDescription.valueReferenceIndicies[fmu.modelDescription.modelVariables[dependency].valueReference] for dependency in modelVariable.dependencies)
+                    dependenciesKind = modelVariable.dependenciesKind
+
+                    k = 1
+                    for j in 1:dim 
+                        if j in indicies
+                            if dependenciesKind[k] == "fixed"
+                                fmu.dependencies[i,j] = fmi2DependencyFixed::fmi2Dependency 
+                            elseif dependenciesKind[k] == "dependent"
+                                fmu.dependencies[i,j] = fmi2DependencyDependent::fmi2Dependency 
+                            else 
+                                @warn "Unknown dependency kind for index ($i, $j) = `$(dependenciesKind[k])`."
+                            end
+                            k += 1
+                        end
+                    end
+                end
+            end 
+        else 
+            fmu.dependencies = fill(fmi2DependencyUnknown::fmi2Dependency, dim, dim)
+        end
+
+        @info "fmi2GetDependencies: Building dependency matrix $(dim) x $(dim) finished."
+    end 
+
+    fmu.dependencies
+end
+
+function fmi2PrintDependencies(fmu::FMU2)
+    dep = fmi2GetDependencies(fmu)
+    ni, nj = size(dep)
+
+    for i in 1:ni
+        str = ""
+        for j in 1:nj
+            str = "$(str) $(Integer(dep[i,j]))"
+        end 
+        println(str)
+    end
 end
 
 """
@@ -977,6 +1033,21 @@ Retrieves directional derivatives.
 For more information call ?fmi2GetDirectionalDerivatives
 """
 function fmi2GetDirectionalDerivative(fmu::FMU2,
+                                      vUnknown_ref::fmi2ValueReference,
+                                      vKnown_ref::fmi2ValueReference,
+                                      dvKnown::fmi2Real = 1.0)
+
+    fmi2GetDirectionalDerivative(fmu.components[end], vUnknown_ref, vKnown_ref, dvKnown)
+end
+
+"""
+TODO: FMI specification reference.
+
+Retrieves directional derivatives.
+
+For more information call ?fmi2GetDirectionalDerivatives
+"""
+function fmi2GetDirectionalDerivative(fmu::FMU2,
                                       vUnknown_ref::Array{fmi2ValueReference},
                                       vKnown_ref::Array{fmi2ValueReference},
                                       dvKnown::Array{fmi2Real} = Array{fmi2Real}([]))
@@ -1012,7 +1083,7 @@ end
 function fmi2SampleDirectionalDerivative!(fmu::FMU2,
                                           vUnknown_ref::Array{fmi2ValueReference},
                                           vKnown_ref::Array{fmi2ValueReference},
-                                          dvUnknown::Array{fmi2Real, 2},
+                                          dvUnknown::Array{fmi2Real},
                                           steps::Array{fmi2Real} = ones(fmi2Real, length(vKnown_ref)).*1e-5)
     fmi2SampleDirectionalDerivative!(fmu.components[end], vUnknown_ref, vKnown_ref, dvUnknown, steps)
 end

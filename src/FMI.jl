@@ -39,9 +39,10 @@ export fmiCanGetSetState, fmiCanSerializeFMUstate
 export fmiProvidesDirectionalDerivative
 export fmiIsCoSimulation, fmiIsModelExchange
 export fmiString2ValueReference
+export fmiGetDependencies
 
 # FMI2.jl
-export fmi2Dependency, fmi2DependencyDependent, fmi2DependencyIndependent, fmi2DependencyUnknown
+export fmi2Dependency, fmi2DependencyDependent, fmi2DependencyIndependent, fmi2DependencyUnknown, fmi2DependencyFixed, fmi2GetDependencies
 export FMU2, fmi2True, fmi2False
 export fmi2SimulationResult, fmi2SimulationResultGetValuesAtIndex, fmi2SimulationResultGetTime, fmi2SimulationResultGetValues
 export fmi2ValueReference, fmi2String2ValueReference, fmi2ValueReference2String
@@ -57,7 +58,7 @@ export fmi2DoStep, fmi2CancelStep
 export fmi2GetStatus, fmi2GetRealStatus, fmi2GetIntegerStatus, fmi2GetBooleanStatus, fmi2GetStringStatus
 export fmi2SetTime, fmi2SetContinuousStates
 export fmi2EnterEventMode, fmi2NewDiscreteStates, fmi2EnterContinuousTimeMode, fmi2CompletedIntegratorStep, fmi2GetDerivatives, fmi2GetEventIndicators, fmi2GetContinuousStates, fmi2GetNominalsOfContinuousStates
-export fmi2Info
+export fmi2Info, fmi2PrintDependencies, fmi2DependenciesSupported, fmi2VariableDependsOnVariable
 
 # FMI2_comp.jl
 # already exported above
@@ -79,6 +80,7 @@ export fmi2GetVariableNamingConvention, fmi2GetNumberOfEventIndicators
 export fmi2CanGetSetState, fmi2CanSerializeFMUstate
 export fmi2ProvidesDirectionalDerivative
 export fmi2IsCoSimulation, fmi2IsModelExchange
+export fmi2ModelVariablesForValueReference
 
 ### EXPORTING LISTS END ###
 
@@ -124,7 +126,18 @@ function prepareValue(value)
 end
 
 """
+Returns the FMU's depndency-matrix for fast look-ups on variable dependencies.
+
+Enter ```fmi2GetDependencies``` for more information.
+"""
+function fmiGetDependencies(fmu::FMU2)
+    fmi2GetDependencies(fmu)
+end
+
+"""
 Returns the ValueReference coresponding to the variable name.
+
+Enter ```fmi2String2ValueReference``` for more information.
 """
 function fmiString2ValueReference(dataStruct::Union{FMU2, fmi2ModelDescription}, identifier::Union{String, Array{String}})
     fmi2String2ValueReference(dataStruct, identifier)
@@ -491,6 +504,19 @@ function fmiGetDirectionalDerivative(str::fmi2Struct,
                                  Array{fmi2ValueReference}(vUnknown_ref),
                                  Array{fmi2ValueReference}(vKnown_ref),
                                  Array{fmi2Real}(dvKnown))
+end
+
+"""
+Returns the values of a single directional derivative.
+"""
+function fmiGetDirectionalDerivative(str::fmi2Struct,
+                                     vUnknown_ref::Integer,
+                                     vKnown_ref::Integer,
+                                     dvKnown::Real = 1.0)
+    fmi2GetDirectionalDerivative(str,
+                                 fmi2ValueReference(vUnknown_ref),
+                                 fmi2ValueReference(vKnown_ref),
+                                 fmi2Real(dvKnown))
 end
 
 """

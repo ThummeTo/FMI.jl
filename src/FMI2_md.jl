@@ -8,7 +8,7 @@ using EzXML
 """
 Extract the FMU variables and meta data from the ModelDescription
 """
-function fmi2readModelDescription(pathToModellDescription::String)
+function fmi2ReadModelDescription(pathToModellDescription::String)
     md = fmi2ModelDescription()
 
     md.stringValueReferences = Dict{String, fmi2ValueReference}()
@@ -83,14 +83,31 @@ function fmi2readModelDescription(pathToModellDescription::String)
     end
 
     if typedefinitions == nothing
-        @warn "Found enum, but no type definition. Skipping enums."
         md.enumerations = []
     else
         md.enumerations = createEnum(typedefinitions)
     end
 
+    md.valueReferences = []
+    md.valueReferenceIndicies = Dict{Integer,Integer}()
+
     derivativeindices = getDerivativeIndices(modelstructure)
     md.modelVariables = parseModelVariables(modelvariables, md, derivativeindices)
+
+    # parse model dependencies (if available)
+    for element in eachelement(modelstructure)
+        if element.name == "Derivatives" || element.name == "InitialUnknowns"
+            parseDependencies(element, md)
+        else 
+            @warn "Unknown tag `$(element.name)` for node `ModelStructure`."
+        end
+    end
+
+    # creating an index for value references (fast look-up for dependencies)
+    for i in 1:length(md.valueReferences)
+        md.valueReferenceIndicies[md.valueReferences[i]] = i
+    end 
+
     md
 end
 
@@ -134,6 +151,19 @@ Returns the tag 'numberOfEventIndicators' from the model description.
 """
 function fmi2GetNumberOfEventIndicators(md::fmi2ModelDescription)
     md.numberOfEventIndicators
+end
+
+"""
+Returns if the FMU model description contains `dependency` information.
+"""
+function fmi2DependenciesSupported(md::fmi2ModelDescription)
+    for mv in md.modelVariables
+        if mv.dependencies != nothing && length(mv.dependencies) > 0
+            return true
+        end
+    end 
+
+    return false
 end
 
 """
@@ -196,9 +226,7 @@ function fmi2IsModelExchange(md::fmi2ModelDescription)
     md.isModelExchange
 end
 
-"""
-Returns the indices of the state derivatives.
-"""
+# Returns the indices of the state derivatives.
 function getDerivativeIndices(node::EzXML.Node)
     indices = []
     for element in eachelement(node)
@@ -250,6 +278,11 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi2ModelDescription, deriva
         causality = ""
         variability = ""
         initial = ""
+
+        if !(ValueReference in md.valueReferences)
+            push!(md.valueReferences, ValueReference)
+        end
+
         if haskey(node, "description")
             description = node["description"]
         end
@@ -264,15 +297,14 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi2ModelDescription, deriva
         end
         datatype = setDatatypeVariables(node, md)
 
-        dependencies = nothing
-        dependenciesKind = nothing
+        dependencies = []
+        dependenciesKind = []
 
         if derivativeIndex != nothing
             if index == derivativeIndex[1]
                 push!(md.stateValueReferences, lastValueReference)
                 push!(md.derivativeValueReferences, ValueReference)
-                dependencies = derivativeIndex[2]
-                dependenciesKind = derivativeIndex[3]
+    
                 if derivativeIndices != []
                     derivativeIndex = pop!(derivativeIndices)
                 end
@@ -295,8 +327,59 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi2ModelDescription, deriva
     scalarVariables
 end
 
+# Parses the model variables of the FMU model description.
+function parseDependencies(nodes::EzXML.Node, md::fmi2ModelDescription)
+    for node in eachelement(nodes)
+        
+        if node.name == "Unknown"
+
+            index = 0
+            dependencies = nothing
+            dependenciesKind = nothing
+
+            if haskey(node, "index") && haskey(node, "dependencies") && haskey(node, "dependenciesKind")
+                index = parseInteger(node["index"])
+                dependencies = node["dependencies"]
+                dependenciesKind = node["dependenciesKind"]
+
+                if length(dependencies) > 0 && length(dependenciesKind) > 0
+                    dependenciesSplit = split(dependencies, " ")
+                    dependenciesKindSplit = split(dependenciesKind, " ")
+
+                    if length(dependenciesSplit) != length(dependenciesKindSplit)
+                        @warn "Length of field dependencies ($(length(dependenciesSplit))) doesn't match length of dependenciesKind ($(length(dependenciesKindSplit)))."
+                    else
+                        md.modelVariables[index].dependencies = vcat(md.modelVariables[index].dependencies, collect(parseInteger(s) for s in dependenciesSplit)) 
+                        md.modelVariables[index].dependenciesKind = vcat(md.modelVariables[index].dependenciesKind,  dependenciesKindSplit)
+                    end
+                else 
+                    md.modelVariables[index].dependencies = []
+                    md.modelVariables[index].dependenciesKind = []
+                end
+            else 
+                @warn "Invalid entry for node `Unknown` in `ModelStructure`."
+            end
+        else 
+            @warn "Unknown entry in `ModelStructure` named `$(node.name)`."
+        end 
+    end
+end
+
+""" 
+Returns the model variable(s) fitting the value reference.
+"""
+function fmi2ModelVariablesForValueReference(md::fmi2ModelDescription, vr::fmi2ValueReference)
+    ar = []
+    for modelVariable in md.modelVariables
+        if modelVariable.valueReference == vr 
+            push!(ar, modelVariable)
+        end 
+    end 
+    ar
+end
+
 # Parses a Bool value represented by a string.
-function parseBoolean(s::String; onfail=nothing)
+function parseBoolean(s::Union{String, SubString{String}}; onfail=nothing)
     if s == "true"
         return true
     elseif s == "false"
@@ -316,7 +399,7 @@ function parseNodeBoolean(node, key; onfail=nothing)
 end
 
 # Parses an Integer value represented by a string.
-function parseInteger(s::String; onfail=nothing)
+function parseInteger(s::Union{String, SubString{String}}; onfail=nothing)
     if onfail == nothing
         return parse(Int, s)
     else
@@ -345,7 +428,7 @@ function parseNodeString(node, key; onfail=nothing)
 end
 
 # Parses a fmi2Boolean value represented by a string.
-function parseFMI2Boolean(s::String)
+function parseFMI2Boolean(s::Union{String, SubString{String}})
     if parseBoolean(s)
         return fmi2True
     else
