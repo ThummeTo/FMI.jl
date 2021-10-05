@@ -1033,6 +1033,21 @@ Retrieves directional derivatives.
 For more information call ?fmi2GetDirectionalDerivatives
 """
 function fmi2GetDirectionalDerivative(fmu::FMU2,
+                                      vUnknown_ref::fmi2ValueReference,
+                                      vKnown_ref::fmi2ValueReference,
+                                      dvKnown::fmi2Real = 1.0)
+
+    fmi2GetDirectionalDerivative(fmu.components[end], vUnknown_ref, vKnown_ref, dvKnown)
+end
+
+"""
+TODO: FMI specification reference.
+
+Retrieves directional derivatives.
+
+For more information call ?fmi2GetDirectionalDerivatives
+"""
+function fmi2GetDirectionalDerivative(fmu::FMU2,
                                       vUnknown_ref::Array{fmi2ValueReference},
                                       vKnown_ref::Array{fmi2ValueReference},
                                       dvKnown::Array{fmi2Real} = Array{fmi2Real}([]))

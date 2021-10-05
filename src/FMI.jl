@@ -507,6 +507,19 @@ function fmiGetDirectionalDerivative(str::fmi2Struct,
 end
 
 """
+Returns the values of a single directional derivative.
+"""
+function fmiGetDirectionalDerivative(str::fmi2Struct,
+                                     vUnknown_ref::Integer,
+                                     vKnown_ref::Integer,
+                                     dvKnown::Real = 1.0)
+    fmi2GetDirectionalDerivative(str,
+                                 fmi2ValueReference(vUnknown_ref),
+                                 fmi2ValueReference(vKnown_ref),
+                                 fmi2Real(dvKnown))
+end
+
+"""
 Returns the values of the directional derivatives (in-place).
 """
 function fmiGetDirectionalDerivative!(str::fmi2Struct,

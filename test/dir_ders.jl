@@ -29,6 +29,7 @@ sample_ders_buffer = zeros(fmi2Real, 2, 1)
 for i in 1:fmiGetNumberOfStates(myFMU)
 
     if fmiProvidesDirectionalDerivative(myFMU)
+        # multi derivatives calls
         sample_ders = fmiSampleDirectionalDerivative(fmuStruct, myFMU.modelDescription.derivativeValueReferences, [myFMU.modelDescription.stateValueReferences[i]])
         fmiSampleDirectionalDerivative!(fmuStruct, myFMU.modelDescription.derivativeValueReferences, [myFMU.modelDescription.stateValueReferences[i]], sample_ders_buffer)
 
@@ -40,6 +41,11 @@ for i in 1:fmiGetNumberOfStates(myFMU)
     
         @test sum(abs.(dir_ders - targetValues[i])) < 1e-3
         @test sum(abs.(dir_ders_buffer - targetValues[i])) < 1e-3
+
+        # single derivative call 
+        dir_der = fmiGetDirectionalDerivative(fmuStruct, myFMU.modelDescription.derivativeValueReferences[1], myFMU.modelDescription.stateValueReferences[1])
+        @test dir_der == targetValues[1][1]
+
     else 
         @warn "Skipping directional derivative testing, FMU from $(ENV["EXPORTINGTOOL"]) doesn't support directional derivatives."
     end

@@ -452,8 +452,7 @@ For more information call ?fmi2GetDirectionalDerivatives
 function fmi2GetDirectionalDerivative(c::fmi2Component,
                                       vUnknown_ref::fmi2ValueReference,
                                       vKnown_ref::fmi2ValueReference,
-                                      dvKnown::fmi2Real = 1.0,
-                                      dvUnknown::fmi2Real = 1.0)
+                                      dvKnown::fmi2Real = 1.0)
 
     fmi2GetDirectionalDerivative(c, [vUnknown_ref], [vKnown_ref], [dvKnown])[1]
 end
