@@ -24,6 +24,10 @@ if tool == "Dymola/2020x"
     @test fmiCanGetSetState(myFMU) == true
     @test fmiCanSerializeFMUstate(myFMU) == true
     @test fmiProvidesDirectionalDerivative(myFMU) == true
+
+    depMtx = fmi2GetDependencies(myFMU)
+    @test fmi2DependencyFixed::fmi2Dependency in depMtx
+    @test fmi2DependencyDependent::fmi2Dependency in depMtx
 elseif tool == "OpenModelica/v1.17.0"
     @test fmiGetGUID(myFMU) == "{8584aa5b-179e-44ed-9ba6-d557ed34541e}"
     @test fmiGetGenerationTool(myFMU) == "OpenModelica Compiler OMCompiler v1.17.0"
@@ -32,6 +36,9 @@ elseif tool == "OpenModelica/v1.17.0"
     @test fmiCanGetSetState(myFMU) == false
     @test fmiCanSerializeFMUstate(myFMU) == false
     @test fmiProvidesDirectionalDerivative(myFMU) == false
+
+    depMtx = fmi2GetDependencies(myFMU)
+    @test fmi2DependencyDependent::fmi2Dependency in depMtx
 else
     @warn "Unknown exporting tool `$tool`. Skipping model description tests."
 end

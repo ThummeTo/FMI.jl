@@ -417,7 +417,7 @@ This function samples the directional derivative by manipulating corresponding v
 function fmi2SampleDirectionalDerivative!(c::fmi2Component,
                                           vUnknown_ref::Array{fmi2ValueReference},
                                           vKnown_ref::Array{fmi2ValueReference},
-                                          dvUnknown::Array{fmi2Real, 2},
+                                          dvUnknown::Array{fmi2Real},
                                           steps::Array{fmi2Real} = ones(fmi2Real, length(vKnown_ref)).*1e-5)
     
     for i in 1:length(vKnown_ref)
