@@ -381,7 +381,7 @@ For more information call ?fmi2GetDirectionalDerivatives
 function fmi2GetDirectionalDerivative!(c::fmi2Component,
                                       vUnknown_ref::Array{fmi2ValueReference},
                                       vKnown_ref::Array{fmi2ValueReference},
-                                      dvUnknown::Array{fmi2Real},
+                                      dvUnknown::AbstractArray, 
                                       dvKnown::Array{fmi2Real} = Array{fmi2Real}([]))
 
     nKnown = Csize_t(length(vKnown_ref))
@@ -393,7 +393,7 @@ function fmi2GetDirectionalDerivative!(c::fmi2Component,
 
     fmi2GetDirectionalDerivative!(c, vUnknown_ref, nUnknown, vKnown_ref, nKnown, dvKnown, dvUnknown)
 
-    dvUnknown
+    nothing
 end
 
 """
@@ -417,7 +417,7 @@ This function samples the directional derivative by manipulating corresponding v
 function fmi2SampleDirectionalDerivative!(c::fmi2Component,
                                           vUnknown_ref::Array{fmi2ValueReference},
                                           vKnown_ref::Array{fmi2ValueReference},
-                                          dvUnknown::Array{fmi2Real},
+                                          dvUnknown::AbstractArray,
                                           steps::Array{fmi2Real} = ones(fmi2Real, length(vKnown_ref)).*1e-5)
     
     for i in 1:length(vKnown_ref)

@@ -98,7 +98,9 @@ function fmi2ReadModelDescription(pathToModellDescription::String)
     for element in eachelement(modelstructure)
         if element.name == "Derivatives" || element.name == "InitialUnknowns"
             parseDependencies(element, md)
-        else 
+        elseif element.name == "Outputs"
+
+        else
             @warn "Unknown tag `$(element.name)` for node `ModelStructure`."
         end
     end

@@ -506,7 +506,7 @@ Returns how a variable depends on another variable based on the model descriptio
 function fmi2VariableDependsOnVariable(fmu::FMU2, vr1::fmi2ValueReference, vr2::fmi2ValueReference) 
     i1 = fmu.modelDescription.valueReferenceIndicies[vr1]
     i2 = fmu.modelDescription.valueReferenceIndicies[vr2]
-    return fmi2GetDependencies(fmu, i1, i2)
+    return fmi2GetDependencies(fmu)[i1, i2]
 end
 
 """
@@ -1065,8 +1065,8 @@ For more information call ?fmi2GetDirectionalDerivatives
 function fmi2GetDirectionalDerivative!(fmu::FMU2,
     vUnknown_ref::Array{fmi2ValueReference},
     vKnown_ref::Array{fmi2ValueReference},
-    dvUnknown::Array{fmi2Real},
-    dvKnown::Array{fmi2Real} = Array{fmi2Real}([]))
+    dvUnknown::AbstractArray,
+    dvKnown::Array{fmi2Real} = Array{fmi2Real}([])) 
 
     fmi2GetDirectionalDerivative!(fmu.components[end], vUnknown_ref, vKnown_ref, dvUnknown, dvKnown)
 end
@@ -1083,7 +1083,7 @@ end
 function fmi2SampleDirectionalDerivative!(fmu::FMU2,
                                           vUnknown_ref::Array{fmi2ValueReference},
                                           vKnown_ref::Array{fmi2ValueReference},
-                                          dvUnknown::Array{fmi2Real},
+                                          dvUnknown::AbstractArray,
                                           steps::Array{fmi2Real} = ones(fmi2Real, length(vKnown_ref)).*1e-5)
     fmi2SampleDirectionalDerivative!(fmu.components[end], vUnknown_ref, vKnown_ref, dvUnknown, steps)
 end
