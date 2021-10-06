@@ -1083,7 +1083,7 @@ end
 function fmi2SampleDirectionalDerivative!(fmu::FMU2,
                                           vUnknown_ref::Array{fmi2ValueReference},
                                           vKnown_ref::Array{fmi2ValueReference},
-                                          dvUnknown::AbstractArray, 
+                                          dvUnknown::AbstractArray,
                                           steps::Array{fmi2Real} = ones(fmi2Real, length(vKnown_ref)).*1e-5)
     fmi2SampleDirectionalDerivative!(fmu.components[end], vUnknown_ref, vKnown_ref, dvUnknown, steps)
 end
