@@ -779,7 +779,7 @@ function fmi2GetDirectionalDerivative!(c::fmi2Component,
                                        vKnown_ref::Array{fmi2ValueReference},
                                        nKnown::Csize_t,
                                        dvKnown::Array{fmi2Real},
-                                       dvUnknown::Array{fmi2Real})
+                                       dvUnknown::AbstractArray)
     @assert fmi2ProvidesDirectionalDerivative(c.fmu) ["fmi2GetDirectionalDerivative!(...): This FMU does not support build-in directional derivatives!"]
     ccall(c.fmu.cGetDirectionalDerivative,
           Cuint,

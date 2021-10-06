@@ -525,7 +525,7 @@ Returns the values of the directional derivatives (in-place).
 function fmiGetDirectionalDerivative!(str::fmi2Struct,
                                      vUnknown_ref::Array{<:Integer},
                                      vKnown_ref::Array{<:Integer},
-                                     dvUnknown::Array{fmi2Real},
+                                     dvUnknown::AbstractArray,
                                      dvKnown::Array{<:Real} = Array{Real}([]))
     fmi2GetDirectionalDerivative!(str,
                                  Array{fmi2ValueReference}(vUnknown_ref),
