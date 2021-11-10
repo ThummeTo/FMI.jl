@@ -195,6 +195,16 @@ mutable struct fmi3ModelDescription
     valueReferenceIndicies::Dict{Integer,Integer}
 end
 
+# TODO update docs
+"""
+Source: FMISpec2.0.2[p.19]: 2.1.5 Creation, Destruction and Logging of FMU Instances
+
+The mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
+"""
+mutable struct fmi3Component
+    compAddr::Ptr{Nothing}
+    fmu
+end
 
 # TODO: fmi3Component struct
 

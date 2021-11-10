@@ -23,8 +23,8 @@ mutable struct FMU3 <: FMU
     modelDescription::fmi3ModelDescription
 
     type::fmi3Type
-    callbackFunctions::fmi3CallbackFunctions
-    components::Array{fmi3Component}
+    # callbackFunctions::fmi3CallbackFunctions
+    # components::Array{fmi3Component}
 
     # paths of ziped and unziped FMU folders
     path::String
@@ -117,7 +117,7 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
         fmu.type = fmi3ModelExchange::fmi3Type
     elseif fmi3IsScheduledExecution(fmu) # TODO
         fmu.type = fmi3ScheduledExecution::fmi3Type
-
+    else
         error(unknownFMUType)
     end
 
