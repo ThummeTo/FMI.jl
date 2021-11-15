@@ -586,3 +586,31 @@ function fmi2GetNominalsOfContinuousStates(c::fmi2Component)
     fmi2GetNominalsOfContinuousStates(c, x, nx)
     x
 end
+
+"""
+Returns the start/default value for a given value reference.
+
+TODO: Add this command in the documentation.
+"""
+function fmi2GetStartValue(c::fmi2Component, vrs::fmi2ValueReferenceFormat)
+
+    vrs = prepareValueReference(c, vrs)
+
+    starts = []
+
+    for vr in vrs
+        mvs = fmi2ModelVariablesForValueReference(c.fmu.modelDescription, vr) 
+
+        if length(mvs) == 0
+            @warn "fmi2GetStartValue(...) found no model variable with value reference $(vr)."
+        end
+    
+        push!(starts, mvs[1].datatype.start)
+    end
+
+    if length(vrs) == 1
+        return starts[1]
+    else
+        return starts 
+    end
+end 

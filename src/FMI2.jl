@@ -1338,3 +1338,12 @@ function fmi2GetNominalsOfContinuousStates(fmu::FMU2)
     fmi2GetNominalsOfContinuousStates(fmu.components[end], x, nx)
     x
 end
+
+"""
+Returns the start/default value for a given value reference.
+
+TODO: Add this command in the documentation.
+"""
+function fmi2GetStartValue(fmu::FMU2, vr::fmi2ValueReferenceFormat)
+    fmi2GetStartValue(fmu.components[end], vr)
+end
