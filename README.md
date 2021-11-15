@@ -1,11 +1,21 @@
 ![FMI.jl Logo](https://github.com/ThummeTo/FMI.jl/blob/main/logo/dark/fmijl_logo_640_320.png "FMI.jl Logo")
 # FMI.jl
 
-## What is FMI.jl?
 FMI.jl is a free-to-use software library for the Julia programming language which integrates FMI ([fmi-standard.org](http://fmi-standard.org/)): load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
 
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) [![](https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg)]() 
 <!--- [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://ThummeTo.github.io/FMI.jl/stable) --->
+
+
+## Features
+- 📊 parameterization, simulation & plotting of CS- and ME-FMUs
+- 🩺 event-handling for discontinuous ME-FMUs
+- 🛠️ Supports Julia Version 1.6
+- 🖥️ tested on :
+
+| Windows | Ubuntu | IOS |
+| ------- | ------ | --- |
+| <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg"> | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Logo-ubuntu_cof-orange-hex.svg/1200px-Logo-ubuntu_cof-orange-hex.svg.png" width = "80"> | <img src = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1024px-Apple_logo_black.svg.png" width = "80">|
 
 ## How can I use FMI.jl?
 1. open a Julia-Command-Window, activate your prefered environment
