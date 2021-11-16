@@ -7,7 +7,7 @@ using Libdl
 using ZipFile
 
 include("FMI3_c.jl")
-include("FMI3_comp.jl")
+# include("FMI3_comp.jl")
 include("FMI3_md.jl")
 
 """
@@ -24,13 +24,13 @@ mutable struct FMU3 <: FMU
 
     type::fmi3Type
     # callbackFunctions::fmi3CallbackFunctions
-    # components::Array{fmi3Component}
+    components::Array{fmi3Component}
 
     # paths of ziped and unziped FMU folders
     path::String
     zipPath::String
     # Constructor
-    fmu3() = new()
+    FMU3() = new()
 
     # c-libraries
     libHandle::Ptr{Nothing}

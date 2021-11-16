@@ -8,145 +8,154 @@ using EzXML
 """
 Extract the FMU variables and meta data from the ModelDescription
 """
-# function fmi3ReadModelDescription(pathToModellDescription::String)
-#     md = fmi3ModelDescription()
+function fmi3ReadModelDescription(pathToModellDescription::String)
+    md = fmi3ModelDescription()
 
-#     md.stringValueReferences = Dict{String, fmi3ValueReference}()
-#     md.outputValueReferences = Array{fmi3ValueReference}(undef, 0)
-#     md.inputValueReferences = Array{fmi3ValueReference}(undef, 0)
-#     md.stateValueReferences = Array{fmi3ValueReference}(undef, 0)
-#     md.derivativeValueReferences = Array{fmi3ValueReference}(undef, 0)
+    md.stringValueReferences = Dict{String, fmi3ValueReference}()
+    md.outputValueReferences = Array{fmi3ValueReference}(undef, 0)
+    md.inputValueReferences = Array{fmi3ValueReference}(undef, 0)
+    md.stateValueReferences = Array{fmi3ValueReference}(undef, 0)
+    md.derivativeValueReferences = Array{fmi3ValueReference}(undef, 0)
 
-#     # CS specific entries
-#     md.CSmodelIdentifier = ""
-#     md.CScanHandleVariableCommunicationStepSize = false
-#     md.CScanInterpolateInputs = false
-#     md.CSmaxOutputDerivativeOrder = -1
-#     md.CScanGetAndSetFMUstate = false
-#     md.CScanSerializeFMUstate = false
-#     md.CSprovidesDirectionalDerivative = false
+    # CS specific entries
+    md.CSmodelIdentifier = ""
+    md.CScanHandleVariableCommunicationStepSize = false
+    # md.CScanInterpolateInputs = false
+    md.CSmaxOutputDerivativeOrder = -1
+    md.CScanGetAndSetFMUstate = false
+    md.CScanSerializeFMUstate = false
+    md.CSprovidesDirectionalDerivatives = false
+    md.CSproivdesAdjointDerivatives = false
 
-#     # ME specific entries
-#     md.MEmodelIdentifier = ""
-#     md.MEcanGetAndSetFMUstate = false
-#     md.MEcanSerializeFMUstate = false
-#     md.MEprovidesDirectionalDerivative = false
+    # ME specific entries
+    md.MEmodelIdentifier = ""
+    md.MEcanGetAndSetFMUstate = false
+    md.MEcanSerializeFMUstate = false
+    md.MEprovidesDirectionalDerivatives = false
+    md.MEprovidesAdjointDerivatives = false
 
-#     md.enumerations = []
-#     typedefinitions = nothing
-#     modelvariables = nothing
-#     modelstructure = nothing
+    md.enumerations = []
+    typedefinitions = nothing
+    modelvariables = nothing
+    modelstructure = nothing
 
-#     doc = readxml(pathToModellDescription)
+    doc = readxml(pathToModellDescription)
 
-#     root = doc.root
+    root = doc.root
 
-#     md.fmiVersion = root["fmiVersion"]
-#     md.modelName = root["modelName"]
-#     md.guid = root["guid"]
-#     md.isModelExchange = false
-#     md.isCoSimulation = false
-#     md.generationTool = parseNodeString(root, "generationTool"; onfail="[Unknown generation tool]")
-#     md.generationDateAndTime = parseNodeString(root, "generationDateAndTime"; onfail="[Unknown generation date and time]")
-#     md.variableNamingConvention = parseNodeString(root, "variableNamingConvention"; onfail="[Unknown variable naming convention]")
-#     md.numberOfEventIndicators = parseNodeInteger(root, "numberOfEventIndicators"; onfail=0)
-#     md.description = parseNodeString(root, "description"; onfail="[Unknown Description]")
+    md.fmiVersion = root["fmiVersion"]
+    md.modelName = root["modelName"]
+    # md.guid = root["guid"]
+    md.instantiationToken = root["instantiationToken"]
+    md.isModelExchange = false
+    md.isCoSimulation = false
+    md.isScheduledExecution = false
+    md.generationTool = parseNodeString(root, "generationTool"; onfail="[Unknown generation tool]")
+    md.generationDateAndTime = parseNodeString(root, "generationDateAndTime"; onfail="[Unknown generation date and time]")
+    md.variableNamingConvention = parseNodeString(root, "variableNamingConvention"; onfail="[Unknown variable naming convention]")
+    # md.numberOfEventIndicators = parseNodeInteger(root, "numberOfEventIndicators"; onfail=0) TODO not included
+    md.description = parseNodeString(root, "description"; onfail="[Unknown Description]")
 
-#     for node in eachelement(root)
+    for node in eachelement(root)
 
-#         if node.name == "CoSimulation"
-#             md.isCoSimulation = true
-#             md.CSmodelIdentifier                        = node["modelIdentifier"]
-#             md.CScanHandleVariableCommunicationStepSize = parseNodeBoolean(node, "canHandleVariableCommunicationStepSize"   ; onfail=false)
-#             md.CScanInterpolateInputs                   = parseNodeBoolean(node, "canInterpolateInputs"                     ; onfail=false)
-#             md.CSmaxOutputDerivativeOrder               = parseNodeInteger(node, "maxOutputDerivativeOrder"                 ; onfail=-1)
-#             md.CScanGetAndSetFMUstate                   = parseNodeBoolean(node, "canGetAndSetFMUstate"                     ; onfail=false)
-#             md.CScanSerializeFMUstate                   = parseNodeBoolean(node, "canSerializeFMUstate"                     ; onfail=false)
-#             md.CSprovidesDirectionalDerivative          = parseNodeBoolean(node, "providesDirectionalDerivative"            ; onfail=false)
+        if node.name == "CoSimulation"
+            md.isCoSimulation = true
+            md.CSmodelIdentifier                        = node["modelIdentifier"]
+            md.CScanHandleVariableCommunicationStepSize = parseNodeBoolean(node, "canHandleVariableCommunicationStepSize"   ; onfail=false)
+            # md.CScanInterpolateInputs                   = parseNodeBoolean(node, "canInterpolateInputs"                     ; onfail=false)
+            md.CSmaxOutputDerivativeOrder               = parseNodeInteger(node, "maxOutputDerivativeOrder"                 ; onfail=-1)
+            md.CScanGetAndSetFMUstate                   = parseNodeBoolean(node, "canGetAndSetFMUstate"                     ; onfail=false)
+            md.CScanSerializeFMUstate                   = parseNodeBoolean(node, "canSerializeFMUstate"                     ; onfail=false)
+            md.CSprovidesDirectionalDerivatives         = parseNodeBoolean(node, "providesDirectionalDerivatives"           ; onfail=false)
+            md.CSproivdesAdjointDerivatives             = parseNodeBoolean(node, "providesAdjointDerivatives"               ; onfail=false)
 
-#         elseif node.name == "ModelExchange"
-#             md.isModelExchange = true
-#             md.MEmodelIdentifier                        = node["modelIdentifier"]
-#             md.MEcanGetAndSetFMUstate                   = parseNodeBoolean(node, "canGetAndSetFMUstate"                     ; onfail=false)
-#             md.MEcanSerializeFMUstate                   = parseNodeBoolean(node, "canSerializeFMUstate"                     ; onfail=false)
-#             md.MEprovidesDirectionalDerivative          = parseNodeBoolean(node, "providesDirectionalDerivative"            ; onfail=false)
+        elseif node.name == "ModelExchange"
+            md.isModelExchange = true
+            md.MEmodelIdentifier                        = node["modelIdentifier"]
+            md.MEcanGetAndSetFMUstate                   = parseNodeBoolean(node, "canGetAndSetFMUstate"                     ; onfail=false)
+            md.MEcanSerializeFMUstate                   = parseNodeBoolean(node, "canSerializeFMUstate"                     ; onfail=false)
+            md.MEprovidesDirectionalDerivatives         = parseNodeBoolean(node, "providesDirectionalDerivatives"           ; onfail=false)
+            md.MEprovidesAdjointDerivatives             = parseNodeBoolean(node, "providesAdjointDerivatives"               ; onfail=false)
+        elseif node.name == "ScheduledExecution"
+            md.isScheduledExecution = true
+            md.SEmodelIdentifier                        = node["modelIdentifier"]
+            # TODO
+        elseif node.name == "TypeDefinitions"
+            typedefinitions = node
 
-#         elseif node.name == "TypeDefinitions"
-#             typedefinitions = node
+        elseif node.name == "ModelVariables"
+            modelvariables = node
 
-#         elseif node.name == "ModelVariables"
-#             modelvariables = node
+        elseif node.name == "ModelStructure"
+            modelstructure = node
+        end
+    end
 
-#         elseif node.name == "ModelStructure"
-#             modelstructure = node
-#         end
-#     end
+    if typedefinitions === nothing
+        md.enumerations = []
+    else
+        md.enumerations = createEnum(typedefinitions)
+    end
 
-#     if typedefinitions == nothing
-#         md.enumerations = []
-#     else
-#         md.enumerations = createEnum(typedefinitions)
-#     end
+    md.valueReferences = []
+    md.valueReferenceIndicies = Dict{Integer,Integer}()
 
-#     md.valueReferences = []
-#     md.valueReferenceIndicies = Dict{Integer,Integer}()
+    derivativeindices = getDerivativeIndices(modelstructure)
+    md.modelVariables = parseModelVariables(modelvariables, md, derivativeindices)
 
-#     derivativeindices = getDerivativeIndices(modelstructure)
-#     md.modelVariables = parseModelVariables(modelvariables, md, derivativeindices)
+    # parse model dependencies (if available)
+    for element in eachelement(modelstructure)
+        if element.name == "Derivatives" || element.name == "InitialUnknowns"
+            parseDependencies(element, md)
+        elseif element.name == "Outputs"
 
-#     # parse model dependencies (if available)
-#     for element in eachelement(modelstructure)
-#         if element.name == "Derivatives" || element.name == "InitialUnknowns"
-#             parseDependencies(element, md)
-#         elseif element.name == "Outputs"
+        else
+            @warn "Unknown tag `$(element.name)` for node `ModelStructure`."
+        end
+    end
 
-#         else
-#             @warn "Unknown tag `$(element.name)` for node `ModelStructure`."
-#         end
-#     end
+    # creating an index for value references (fast look-up for dependencies)
+    for i in 1:length(md.valueReferences)
+        md.valueReferenceIndicies[md.valueReferences[i]] = i
+    end 
 
-#     # creating an index for value references (fast look-up for dependencies)
-#     for i in 1:length(md.valueReferences)
-#         md.valueReferenceIndicies[md.valueReferences[i]] = i
-#     end 
+    md
+end
 
-#     md
-# end
+"""
+Returns the tag 'modelName' from the model description.
+"""
+function fmi2GetModelName(md::fmi3ModelDescription)#, escape::Bool = true)
+    md.modelName
+end
 
-# """
-# Returns the tag 'modelName' from the model description.
-# """
-# function fmi2GetModelName(md::fmi2ModelDescription)#, escape::Bool = true)
-#     md.modelName
-# end
+"""
+Returns the tag 'guid' from the model description.
+"""
+function fmi2GetGUID(md::fmi3ModelDescription)
+    md.guid
+end
 
-# """
-# Returns the tag 'guid' from the model description.
-# """
-# function fmi2GetGUID(md::fmi2ModelDescription)
-#     md.guid
-# end
+"""
+Returns the tag 'generationtool' from the model description.
+"""
+function fmi2GetGenerationTool(md::fmi3ModelDescription)
+    md.generationTool
+end
 
-# """
-# Returns the tag 'generationtool' from the model description.
-# """
-# function fmi2GetGenerationTool(md::fmi2ModelDescription)
-#     md.generationTool
-# end
+"""
+Returns the tag 'generationdateandtime' from the model description.
+"""
+function fmi2GetGenerationDateAndTime(md::fmi3ModelDescription)
+    md.generationDateAndTime
+end
 
-# """
-# Returns the tag 'generationdateandtime' from the model description.
-# """
-# function fmi2GetGenerationDateAndTime(md::fmi2ModelDescription)
-#     md.generationDateAndTime
-# end
-
-# """
-# Returns the tag 'varaiblenamingconvention' from the model description.
-# """
-# function fmi2GetVariableNamingConvention(md::fmi2ModelDescription)
-#     md.variableNamingConvention
-# end
+"""
+Returns the tag 'varaiblenamingconvention' from the model description.
+"""
+function fmi2GetVariableNamingConvention(md::fmi3ModelDescription)
+    md.variableNamingConvention
+end
 
 # """
 # Returns the tag 'numberOfEventIndicators' from the model description.
@@ -228,106 +237,106 @@ Extract the FMU variables and meta data from the ModelDescription
 #     md.isModelExchange
 # end
 
-# # Returns the indices of the state derivatives.
-# function getDerivativeIndices(node::EzXML.Node)
-#     indices = []
-#     for element in eachelement(node)
-#         if element.name == "Derivatives"
-#             for derivative in eachelement(element)
-#                 ind = parse(Int, derivative["index"])
-#                 der = nothing 
-#                 derKind = nothing 
+# Returns the indices of the state derivatives.
+function getDerivativeIndices(node::EzXML.Node)
+    indices = []
+    for element in eachelement(node)
+        if element.name == "Derivatives"
+            for derivative in eachelement(element)
+                ind = parse(Int, derivative["index"])
+                der = nothing 
+                derKind = nothing 
 
-#                 if haskey(derivative, "dependencies")
-#                     der = split(derivative["dependencies"], " ")
+                if haskey(derivative, "dependencies")
+                    der = split(derivative["dependencies"], " ")
 
-#                     if der[1] == ""
-#                         der = fmi2Integer[]
-#                     else
-#                         der = collect(parse(fmi2Integer, e) for e in der)
-#                     end
-#                 end 
+                    if der[1] == ""
+                        der = fmi3Integer[]
+                    else
+                        der = collect(parse(fmi3Integer, e) for e in der)
+                    end
+                end 
 
-#                 if haskey(derivative, "dependenciesKind")
-#                     derKind = split(derivative["dependenciesKind"], " ")
-#                 end 
+                if haskey(derivative, "dependenciesKind")
+                    derKind = split(derivative["dependenciesKind"], " ")
+                end 
 
-#                 push!(indices, (ind, der, derKind))
-#             end
-#         end
-#     end
-#     sort!(indices, rev=true)
-# end
+                push!(indices, (ind, der, derKind))
+            end
+        end
+    end
+    sort!(indices, rev=true)
+end
 
-# # Parses the model variables of the FMU model description.
-# function parseModelVariables(nodes::EzXML.Node, md::fmi2ModelDescription, derivativeIndices)
-#     lastValueReference = fmi2ValueReference(0)
-#     derivativeIndex = nothing
-#     if derivativeIndices != []
-#         derivativeIndex = pop!(derivativeIndices)
-#     end
-#     numberOfVariables = 0
-#     for node in eachelement(nodes)
-#         numberOfVariables += 1
-#     end
-#     scalarVariables = Array{fmi2ScalarVariable}(undef, numberOfVariables)
-#     index = 1
+# Parses the model variables of the FMU model description.
+function parseModelVariables(nodes::EzXML.Node, md::fmi3ModelDescription, derivativeIndices)
+    lastValueReference = fmi3ValueReference(0)
+    derivativeIndex = nothing
+    if derivativeIndices != []
+        derivativeIndex = pop!(derivativeIndices)
+    end
+    numberOfVariables = 0
+    for node in eachelement(nodes)
+        numberOfVariables += 1
+    end
+    modelVariables = Array{fmi3ModelVariable}(undef, numberOfVariables)
+    index = 1
+    # TODO bis hhierierher
+    for node in eachelement(nodes)
+        name = node["name"]
+        ValueReference = parse(fmi3ValueReference, (node["valueReference"]))
+        description = ""
+        causality = ""
+        variability = ""
+        initial = ""
 
-#     for node in eachelement(nodes)
-#         name = node["name"]
-#         ValueReference = parse(fmi2ValueReference, (node["valueReference"]))
-#         description = ""
-#         causality = ""
-#         variability = ""
-#         initial = ""
+        if !(ValueReference in md.valueReferences)
+            push!(md.valueReferences, ValueReference)
+        end
 
-#         if !(ValueReference in md.valueReferences)
-#             push!(md.valueReferences, ValueReference)
-#         end
+        if haskey(node, "description")
+            description = node["description"]
+        end
+        if haskey(node, "causality")
+            causality = node["causality"]
+        end
+        if haskey(node, "variability")
+            variability = node["variability"]
+        end
+        if haskey(node, "initial")
+            initial = node["initial"]
+        end
+        # datatype = setDatatypeVariables(node, md) #TODO bis hierhin
 
-#         if haskey(node, "description")
-#             description = node["description"]
-#         end
-#         if haskey(node, "causality")
-#             causality = node["causality"]
-#         end
-#         if haskey(node, "variability")
-#             variability = node["variability"]
-#         end
-#         if haskey(node, "initial")
-#             initial = node["initial"]
-#         end
-#         datatype = setDatatypeVariables(node, md)
+        dependencies = []
+        dependenciesKind = []
 
-#         dependencies = []
-#         dependenciesKind = []
-
-#         if derivativeIndex != nothing
-#             if index == derivativeIndex[1]
-#                 push!(md.stateValueReferences, lastValueReference)
-#                 push!(md.derivativeValueReferences, ValueReference)
+        if derivativeIndex !== nothing
+            if index == derivativeIndex[1]
+                push!(md.stateValueReferences, lastValueReference)
+                push!(md.derivativeValueReferences, ValueReference)
     
-#                 if derivativeIndices != []
-#                     derivativeIndex = pop!(derivativeIndices)
-#                 end
-#             end
-#         end
+                if derivativeIndices != []
+                    derivativeIndex = pop!(derivativeIndices)
+                end
+            end
+        end
 
-#         scalarVariables[index] = fmi2ScalarVariable(name, ValueReference, datatype, description, causality, variability, initial, dependencies, dependenciesKind)
+        modelVariables[index] = fmi3ScalarVariable(name, ValueReference, datatype, description, causality, variability, initial, dependencies, dependenciesKind)
 
-#         if causality == "output"
-#             push!(md.outputValueReferences, ValueReference)
-#         elseif causality == "input"
-#             push!(md.inputValueReferences, ValueReference)
-#         end
-#         md.stringValueReferences[name] = ValueReference
+        if causality == "output"
+            push!(md.outputValueReferences, ValueReference)
+        elseif causality == "input"
+            push!(md.inputValueReferences, ValueReference)
+        end
+        md.stringValueReferences[name] = ValueReference
 
-#         lastValueReference = ValueReference
-#         index += 1
-#     end
-#     md.numberOfContinuousStates = length(md.stateValueReferences)
-#     scalarVariables
-# end
+        lastValueReference = ValueReference
+        index += 1
+    end
+    md.numberOfContinuousStates = length(md.stateValueReferences)
+    modelVariables
+end
 
 # # Parses the model variables of the FMU model description.
 # function parseDependencies(nodes::EzXML.Node, md::fmi2ModelDescription)
@@ -380,63 +389,63 @@ Extract the FMU variables and meta data from the ModelDescription
 #     ar
 # end
 
-# # Parses a Bool value represented by a string.
-# function parseBoolean(s::Union{String, SubString{String}}; onfail=nothing)
-#     if s == "true"
-#         return true
-#     elseif s == "false"
-#         return false
-#     else
-#         @assert onfail != nothing ["parseBoolean(...) unknown boolean value '$s'."]
-#         return onfail
-#     end
-# end
+# Parses a Bool value represented by a string.
+function parseBoolean(s::Union{String, SubString{String}}; onfail=nothing)
+    if s == "true"
+        return true
+    elseif s == "false"
+        return false
+    else
+        @assert onfail != nothing ["parseBoolean(...) unknown boolean value '$s'."]
+        return onfail
+    end
+end
 
-# function parseNodeBoolean(node, key; onfail=nothing)
-#     if haskey(node, key)
-#         return parseBoolean(node[key]; onfail=onfail)
-#     else
-#         return onfail
-#     end
-# end
+function parseNodeBoolean(node, key; onfail=nothing)
+    if haskey(node, key)
+        return parseBoolean(node[key]; onfail=onfail)
+    else
+        return onfail
+    end
+end
 
-# # Parses an Integer value represented by a string.
-# function parseInteger(s::Union{String, SubString{String}}; onfail=nothing)
-#     if onfail == nothing
-#         return parse(Int, s)
-#     else
-#         try
-#             return parse(Int, s)
-#         catch
-#             return onfail
-#         end
-#     end
-# end
+# Parses an Integer value represented by a string.
+function parseInteger(s::Union{String, SubString{String}}; onfail=nothing)
+    if onfail == nothing
+        return parse(Int, s)
+    else
+        try
+            return parse(Int, s)
+        catch
+            return onfail
+        end
+    end
+end
 
-# function parseNodeInteger(node, key; onfail=nothing)
-#     if haskey(node, key)
-#         return parseInteger(node[key]; onfail=onfail)
-#     else
-#         return onfail
-#     end
-# end
+function parseNodeInteger(node, key; onfail=nothing)
+    if haskey(node, key)
+        return parseInteger(node[key]; onfail=onfail)
+    else
+        return onfail
+    end
+end
 
-# function parseNodeString(node, key; onfail=nothing)
-#     if haskey(node, key)
-#         return node[key]
-#     else
-#         return onfail
-#     end
-# end
+function parseNodeString(node, key; onfail=nothing)
+    if haskey(node, key)
+        return node[key]
+    else
+        return onfail
+    end
+end
 
-# # Parses a fmi2Boolean value represented by a string.
-# function parseFMI2Boolean(s::Union{String, SubString{String}})
-#     if parseBoolean(s)
-#         return fmi2True
-#     else
-#         return fmi2False
-#     end
-# end
+# Parses a fmi2Boolean value represented by a string.
+function parseFMI3Boolean(s::Union{String, SubString{String}})
+    if parseBoolean(s)
+        return fmi3True
+    else
+        return fmi3False
+    end
+end
 
 # # set the datatype and attributes of an model variable
 # function setDatatypeVariables(node::EzXML.Node, md::fmi2ModelDescription)
@@ -530,29 +539,29 @@ Extract the FMU variables and meta data from the ModelDescription
 #     type
 # end
 
-# #=
-# Read all enumerations from the modeldescription and store them in a matrix. First entries are the enum names
-# -------------------------------------------
-# Example:
-# "enum1name" "value1"    "value2"
-# "enum2name" "value1"    "value2"
-# =#
-# function createEnum(node::EzXML.Node)
-#     enum = 1
-#     idx = 1
-#     enumerations = []
-#     for simpleType in eachelement(node)
-#         name = simpleType["name"]
-#         for type in eachelement(simpleType)
-#             if type.name == "Enumeration"
-#                 enum = []
-#                 push!(enum, name)
-#                 for item in eachelement(type)
-#                     push!(enum, item["name"])
-#                 end
-#                 push!(enumerations, enum)
-#             end
-#         end
-#     end
-#     enumerations
-# end
+#=
+Read all enumerations from the modeldescription and store them in a matrix. First entries are the enum names
+-------------------------------------------
+Example:
+"enum1name" "value1"    "value2"
+"enum2name" "value1"    "value2"
+=#
+function createEnum(node::EzXML.Node)
+    enum = 1
+    idx = 1
+    enumerations = []
+    for simpleType in eachelement(node)
+        name = simpleType["name"]
+        for type in eachelement(simpleType)
+            if type.name == "Enumeration"
+                enum = []
+                push!(enum, name)
+                for item in eachelement(type)
+                    push!(enum, item["name"])
+                end
+                push!(enumerations, enum)
+            end
+        end
+    end
+    enumerations
+end

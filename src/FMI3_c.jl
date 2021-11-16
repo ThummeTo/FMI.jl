@@ -28,6 +28,37 @@ const fmi3FMUstate = Ptr{Cvoid}
 const fmi3ComponentEnvironment = Ptr{Cvoid}
 const fmi3Enum = Array{Array{String}} # TODO: correct it
 
+const FMI3False = false
+const FMI3True = true
+
+# TODO docs
+@enum fmi3causality begin
+    # _parameter
+    # calculatedParameter
+    # input
+    # output
+    # _local
+    # independent
+    structuralParameter
+end
+
+# TODO docs
+@enum fmi3variability begin
+    # constant
+    # fixed
+    # tunable
+    # discrete
+    # continuous
+    placeholder
+end
+
+# TODO docs
+@enum fmi3initial begin
+    # exact
+    # approx
+    # calculated
+    placeb
+end
 """
 Source: FMISpec2.0.2[p.19]: 2.1.5 Creation, Destruction and Logging of FMU Instances
 
@@ -46,15 +77,16 @@ end
 
 mutable struct fmi3ModelVariable
     #mandatory
-    name::fmi2String
-    valueReference::fmi2ValueReference
-    datatype::datatypeVariable
+    name::fmi3String
+    valueReference::fmi3ValueReference
+    # datatype::datatypeVariable
 
     # Optional
-    description::fmi2String
-    causality::fmi2causality
-    variability::fmi2variability
-    initial::fmi2initial
+    description::fmi3String
+
+    causality::fmi3causality
+    variability::fmi3variability
+    # initial::fmi3initial ist in fmi3 optional
 
     # dependencies 
     dependencies #::Array{fmi2Integer}
@@ -68,36 +100,36 @@ mutable struct fmi3ModelVariable
     # Constructor for fully specified ScalarVariable
     function fmi3ModelVariable(name, valueReference, datatype, description, causalityString, variabilityString, initialString, dependencies, dependenciesKind)
 
-        var = continuous::fmi2variability
-        cau = _local::fmi2causality
-        init = calculated::fmi2initial
+        var = continuous::fmi3variability
+        cau = _local::fmi3causality
+        init = calculated::fmi3initial
         #check if causality, variability and initial are correct
-        if !occursin(variabilityString, string(instances(fmi2variability)))
+        if !occursin(variabilityString, string(instances(fmi3variability)))
             display("Error: variability not known")
         else
-            for i in 0:(length(instances(fmi2variability))-1)
-                if variabilityString == string(fmi2variability(i))
-                    var = fmi2variability(i)
+            for i in 0:(length(instances(fmi3variability))-1)
+                if variabilityString == string(fmi3variability(i))
+                    var = fmi3variability(i)
                 end
             end
         end
 
-        if !occursin(causalityString, string(instances(fmi2causality)))
+        if !occursin(causalityString, string(instances(fmi3causality)))
             display("Error: causality not known")
         else
-            for i in 0:(length(instances(fmi2causality))-1)
-                if causalityString == string(fmi2causality(i))
-                    cau = fmi2causality(i)
+            for i in 0:(length(instances(fmi3causality))-1)
+                if causalityString == string(fmi3causality(i))
+                    cau = fmi3causality(i)
                 end
             end
         end
 
-        if !occursin(initialString, string(instances(fmi2initial)))
+        if !occursin(initialString, string(instances(fmi3initial)))
             display("Error: initial not known")
         else
-            for i in 0:(length(instances(fmi2initial))-1)
-                if initialString == string(fmi2initial(i))
-                    init = fmi2initial(i)
+            for i in 0:(length(instances(fmi3initial))-1)
+                if initialString == string(fmi3initial(i))
+                    init = fmi3initial(i)
                 end
             end
         end
@@ -106,22 +138,22 @@ mutable struct fmi3ModelVariable
 end
 
 mutable struct fmi3datatypeVariable
-    # mandatory
-    datatype::Union{Type{fmi2String}, Type{fmi2Real}, Type{fmi2Integer}, Type{fmi2Boolean}, Type{fmi2Enum}}
-    declaredType::fmi2String
+    # # mandatory
+    # datatype::Union{Type{fmi3String}, Type{fmi3Float64}, Type{fmi3Int64}, Type{fmi3Boolean}, Type{fmi3Enum}}
+    # declaredType::fmi3String
 
-    # Optional
-    start::Union{fmi2Integer, fmi2Real, fmi2Boolean, fmi2String, Nothing}
-    min::Union{fmi2Integer, fmi2Real, Nothing}
-    max::Union{fmi2Integer, fmi2Real, Nothing}
-    quantity::Union{fmi2String, Nothing}
-    unit::Union{fmi2String, Nothing}
-    displayUnit::Union{fmi2String, Nothing}
-    relativeQuantity::Union{fmi2Boolean, Nothing}
-    nominal::Union{fmi2Real, Nothing}
-    unbounded::Union{fmi2Boolean, Nothing}
-    derivative::Union{Unsigned, Nothing}
-    reinit::Union{fmi2Boolean, Nothing}
+    # # Optional
+    # start::Union{fmi2Integer, fmi2Real, fmi2Boolean, fmi3String, Nothing}
+    # min::Union{fmi2Integer, fmi2Real, Nothing}
+    # max::Union{fmi2Integer, fmi2Real, Nothing}
+    # quantity::Union{fmi3String, Nothing}
+    # unit::Union{fmi3String, Nothing}
+    # displayUnit::Union{fmi3String, Nothing}
+    # relativeQuantity::Union{fmi2Boolean, Nothing}
+    # nominal::Union{fmi2Real, Nothing}
+    # unbounded::Union{fmi2Boolean, Nothing}
+    # derivative::Union{Unsigned, Nothing}
+    # reinit::Union{fmi2Boolean, Nothing}
 
     # additional (not in spec)
     #unknownIndex::Intger 
@@ -137,7 +169,7 @@ mutable struct fmi3ModelDescription
     # FMI model description
     fmiVersion::String
     modelName::String
-    guid::String
+    # guid::String
     generationTool::String
     generationDateAndTime::String
     variableNamingConvention::String
@@ -184,7 +216,7 @@ mutable struct fmi3ModelDescription
 
     numberOfContinuousStates::Int
     numberOfEventIndicators::Int
-    enumerations::fmi2Enum
+    enumerations::fmi3Enum
 
     stringValueReferences
 
