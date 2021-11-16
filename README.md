@@ -26,48 +26,35 @@
 
 
 ## Get Started
+1. open a Julia-Command-Window, activate your preferred environment
+1. go to package manager using ```]``` and type ```add FMI```
+```julia
+julia> ]
 
+(@v1.6) pkg> add FMI
+```
+
+> To check that everything is working correctly, you can run the tests bundled with FMI.jl:
+```julia
+julia> using Pkg
+
+julia> Pkg.test("FMI")
+```
+
+> In addition, the ```status``` command allows you to check the version of FMI.jl that you have installed.
+```julia
+julia> ]
+(@v1.6) pkg> status FMI
+```
+
+> For the rest of the tutorial, we will assume that you have installed the package FMI.jl and entered ``Using FMI``, which will load the package:
+
+```julia
+julia> using FMI
+```
 ## How can I use FMI.jl?
 1. open a Julia-Command-Window, activate your prefered environment
 1. goto package manager using ```]```
 1. type ```add FMI``` or ```add "https://github.com/ThummeTo/FMI.jl"```
 1. have a look inside the ```example``` folder
 
-## How can I simulate a FMU and plot values?
-```julia
-# load and instantiate a FMU
-myFMU = fmiLoad(pathToFMU)
-fmiInstantiate!(myFMU)
-
-# simulate from t=0.0s until t=10.0s and record the FMU variable named "mass.s"
-simData = fmiSimulate(myFMU, 0.0, 10.0; recordValues=["mass.s"])
-
-# plot it!
-fmiPlot(simData)
-
-# free memory
-fmiUnload(myFMU)
-```
-
-## What is currently supported in FMI.jl?
-- the full FMI 2.0.1 command set, including optional specials like getState, setState and getDirectionalDerivative
-- parameterization, simulation & plotting of CS- and ME-FMUs
-- event-handling for discontinuous ME-FMUs
-- ...
-
-## What is under development in FMI.jl?
-- FMI 3.0 and SSP 1.0 support
-- FMI Cross Checks
-- more examples
-- ...
-
-## What Platforms are supported?
-FMI.jl is tested (and testing) under Julia Versions 1.6 and *nightly* on Windows (latest) and Ubuntu (latest). Mac should work, but untested.
-
-## How to cite? Related publications?
-Tobias Thummerer, Lars Mikelsons and Josef Kircher. 2021. **NeuralFMU: towards structural integration of FMUs into neural networks.** In Martin Sjölund, Lena Buffoni, Adrian Pop and Lennart Ochel (Ed.). Proceedings of 14th Modelica Conference 2021, Linköping, Sweden, September 20-24, 2021. Linköping University Electronic Press, Linköping (Linköping Electronic Conference Proceedings ; 181), 297-306. [DOI: 10.3384/ecp21181297](https://doi.org/10.3384/ecp21181297)
-
-Tobias Thummerer, Johannes Tintenherr, Lars Mikelsons 2021 **Hybrid modeling of the human cardiovascular system using NeuralFMUs** (10th International Conference on Mathematical Modeling in Physical Sciences, Preprint, Accepted) [arXiv:2109.04880](https://arxiv.org/abs/2109.04880)
-
-## Interested in Hybrid Modelling in Julia using FMUs?
-See [FMIFlux.jl](https://github.com/ThummeTo/FMIFlux.jl).
