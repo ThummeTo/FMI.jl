@@ -15,7 +15,7 @@
 | ------- | ------ | --- |
 | <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg"> | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Logo-ubuntu_cof-orange-hex.svg/1200px-Logo-ubuntu_cof-orange-hex.svg.png" width = "80"> | <img src = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1024px-Apple_logo_black.svg.png" width = "80">|
 
-## Documentation overview
+## Documentation Overview
 1. ```Intorduction```
 2. ```Tutorials```
 3. ```Examples```
@@ -23,6 +23,9 @@
 5. ```Relted Publications```
 
 > continue to the [documentation](https://thummeto.github.io/FMI.jl/dev/)
+
+
+## Get Started
 
 ## How can I use FMI.jl?
 1. open a Julia-Command-Window, activate your prefered environment
