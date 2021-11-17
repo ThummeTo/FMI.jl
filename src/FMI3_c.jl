@@ -94,7 +94,7 @@ mutable struct fmi3ModelVariable
 
     # Constructor for not further specified ScalarVariables
     function fmi3ModelVariable(name, valueReference)
-        new(name, Cint(valueReference), datatypeVariable(), "", _local::fmi2causality, continuous::fmi2variability, calculated::fmi2initial)
+        new(name, Clonglong(valueReference), datatypeVariable(), "", _local::fmi2causality, continuous::fmi2variability)
     end
 
     # Constructor for fully specified ScalarVariable
@@ -138,27 +138,28 @@ mutable struct fmi3ModelVariable
 end
 
 mutable struct fmi3datatypeVariable
-    # # mandatory
-    # datatype::Union{Type{fmi3String}, Type{fmi3Float64}, Type{fmi3Int64}, Type{fmi3Boolean}, Type{fmi3Enum}}
-    # declaredType::fmi3String
+    # mandatory
+    datatype::Union{Type{fmi3String}, Type{fmi3Float64}, Type{fmi3Float32}, Type{fmi3Int8}, Type{fmi3UInt8}, Type{fmi3Int16}, Type{fmi3UInt16}, Type{fmi3Int32}, Type{fmi3UInt32}, Type{fmi3Int64}, Type{fmi3UInt64}, Type{fmi3Boolean}, Type{fmi3Binary}, Type{fmi3Char}, Type{fmi3Byte}, Type{fmi3Enum}}
+    
 
-    # # Optional
-    # start::Union{fmi2Integer, fmi2Real, fmi2Boolean, fmi3String, Nothing}
-    # min::Union{fmi2Integer, fmi2Real, Nothing}
-    # max::Union{fmi2Integer, fmi2Real, Nothing}
-    # quantity::Union{fmi3String, Nothing}
-    # unit::Union{fmi3String, Nothing}
-    # displayUnit::Union{fmi3String, Nothing}
-    # relativeQuantity::Union{fmi2Boolean, Nothing}
-    # nominal::Union{fmi2Real, Nothing}
-    # unbounded::Union{fmi2Boolean, Nothing}
-    # derivative::Union{Unsigned, Nothing}
-    # reinit::Union{fmi2Boolean, Nothing}
+    # Optional
+    declaredType::Union{fmi3String, Nothingdd}
+    start::Union{fmi2Integer, fmi2Real, fmi2Boolean, fmi3String, Nothing}
+    min::Union{fmi2Integer, fmi2Real, Nothing}
+    max::Union{fmi2Integer, fmi2Real, Nothing}
+    quantity::Union{fmi3String, Nothing}
+    unit::Union{fmi3String, Nothing}
+    displayUnit::Union{fmi3String, Nothing}
+    relativeQuantity::Union{fmi2Boolean, Nothing}
+    nominal::Union{fmi2Real, Nothing}
+    unbounded::Union{fmi2Boolean, Nothing}
+    derivative::Union{Unsigned, Nothing}
+    reinit::Union{fmi2Boolean, Nothing}
 
     # additional (not in spec)
-    #unknownIndex::Intger 
-    #dependencies::Array{Intger}
-    #dependenciesValueReferences::Array{fmi2ValueReference}
+    unknownIndex::Intger 
+    dependencies::Array{Intger}
+    dependenciesValueReferences::Array{fmi2ValueReference}
 
     # Constructor
     datatypeVariable() = new()

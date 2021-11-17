@@ -17,3 +17,4 @@ modelDescription.xml
 *.pdf
 *.obj
 *.fmu
+fmi3/
