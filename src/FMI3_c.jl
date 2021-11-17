@@ -28,36 +28,34 @@ const fmi3FMUstate = Ptr{Cvoid}
 const fmi3ComponentEnvironment = Ptr{Cvoid}
 const fmi3Enum = Array{Array{String}} # TODO: correct it
 
-const FMI3False = false
-const FMI3True = true
+const fmi3False = fmi3Boolean(false)
+const fmi3True = fmi3Boolean(true)
 
 # TODO docs
 @enum fmi3causality begin
-    # _parameter
-    # calculatedParameter
-    # input
-    # output
-    # _local
-    # independent
+    _parameter
+    calculatedParameter
+    input
+    output
+    _local
+    independent
     structuralParameter
 end
 
 # TODO docs
 @enum fmi3variability begin
-    # constant
-    # fixed
-    # tunable
-    # discrete
-    # continuous
-    placeholder
+    constant
+    fixed
+    tunable
+    discrete
+    continuous
 end
 
 # TODO docs
 @enum fmi3initial begin
-    # exact
-    # approx
-    # calculated
-    placeb
+    exact
+    approx
+    calculated
 end
 """
 Source: FMISpec2.0.2[p.19]: 2.1.5 Creation, Destruction and Logging of FMU Instances
@@ -75,11 +73,59 @@ end
 # TODO: Callback functions
 
 
+
+
+mutable struct fmi3datatypeVariable
+    # mandatory TODO clock
+    datatype::Union{Type{fmi3String}, Type{fmi3Float64}, Type{fmi3Float32}, Type{fmi3Int8}, Type{fmi3UInt8}, Type{fmi3Int16}, Type{fmi3UInt16}, Type{fmi3Int32}, Type{fmi3UInt32}, Type{fmi3Int64}, Type{fmi3UInt64}, Type{fmi3Boolean}, Type{fmi3Binary}, Type{fmi3Char}, Type{fmi3Byte}, Type{fmi3Enum}}
+    
+
+    # Optional
+    canHandleMultipleSet::Union{fmi3Boolean, Nothing}
+    intermediateUpdate::Union{fmi3Boolean, Nothing}
+    previous::Union{fmi3UInt32, Nothing}
+    clocks
+    declaredType::Union{fmi3String, Nothing}
+    start::Union{fmi3String, fmi3Float64, fmi3Float32, fmi3Int8, fmi3UInt8, fmi3Int16, fmi3UInt16, fmi3Int32, fmi3UInt32, fmi3Int64, fmi3UInt64, fmi3Boolean, fmi3Binary, fmi3Char, fmi3Byte, fmi3Enum, Nothing}
+    min::Union{fmi3Float64,fmi3Int32, fmi3UInt32, fmi3Int64, Nothing}
+    max::Union{fmi3Float64,fmi3Int32, fmi3UInt32, fmi3Int64, Nothing}
+    initial::Union{fmi3initial, Nothing}
+    quantity::Union{fmi3String, Nothing}
+    unit::Union{fmi3String, Nothing}
+    displayUnit::Union{fmi3String, Nothing}
+    relativeQuantity::Union{fmi3Boolean, Nothing}
+    nominal::Union{fmi3Float64, Nothing}
+    unbounded::Union{fmi3Boolean, Nothing}
+    derivative::Union{fmi3UInt32, Nothing}
+    reinit::Union{fmi3Boolean, Nothing}
+    mimeType::Union{fmi3String, Nothing}
+    maxSize::Union{fmi3UInt32, Nothing}
+
+    # # used by Clocks TODO
+    # canBeDeactivated::Union{fmi3Boolean, Nothing}
+    # priority::Union{fmi3UInt32, Nothing}
+    # intervall
+    # intervallDecimal::Union{fmi3Float32, Nothing}
+    # shiftDecimal::Union{fmi3Float32, Nothing}
+    # supportsFraction::Union{fmi3Boolean, Nothing}
+    # resolution::Union{fmi3UInt64, Nothing}
+    # intervallCounter::Union{fmi3UInt64, Nothing}
+    # shitftCounter::Union{fmi3Int32, Nothing}
+
+    # additional (not in spec)
+    unknownIndex::Integer 
+    dependencies::Array{Integer}
+    dependenciesValueReferences::Array{fmi2ValueReference}
+
+    # Constructor
+    fmi3datatypeVariable() = new()
+end
+
 mutable struct fmi3ModelVariable
     #mandatory
     name::fmi3String
     valueReference::fmi3ValueReference
-    # datatype::datatypeVariable
+    datatype::fmi3datatypeVariable
 
     # Optional
     description::fmi3String
@@ -92,18 +138,21 @@ mutable struct fmi3ModelVariable
     dependencies #::Array{fmi2Integer}
     dependenciesKind #::Array{fmi2String}
 
-    # Constructor for not further specified ScalarVariables
+    # Constructor for not further specified Model variable
     function fmi3ModelVariable(name, valueReference)
-        new(name, Clonglong(valueReference), datatypeVariable(), "", _local::fmi2causality, continuous::fmi2variability)
+        new(name, Clonglong(valueReference), fmi3datatypeVariable(), "", _local::fmi3causality, continuous::fmi3variability)
     end
 
     # Constructor for fully specified ScalarVariable
-    function fmi3ModelVariable(name, valueReference, datatype, description, causalityString, variabilityString, initialString, dependencies, dependenciesKind)
-
+    function fmi3ModelVariable(name, valueReference, type, description, causalityString, variabilityString, dependencies, dependenciesKind)
         var = continuous::fmi3variability
+        # if datatype.datatype == fmi3Float32 || datatype.datatype == fmi3Float64
+        #     var = continuous::fmi3variability
+        # else
+        #     var = discretes
+        # end
         cau = _local::fmi3causality
-        init = calculated::fmi3initial
-        #check if causality, variability and initial are correct
+        #check if causality and variability are correct
         if !occursin(variabilityString, string(instances(fmi3variability)))
             display("Error: variability not known")
         else
@@ -124,45 +173,17 @@ mutable struct fmi3ModelVariable
             end
         end
 
-        if !occursin(initialString, string(instances(fmi3initial)))
-            display("Error: initial not known")
-        else
-            for i in 0:(length(instances(fmi3initial))-1)
-                if initialString == string(fmi3initial(i))
-                    init = fmi3initial(i)
-                end
-            end
-        end
-        new(name, valueReference, datatype, description, cau, var, init, dependencies, dependenciesKind)
+        # if !occursin(initialString, string(instances(fmi3initial)))
+        #     display("Error: initial not known")
+        # else
+        #     for i in 0:(length(instances(fmi3initial))-1)
+        #         if initialString == string(fmi3initial(i))
+        #             init = fmi3initial(i)
+        #         end
+        #     end
+        # end
+        new(name, valueReference, type, description, cau, var, dependencies, dependenciesKind)
     end
-end
-
-mutable struct fmi3datatypeVariable
-    # mandatory
-    datatype::Union{Type{fmi3String}, Type{fmi3Float64}, Type{fmi3Float32}, Type{fmi3Int8}, Type{fmi3UInt8}, Type{fmi3Int16}, Type{fmi3UInt16}, Type{fmi3Int32}, Type{fmi3UInt32}, Type{fmi3Int64}, Type{fmi3UInt64}, Type{fmi3Boolean}, Type{fmi3Binary}, Type{fmi3Char}, Type{fmi3Byte}, Type{fmi3Enum}}
-    
-
-    # Optional
-    declaredType::Union{fmi3String, Nothingdd}
-    start::Union{fmi2Integer, fmi2Real, fmi2Boolean, fmi3String, Nothing}
-    min::Union{fmi2Integer, fmi2Real, Nothing}
-    max::Union{fmi2Integer, fmi2Real, Nothing}
-    quantity::Union{fmi3String, Nothing}
-    unit::Union{fmi3String, Nothing}
-    displayUnit::Union{fmi3String, Nothing}
-    relativeQuantity::Union{fmi2Boolean, Nothing}
-    nominal::Union{fmi2Real, Nothing}
-    unbounded::Union{fmi2Boolean, Nothing}
-    derivative::Union{Unsigned, Nothing}
-    reinit::Union{fmi2Boolean, Nothing}
-
-    # additional (not in spec)
-    unknownIndex::Intger 
-    dependencies::Array{Intger}
-    dependenciesValueReferences::Array{fmi2ValueReference}
-
-    # Constructor
-    datatypeVariable() = new()
 end
 
 # TODO: Model description
@@ -170,11 +191,10 @@ mutable struct fmi3ModelDescription
     # FMI model description
     fmiVersion::String
     modelName::String
-    # guid::String
     generationTool::String
     generationDateAndTime::String
     variableNamingConvention::String
-    instantiationToken::String
+    instantiationToken::String  # replaces GUID
 
     CSmodelIdentifier::String
     CScanHandleVariableCommunicationStepSize::Bool

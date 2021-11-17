@@ -45,7 +45,6 @@ function fmi3ReadModelDescription(pathToModellDescription::String)
 
     md.fmiVersion = root["fmiVersion"]
     md.modelName = root["modelName"]
-    # md.guid = root["guid"]
     md.instantiationToken = root["instantiationToken"]
     md.isModelExchange = false
     md.isCoSimulation = false
@@ -125,35 +124,35 @@ end
 """
 Returns the tag 'modelName' from the model description.
 """
-function fmi2GetModelName(md::fmi3ModelDescription)#, escape::Bool = true)
+function fmi3GetModelName(md::fmi3ModelDescription)#, escape::Bool = true)
     md.modelName
 end
 
 """
-Returns the tag 'guid' from the model description.
+Returns the tag 'instantionToken' from the model description.
 """
-function fmi2GetGUID(md::fmi3ModelDescription)
-    md.guid
+function fmi3GetInstantiationToken(md::fmi3ModelDescription)
+    md.instantiationToken
 end
 
 """
 Returns the tag 'generationtool' from the model description.
 """
-function fmi2GetGenerationTool(md::fmi3ModelDescription)
+function fmi3GetGenerationTool(md::fmi3ModelDescription)
     md.generationTool
 end
 
 """
 Returns the tag 'generationdateandtime' from the model description.
 """
-function fmi2GetGenerationDateAndTime(md::fmi3ModelDescription)
+function fmi3GetGenerationDateAndTime(md::fmi3ModelDescription)
     md.generationDateAndTime
 end
 
 """
 Returns the tag 'varaiblenamingconvention' from the model description.
 """
-function fmi2GetVariableNamingConvention(md::fmi3ModelDescription)
+function fmi3GetVariableNamingConvention(md::fmi3ModelDescription)
     md.variableNamingConvention
 end
 
@@ -238,7 +237,7 @@ end
 # end
 
 # Returns the indices of the state derivatives.
-function getDerivativeIndices(node::EzXML.Node)
+function fmi3getDerivativeIndices(node::EzXML.Node)
     indices = []
     for element in eachelement(node)
         if element.name == "Derivatives"
@@ -288,7 +287,7 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi3ModelDescription, deriva
         description = ""
         causality = ""
         variability = ""
-        initial = ""
+        # initial = ""
 
         if !(ValueReference in md.valueReferences)
             push!(md.valueReferences, ValueReference)
@@ -303,10 +302,10 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi3ModelDescription, deriva
         if haskey(node, "variability")
             variability = node["variability"]
         end
-        if haskey(node, "initial")
-            initial = node["initial"]
-        end
-        # datatype = setDatatypeVariables(node, md) #TODO bis hierhin
+        # if haskey(node, "initial")
+        #     initial = node["initial"]
+        # end
+        datatype = fmi3setDatatypeVariables(node, md) #TODO bis hierhin
 
         dependencies = []
         dependenciesKind = []
@@ -322,7 +321,7 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi3ModelDescription, deriva
             end
         end
 
-        modelVariables[index] = fmi3ScalarVariable(name, ValueReference, datatype, description, causality, variability, initial, dependencies, dependenciesKind)
+        modelVariables[index] = fmi3ModelVariable(name, ValueReference, datatype, description, causality, variability, dependencies, dependenciesKind)
 
         if causality == "output"
             push!(md.outputValueReferences, ValueReference)
@@ -390,7 +389,7 @@ end
 # end
 
 # Parses a Bool value represented by a string.
-function parseBoolean(s::Union{String, SubString{String}}; onfail=nothing)
+function fmi3parseBoolean(s::Union{String, SubString{String}}; onfail=nothing)
     if s == "true"
         return true
     elseif s == "false"
@@ -401,16 +400,16 @@ function parseBoolean(s::Union{String, SubString{String}}; onfail=nothing)
     end
 end
 
-function parseNodeBoolean(node, key; onfail=nothing)
+function fmi3parseNodeBoolean(node, key; onfail=nothing)
     if haskey(node, key)
-        return parseBoolean(node[key]; onfail=onfail)
+        return fmi3parseBoolean(node[key]; onfail=onfail)
     else
         return onfail
     end
 end
 
 # Parses an Integer value represented by a string.
-function parseInteger(s::Union{String, SubString{String}}; onfail=nothing)
+function fmi3parseInteger(s::Union{String, SubString{String}}; onfail=nothing)
     if onfail == nothing
         return parse(Int, s)
     else
@@ -422,15 +421,15 @@ function parseInteger(s::Union{String, SubString{String}}; onfail=nothing)
     end
 end
 
-function parseNodeInteger(node, key; onfail=nothing)
+function fmi3parseNodeInteger(node, key; onfail=nothing)
     if haskey(node, key)
-        return parseInteger(node[key]; onfail=onfail)
+        return fmi3parseInteger(node[key]; onfail=onfail)
     else
         return onfail
     end
 end
 
-function parseNodeString(node, key; onfail=nothing)
+function fmi3parseNodeString(node, key; onfail=nothing)
     if haskey(node, key)
         return node[key]
     else
@@ -440,104 +439,192 @@ end
 
 # Parses a fmi2Boolean value represented by a string.
 function parseFMI3Boolean(s::Union{String, SubString{String}})
-    if parseBoolean(s)
+    if fmi3parseBoolean(s)
         return fmi3True
     else
         return fmi3False
     end
 end
 
-# # set the datatype and attributes of an model variable
-# function setDatatypeVariables(node::EzXML.Node, md::fmi2ModelDescription)
-#     type = datatypeVariable()
-#     typenode = node.firstelement
-#     typename = typenode.name
-#     type.start = nothing
-#     type.min = nothing
-#     type.max = nothing
-#     type.quantity = nothing
-#     type.unit = nothing
-#     type.displayUnit = nothing
-#     type.relativeQuantity = nothing
-#     type.nominal = nothing
-#     type.unbounded = nothing
-#     type.derivative = nothing
-#     type.reinit = nothing
-#     if typename == "Real"
-#         type.datatype = fmi2Real
-#     elseif typename == "String"
-#         type.datatype = fmi2String
-#     elseif typename == "Boolean"
-#         type.datatype = fmi2Boolean
-#     elseif typename == "Integer"
-#         type.datatype = fmi2Integer
-#     else
-#         type.datatype = fmi2Enum
-#     end
+# set the datatype and attributes of an model variable
+function fmi3setDatatypeVariables(node::EzXML.Node, md::fmi3ModelDescription)
+    type = fmi3datatypeVariable()
+    typename = node.name
+    type.canHandleMultipleSet = nothing
+    type.intermediateUpdate = nothing
+    type.previous = nothing
+    type.clocks = nothing
+    type.declaredType = nothing
+    type.start = nothing
+    type.min = nothing
+    type.max = nothing
+    type.initial = nothing
+    type.quantity = nothing
+    type.unit = nothing
+    type.displayUnit = nothing
+    type.relativeQuantity = nothing
+    type.nominal = nothing
+    type.unbounded = nothing
+    type.derivative = nothing
+    type.reinit = nothing
+    type.mimeType = nothing
+    type.maxSize = nothing
 
-#     if haskey(typenode, "declaredType")
-#         type.declaredType = typenode["declaredType"]
-#     end
+    if typename == "Float32"
+        type.datatype = fmi3Float32
+    elseif typename == "Float64"
+        type.datatype = fmi3Float64
+    elseif typename == "Int8"
+        type.datatype = fmi3Int8
+    elseif typename == "UInt8"
+        type.datatype = fmi3UInt8
+    elseif typename == "Int16"
+        type.datatype = fmi3Int16
+    elseif typename == "UInt16"
+        type.datatype = fmi3UInt16
+    elseif typename == "Int32"
+        type.datatype = fmi3Int32
+    elseif typename == "UInt32"
+        type.datatype = fmi3UInt32
+    elseif typename == "Int64"
+        type.datatype = fmi3Int64
+    elseif typename == "UInt64"
+        type.datatype = fmi3UInt64
+    elseif typename == "Boolean"
+        type.datatype = fmi3Boolean
+    elseif typename == "Binary" # nicht sicher wie diese Datentypen in der modelDescription ausschauen
+        type.datatype = fmi3Binary
+    elseif typename == "Char"
+        type.datatype = fmi3Char
+    elseif typename == "String"
+        type.datatype = fmi3String
+    elseif typename == "Byte"
+        type.datatype = fmi3Byte
+    elseif typename == "Enum"
+        type.datatype = fmi3Enum
+    else
+        @warn "Datatype for the variable $(node["name"]) is unknown!"
+    end
 
-#     if haskey(typenode, "start")
-#         if typename == "Real"
-#             type.start = parse(fmi2Real, typenode["start"])
-#         elseif typename == "Integer"
-#             type.start = parse(fmi2Integer, typenode["start"])
-#         elseif typename == "Boolean"
-#             type.start = parseFMI2Boolean(typenode["start"])
-#         elseif typename == "Enumeration"
-#             for i in 1:length(md.enumerations)
-#                 if type.declaredType == md.enumerations[i][1] # identify the enum by the name
-#                     type.start = md.enumerations[i][1 + parse(Int, typenode["start"])] # find the enum value and set it
-#                 end
-#             end
-#         else
-#             @warn "setDatatypeVariables(...) unimplemented start value type $typename"
-#             type.start = typenode["start"]
-#         end
-#     end
+    if haskey(node, "declaredType")
+        type.declaredType = node["declaredType"]
+    end
 
-#     if haskey(typenode, "min") && (type.datatype == fmi2Real || type.datatype == fmi2Integer || type.datatype == fmi2Enum)
-#         if type.datatype == fmi2Real
-#             type.min = parse(fmi2Real, typenode["min"])
-#         else
-#             type.min = parse(fmi2Integer, typenode["min"])
-#         end
-#     end
-#     if haskey(typenode, "max") && (type.datatype == fmi2Real || type.datatype == fmi2Integer || type.datatype == fmi2Enum)
-#         if type.datatype == fmi2Real
-#             type.max = parse(fmi2Real, typenode["max"])
-#         elseif type.datatype == fmi2Integer
-#             type.max = parse(fmi2Integer, typenode["max"])
-#         end
-#     end
-#     if haskey(typenode, "quantity") && (type.datatype == fmi2Real || type.datatype == fmi2Integer || type.datatype == fmi2Enum)
-#         type.quantity = typenode["quantity"]
-#     end
-#     if haskey(typenode, "unit") && type.datatype == fmi2Real
-#         type.unit = typenode["unit"]
-#     end
-#     if haskey(typenode, "displayUnit") && type.datatype == fmi2Real
-#         type.displayUnit = typenode["displayUnit"]
-#     end
-#     if haskey(typenode, "relativeQuantity") && type.datatype == fmi2Real
-#         type.relativeQuantity = convert(fmi2Boolean, parse(Bool, typenode["relativeQuantity"]))
-#     end
-#     if haskey(typenode, "nominal") && type.datatype == fmi2Real
-#         type.nominal = parse(fmi2Real, typenode["nominal"])
-#     end
-#     if haskey(typenode, "unbounded") && type.datatype == fmi2Real
-#         type.unbounded = parse(fmi2Boolean, typenode["unbounded"])
-#     end
-#     if haskey(typenode, "derivative") && type.datatype == fmi2Real
-#         type.derivative = parse(fmi2Integer, typenode["derivative"])
-#     end
-#     if haskey(typenode, "reinit") && type.datatype == fmi2Real
-#         type.reinit = parseFMI2Boolean(typenode["reinit"])
-#     end
-#     type
-# end
+    if haskey(node, "initial")
+        if !occursin(node["initial"], string(instances(fmi3initial)))
+            display("Error: initial not known")
+        else
+            for i in 0:(length(instances(fmi3initial))-1)
+                if node["initial"] == string(fmi3initial(i))
+                    type.initial = fmi3initial(i)
+                end
+            end
+        end
+    end
+
+    if haskey(node, "start")
+        if typename == "Float32"
+            type.start = parse(fmi3Float32, node["start"])
+        elseif typename == "Float64"
+            type.start = parse(fmi3Float32, node["start"])
+        elseif typename == "Int8"
+            type.start = parse(fmi3Int8, node["start"])
+        elseif typename == "UInt8"
+            type.start = parse(fmi3UInt8, node["start"])
+        elseif typename == "Int16"
+            type.start = parse(fmi3Int16, node["start"])
+        elseif typename == "UInt16"
+            type.start = parse(fmi3UInt16, node["start"])
+        elseif typename == "Int32"
+            type.start = parse(fmi3Int32, node["start"])
+        elseif typename == "UInt32"
+            type.start = parse(fmi3UInt32, node["start"])
+        elseif typename == "Int64"
+            type.start = parse(fmi3Int64, node["start"])
+        elseif typename == "UInt64"
+            type.start = parse(fmi3UInt64, node["start"]) 
+        elseif typename == "Boolean"
+            type.start = parse(fmi3Boolean, node["start"])
+        elseif typename == "Binary"
+            type.start = parse(fmi3Binary, node["start"])
+        elseif typename == "Char"
+            type.start = parse(fmi3Char, node["start"])
+        elseif typename == "String"
+            type.start = parse(fmi3String, node["start"])
+        elseif typename == "Byte"
+            type.start = parse(fmi3Byte, node["start"])
+        elseif typename == "Enum"
+            for i in 1:length(md.enumerations)
+                if type.declaredType == md.enumerations[i][1] # identify the enum by the name
+                    type.start = md.enumerations[i][1 + parse(Int, node["start"])] # find the enum value and set it
+                end
+            end
+        else
+            @warn "setDatatypeVariables(...) unimplemented start value type $typename"
+            type.start = node["start"]
+        end
+    end
+
+    if haskey(node, "min") && (type.datatype != fmi3Binary || type.datatype != fmiBoolean)
+        if type.datatype == fmi3Float32 || type.datatype == fmi3Float64
+            type.min = parse(fmi3Float64, node["min"])
+        elseif type.datatype == fmi3Enum
+            type.min = parse(fmi3Int64, node["min"])
+        elseif type.datatype == fmi3Int8 || type.datatype == fmi3Int16 || type.datatype == fmi3Int32 || type.datatype == fmi3Int64
+            type.min = parse(fmi3Int32, node["min"])
+        else
+            type.min = parse(fmi3UInt32, node["min"])
+        end
+    end
+    if haskey(node, "max") && (type.datatype != fmi3Binary || type.datatype != fmiBoolean)
+        if type.datatype == fmi3Float32 || type.datatype == fmi3Float64
+            type.max = parse(fmi3Float64, node["max"])
+        elseif type.datatype == fmi3Enum
+            type.max = parse(fmi3Int64, node["max"])
+        elseif type.datatype == fmi3Int8 || type.datatype == fmi3Int16 || type.datatype == fmi3Int32 || type.datatype == fmi3Int64
+            type.max = parse(fmi3Int32, node["max"])
+        else
+            type.max = parse(fmi3UInt32, node["max"])
+        end
+    end
+    if haskey(node, "quantity") && (type.datatype != Boolean || type.datatype != fmi3Binary)
+        type.quantity = node["quantity"]
+    end
+    if haskey(node, "unit") && (type.datatype == fmi3Float32 || type.datatype == fmi3Float64)
+        type.unit = node["unit"]
+    end
+    if haskey(node, "displayUnit") && (type.datatype == fmi3Float32 || type.datatype == fmi3Float64)
+        type.displayUnit = node["displayUnit"]
+    end
+    if haskey(node, "relativeQuantity") && (type.datatype == fmi3Float32 || type.datatype == fmi3Float64)
+        type.relativeQuantity = parseFMI3Boolean(node["relativeQuantity"])
+    else
+        type.relativeQuantity = fmi3False
+    end
+    if haskey(node, "nominal") && (type.datatype == fmi3Float32 || type.datatype == fmi3Float64)
+        type.nominal = parse(fmi3Float64, node["nominal"])
+    end
+    if haskey(node, "unbounded") && (type.datatype == fmi3Float32 || type.datatype == fmi3Float64)
+        type.unbounded = parseFMI3Boolean(node["unbounded"])
+    else
+        type.unbounded = fmi3False
+    end
+    if haskey(node, "derivative") && (type.datatype == fmi3Float32 || type.datatype == fmi3Float64)
+        type.derivative = parse(fmi3UInt32, node["derivative"])
+    end
+    if haskey(node, "reinit") && (type.datatype == fmi3Float32 || type.datatype == fmi3Float64)
+        type.reinit = parseFMI3Boolean(node["reinit"])
+    end
+    if haskey(node, "mimeType") && type.datatype == fmi3Binary
+        type.mimeType = node["mimeType"]
+    else
+        type.mimeType = "application/octet"
+    end
+    if haskey(node, "maxSize") && type.datatype == fmi3Binary
+        type.maxSize = parse(fmi3UInt32, node["maxSize"])
+    end
+    type
+end
 
 #=
 Read all enumerations from the modeldescription and store them in a matrix. First entries are the enum names
@@ -546,7 +633,7 @@ Example:
 "enum1name" "value1"    "value2"
 "enum2name" "value1"    "value2"
 =#
-function createEnum(node::EzXML.Node)
+function fmi3createEnum(node::EzXML.Node)
     enum = 1
     idx = 1
     enumerations = []
