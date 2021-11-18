@@ -582,8 +582,8 @@ end
 """
 Set a time instant
 """
-function fmiSetTime(fmu2::fmi2Struct, time::Real)
-    fmi2SetTime(fmu, time)
+function fmiSetTime(c::fmi2Struct, time::Real)
+    fmi2SetTime(c, time)
 end
 
 """
@@ -596,8 +596,8 @@ end
 """
 The model enters Event Mode
 """
-function fmi2EnterEventMode(fmu2::fmi2Struct)
-    fmi2EnterEventMode(fmu2)
+function fmi2EnterEventMode(c::fmi2Struct)
+    fmi2EnterEventMode(c)
 end
 
 """

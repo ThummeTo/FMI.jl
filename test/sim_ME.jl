@@ -34,4 +34,6 @@ solution = fmiSimulateME(fmuStruct, t_start, t_stop)
 @test solution.u[1] == [0.5, 0.0]
 @test sum(abs.(solution.u[end] - [1.06736, -1.03552e-10])) < 0.01
 
+# ToDo: Add test with time-dependent FMU
+
 fmiUnload(myFMU)
