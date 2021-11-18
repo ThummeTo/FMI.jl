@@ -23,17 +23,87 @@ mutable struct FMU3 <: FMU
     modelDescription::fmi3ModelDescription
 
     type::fmi3Type
-    # callbackFunctions::fmi3CallbackFunctions
+    callbackFunctions::fmi3CallbackFunctions
+    instanceEnvironment::fmi3InstanceEnvironment
     components::Array{fmi3Component}
 
     # paths of ziped and unziped FMU folders
     path::String
     zipPath::String
-    # Constructor
-    FMU3() = new()
+
+    # c-functions
+    cInstantiateModelExchange::Ptr{Cvoid}
+    cGetTypesPlatform::Ptr{Cvoid}
+    cGetVersion::Ptr{Cvoid}
+    cFreeInstance::Ptr{Cvoid}
+    cSetDebugLogging::Ptr{Cvoid}
+    cSetupExperiment::Ptr{Cvoid}
+    cEnterInitializationMode::Ptr{Cvoid}
+    cExitInitializationMode::Ptr{Cvoid}
+    cTerminate::Ptr{Cvoid}
+    cReset::Ptr{Cvoid}
+    cGetReal::Ptr{Cvoid}
+    cSetReal::Ptr{Cvoid}
+    cGetInteger::Ptr{Cvoid}
+    cSetInteger::Ptr{Cvoid}
+    cGetBoolean::Ptr{Cvoid}
+    cSetBoolean::Ptr{Cvoid}
+    cGetString::Ptr{Cvoid}
+    cSetString::Ptr{Cvoid}
+    cGetFMUstate::Ptr{Cvoid}
+    cSetFMUstate::Ptr{Cvoid}
+    cFreeFMUstate::Ptr{Cvoid}
+    cSerializedFMUstateSize::Ptr{Cvoid}
+    cSerializeFMUstate::Ptr{Cvoid}
+    cDeSerializeFMUstate::Ptr{Cvoid}
+    cGetDirectionalDerivative::Ptr{Cvoid}
+
+    # Co Simulation function calls
+    cSetRealInputDerivatives::Ptr{Cvoid}
+    cGetRealOutputDerivatives::Ptr{Cvoid}
+    cDoStep::Ptr{Cvoid}
+    cCancelStep::Ptr{Cvoid}
+    cGetStatus::Ptr{Cvoid}
+    cGetRealStatus::Ptr{Cvoid}
+    cGetIntegerStatus::Ptr{Cvoid}
+    cGetBooleanStatus::Ptr{Cvoid}
+    cGetStringStatus::Ptr{Cvoid}
+
+    # Model Exchange function calls
+    cEnterContinuousTimeMode::Ptr{Cvoid}
+    cGetContinuousStates::Ptr{Cvoid}
+    cGetDerivatives::Ptr{Cvoid}
+    cSetTime::Ptr{Cvoid}
+    cSetContinuousStates::Ptr{Cvoid}
+    cCompletedIntegratorStep::Ptr{Cvoid}
+    cEnterEventMode::Ptr{Cvoid}
+    cNewDiscreteStates::Ptr{Cvoid}
+    cGetEventIndicators::Ptr{Cvoid}
+    cGetNominalsOfContinuousStates::Ptr{Cvoid}
 
     # c-libraries
     libHandle::Ptr{Nothing}
+
+    # START: experimental section (to FMIFlux.jl)
+    dependencies::Matrix{fmi2Dependency}
+
+    t::Real         # current time
+    next_t::Real    # next time
+
+    x       # current state
+    next_x  # next state
+
+    dx      # current state derivative
+    simulationResult
+
+    jac_dxy_x::Matrix{fmi2Real}
+    jac_dxy_u::Matrix{fmi2Real}
+    jac_x::Array{fmi2Real}
+    jac_t::fmi2Real
+    # END: experimental section
+
+    # Constructor
+    FMU3() = new()
 
 end
 
@@ -61,7 +131,7 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
     pathToModelDescription = joinpath(fmu.path, "modelDescription.xml")
 
     # parse modelDescription.xml
-    fmu.modelDescription = fmi3ReadModelDescription(pathToModelDescription) # TODO
+    fmu.modelDescription = fmi3ReadModelDescription(pathToModelDescription) # TODO Matrix mit Dimensions
     fmu.modelName = fmu.modelDescription.modelName
     fmu.instanceName = fmu.modelDescription.modelName
     fmuName = fmi3GetModelIdentifier(fmu.modelDescription) # tmpName[length(tmpName)] TODO
@@ -133,7 +203,7 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
     @info "fmi3Load(...): FMU resources location is `$(fmu.fmuResourceLocation)`"
 
     # # retrieve functions TODO check new Names and availability in FMI3
-    # fmu.cInstantiate                  = dlsym(fmu.libHandle, :fmi2Instantiate)
+    fmu.cInstantiateModelExchange                  = dlsym(fmu.libHandle, :fmi3InstantiateModelExchange)
     # fmu.cGetTypesPlatform             = dlsym(fmu.libHandle, :fmi2GetTypesPlatform)
     # fmu.cGetVersion                   = dlsym(fmu.libHandle, :fmi2GetVersion)
     # fmu.cFreeInstance                 = dlsym(fmu.libHandle, :fmi2FreeInstance)
@@ -207,6 +277,45 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
 
     fmu
 end
+
+# wrapper functions on the model description
+function fmi3GetModelName(fmu::FMU3)
+    fmi3GetModelName(fmu.modelDescription)
+end
+function fmi3GetInstantiationToken(fmu::FMU3)
+    fmi3GetInstantiationToken(fmu.modelDescription)
+end
+function fmi3GetGenerationTool(fmu::FMU3)
+    fmi3GetGenerationTool(fmu.modelDescription)
+end
+function fmi3GetGenerationDateAndTime(fmu::FMU3)
+    fmi3GetGenerationDateAndTime(fmu.modelDescription)
+end
+function fmi3GetVariableNamingConvention(fmu::FMU3)
+    fmi3GetVariableNamingConvention(fmu.modelDescription)
+end
+function fmi3GetNumberOfEventIndicators(fmu::FMU3)
+    fmi3GetNumberOfEventIndicators(fmu.modelDescription)
+end
+
+function fmi3CanGetSetState(fmu::FMU3)
+    fmi3CanGetSetState(fmu.modelDescription)
+end
+function fmi3CanSerializeFMUstate(fmu::FMU3)
+    fmi3CanSerializeFMUstate(fmu.modelDescription)
+end
+function fmi3ProvidesDirectionalDerivatives(fmu::FMU3)
+    fmi3ProvidesDirectionalDerivatives(fmu.modelDescription)
+end
+function fmi3ProvidesAdjointDerivatives(fmu::FMU3)
+    fmi3ProvidesAdjointDerivatives(fmu.modelDescription)
+end
+function fmi3IsCoSimulation(fmu::FMU3)
+    fmi3IsCoSimulation(fmu.modelDescription)
+end
+function fmi3IsModelExchange(fmu::FMU3)
+    fmi3IsModelExchange(fmu.modelDescription)
+end
 """
 Create a copy of the .fmu file as a .zip folder and unzips it.
 Returns the paths to the zipped and unzipped folders.
@@ -251,7 +360,7 @@ function fmi3Unzip(pathToFMU::String; unpackPath=nothing)
             if endswith(f.name,"/") || endswith(f.name,"\\")
                 mkpath(fileAbsPath) # mkdir(fileAbsPath)
 
-                @assert isdir(fileAbsPath) ["fmi2Unzip(...): Can't create directory `$(f.name)` at `$(fileAbsPath)`."]
+                @assert isdir(fileAbsPath) ["fmi3Unzip(...): Can't create directory `$(f.name)` at `$(fileAbsPath)`."]
             else
                 # create directory if not forced by zip file folder
                 mkpath(dirname(fileAbsPath))
@@ -281,4 +390,60 @@ function fmi3VariableDependsOnVariable(fmu::FMU2, vr1::fmi2ValueReference, vr2::
     i1 = fmu.modelDescription.valueReferenceIndicies[vr1]
     i2 = fmu.modelDescription.valueReferenceIndicies[vr2]
     return fmi2GetDependencies(fmu)[i1, i2]
+end
+
+
+"""
+Unload a FMU.
+
+Free the allocated memory, close the binaries and remove temporary zip and unziped FMU model description.
+"""
+function fmi3Unload(fmu::FMU3, cleanUp::Bool = true)
+
+    while length(fmu.components) > 0
+        fmi3FreeInstance!(fmu.components[end])
+    end
+
+    dlclose(fmu.libHandle)
+
+    # the components are removed from the component list via call to fmi2FreeInstance!
+    @assert length(fmu.components) == 0 "fmi3Unload(...): Failure during deleting components, $(length(fmu.components)) remaining in stack."
+
+    if cleanUp
+        try
+            rm(fmu.path; recursive = true, force = true)
+            rm(fmu.zipPath; recursive = true, force = true)
+        catch e
+            @warn "Cannot delete unpacked data on disc. Maybe some files are opened in another application."
+        end
+    end
+end
+
+"""
+TODO: FMI specification reference.
+
+Create a new instance of the given fmu, adds a logger if logginOn == true.
+
+Returns the instance of a new FMU component.
+
+For more information call ?fmi2Instantiate
+"""
+function fmi3InstantiateModelExchange!(fmu::FMU3; visible::Bool = false, loggingOn::Bool = false)
+
+    ptrLogger = @cfunction(fmi3CallbackLogMessage, Cvoid, (Ptr{Cvoid}, Ptr{Cchar}, Cuint, Ptr{Cchar}, Ptr{Cchar}))
+    # ptrAllocateMemory = @cfunction(cbAllocateMemory, Ptr{Cvoid}, (Csize_t, Csize_t))
+    # ptrFreeMemory = @cfunction(cbFreeMemory, Cvoid, (Ptr{Cvoid},))
+    # ptrStepFinished = C_NULL
+    fmu.callbackFunctions = fmi3CallbackFunctions(ptrLogger) #, ptrAllocateMemory, ptrFreeMemory, ptrStepFinished, C_NULL)
+
+    compAddr = fmi3InstantiateModelExchange(fmu.cInstantiateModelExchange, fmu.instanceName, fmu.modelDescription.instantiationToken, fmu.fmuResourceLocation, fmi2Boolean(visible), fmi2Boolean(loggingOn), fmu.instanceEnvironment, fmu.callbackFunctions)
+
+    if compAddr == Ptr{Cvoid}(C_NULL)
+        @error "fmi2Instantiate!(...): Instantiation failed!"
+        return nothing
+    end
+
+    component = fmi3Component(compAddr, fmu)
+    push!(fmu.components, component)
+    component
 end

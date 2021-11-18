@@ -176,65 +176,80 @@ end
 #     return false
 # end
 
-# """
-# Returns the tag 'modelIdentifier' from CS or ME section.
-# """
-# function fmi2GetModelIdentifier(md::fmi2ModelDescription)
-#     if fmi2IsCoSimulation(md)
-#         return md.CSmodelIdentifier
-#     elseif fmi2IsModelExchange(md)
-#         return md.MEmodelIdentifier
-#     else
-#         @assert false "fmi2GetModelName(...): FMU does not support ME or CS!"
-#     end
-# end
+"""
+Returns the tag 'modelIdentifier' from CS or ME section.
+"""
+function fmi3GetModelIdentifier(md::fmi3ModelDescription)
+    if fmi3IsCoSimulation(md)
+        return md.CSmodelIdentifier
+    elseif fmi3IsModelExchange(md)
+        return md.MEmodelIdentifier
+    else
+        @assert false "fmi3GetModelName(...): FMU does not support ME or CS!"
+    end
+end
 
-# """
-# Returns true, if the FMU supports the getting/setting of states
-# """
-# function fmi2CanGetSetState(md::fmi2ModelDescription)
-#     if md.CScanGetAndSetFMUstate || md.MEcanGetAndSetFMUstate
-#         return true
-#     else
-#         return false
-#     end
-# end
+"""
+Returns true, if the FMU supports the getting/setting of states
+"""
+function fmi3CanGetSetState(md::fmi3ModelDescription)
+    if md.CScanGetAndSetFMUstate || md.MEcanGetAndSetFMUstate
+        return true
+    else
+        return false
+    end
+end
 
-# """
-# Returns true, if the FMU state can be serialized
-# """
-# function fmi2CanSerializeFMUstate(md::fmi2ModelDescription)
-#     if md.CScanSerializeFMUstate || md.MEcanSerializeFMUstate
-#         return true
-#     else
-#         return false
-#     end
-# end
+"""
+Returns true, if the FMU state can be serialized
+"""
+function fmi3CanSerializeFMUstate(md::fmi3ModelDescription)
+    if md.CScanSerializeFMUstate || md.MEcanSerializeFMUstate
+        return true
+    else
+        return false
+    end
+end
 
-# """
-# Returns true, if the FMU provides directional derivatives
-# """
-# function fmi2ProvidesDirectionalDerivative(md::fmi2ModelDescription)
-#     if md.CSprovidesDirectionalDerivative || md.MEprovidesDirectionalDerivative
-#         return true
-#     else
-#         return false
-#     end
-# end
+"""
+Returns true, if the FMU provides directional derivatives
+"""
+function fmi3ProvidesDirectionalDerivatives(md::fmi3ModelDescription)
+    if md.CSprovidesDirectionalDerivatives || md.MEprovidesDirectionalDerivatives
+        return true
+    else
+        return false
+    end
+end
 
-# """
-# Returns true, if the FMU supports co simulation
-# """
-# function fmi2IsCoSimulation(md::fmi2ModelDescription)
-#     md.isCoSimulation
-# end
+"""
+Returns true, if the FMU provides adjoint derivatives
+"""
+function fmi3ProvidesAdjointDerivatives(md::fmi3ModelDescription)
+    if md.CSproivdesAdjointDerivatives || md.MEprovidesAdjointDerivatives
+        return true
+    else
+        return false
+    end
+end
 
-# """
-# Returns true, if the FMU supports model exchange
-# """
-# function fmi2IsModelExchange(md::fmi2ModelDescription)
-#     md.isModelExchange
-# end
+"""
+Returns true, if the FMU supports co simulation
+"""
+function fmi3IsCoSimulation(md::fmi3ModelDescription)
+    md.isCoSimulation
+end
+
+"""
+Returns true, if the FMU supports model exchange
+"""
+function fmi3IsModelExchange(md::fmi3ModelDescription)
+    md.isModelExchange
+end
+
+function fmi3IsScheduledExecution(md::fmi3ModelDescription)
+    md.isScheduledExecution
+end
 
 # Returns the indices of the state derivatives.
 function fmi3getDerivativeIndices(node::EzXML.Node)
@@ -544,9 +559,9 @@ function fmi3setDatatypeVariables(node::EzXML.Node, md::fmi3ModelDescription)
         elseif typename == "UInt64"
             type.start = parse(fmi3UInt64, node["start"]) 
         elseif typename == "Boolean"
-            type.start = parse(fmi3Boolean, node["start"])
+            type.start = parseFMI3Boolean(node["start"])
         elseif typename == "Binary"
-            type.start = parse(fmi3Binary, node["start"])
+            type.start = pointer(node["start"])
         elseif typename == "Char"
             type.start = parse(fmi3Char, node["start"])
         elseif typename == "String"

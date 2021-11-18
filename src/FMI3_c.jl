@@ -25,7 +25,7 @@ const fmi3Byte = Cuchar
 const fmi3Binary = Ptr{fmi3Byte}
 const fmi3ValueReference = Cint
 const fmi3FMUstate = Ptr{Cvoid}
-const fmi3ComponentEnvironment = Ptr{Cvoid}
+const fmi3InstanceEnvironment = Ptr{Cvoid}
 const fmi3Enum = Array{Array{String}} # TODO: correct it
 
 const fmi3False = fmi3Boolean(false)
@@ -71,7 +71,71 @@ Argument fmuType defines the type of the FMU:
 end
 
 # TODO: Callback functions
+"""
+Source: FMISpec2.0.2[p.19-22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
 
+The struct contains pointers to functions provided by the environment to be used by the FMU. It is not allowed to change these functions between fmi2Instantiate(..) and fmi2Terminate(..) calls. Additionally, a pointer to the environment is provided (componentEnvironment) that needs to be passed to the “logger” function, in order that the logger function can utilize data from the environment, such as mapping a valueReference to a string. In the unlikely case that fmi2Component is also needed in the logger, it has to be passed via argument componentEnvironment. Argument componentEnvironment may be a null pointer. The componentEnvironment pointer is also passed to the stepFinished(..) function in order that the environment can provide an efficient way to identify the slave that called stepFinished(..).
+"""
+mutable struct fmi3CallbackFunctions
+    logger::Ptr{Cvoid}
+end
+
+"""
+Source: FMISpec2.0.2[p.21]: 2.1.5 Creation, Destruction and Logging of FMU Instances
+
+Function that is called in the FMU, usually if an fmi2XXX function, does not behave as desired. If “logger” is called with “status = fmi2OK”, then the message is a pure information message. “instanceName” is the instance name of the model that calls this function. “category” is the category of the message. The meaning of “category” is defined by the modeling environment that generated the FMU. Depending on this modeling environment, none, some or all allowed values of “category” for this FMU are defined in the modelDescription.xml file via element “<fmiModelDescription><LogCategories>”, see section 2.2.4. Only messages are provided by function logger that have a category according to a call to fmi2SetDebugLogging (see below). Argument “message” is provided in the same way and with the same format control as in function “printf” from the C standard library. [Typically, this function prints the message and stores it optionally in a log file.]
+"""
+function fmi3CallbackLogMessage(componentEnvironment::Ptr{Cvoid},
+            status::Cuint,
+            category::Ptr{Cchar},
+            message::Ptr{Cchar})
+    _message = unsafe_string(message)
+    _category = unsafe_string(category)
+    _status = fmi2StatusString(status)
+    _instanceName = unsafe_string(instanceName)
+
+    if status == Integer(fmi2OK)
+        @info "[$_status][$_category]: $_message"
+    elseif status == Integer(fmi2Warning)
+        @warn "[$_status][$_category]: $_message"
+    else
+        @error "[$_status][$_category]: $_message"
+    end
+
+    nothing
+end
+
+# """
+# Source: FMISpec2.0.2[p.21-22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
+
+# Function that is called in the FMU if memory needs to be allocated. If attribute “canNotUseMemoryManagementFunctions = true” in <fmiModelDescription><ModelExchange / CoSimulation>, then function allocateMemory is not used in the FMU and a void pointer can be provided. If this attribute has a value of “false” (which is the default), the FMU must not use malloc, calloc or other memory allocation functions. One reason is that these functions might not be available for embedded systems on the target machine. Another reason is that the environment may have optimized or specialized memory allocation functions. allocateMemory returns a pointer to space for a vector of nobj objects, each of size “size” or NULL, if the request cannot be satisfied. The space is initialized to zero bytes [(a simple implementation is to use calloc from the C standard library)].
+# """
+# function cbAllocateMemory(nobj::Csize_t, size::Csize_t)
+#     ptr = Libc.calloc(nobj, size)
+#     #display("$ptr: Allocated $nobj x $size bytes.")
+# 	ptr
+# end
+
+# """
+# Source: FMISpec2.0.2[p.22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
+
+# Function that must be called in the FMU if memory is freed that has been allocated with allocateMemory. If a null pointer is provided as input argument obj, the function shall perform no action [(a simple implementation is to use free from the C standard library; in ANSI C89 and C99, the null pointer handling is identical as defined here)]. If attribute “canNotUseMemoryManagementFunctions = true” in <fmiModelDescription><ModelExchange / CoSimulation>, then function freeMemory is not used in the FMU and a null pointer can be provided.
+# """
+# function cbFreeMemory(obj::Ptr{Cvoid})
+#     #display("$obj: Freed.")
+# 	Libc.free(obj)
+#     nothing
+# end
+
+# """
+# Source: FMISpec2.0.2[p.22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
+
+# Optional call back function to signal if the computation of a communication step of a co-simulation slave is finished. A null pointer can be provided. In this case the master must use fmiGetStatus(..) to query the status of fmi2DoStep. If a pointer to a function is provided, it must be called by the FMU after a completed communication step.
+# """
+# function cbStepFinished(componentEnvironment::Ptr{Cvoid}, status::Cuint)
+#     #display("Step finished.")
+#     nothing
+# end
 
 
 
@@ -259,10 +323,25 @@ mutable struct fmi3Component
     fmu
 end
 
-# TODO: fmi3Component struct
-
 # TODO: 
-# fmi3InstantiateModelExchange
+function fmi3InstantiateModelExchange(cfunc::Ptr{Nothing},
+        instanceName::fmi3String,
+        fmuinstantiationToken::fmi3String,
+        fmuResourceLocation::fmi3String,
+        visible::fmi3Boolean,
+        loggingOn::fmi3Boolean,
+        instanceEnvironment::fmi3InstanceEnvironment,
+        logMessage::fmi3CallbackFunctions)
+
+compAddr = ccall(cfunc,
+    Ptr{Cvoid},
+    (Cstring, Cstring, Cstring,
+    Cint, Cint, Ptr{Cvoid}, Ptr{Cvoid}),
+    instanceName, fmuinstantiationToken, fmuResourceLocation,
+     visible, loggingOn, instanceEnvironment, Ref(logMessage))
+
+compAddr
+end
 # fmi3InstantiateCoSimulation
 # fmi3InstantiateScheduledExecution
 # fmi3 ...
