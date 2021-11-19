@@ -62,6 +62,7 @@ function affect!(c::fmi2Component, integrator, idx)
     if nominalsChanged == fmi2True
         x_nom = fmi2GetNominalsOfContinuousStates(c)
     end
+    timeEventCb = PresetTimeCallback(2.0, (integrator) -> affect!(c, integrator, 0))
 end
 
 # Does one step in the simulation.
