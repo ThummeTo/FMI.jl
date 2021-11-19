@@ -90,11 +90,11 @@ Events are handled correctly.
 Returns an ODESolution.
 """
 function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.0;
-                        solver = nothing,
-                        customFx = nothing,
-                        recordValues::fmi2ValueReferenceFormat = nothing,
-                        saveat = [],
-                        setup = true)
+    solver = nothing,
+    customFx = nothing,
+    recordValues::fmi2ValueReferenceFormat = nothing,
+    saveat = [],
+    setup = true)
 
     recordValues = prepareValueReference(c, recordValues)
 
@@ -118,28 +118,30 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     end
 
     eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator),
-                                       (integrator, idx) -> affect!(c, integrator, idx),
-                                       Int64(c.fmu.modelDescription.numberOfEventIndicators);
-                                       rootfind=DiffEqBase.RightRootFind)
+        (integrator, idx) -> affect!(c, integrator, idx),
+        Int64(c.fmu.modelDescription.numberOfEventIndicators);
+        rootfind = DiffEqBase.RightRootFind)
 
     stepCb = FunctionCallingCallback((x, t, integrator) -> stepCompleted(c, x, t, integrator);
-                                     func_everystep=true,
-                                     func_start=true)
+        func_everystep = true,
+        func_start = true)
 
-     # First evaluation of the FMU
-     x0 = fmi2GetContinuousStates(c)
-     x0_nom = fmi2GetNominalsOfContinuousStates(c)
+    timeEventCb = PresetTimeCallback(tstops, (integrator) -> affect!(c, integrator, idx))
 
-     fmi2SetContinuousStates(c, x0)
-     handleEvents(c, true)
+    # First evaluation of the FMU
+    x0 = fmi2GetContinuousStates(c)
+    x0_nom = fmi2GetNominalsOfContinuousStates(c)
 
-     # Get states of handling initial Events
-     x0 = fmi2GetContinuousStates(c)
-     x0_nom = fmi2GetNominalsOfContinuousStates(c)
+    fmi2SetContinuousStates(c, x0)
+    handleEvents(c, true)
 
-     p = []
-     problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
-     solution = solve(problem, solver, callback=CallbackSet(eventCb, stepCb), saveat=saveat)
+    # Get states of handling initial Events
+    x0 = fmi2GetContinuousStates(c)
+    x0_nom = fmi2GetNominalsOfContinuousStates(c)
+
+    p = []
+    problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
+    solution = solve(problem, solver, callback = CallbackSet(eventCb, stepCb, timeEventCb), saveat = saveat)
 end
 
 ############ Co-Simulation ############
