@@ -9,20 +9,25 @@ using FMI
 
 fmu = FMI.fmi3Load("model/fmi3/BouncingBall.fmu")
 instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
+instance2 = FMI.fmi3InstantiateCoSimulation!(fmu)
 fmu.components
 FMI.fmi3Unload(fmu)
 
 fmu = FMI.fmi3Load("model/fmi3/Dahlquist.fmu")
+instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
 FMI.fmi3Unload(fmu)
 
 fmu = FMI.fmi3Load("model/fmi3/Feedthrough.fmu")
+instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
 FMI.fmi3Unload(fmu)
 
-fmu = FMI.fmi3Load("model/fmi3/LinearTransform.fmu")
-FMI.fmi3Unload(fmu)
+# fmu = FMI.fmi3Load("model/fmi3/LinearTransform.fmu")
+# FMI.fmi3Unload(fmu)
 
 fmu = FMI.fmi3Load("model/fmi3/Stair.fmu")
+instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
 FMI.fmi3Unload(fmu)
 
 fmu = FMI.fmi3Load("model/fmi3/VanDerPol.fmu")
+instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
 FMI.fmi3Unload(fmu)
