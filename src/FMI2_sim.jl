@@ -126,7 +126,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
         func_everystep = true,
         func_start = true)
 
-    timeEventCb = PresetTimeCallback(tstops, (integrator) -> affect!(c, integrator, idx))
+    timeEventCb = PresetTimeCallback(1.0, (integrator) -> affect!(c, integrator, idx))
 
     # First evaluation of the FMU
     x0 = fmi2GetContinuousStates(c)
