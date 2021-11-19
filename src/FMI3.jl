@@ -23,7 +23,8 @@ mutable struct FMU3 <: FMU
     modelDescription::fmi3ModelDescription
 
     type::fmi3Type
-    callbackFunctions::fmi3CallbackFunctions
+    fmi3CallbackLoggerFunction::fmi3CallbackLoggerFunction
+    fmi3CallbackIntermediateUpdateFunction::fmi3CallbackIntermediateUpdateFunction
     instanceEnvironment::fmi3InstanceEnvironment
     components::Array{fmi3Component}
 
@@ -33,6 +34,8 @@ mutable struct FMU3 <: FMU
 
     # c-functions
     cInstantiateModelExchange::Ptr{Cvoid}
+    cInstantiateCoSimulation::Ptr{Cvoid}
+
     cGetTypesPlatform::Ptr{Cvoid}
     cGetVersion::Ptr{Cvoid}
     cFreeInstance::Ptr{Cvoid}
@@ -204,6 +207,7 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
 
     # # retrieve functions TODO check new Names and availability in FMI3
     fmu.cInstantiateModelExchange                  = dlsym(fmu.libHandle, :fmi3InstantiateModelExchange)
+    fmu.cInstantiateCoSimulation                   = dlsym(fmu.libHandle, :fmi3InstantiateCoSimulation)
     # fmu.cGetTypesPlatform             = dlsym(fmu.libHandle, :fmi2GetTypesPlatform)
     # fmu.cGetVersion                   = dlsym(fmu.libHandle, :fmi2GetVersion)
     # fmu.cFreeInstance                 = dlsym(fmu.libHandle, :fmi2FreeInstance)
@@ -386,10 +390,10 @@ end
 """ 
 Returns how a variable depends on another variable based on the model description.
 """
-function fmi3VariableDependsOnVariable(fmu::FMU2, vr1::fmi2ValueReference, vr2::fmi2ValueReference) # TODO check what it does
+function fmi3VariableDependsOnVariable(fmu::FMU3, vr1::fmi3ValueReference, vr2::fmi3ValueReference) # TODO check what it does
     i1 = fmu.modelDescription.valueReferenceIndicies[vr1]
     i2 = fmu.modelDescription.valueReferenceIndicies[vr2]
-    return fmi2GetDependencies(fmu)[i1, i2]
+    return fmi3GetDependencies(fmu)[i1, i2]
 end
 
 
@@ -434,9 +438,42 @@ function fmi3InstantiateModelExchange!(fmu::FMU3; visible::Bool = false, logging
     # ptrAllocateMemory = @cfunction(cbAllocateMemory, Ptr{Cvoid}, (Csize_t, Csize_t))
     # ptrFreeMemory = @cfunction(cbFreeMemory, Cvoid, (Ptr{Cvoid},))
     # ptrStepFinished = C_NULL
-    fmu.callbackFunctions = fmi3CallbackFunctions(ptrLogger) #, ptrAllocateMemory, ptrFreeMemory, ptrStepFinished, C_NULL)
+    fmu.fmi3CallbackLoggerFunction = fmi3CallbackLoggerFunction(ptrLogger) #, ptrAllocateMemory, ptrFreeMemory, ptrStepFinished, C_NULL)
 
-    compAddr = fmi3InstantiateModelExchange(fmu.cInstantiateModelExchange, fmu.instanceName, fmu.modelDescription.instantiationToken, fmu.fmuResourceLocation, fmi2Boolean(visible), fmi2Boolean(loggingOn), fmu.instanceEnvironment, fmu.callbackFunctions)
+    compAddr = fmi3InstantiateModelExchange(fmu.cInstantiateModelExchange, fmu.instanceName, fmu.modelDescription.instantiationToken, fmu.fmuResourceLocation, fmi3Boolean(visible), fmi3Boolean(loggingOn), fmu.instanceEnvironment, fmu.fmi3CallbackLoggerFunction)
+
+    if compAddr == Ptr{Cvoid}(C_NULL)
+        @error "fmi2Instantiate!(...): Instantiation failed!"
+        return nothing
+    end
+
+    component = fmi3Component(compAddr, fmu)
+    push!(fmu.components, component)
+    component
+end
+
+"""
+TODO: FMI specification reference.
+
+Create a new instance of the given fmu, adds a logger if logginOn == true.
+
+Returns the instance of a new FMU component.
+
+For more information call ?fmi2Instantiate
+"""
+function fmi3InstantiateCoSimulation!(fmu::FMU3; visible::Bool = false, loggingOn::Bool = false, eventModeUsed::Bool = false)
+
+    ptrLogger = @cfunction(fmi3CallbackLogMessage, Cvoid, (Ptr{Cvoid}, Ptr{Cchar}, Cuint, Ptr{Cchar}, Ptr{Cchar}))
+    ptrIntermediateUpdate = @cfunction(fmi3CallbackIntermediateUpdate, Cvoid, (Ptr{Cvoid}, fmi3Float64, fmi3Boolean, fmi3Boolean, fmi3Boolean, fmi3Boolean, fmi3Boolean, Ptr{fmi3Boolean}, Ptr{fmi3Float64}))
+    if fmu.modelDescription.CShasEventMode 
+        mode = eventModeUsed
+    else
+        mode = false
+    end
+    fmu.fmi3CallbackLoggerFunction = fmi3CallbackLoggerFunction(ptrLogger) #, ptrAllocateMemory, ptrFreeMemory, ptrStepFinished, C_NULL)
+    fmu.fmi3CallbackIntermediateUpdateFunction = fmi3CallbackIntermediateUpdateFunction(ptrIntermediateUpdate)
+    compAddr = fmi3InstantiateModelExchange(fmu.cInstantiateCoSimulation, fmu.instanceName, fmu.modelDescription.instantiationToken, fmu.fmuResourceLocation, fmi3Boolean(visible), fmi3Boolean(loggingOn), 
+                                            fmi3Boolean(mode), fmi3Boolean(fmu.modelDescription.CScanReturnEarlyAfterIntermediateUpdate), fmu.modelDescription.intermediateUpdateValueReferences, length(fmu.modelDescription.intermediateUpdateValueReferences), fmu.instanceEnvironment, fmu.fmi3CallbackLoggerFunction, fmu.fmi3CallbackIntermediateUpdateFunction)
 
     if compAddr == Ptr{Cvoid}(C_NULL)
         @error "fmi2Instantiate!(...): Instantiation failed!"

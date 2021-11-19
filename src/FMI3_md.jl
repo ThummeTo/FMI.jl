@@ -16,16 +16,24 @@ function fmi3ReadModelDescription(pathToModellDescription::String)
     md.inputValueReferences = Array{fmi3ValueReference}(undef, 0)
     md.stateValueReferences = Array{fmi3ValueReference}(undef, 0)
     md.derivativeValueReferences = Array{fmi3ValueReference}(undef, 0)
+    md.intermediateUpdateValueReferences = Array{fmi3ValueReference}(undef, 0)
 
     # CS specific entries
     md.CSmodelIdentifier = ""
-    md.CScanHandleVariableCommunicationStepSize = false
-    # md.CScanInterpolateInputs = false
-    md.CSmaxOutputDerivativeOrder = -1
+    md.CSneedsExecutionTool = false
+    md.CScanBeInstantiatedOnlyOncePerProcess = false
     md.CScanGetAndSetFMUstate = false
     md.CScanSerializeFMUstate = false
     md.CSprovidesDirectionalDerivatives = false
     md.CSproivdesAdjointDerivatives = false
+    md.CSprovidesPerElementDependencies = false
+    md.CScanHandleVariableCommunicationStepSize = false
+    md.CSmaxOutputDerivativeOrder = 0
+    md.CSprovidesIntermediateUpdate = false
+    md.CSrecommendedIntermediateInputSmoothness = 0
+    md.CScanReturnEarlyAfterIntermediateUpdate = false
+    md.CShasEventMode = false
+    md.CSprovidesEvaluateDiscreteStates = false
 
     # ME specific entries
     md.MEmodelIdentifier = ""
@@ -60,15 +68,23 @@ function fmi3ReadModelDescription(pathToModellDescription::String)
         if node.name == "CoSimulation"
             md.isCoSimulation = true
             md.CSmodelIdentifier                        = node["modelIdentifier"]
-            md.CScanHandleVariableCommunicationStepSize = parseNodeBoolean(node, "canHandleVariableCommunicationStepSize"   ; onfail=false)
-            # md.CScanInterpolateInputs                   = parseNodeBoolean(node, "canInterpolateInputs"                     ; onfail=false)
-            md.CSmaxOutputDerivativeOrder               = parseNodeInteger(node, "maxOutputDerivativeOrder"                 ; onfail=-1)
+            md.CSneedsExecutionTool                     = parseNodeBoolean(node, "needsExecutionTool"                       ; onfail=false)
+            md.CScanBeInstantiatedOnlyOncePerProcess    = parseNodeBoolean(node, "canBeInstantiatedOnlyOncePerProcess"      ; onfail=false)
             md.CScanGetAndSetFMUstate                   = parseNodeBoolean(node, "canGetAndSetFMUstate"                     ; onfail=false)
             md.CScanSerializeFMUstate                   = parseNodeBoolean(node, "canSerializeFMUstate"                     ; onfail=false)
             md.CSprovidesDirectionalDerivatives         = parseNodeBoolean(node, "providesDirectionalDerivatives"           ; onfail=false)
             md.CSproivdesAdjointDerivatives             = parseNodeBoolean(node, "providesAdjointDerivatives"               ; onfail=false)
+            md.CSprovidesPerElementDependencies         = parseNodeBoolean(node, "providesPerElementDependencies"           ; onfail=false)
+            md.CScanHandleVariableCommunicationStepSize = parseNodeBoolean(node, "canHandleVariableCommunicationStepSize"   ; onfail=false)
+            md.CSmaxOutputDerivativeOrder               = parseNodeInteger(node, "maxOutputDerivativeOrder"                 ; onfail=0)
+            md.CSprovidesIntermediateUpdate             = parseNodeBoolean(node, "providesIntermediateUpdate"               ; onfail=false)
+            md.CSrecommendedIntermediateInputSmoothness = parseNodeInteger(node, "recommendedIntermediateInputSmoothness"   ; onfail=0)
+            md.CScanReturnEarlyAfterIntermediateUpdate  = parseNodeBoolean(node, "canReturnEarlyAfterIntermediateUpdate"    ; onfail=false)
+            md.CShasEventMode                           = parseNodeBoolean(node, "hasEventMode"                             ; onfail=false)
+            md.CSprovidesEvaluateDiscreteStates         = parseNodeBoolean(node, "providesEvaluateDiscreteStates"           ; onfail=false)
 
         elseif node.name == "ModelExchange"
+            # TODO check if all are included
             md.isModelExchange = true
             md.MEmodelIdentifier                        = node["modelIdentifier"]
             md.MEcanGetAndSetFMUstate                   = parseNodeBoolean(node, "canGetAndSetFMUstate"                     ; onfail=false)
@@ -117,6 +133,13 @@ function fmi3ReadModelDescription(pathToModellDescription::String)
     for i in 1:length(md.valueReferences)
         md.valueReferenceIndicies[md.valueReferences[i]] = i
     end 
+
+    # check all intermediateUpdate variables
+    for variable in md.modelVariables
+        if Bool(variable.datatype.intermediateUpdate)
+            push!(md.intermediateUpdateValueReferences, variable.valueReference)
+        end
+    end
 
     md
 end
@@ -466,7 +489,7 @@ function fmi3setDatatypeVariables(node::EzXML.Node, md::fmi3ModelDescription)
     type = fmi3datatypeVariable()
     typename = node.name
     type.canHandleMultipleSet = nothing
-    type.intermediateUpdate = nothing
+    type.intermediateUpdate = false
     type.previous = nothing
     type.clocks = nothing
     type.declaredType = nothing
@@ -578,6 +601,9 @@ function fmi3setDatatypeVariables(node::EzXML.Node, md::fmi3ModelDescription)
             @warn "setDatatypeVariables(...) unimplemented start value type $typename"
             type.start = node["start"]
         end
+    end
+    if haskey(node, "intermediateUpdate")
+        type.intermediateUpdate = true
     end
 
     if haskey(node, "min") && (type.datatype != fmi3Binary || type.datatype != fmiBoolean)
