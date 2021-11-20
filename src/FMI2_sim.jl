@@ -88,6 +88,11 @@ function fx(c::fmi2Component, x, p, t)
     dx = fmi2GetDerivatives(c)
 end
 
+# Handles the upcoming events.
+function myaffect!(c::fmi2Component, integrator, idx)
+    
+end
+
 """
 Source: FMISpec2.0.2[p.90 ff]: 3.2.4 Pseudocode Example
 
@@ -134,7 +139,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
         func_start = true)
 
     timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator), 
-       (integrator) -> affect!(c, integrator, 0), Float64; initial_affect = true)
+       (integrator) -> myaffect!(c, integrator, 0), Float64; initial_affect = true)
 
     # First evaluation of the FMU
     x0 = fmi2GetContinuousStates(c)
