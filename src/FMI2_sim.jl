@@ -90,7 +90,7 @@ end
 
 # Handles the upcoming events.
 function myaffect!(c::fmi2Component,integrator)
-
+    affect!(c,integrator,0)
 end
 
 """
