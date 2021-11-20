@@ -134,7 +134,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
         func_start = true)
 
     timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator), 
-       (integrator) -> affect!(c, integrator, 0); initial_affect = true)
+       (integrator) -> affect!(c, integrator, 0), Float64; initial_affect = true)
 
     # First evaluation of the FMU
     x0 = fmi2GetContinuousStates(c)
