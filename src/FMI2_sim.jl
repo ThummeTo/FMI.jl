@@ -149,21 +149,22 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     x0_nom = fmi2GetNominalsOfContinuousStates(c)
 
     p = []
-    eventInfo = fmi2NewDiscreteStates(c)
+    problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
 
+    eventInfo = fmi2NewDiscreteStates(c)
     if Int64(c.fmu.modelDescription.numberOfEventIndicators) > 0
         if Bool(eventInfo.nextEventTimeDefined)
-            callback = CallbackSet(eventCb, stepCb, timeEventCb)
+            solution = solve(problem, solver, callback = CallbackSet(eventCb, stepCb, timeEventCb), saveat = saveat)
         else
-            callback = CallbackSet(eventCb, stepCb)
+            solution = solve(problem, solver, callback = CallbackSet(eventCb, stepCb), saveat = saveat)
         end
     else
-        callback = CallbackSet(stepCb)
+        solution = solve(problem, solver, callback = CallbackSet(stepCb), saveat = saveat)
     end
 
 
-    problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
-    solution = solve(problem, solver, callback, saveat = saveat)
+
+    
 end
 
 ############ Co-Simulation ############
