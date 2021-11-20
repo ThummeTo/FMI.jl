@@ -138,8 +138,8 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
         func_everystep = true,
         func_start = true)
 
-    timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator), 
-       (integrator) -> affectFMU!(c,integrator,0), Float64; initial_affect = true)
+    timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator),
+        (integrator) -> affectFMU!(c, integrator, 0), Float64; initial_affect = true)
 
     # First evaluation of the FMU
     x0 = fmi2GetContinuousStates(c)
@@ -153,8 +153,21 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     x0_nom = fmi2GetNominalsOfContinuousStates(c)
 
     p = []
+    eventInfo = fmi2NewDiscreteStates(c)
+
+    if fmiGetNumberOfEventIndicators(c)
+        if eventInfo.nextEventTimeDefined
+            callback = CallbackSet(eventCb, stepCb, timeEventCb)
+        else
+            callback = CallbackSet(eventCb, stepCb)
+        end
+    else
+        callback = CallbackSet(stepCb)
+    end
+
+
     problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
-    solution = solve(problem, solver, callback = CallbackSet(eventCb, stepCb, timeEventCb), saveat = saveat)
+    solution = solve(problem, solver, callback, saveat = saveat)
 end
 
 ############ Co-Simulation ############
