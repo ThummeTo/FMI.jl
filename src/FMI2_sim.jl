@@ -151,7 +151,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     p = []
     eventInfo = fmi2NewDiscreteStates(c)
 
-    if fmiGetNumberOfEventIndicators(c)
+    if Int64(c.fmu.modelDescription.numberOfEventIndicators)
         if eventInfo.nextEventTimeDefined
             callback = CallbackSet(eventCb, stepCb, timeEventCb)
         else
