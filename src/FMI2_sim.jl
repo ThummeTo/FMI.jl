@@ -88,10 +88,6 @@ function fx(c::fmi2Component, x, p, t)
     dx = fmi2GetDerivatives(c)
 end
 
-# Handles the upcoming events.
-function myaffect!(c::fmi2Component,integrator)
-    affect!(c,integrator,0)
-end
 
 """
 Source: FMISpec2.0.2[p.90 ff]: 3.2.4 Pseudocode Example
