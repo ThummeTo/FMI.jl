@@ -57,7 +57,7 @@ function condition(c::fmi2Component, out, x, t, integrator) # Event when event_f
 end
 
 # Handles the upcoming events.
-function affect!(c::fmi2Component, integrator, idx)
+function affectFMU!(c::fmi2Component, integrator, idx)
     # Event found - handle it
     continuousStatesChanged, nominalsChanged = handleEvents(c, false)
 
@@ -130,7 +130,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     end
 
     eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator),
-        (integrator, idx) -> affect!(c, integrator, idx),
+        (integrator, idx) -> affectFMU!(c, integrator, idx),
         Int64(c.fmu.modelDescription.numberOfEventIndicators);
         rootfind = DiffEqBase.RightRootFind)
 
@@ -139,7 +139,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
         func_start = true)
 
     timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator), 
-       (integrator) -> myaffect!(c,integrator), Float64; initial_affect = true)
+       (integrator) -> affectFMU!(c,integrator,0), Float64; initial_affect = true)
 
     # First evaluation of the FMU
     x0 = fmi2GetContinuousStates(c)
