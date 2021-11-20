@@ -7,11 +7,11 @@ using DifferentialEquations, DiffEqCallbacks
 
 ############ Model-Exchange ############
 
-# Read next time event from fmu 
-#function time_choice(c::fmi2Component, integrator)
-#    eventInfo = fmi2NewDiscreteStates(c)
-#    eventInfo.nextEventTime
-#end
+# Read next time event from fmu and provide it to the integrator 
+function time_choice(c::fmi2Component, integrator)
+    eventInfo = fmi2NewDiscreteStates(c)
+    eventInfo.nextEventTime
+end
 
 # Handles events and returns the values and nominals of the changed continuous states.
 function handleEvents(c::fmi2Component, initialEventMode)
@@ -133,8 +133,8 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
         func_everystep = true,
         func_start = true)
 
-    #timeEventCb = function IterativeCallback((integrator) -> time_choice(c, integrator), 
-    #   (integrator, idx) -> affect!(c, integrator, idx), tType = Float64; initial_affect = true)
+    timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator), 
+       (integrator, idx) -> affect!(c, integrator, idx), tType = Float64; initial_affect = true)
 
     # First evaluation of the FMU
     x0 = fmi2GetContinuousStates(c)
