@@ -3,9 +3,8 @@
 This section is intended to familiarise users with the documentation environment and to provide a first detailed insight into the FMI.jl library.
 ## Documentation Overview
 ### 1. ```Introduction```
-
-
 - ***Prior knowledge***
+To better understand how the FMI.jl library works, it is useful to have an overview of the most important terms and their features.  
 
 
 > is intended to describe the operation and other features
@@ -29,7 +28,9 @@ This section is intended to familiarise users with the documentation environment
 
 
 ### FMI
-The Functional Mock-up Interface (FMI) is an open standard for the tool-independent exchange and integration of track models from different manufactures. FMI simplifies the use of the best tools for specific modeling tasks and the consistent reuse of models in different development phases and across departmental boundaries. This way you can choose the most suitable tool for each type of analysis while keeping the same model.\\
+The Functional Mock-up Interface (FMI) is an open standard for the tool-independent exchange and integration of track models from different manufactures. FMI simplifies the use of the best tools for specific modeling tasks and the consistent reuse of models in different development phases and across departmental boundaries. This way you can choose the most suitable tool for each type of analysis while keeping the same model.  
+
+
 ### FMU
 
 ## Library FMI.jl
