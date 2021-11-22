@@ -3,7 +3,7 @@
 This section is intended to familiarise users with the documentation environment and to provide a first detailed insight into the FMI.jl library.
 ## Documentation Overview
 ### 1. ```Introduction```
-- ***Prior knowledge***
+- ***Prior knowledge***  
 To better understand how the FMI.jl library works, it is useful to have an overview of the most important terms and their features.  
 
 
