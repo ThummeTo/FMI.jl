@@ -3,22 +3,45 @@
 This section is intended to familiarise users with the documentation environment and to provide a first detailed insight into the FMI.jl library.
 ## Documentation Overview
 ### 1. ```Introduction```
-- ***Library FMI.jl***
 
 
-> describes important properties of the library and is intended to answer initial questions about the library. 
-
-- ***Info. about FMI***
+- ***Prior knowledge***
 
 
 > is intended to describe the operation and other features
 
 - ***Info. about FMU***
 
+- ***Library FMI.jl***
+
+
+> describes important properties of the library and is intended to answer initial questions about the library. 
+
 ### 2. ```Tutorials```
+
 ### 3. ```Examples```
+
 ### 4. ```Libary Funktions```
+
 ### 5. ```Related Publications```
+
+
+
+## Library FMI.jl
+FMI.jl is a free-to-use software library for the Julia programming language, which integrates FMI ([fmi-standard.org](http://fmi-standard.org/)): load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
+
+## Prior knowledge
+
+### FMU
+
+
+### FMI
+The Functional Mock-up Interface (FMI) is an open standard for the tool-independent exchange and integration of track models from different manufactures. Functional Mock-up Interface simplifies the use of the best tools for specific modeling tasks and the consistent reuse of models in different development phases and across departmental boundaries.
+
+
+
+
+
 
 
 
