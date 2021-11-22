@@ -3,9 +3,11 @@
 This section is intended to familiarise users with the documentation environment and to provide a first detailed insight into the FMI.jl library.
 ## Documentation Overview
 ### 1. ```Introduction```
-* ***Library FMI.jl*** describes important properties of the library and is intended to answer initial questions about the library. 
+* ***Library FMI.jl***
+        > describes important properties of the library and is intended to answer initial questions about the library. 
 
-* - ***Info. about FMI*** is intended to describe the operation and other features
+* - ***Info. about FMI***
+        > is intended to describe the operation and other features
 
 * - ***Info. about FMU***
 
