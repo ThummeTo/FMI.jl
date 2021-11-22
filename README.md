@@ -22,7 +22,7 @@
 4. ```Libary Funktions```
 5. ```Relted Publications```
 
-> continue to the [Documentation](https://ThummeTo.github.io/FMI.jl/dev)
+continue to the [Documentation](https://ThummeTo.github.io/FMI.jl/dev)
 
 
 ## Get Started
