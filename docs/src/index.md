@@ -6,12 +6,12 @@ This section is intended to familiarise users with the documentation environment
 - ***Library FMI.jl***
 
 
-        > describes important properties of the library and is intended to answer initial questions about the library. 
+> describes important properties of the library and is intended to answer initial questions about the library. 
 
 - ***Info. about FMI***
 
 
-        > is intended to describe the operation and other features
+> is intended to describe the operation and other features
 
 - ***Info. about FMU***
 
