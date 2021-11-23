@@ -475,16 +475,17 @@ function fmi2DoStep(c::fmi2Component, communicationStepSize::Real)
 end
 
 # Model Exchange specific functions
-"""
-TODO: FMI specification reference.
 
-Set independent variable time and reinitialize chaching of variables that depend on time.
+# """
+# TODO: FMI specification reference.
 
-For more information call ?fmi2SetTime
-"""
-function fmi2SetTime(c::fmi2Component, time::Real)
-    fmi2SetTime(c, fmi2Real(time))
-end
+# Set independent variable time and reinitialize chaching of variables that depend on time.
+
+# For more information call ?fmi2SetTime
+# """
+# function fmi2SetTime(c::fmi2Component, time::Real)
+#     fmi2SetTime(c, fmi2Real(time))
+# end
 
 """
 TODO: FMI specification reference.
