@@ -1,7 +1,7 @@
 name = "FMI"
 uuid = "14a09403-18e3-468f-ad8a-74f8dda2d9ac"
 authors = ["TT <tobias.thummerer@informatik.uni-augsburg.de>", "LM <lars.mikelsons@informatik.uni-augsburg.de>", "JK <josef.kircher@student.uni-augsburg.de>"]
-version = "0.1.7"
+version = "0.1.9"
 
 [deps]
 DiffEqCallbacks = "459566f4-90b8-5000-8ac3-15dfb0a30def"
