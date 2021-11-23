@@ -67,6 +67,8 @@ mutable struct FMU3 <: FMU
     cSetBoolean::Ptr{Cvoid}
     cGetString::Ptr{Cvoid}
     cSetString::Ptr{Cvoid}
+    cGetBinary::Ptr{Cvoid}
+    cSetBinary::Ptr{Cvoid}
     cGetFMUstate::Ptr{Cvoid}
     cSetFMUstate::Ptr{Cvoid}
     cFreeFMUstate::Ptr{Cvoid}
@@ -249,14 +251,13 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
     fmu.cSetInt64                                  = dlsym(fmu.libHandle, :fmi3SetInt64)
     fmu.cGetUInt64                                 = dlsym(fmu.libHandle, :fmi3GetUInt64)
     fmu.cSetUInt64                                 = dlsym(fmu.libHandle, :fmi3SetUInt64)
-    # fmu.cSetReal                      = dlsym(fmu.libHandle, :fmi2SetReal)
-    # fmu.cGetInteger                   = dlsym(fmu.libHandle, :fmi2GetInteger)
-    # fmu.cSetInteger                   = dlsym(fmu.libHandle, :fmi2SetInteger)
-    # fmu.cGetBoolean                   = dlsym(fmu.libHandle, :fmi2GetBoolean)
-    # fmu.cSetBoolean                   = dlsym(fmu.libHandle, :fmi2SetBoolean)
+    fmu.cGetBoolean                                = dlsym(fmu.libHandle, :fmi3GetBoolean)
+    fmu.cSetBoolean                                = dlsym(fmu.libHandle, :fmi3SetBoolean)
 
-    # fmu.cGetString                    = dlsym_opt(fmu.libHandle, :fmi2GetString)
-    # fmu.cSetString                    = dlsym_opt(fmu.libHandle, :fmi2SetString)
+    fmu.cGetString                                 = dlsym_opt(fmu.libHandle, :fmi3GetString)
+    fmu.cSetString                                 = dlsym_opt(fmu.libHandle, :fmi3SetString)
+    fmu.cGetBinary                                 = dlsym_opt(fmu.libHandle, :fmi3GetBinary)
+    fmu.cSetBinary                                 = dlsym_opt(fmu.libHandle, :fmi3SetBinary)
 
     # if fmi2CanGetSetState(fmu)
     #     fmu.cGetFMUstate                  = dlsym_opt(fmu.libHandle, :fmi2GetFMUstate)
@@ -943,4 +944,136 @@ For more information call ?fmi2SetReal
 """
 function fmi3SetUInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt64}, fmi3UInt64})
     fmi3SetUInt64(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Boolean variables.
+
+For more information call ?fmi2GetBoolean!
+"""
+function fmi3GetBoolean(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    fmi3GetBoolean(fmu.components[end], vr)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Boolean variables.
+
+For more information call ?fmi2GetBoolean!
+"""
+function fmi3GetBoolean!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{Bool}, Bool, Array{fmi3Boolean}})
+    fmi3GetBoolean!(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Boolean variables.
+
+For more information call ?fmi2SetBoolean
+"""
+function fmi3SetBoolean(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{Bool}, Bool})
+    fmi3SetBoolean(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2String variables.
+
+For more information call ?fmi2GetString!
+"""
+function fmi3GetString(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    fmi3GetString(fmu.components[end], vr)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2String variables.
+
+For more information call ?fmi2GetString!
+"""
+function fmi3GetString!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{String}, String})
+    fmi3GetString!(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2String variables.
+
+For more information call ?fmi2SetString
+"""
+function fmi3SetString(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{String}, String})
+    fmi3SetString(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2String variables.
+
+For more information call ?fmi2GetString!
+"""
+function fmi3GetBinary(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    fmi3GetBinary(fmu.components[end], vr)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2String variables.
+
+For more information call ?fmi2GetString!
+"""
+function fmi3GetBinary!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Binary}, fmi3Binary})
+    fmi3GetBinary!(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2String variables.
+
+For more information call ?fmi2SetString
+"""
+function fmi3SetBinary(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Binary}, fmi3Binary})
+    fmi3SetBinary(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2String variables.
+
+For more information call ?fmi2GetString!
+"""
+function fmi3GetClock(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    fmi3GetClock(fmu.components[end], vr)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2String variables.
+
+For more information call ?fmi2GetString!
+"""
+function fmi3GetClock!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Clock}, fmi3Clock})
+    fmi3GetClock!(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2String variables.
+
+For more information call ?fmi2SetString
+"""
+function fmi3SetClock(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Clock}, fmi3Clock})
+    fmi3SetBinary(fmu.components[end], vr, values)
 end

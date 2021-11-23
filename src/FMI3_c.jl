@@ -27,6 +27,7 @@ const fmi3ValueReference = Cint
 const fmi3FMUstate = Ptr{Cvoid}
 const fmi3InstanceEnvironment = Ptr{Cvoid}
 const fmi3Enum = Array{Array{String}} # TODO: correct it
+const fmi3Clock = Cint
 
 # custom types
 fmi3ValueReferenceFormat = Union{Nothing, String, Array{String,1}, fmi3ValueReference, Array{fmi3ValueReference,1}, Int64, Array{Int64,1}} # wildcard how a user can pass a fmi2ValueReference
@@ -725,6 +726,111 @@ function fmi3SetUInt64(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csi
     status = ccall(c.fmu.cSetUInt64,
                 Cuint,
                 (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3UInt64}, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3GetBoolean!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Boolean}, nvalue::Csize_t)
+    ccall(c.fmu.cGetBoolean,
+          Cuint,
+          (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Boolean}, Csize_t),
+          c.compAddr, vr, nvr, value, nvalue)
+end
+
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3SetBoolean(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Boolean}, nvalue::Csize_t)
+    status = ccall(c.fmu.cSetBoolean,
+                Cuint,
+                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Boolean}, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3GetString!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Vector{Ptr{Cchar}}, nvalue::Csize_t)
+    status = ccall(c.fmu.cGetString,
+                Cuint,
+                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t,  Ptr{Cchar}, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3SetString(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Union{Array{Ptr{Cchar}}, Array{Ptr{UInt8}}}, nvalue::Csize_t)
+    status = ccall(c.fmu.cSetString,
+                Cuint,
+                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{Cchar}, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end
+
+# TODO not working yet
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3GetBinary!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Binary}, nvalue::Csize_t)
+    status = ccall(c.fmu.cGetBinary,
+                Cuint,
+                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t,  fmi3Binary, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3SetBinary(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Binary}, nvalue::Csize_t)
+    status = ccall(c.fmu.cSetBinary,
+                Cuint,
+                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Binary}, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3GetClock!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Clock}, nvalue::Csize_t)
+    status = ccall(c.fmu.cGetClock,
+                Cuint,
+                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t,  Ptr{fmi3Clock}, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3SetClock(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Clock}, nvalue::Csize_t)
+    status = ccall(c.fmu.cSetBinary,
+                Cuint,
+                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Clock}, Csize_t),
                 c.compAddr, vr, nvr, value, nvalue)
     status
 end
