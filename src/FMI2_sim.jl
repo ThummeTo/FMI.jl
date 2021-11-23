@@ -10,13 +10,18 @@ using DifferentialEquations, DiffEqCallbacks
 # Read next time event from fmu and provide it to the integrator 
 function time_choice(c::fmi2Component, integrator)
     eventInfo = fmi2NewDiscreteStates(c)
-    eventInfo.nextEventTime
+    fmi2EnterContinuousTimeMode(c)
+    if Bool(eventInfo.nextEventTimeDefined)
+        eventInfo.nextEventTime
+    else
+        Inf
+    end
 end
 
 # Handles events and returns the values and nominals of the changed continuous states.
-function handleEvents(c::fmi2Component, initialEventMode)
+function handleEvents(c::fmi2Component, enterEventMode::Bool, exitInContinuousMode::Bool)
 
-    if initialEventMode == false
+    if enterEventMode
         fmi2EnterEventMode(c)
     end
 
@@ -39,7 +44,9 @@ function handleEvents(c::fmi2Component, initialEventMode)
         end
     end
 
-    fmi2EnterContinuousTimeMode(c)
+    if exitInContinuousMode
+        fmi2EnterContinuousTimeMode(c)
+    end
 
     return valuesOfContinuousStatesChanged, nominalsOfContinuousStatesChanged
 
@@ -59,7 +66,7 @@ end
 # Handles the upcoming events.
 function affectFMU!(c::fmi2Component, integrator, idx)
     # Event found - handle it
-    continuousStatesChanged, nominalsChanged = handleEvents(c, false)
+    continuousStatesChanged, nominalsChanged = handleEvents(c, true, Bool(sign(idx)))
 
     if continuousStatesChanged == fmi2True
         integrator.u = fmi2GetContinuousStates(c)
@@ -142,7 +149,8 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     x0_nom = fmi2GetNominalsOfContinuousStates(c)
 
     fmi2SetContinuousStates(c, x0)
-    handleEvents(c, true)
+    
+    handleEvents(c, false,false)
 
     # Get states of handling initial Events
     x0 = fmi2GetContinuousStates(c)
@@ -151,7 +159,9 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     p = []
     problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
 
+    # TODO: Make it more elegant
     eventInfo = fmi2NewDiscreteStates(c)
+    fmi2EnterContinuousTimeMode(c)
     if Int64(c.fmu.modelDescription.numberOfEventIndicators) > 0
         if Bool(eventInfo.nextEventTimeDefined)
             solution = solve(problem, solver, callback = CallbackSet(eventCb, stepCb, timeEventCb), saveat = saveat)
@@ -164,7 +174,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
 
 
 
-    
+
 end
 
 ############ Co-Simulation ############
