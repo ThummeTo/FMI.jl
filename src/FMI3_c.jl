@@ -28,6 +28,10 @@ const fmi3FMUstate = Ptr{Cvoid}
 const fmi3InstanceEnvironment = Ptr{Cvoid}
 const fmi3Enum = Array{Array{String}} # TODO: correct it
 
+# custom types
+fmi3ValueReferenceFormat = Union{Nothing, String, Array{String,1}, fmi3ValueReference, Array{fmi3ValueReference,1}, Int64, Array{Int64,1}} # wildcard how a user can pass a fmi2ValueReference
+
+
 const fmi3False = fmi3Boolean(false)
 const fmi3True = fmi3Boolean(true)
 
@@ -386,6 +390,341 @@ function fmi3InstantiateCoSimulation(cfunc::Ptr{Nothing},
     compAddr
 end
 
-# fmi3InstantiateCoSimulation
-# fmi3InstantiateScheduledExecution
-# fmi3 ...
+# TODO docs
+function fmi3FreeInstance!(c::fmi3Component)
+
+    ind = findall(x->x==c, c.fmu.components)
+    deleteat!(c.fmu.components, ind)
+    ccall(c.fmu.cFreeInstance, Cvoid, (Ptr{Cvoid},), c.compAddr)
+
+    nothing
+end
+
+"""
+Source: FMISpec2.0.2[p.22]: 2.1.4 Inquire Platform and Version Number of Header Files
+
+Returns the version of the “fmi2Functions.h” header file which was used to compile the functions of the FMU. The function returns “fmiVersion” which is defined in this header file. The standard header file as documented in this specification has version “2.0”
+"""
+function fmi3GetVersion(cfunc::Ptr{Nothing})
+
+    fmi3Version = ccall(cfunc,
+                        Cstring,
+                        ())
+
+    unsafe_string(fmi3Version)
+end
+
+"""
+Source: FMISpec2.0.2[p.22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
+
+The function controls debug logging that is output via the logger function callback. If loggingOn = fmi2True, debug logging is enabled, otherwise it is switched off.
+"""
+function fmi3SetDebugLogging(c::fmi3Component, logginOn::fmi3Boolean, nCategories::Unsigned, categories::Ptr{Nothing})
+    status = ccall(c.fmu.cSetDebugLogging,
+                   Cuint,
+                   (Ptr{Nothing}, Cint, Csize_t, Ptr{Nothing}),
+                   c.compAddr, logginOn, nCategories, categories)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
+
+Informs the FMU to enter Initialization Mode. Before calling this function, all variables with attribute <ScalarVariable initial = "exact" or "approx"> can be set with the “fmi2SetXXX” functions (the ScalarVariable attributes are defined in the Model Description File, see section 2.2.7). Setting other variables is not allowed. Furthermore, fmi2SetupExperiment must be called at least once before calling fmi2EnterInitializationMode, in order that startTime is defined.
+"""
+function fmi3EnterInitializationMode(c::fmi3Component)
+    ccall(c.fmu.cEnterInitializationMode,
+          Cuint,
+          (Ptr{Nothing},),
+          c.compAddr)
+end
+
+"""
+Source: FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
+
+Informs the FMU to exit Initialization Mode.
+"""
+function fmi3ExitInitializationMode(c::fmi3Component)
+    ccall(c.fmu.cExitInitializationMode,
+          Cuint,
+          (Ptr{Nothing},),
+          c.compAddr)
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.6 Initialization, Termination, and Resetting an FMU
+
+Informs the FMU that the simulation run is terminated.
+"""
+function fmi3Terminate(c::fmi3Component)
+    ccall(c.fmu.cTerminate, Cuint, (Ptr{Nothing},), c.compAddr)
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.6 Initialization, Termination, and Resetting an FMU
+
+Is called by the environment to reset the FMU after a simulation run. The FMU goes into the same state as if fmi2Instantiate would have been called.
+"""
+function fmi3Reset(c::fmi3Component)
+    ccall(c.fmu.cReset, Cuint, (Ptr{Nothing},), c.compAddr)
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3GetFloat32!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Float32}, nvalue::Csize_t)
+    ccall(c.fmu.cGetFloat32,
+          Cuint,
+          (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Float32}, Csize_t),
+          c.compAddr, vr, nvr, value, nvalue)
+end
+
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3SetFloat32(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Float32}, nvalue::Csize_t)
+    status = ccall(c.fmu.cSetFloat32,
+                Cuint,
+                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Float32}, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3GetFloat64!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Float64}, nvalue::Csize_t)
+    ccall(c.fmu.cGetFloat64,
+          Cuint,
+          (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Float64}, Csize_t),
+          c.compAddr, vr, nvr, value, nvalue)
+end
+
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3SetFloat64(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Float64}, nvalue::Csize_t)
+    status = ccall(c.fmu.cSetFloat64,
+                Cuint,
+                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Float64}, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3GetInt8!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int8}, nvalue::Csize_t)
+    ccall(c.fmu.cGetInt8,
+          Cuint,
+          (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Int8}, Csize_t),
+          c.compAddr, vr, nvr, value, nvalue)
+end
+
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3SetInt8(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int8}, nvalue::Csize_t)
+    status = ccall(c.fmu.cSetInt8,
+                Cuint,
+                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Int8}, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3GetUInt8!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3UInt8}, nvalue::Csize_t)
+    ccall(c.fmu.cGetUInt8,
+          Cuint,
+          (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3UInt8}, Csize_t),
+          c.compAddr, vr, nvr, value, nvalue)
+end
+
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3SetUInt8(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int8}, nvalue::Csize_t)
+    status = ccall(c.fmu.cSetUInt8,
+                Cuint,
+                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3UInt8}, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3GetInt16!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int16}, nvalue::Csize_t)
+    ccall(c.fmu.cGetInt16,
+          Cuint,
+          (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Int16}, Csize_t),
+          c.compAddr, vr, nvr, value, nvalue)
+end
+
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3SetInt16(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int16}, nvalue::Csize_t)
+    status = ccall(c.fmu.cSetInt16,
+                Cuint,
+                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Int16}, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3GetUInt16!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3UInt16}, nvalue::Csize_t)
+    ccall(c.fmu.cGetUInt16,
+          Cuint,
+          (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3UInt16}, Csize_t),
+          c.compAddr, vr, nvr, value, nvalue)
+end
+
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3SetUInt16(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int16}, nvalue::Csize_t)
+    status = ccall(c.fmu.cSetUInt16,
+                Cuint,
+                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3UInt16}, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3GetInt32!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int32}, nvalue::Csize_t)
+    ccall(c.fmu.cGetInt32,
+          Cuint,
+          (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Int32}, Csize_t),
+          c.compAddr, vr, nvr, value, nvalue)
+end
+
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3SetInt32(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int32}, nvalue::Csize_t)
+    status = ccall(c.fmu.cSetInt32,
+                Cuint,
+                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Int32}, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3GetUInt32!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3UInt32}, nvalue::Csize_t)
+    ccall(c.fmu.cGetUInt32,
+          Cuint,
+          (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3UInt32}, Csize_t),
+          c.compAddr, vr, nvr, value, nvalue)
+end
+
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3SetUInt32(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int32}, nvalue::Csize_t)
+    status = ccall(c.fmu.cSetUInt32,
+                Cuint,
+                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3UInt32}, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3GetInt64!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int64}, nvalue::Csize_t)
+    ccall(c.fmu.cGetInt64,
+          Cuint,
+          (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Int64}, Csize_t),
+          c.compAddr, vr, nvr, value, nvalue)
+end
+
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3SetInt64(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int64}, nvalue::Csize_t)
+    status = ccall(c.fmu.cSetInt64,
+                Cuint,
+                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Int64}, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3GetUInt64!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3UInt64}, nvalue::Csize_t)
+    ccall(c.fmu.cGetUInt64,
+          Cuint,
+          (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3UInt64}, Csize_t),
+          c.compAddr, vr, nvr, value, nvalue)
+end
+
+
+"""
+Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+
+Functions to get and set values of variables idetified by their valueReference
+"""
+function fmi3SetUInt64(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int64}, nvalue::Csize_t)
+    status = ccall(c.fmu.cSetUInt64,
+                Cuint,
+                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3UInt64}, Csize_t),
+                c.compAddr, vr, nvr, value, nvalue)
+    status
+end

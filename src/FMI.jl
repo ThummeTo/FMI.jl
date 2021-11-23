@@ -113,6 +113,33 @@ end
 function prepareValueReference(comp::fmi2Component, vr::fmi2ValueReferenceFormat)
     prepareValueReference(comp.fmu.modelDescription, vr)
 end
+# TODO just copied the functions might be joined in a new union datatype
+function prepareValueReference(md::fmi3ModelDescription, vr::fmi3ValueReferenceFormat)
+    tvr = typeof(vr)
+    if tvr == Array{fmi3ValueReference,1}
+        return vr
+    elseif tvr == fmi3ValueReference
+        return [vr]
+    elseif tvr == String
+        return [fmi3String2ValueReference(md, vr)]
+    elseif tvr == Array{String,1}
+        return fmi3String2ValueReference(md, vr)
+    elseif tvr == Int64
+        return [fmi3ValueReference(vr)]
+    elseif tvr == Array{Int64,1}
+        return fmi3ValueReference.(vr)
+    elseif tvr == Nothing
+        return []
+    end
+
+    @assert false "prepareValueReference(...): Unknown value reference structure `$tvr`."
+end
+function prepareValueReference(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    prepareValueReference(fmu.modelDescription, vr)
+end
+function prepareValueReference(comp::fmi3Component, vr::fmi3ValueReferenceFormat)
+    prepareValueReference(comp.fmu.modelDescription, vr)
+end
 
 # Receives one or an array of values and converts it into an Array{typeof(value)} (if not already).
 function prepareValue(value)
@@ -141,6 +168,17 @@ Enter ```fmi2String2ValueReference``` for more information.
 """
 function fmiString2ValueReference(dataStruct::Union{FMU2, fmi2ModelDescription}, identifier::Union{String, Array{String}})
     fmi2String2ValueReference(dataStruct, identifier)
+end
+
+# TODO join in with function above
+
+"""
+Returns the ValueReference coresponding to the variable name.
+
+Enter ```fmi2String2ValueReference``` for more information.
+"""
+function fmiString2ValueReference(dataStruct::Union{FMU3, fmi3ModelDescription}, identifier::Union{String, Array{String}})
+    fmi3String2ValueReference(dataStruct, identifier)
 end
 
 # Wrapping modelDescription Functions

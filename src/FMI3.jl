@@ -7,7 +7,7 @@ using Libdl
 using ZipFile
 
 include("FMI3_c.jl")
-# include("FMI3_comp.jl")
+include("FMI3_comp.jl")
 include("FMI3_md.jl")
 
 """
@@ -36,19 +36,33 @@ mutable struct FMU3 <: FMU
     cInstantiateModelExchange::Ptr{Cvoid}
     cInstantiateCoSimulation::Ptr{Cvoid}
 
-    cGetTypesPlatform::Ptr{Cvoid}
     cGetVersion::Ptr{Cvoid}
     cFreeInstance::Ptr{Cvoid}
     cSetDebugLogging::Ptr{Cvoid}
-    cSetupExperiment::Ptr{Cvoid}
     cEnterInitializationMode::Ptr{Cvoid}
     cExitInitializationMode::Ptr{Cvoid}
     cTerminate::Ptr{Cvoid}
     cReset::Ptr{Cvoid}
-    cGetReal::Ptr{Cvoid}
-    cSetReal::Ptr{Cvoid}
-    cGetInteger::Ptr{Cvoid}
-    cSetInteger::Ptr{Cvoid}
+    cGetFloat32::Ptr{Cvoid}
+    cSetFloat32::Ptr{Cvoid}
+    cGetFloat64::Ptr{Cvoid}
+    cSetFloat64::Ptr{Cvoid}
+    cGetInt8::Ptr{Cvoid}
+    cSetInt8::Ptr{Cvoid}
+    cGetUInt8::Ptr{Cvoid}
+    cSetUInt8::Ptr{Cvoid}
+    cGetInt16::Ptr{Cvoid}
+    cSetInt16::Ptr{Cvoid}
+    cGetUInt16::Ptr{Cvoid}
+    cSetUInt16::Ptr{Cvoid}
+    cGetInt32::Ptr{Cvoid}
+    cSetInt32::Ptr{Cvoid}
+    cGetUInt32::Ptr{Cvoid}
+    cSetUInt32::Ptr{Cvoid}
+    cGetInt64::Ptr{Cvoid}
+    cSetInt64::Ptr{Cvoid}
+    cGetUInt64::Ptr{Cvoid}
+    cSetUInt64::Ptr{Cvoid}
     cGetBoolean::Ptr{Cvoid}
     cSetBoolean::Ptr{Cvoid}
     cGetString::Ptr{Cvoid}
@@ -208,16 +222,33 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
     # # retrieve functions TODO check new Names and availability in FMI3
     fmu.cInstantiateModelExchange                  = dlsym(fmu.libHandle, :fmi3InstantiateModelExchange)
     fmu.cInstantiateCoSimulation                   = dlsym(fmu.libHandle, :fmi3InstantiateCoSimulation)
-    # fmu.cGetTypesPlatform             = dlsym(fmu.libHandle, :fmi2GetTypesPlatform)
-    # fmu.cGetVersion                   = dlsym(fmu.libHandle, :fmi2GetVersion)
-    # fmu.cFreeInstance                 = dlsym(fmu.libHandle, :fmi2FreeInstance)
-    # fmu.cSetDebugLogging              = dlsym(fmu.libHandle, :fmi2SetDebugLogging)
-    # fmu.cSetupExperiment              = dlsym(fmu.libHandle, :fmi2SetupExperiment)
-    # fmu.cEnterInitializationMode      = dlsym(fmu.libHandle, :fmi2EnterInitializationMode)
-    # fmu.cExitInitializationMode       = dlsym(fmu.libHandle, :fmi2ExitInitializationMode)
-    # fmu.cTerminate                    = dlsym(fmu.libHandle, :fmi2Terminate)
-    # fmu.cReset                        = dlsym(fmu.libHandle, :fmi2Reset)
-    # fmu.cGetReal                      = dlsym(fmu.libHandle, :fmi2GetReal)
+    fmu.cGetVersion                                = dlsym(fmu.libHandle, :fmi3GetVersion)
+    fmu.cFreeInstance                              = dlsym(fmu.libHandle, :fmi3FreeInstance)
+    fmu.cSetDebugLogging                           = dlsym(fmu.libHandle, :fmi3SetDebugLogging)
+    fmu.cEnterInitializationMode                   = dlsym(fmu.libHandle, :fmi3EnterInitializationMode)
+    fmu.cExitInitializationMode                    = dlsym(fmu.libHandle, :fmi3ExitInitializationMode)
+    fmu.cTerminate                                 = dlsym(fmu.libHandle, :fmi3Terminate)
+    fmu.cReset                                     = dlsym(fmu.libHandle, :fmi3Reset)
+    fmu.cGetFloat32                                = dlsym(fmu.libHandle, :fmi3GetFloat32)
+    fmu.cSetFloat32                                = dlsym(fmu.libHandle, :fmi3SetFloat32)
+    fmu.cGetFloat64                                = dlsym(fmu.libHandle, :fmi3GetFloat64)
+    fmu.cSetFloat64                                = dlsym(fmu.libHandle, :fmi3SetFloat64)
+    fmu.cGetInt8                                   = dlsym(fmu.libHandle, :fmi3GetInt8)
+    fmu.cSetInt8                                   = dlsym(fmu.libHandle, :fmi3SetInt8)
+    fmu.cGetUInt8                                  = dlsym(fmu.libHandle, :fmi3GetUInt8)
+    fmu.cSetUInt8                                  = dlsym(fmu.libHandle, :fmi3SetUInt8)
+    fmu.cGetInt16                                  = dlsym(fmu.libHandle, :fmi3GetInt16)
+    fmu.cSetInt16                                  = dlsym(fmu.libHandle, :fmi3SetInt16)
+    fmu.cGetUInt16                                 = dlsym(fmu.libHandle, :fmi3GetUInt16)
+    fmu.cSetUInt16                                 = dlsym(fmu.libHandle, :fmi3SetUInt16)
+    fmu.cGetInt32                                  = dlsym(fmu.libHandle, :fmi3GetInt32)
+    fmu.cSetInt32                                  = dlsym(fmu.libHandle, :fmi3SetInt32)
+    fmu.cGetUInt32                                 = dlsym(fmu.libHandle, :fmi3GetUInt32)
+    fmu.cSetUInt32                                 = dlsym(fmu.libHandle, :fmi3SetUInt32)
+    fmu.cGetInt64                                  = dlsym(fmu.libHandle, :fmi3GetInt64)
+    fmu.cSetInt64                                  = dlsym(fmu.libHandle, :fmi3SetInt64)
+    fmu.cGetUInt64                                 = dlsym(fmu.libHandle, :fmi3GetUInt64)
+    fmu.cSetUInt64                                 = dlsym(fmu.libHandle, :fmi3SetUInt64)
     # fmu.cSetReal                      = dlsym(fmu.libHandle, :fmi2SetReal)
     # fmu.cGetInteger                   = dlsym(fmu.libHandle, :fmi2GetInteger)
     # fmu.cSetInteger                   = dlsym(fmu.libHandle, :fmi2SetInteger)
@@ -320,6 +351,39 @@ end
 function fmi3IsModelExchange(fmu::FMU3)
     fmi3IsModelExchange(fmu.modelDescription)
 end
+
+"""
+Returns an array of ValueReferences coresponding to the variable names.
+"""
+function fmi3String2ValueReference(md::fmi3ModelDescription, names::Array{String})
+    vr = Array{fmi3ValueReference}(undef,0)
+    for name in names
+        reference = fmi3String2ValueReference(md, name)
+        if reference === nothing
+            @warn "Value reference for variable '$name' not found, skipping."
+        else
+            push!(vr, reference)
+        end
+    end
+    vr
+end
+
+"""
+Returns the ValueReference coresponding to the variable name.
+"""
+function fmi3String2ValueReference(md::fmi3ModelDescription, name::String)
+    reference = nothing
+    if haskey(md.stringValueReferences, name)
+        reference = md.stringValueReferences[name]
+    else
+        @warn "No variable named '$name' found."
+    end
+    reference
+end
+
+function fmi3String2ValueReference(fmu::FMU3, name::Union{String, Array{String}})
+    fmi3String2ValueReference(fmu.modelDescription, name)
+end
 """
 Create a copy of the .fmu file as a .zip folder and unzips it.
 Returns the paths to the zipped and unzipped folders.
@@ -331,7 +395,7 @@ function fmi3Unzip(pathToFMU::String; unpackPath=nothing)
     fileNameExt = basename(pathToFMU)
     (fileName, fileExt) = splitext(fileNameExt)
         
-    if unpackPath == nothing
+    if unpackPath === nothing
         # cleanup=true leads to issues with automatic testing on linux server.
         unpackPath = mktempdir(; prefix="fmijl_", cleanup=false)
     end
@@ -472,8 +536,8 @@ function fmi3InstantiateCoSimulation!(fmu::FMU3; visible::Bool = false, loggingO
     end
     fmu.fmi3CallbackLoggerFunction = fmi3CallbackLoggerFunction(ptrLogger) #, ptrAllocateMemory, ptrFreeMemory, ptrStepFinished, C_NULL)
     fmu.fmi3CallbackIntermediateUpdateFunction = fmi3CallbackIntermediateUpdateFunction(ptrIntermediateUpdate)
-    compAddr = fmi3InstantiateModelExchange(fmu.cInstantiateCoSimulation, fmu.instanceName, fmu.modelDescription.instantiationToken, fmu.fmuResourceLocation, fmi3Boolean(visible), fmi3Boolean(loggingOn), 
-                                            fmi3Boolean(mode), fmi3Boolean(fmu.modelDescription.CScanReturnEarlyAfterIntermediateUpdate), fmu.modelDescription.intermediateUpdateValueReferences, length(fmu.modelDescription.intermediateUpdateValueReferences), fmu.instanceEnvironment, fmu.fmi3CallbackLoggerFunction, fmu.fmi3CallbackIntermediateUpdateFunction)
+    compAddr = fmi3InstantiateCoSimulation(fmu.cInstantiateCoSimulation, fmu.instanceName, fmu.modelDescription.instantiationToken, fmu.fmuResourceLocation, fmi3Boolean(visible), fmi3Boolean(loggingOn), 
+                                            fmi3Boolean(mode), fmi3Boolean(fmu.modelDescription.CScanReturnEarlyAfterIntermediateUpdate), fmu.modelDescription.intermediateUpdateValueReferences, Csize_t(length(fmu.modelDescription.intermediateUpdateValueReferences)), fmu.instanceEnvironment, fmu.fmi3CallbackLoggerFunction, fmu.fmi3CallbackIntermediateUpdateFunction)
 
     if compAddr == Ptr{Cvoid}(C_NULL)
         @error "fmi2Instantiate!(...): Instantiation failed!"
@@ -483,4 +547,400 @@ function fmi3InstantiateCoSimulation!(fmu::FMU3; visible::Bool = false, loggingO
     component = fmi3Component(compAddr, fmu)
     push!(fmu.components, component)
     component
+end
+
+"""
+TODO: FMI specification reference.
+
+Returns the version of the FMI Standard used in this FMU.
+
+For more information call ?fmi2GetVersion
+"""
+function fmi3GetVersion(fmu::FMU3)
+    fmi3GetVersion(fmu.cGetVersion)
+end
+
+"""
+TODO: FMI specification reference.
+
+Sets debug logging for the FMU.
+
+For more information call ?fmi2SetDebugLogging
+"""
+function fmi3SetDebugLogging(fmu::FMU3)
+    fmi3SetDebugLogging(fmu.components[end])
+end
+
+"""
+TODO: FMI specification reference.
+
+FMU enters Initialization mode.
+
+For more information call ?fmi2EnterInitializationMode
+"""
+function fmi3EnterInitializationMode(fmu::FMU3)
+    fmi3EnterInitializationMode(fmu.components[end])
+end
+
+"""
+TODO: FMI specification reference.
+
+FMU exits Initialization mode.
+
+For more information call ?fmi2ExitInitializationMode
+"""
+function fmi3ExitInitializationMode(fmu::FMU3)
+    fmi3ExitInitializationMode(fmu.components[end])
+end
+
+"""
+TODO: FMI specification reference.
+
+Informs FMU that simulation run is terminated.
+
+For more information call ?fmi2Terminate
+"""
+function fmi3Terminate(fmu::FMU3)
+    fmi3Terminate(fmu.components[end])
+end
+
+"""
+TODO: FMI specification reference.
+
+Resets FMU.
+
+For more information call ?fmi2Reset
+"""
+function fmi3Reset(fmu::FMU3)
+    fmi3Reset(fmu.components[end])
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetFloat32(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    fmi3GetFloat32(fmu.components[end], vr)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetFloat32!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Float32}, fmi3Float32})
+    fmi2GetFloat32!(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Real variables.
+
+For more information call ?fmi2SetReal
+"""
+function fmi3SetFloat32(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Float32}, fmi3Float32})
+    fmi3SetFloat32(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetFloat64(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    fmi3GetFloat64(fmu.components[end], vr)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetFloat64!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Float64}, fmi3Float64})
+    fmi2GetFloat64!(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Real variables.
+
+For more information call ?fmi2SetReal
+"""
+function fmi3SetFloat64(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Float64}, fmi3Float64})
+    fmi3SetFloat64(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetInt8(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    fmi3GetInt8(fmu.components[end], vr)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetInt8!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int8}, fmi3Int8})
+    fmi2GetInt8!(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Real variables.
+
+For more information call ?fmi2SetReal
+"""
+function fmi3SetInt8(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int8}, fmi3Int8})
+    fmi3SetInt8(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetUInt8(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    fmi3GetUInt8(fmu.components[end], vr)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetUInt8!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt8}, fmi3UInt8})
+    fmi2GetUInt8!(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Real variables.
+
+For more information call ?fmi2SetReal
+"""
+function fmi3SetUInt8(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt8}, fmi3UInt8})
+    fmi3SetUInt8(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetInt16(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    fmi3GetInt16(fmu.components[end], vr)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetInt16!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int16}, fmi3Int16})
+    fmi2GetInt16!(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Real variables.
+
+For more information call ?fmi2SetReal
+"""
+function fmi3SetInt16(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int16}, fmi3Int16})
+    fmi3SetInt16(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetUInt16(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    fmi3GetUInt16(fmu.components[end], vr)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetUInt16!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt16}, fmi3UInt16})
+    fmi2GetUInt16!(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Real variables.
+
+For more information call ?fmi2SetReal
+"""
+function fmi3SetUInt16(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt16}, fmi3UInt16})
+    fmi3SetUInt16(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetInt32(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    fmi3GetInt32(fmu.components[end], vr)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetInt32!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int32}, fmi3Int32})
+    fmi2GetInt32!(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Real variables.
+
+For more information call ?fmi2SetReal
+"""
+function fmi3SetInt32(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int32}, fmi3Int32})
+    fmi3SetInt32(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetUInt32(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    fmi3GetUInt32(fmu.components[end], vr)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetUInt32!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt32}, fmi3UInt32})
+    fmi2GetUInt32!(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Real variables.
+
+For more information call ?fmi2SetReal
+"""
+function fmi3SetUInt32(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt32}, fmi3UInt32})
+    fmi3SetUInt32(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    fmi3GetInt64(fmu.components[end], vr)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetInt64!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int64}, fmi3Int64})
+    fmi2GetInt64!(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Real variables.
+
+For more information call ?fmi2SetReal
+"""
+function fmi3SetInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int64}, fmi3Int64})
+    fmi3SetInt64(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetUInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    fmi3GetUInt64(fmu.components[end], vr)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the values of an array of fmi2Real variables.
+
+For more information call ?fmi2GetReal!
+"""
+function fmi3GetUInt64!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt64}, fmi3UInt64})
+    fmi2GetUInt64!(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Set the values of an array of fmi2Real variables.
+
+For more information call ?fmi2SetReal
+"""
+function fmi3SetUInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt64}, fmi3UInt64})
+    fmi3SetUInt64(fmu.components[end], vr, values)
 end

@@ -8,17 +8,35 @@ using FMI
 # xml = FMI.fmi3ReadModelDescription("model/fmi3/VanDerPol/modelDescription.xml")
 
 fmu = FMI.fmi3Load("model/fmi3/BouncingBall.fmu")
-instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
+# instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
 instance2 = FMI.fmi3InstantiateCoSimulation!(fmu)
-fmu.components
+# fmu.components
+FMI.fmi3GetVersion(fmu)
+FMI.fmi3SetDebugLogging(fmu)
+FMI.fmi3EnterInitializationMode(fmu)
+FMI.fmi3GetFloat64(fmu, "g")
+FMI.fmi3SetFloat64(fmu, ["g"], [0.5])
+FMI.fmi3GetFloat64(fmu, "g")
+FMI.fmi3ExitInitializationMode(fmu)
+FMI.fmi3Terminate(fmu)
+FMI.fmi3Reset(fmu)
 FMI.fmi3Unload(fmu)
 
 fmu = FMI.fmi3Load("model/fmi3/Dahlquist.fmu")
 instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
+instance2 = FMI.fmi3InstantiateCoSimulation!(fmu)
 FMI.fmi3Unload(fmu)
 
 fmu = FMI.fmi3Load("model/fmi3/Feedthrough.fmu")
 instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
+instance2 = FMI.fmi3InstantiateCoSimulation!(fmu)
+FMI.fmi3EnterInitializationMode(fmu)
+FMI.fmi3GetInt32(fmu, "int_in")
+FMI.fmi3SetInt32(fmu, ["int_in"], [FMI.fmi3Int32(2)])
+FMI.fmi3GetInt32(fmu, "int_in")
+FMI.fmi3ExitInitializationMode(fmu)
+FMI.fmi3Terminate(fmu)
+FMI.fmi3Reset(fmu)
 FMI.fmi3Unload(fmu)
 
 # fmu = FMI.fmi3Load("model/fmi3/LinearTransform.fmu")
@@ -26,8 +44,10 @@ FMI.fmi3Unload(fmu)
 
 fmu = FMI.fmi3Load("model/fmi3/Stair.fmu")
 instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
+instance2 = FMI.fmi3InstantiateCoSimulation!(fmu)
 FMI.fmi3Unload(fmu)
 
 fmu = FMI.fmi3Load("model/fmi3/VanDerPol.fmu")
 instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
+instance2 = FMI.fmi3InstantiateCoSimulation!(fmu)
 FMI.fmi3Unload(fmu)
