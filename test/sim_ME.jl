@@ -6,6 +6,8 @@
 t_start = 0.0
 t_stop = 8.0
 
+# case 1: ME-FMU with state events
+
 pathToFMU = joinpath(dirname(@__FILE__), "..", "model", ENV["EXPORTINGTOOL"], "SpringFrictionPendulum1D.fmu")
 
 myFMU = fmiLoad(pathToFMU)
@@ -34,6 +36,7 @@ solution = fmiSimulateME(fmuStruct, t_start, t_stop)
 @test solution.u[1] == [0.5, 0.0]
 @test sum(abs.(solution.u[end] - [1.06736, -1.03552e-10])) < 0.01
 
-# ToDo: Add test with time-dependent FMU
+# case 2: ME-FMU with state and time events
+# ToDo 
 
 fmiUnload(myFMU)

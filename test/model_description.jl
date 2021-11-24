@@ -17,9 +17,9 @@ myFMU = fmiLoad(pathToFMU)
 @test fmiIsModelExchange(myFMU) == true
 
 if tool == "Dymola/2020x"
-    @test fmiGetGUID(myFMU) == "{a357de9f-764f-41f1-81c4-b2d344c98a37}"
+    @test fmiGetGUID(myFMU) == "{b02421b8-652a-4d48-9ffc-c2b223aa1b94}"
     @test fmiGetGenerationTool(myFMU) == "Dymola Version 2020x (64-bit), 2019-10-10"
-    @test fmiGetGenerationDateAndTime(myFMU) == "2021-05-06T08:23:56Z"
+    @test fmiGetGenerationDateAndTime(myFMU) == "2021-11-23T13:36:30Z"
     @test fmiGetNumberOfEventIndicators(myFMU) == 24
     @test fmiCanGetSetState(myFMU) == true
     @test fmiCanSerializeFMUstate(myFMU) == true
