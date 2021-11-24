@@ -132,7 +132,6 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
         fmi2ExitInitializationMode(c)
     end
 
-
     eventHandling = c.fmu.modelDescription.numberOfEventIndicators > 0
     
     # First evaluation of the FMU
@@ -141,7 +140,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
 
     fmi2SetContinuousStates(c, x0)
     
-    handleEvents(c, false,false)
+    handleEvents(c, false, false)
 
     # Get states of handling initial Events
     x0 = fmi2GetContinuousStates(c)
@@ -150,10 +149,12 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     p = []
     problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
 
-    # TODO: Make it more elegant
-    eventInfo = fmi2NewDiscreteStates(c)
-    fmi2EnterContinuousTimeMode(c)
     if eventHandling
+
+        eventInfo = fmi2NewDiscreteStates(c)
+        fmi2EnterContinuousTimeMode(c)
+
+        timeEvents = (eventInfo.nextEventTimeDefined == fmi2True)
       
         eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator),
           (integrator, idx) -> affectFMU!(c, integrator, idx),
@@ -164,7 +165,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
           func_everystep = true,
           func_start = true)
 
-        if Bool(eventInfo.nextEventTimeDefined)
+        if timeEvents
             timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator),
               (integrator) -> affectFMU!(c, integrator, 0), Float64; initial_affect = true)
         
