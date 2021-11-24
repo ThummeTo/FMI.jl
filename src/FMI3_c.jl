@@ -24,7 +24,7 @@ const fmi3String = String # TODO: correct it
 const fmi3Byte = Cuchar
 const fmi3Binary = Ptr{fmi3Byte}
 const fmi3ValueReference = Cint
-const fmi3FMUstate = Ptr{Cvoid}
+const fmi3FMUState = Ptr{Cvoid}
 const fmi3InstanceEnvironment = Ptr{Cvoid}
 const fmi3Enum = Array{Array{String}} # TODO: correct it
 const fmi3Clock = Cint
@@ -101,9 +101,9 @@ function fmi3CallbackLogMessage(instanceEnvironment::Ptr{Cvoid},
     _category = unsafe_string(category)
     _status = fmi2StatusString(status)
 
-    if status == Integer(fmi2OK)
+    if status == Integer(fmi3OK)
         @info "[$_status][$_category]: $_message"
-    elseif status == Integer(fmi2Warning)
+    elseif status == Integer(fmi3Warning)
         @warn "[$_status][$_category]: $_message"
     else
         @error "[$_status][$_category]: $_message"
@@ -833,4 +833,299 @@ function fmi3SetClock(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csiz
                 (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Clock}, Csize_t),
                 c.compAddr, vr, nvr, value, nvalue)
     status
+end
+
+"""
+Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
+
+fmi2GetFMUstate makes a copy of the internal FMU state and returns a pointer to this copy
+"""
+function fmi3GetFMUState(c::fmi3Component, FMUstate::Ref{fmi3FMUState})
+    status = ccall(c.fmu.cGetFMUState,
+                Cuint,
+                (Ptr{Nothing}, Ptr{fmi3FMUState}),
+                c.compAddr, FMUstate)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
+
+fmi2SetFMUstate copies the content of the previously copied FMUstate back and uses it as actual new FMU state.
+"""
+function fmi3SetFMUState(c::fmi3Component, FMUstate::fmi3FMUState)
+    status = ccall(c.fmu.cSetFMUState,
+                Cuint,
+                (Ptr{Nothing}, fmi3FMUState),
+                c.compAddr, FMUstate)
+    status
+end
+
+"""
+Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
+
+fmi2FreeFMUstate frees all memory and other resources allocated with the fmi2GetFMUstate call for this FMUstate.
+"""
+function fmi3FreeFMUState(c::fmi3Component, FMUstate::Ref{fmi3FMUState})
+    status = ccall(c.fmu.cFreeFMUState,
+                Cuint,
+                (Ptr{Nothing}, Ptr{fmi3FMUState}),
+                c.compAddr, FMUstate)
+    status
+end
+
+# TODO keeps crashing Julia
+"""
+Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
+
+fmi2SerializedFMUstateSize returns the size of the byte vector, in order that FMUstate can be stored in it.
+"""
+function fmi3SerializedFMUStateSize(c::fmi3Component, FMUstate::fmi3FMUState, size::Ref{Csize_t})
+    status = ccall(c.fmu.cSerializedFMUStateSize,
+                Cuint,
+                (Ptr{Nothing}, Ptr{Cvoid}, Ptr{Csize_t}),
+                c.compAddr, FMUstate, size)
+end
+
+"""
+Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
+
+fmi2SerializeFMUstate serializes the data which is referenced by pointer FMUstate and copies this data in to the byte vector serializedState of length size
+"""
+function fmi3SerializeFMUState(c::fmi3Component, FMUstate::fmi3FMUState, serialzedState::Array{fmi3Byte}, size::Csize_t)
+    status = ccall(c.fmu.cSerializeFMUState,
+                Cuint,
+                (Ptr{Nothing}, Ptr{Cvoid}, Ptr{Cchar}, Csize_t),
+                c.compAddr, FMUstate, serialzedState, size)
+end
+
+"""
+Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
+
+fmi2DeSerializeFMUstate deserializes the byte vector serializedState of length size, constructs a copy of the FMU state and returns FMUstate, the pointer to this copy.
+"""
+function fmi3DeSerializeFMUState(c::fmi3Component, serialzedState::Array{fmi3Byte}, size::Csize_t, FMUstate::Ref{fmi3FMUState})
+    status = ccall(c.fmu.cDeSerializeFMUState,
+                Cuint,
+                (Ptr{Nothing}, Ptr{Cchar}, Csize_t, Ptr{fmi3FMUState}),
+                c.compAddr, serialzedState, size, FMUstate)
+end
+
+# TODO Clocks and dependencies functions
+
+# TODO Modeldescription for testing anpassen
+"""
+Source: FMISpec2.0.2[p.26]: 2.1.9 Getting Partial Derivatives
+
+This function computes the directional derivatives of an FMU.
+"""
+function fmi3GetDirectionalDerivative!(c::fmi3Component,
+                                       unknowns::Array{fmi3ValueReference},
+                                       nUnknowns::Csize_t,
+                                       knowns::Array{fmi3ValueReference},
+                                       nKnowns::Csize_t,
+                                       seed::Array{fmi3Float64},
+                                       nSeed::Csize_t,
+                                       sensitivity::Array{fmi3Float64},
+                                       nSensitivity::Csize_t)
+    @assert fmi3ProvidesDirectionalDerivative(c.fmu) ["fmi3GetDirectionalDerivative!(...): This FMU does not support build-in directional derivatives!"]
+    ccall(c.fmu.cGetDirectionalDerivative,
+          Cuint,
+          (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Float64}, Csize_t, Ptr{fmi3Float64}, Csize_t),
+          c.compAddr, unknowns, nUnknowns, knowns, nKnowns, seed, nSeed, sensitivity, nSensitivity)
+    
+end
+
+"""
+Source: FMISpec2.0.2[p.104]: 4.2.1 Transfer of Input / Output Values and Parameters
+
+Retrieves the n-th derivative of output values.
+vr defines the value references of the variables
+the array order specifies the corresponding order of derivation of the variables
+"""
+function fmi3GetOutputDerivatives(c::fmi3Component,  vr::fmi3ValueReference, nValueReferences::Csize_t, order::fmi3Int32, values::fmi3Float64, nValues::Csize_t)
+    status = ccall(c.fmu.cGetOutputDerivatives,
+                Cuint,
+                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Int32}, Ptr{Cdouble}, Csize_t),
+                c.compAddr, Ref(vr), nValueReferences, Ref(order), Ref(values), nValues)
+end
+
+function fmi3EnterConfigurationMode(c::fmi3Component)
+    ccall(c.fmu.cEnterConfigurationMode,
+            Cuint,
+            (Ptr{Nothing},),
+            c.compAddr)
+end
+
+function fmi3GetNumberOfContinuousStates(c::fmi3Component, nContinuousStates::Ref{Csize_t})
+    ccall(c.fmu.cGetNumberOfContinuousStates,
+            Cuint,
+            (Ptr{Nothing}, Ptr{Csize_t}),
+            c.compAddr, nContinuousStates)
+end
+
+function fmi3GetNumberOfEventIndicators(c::fmi3Component, nEventIndicators::Ref{Csize_t})
+    ccall(c.fmu.cGetNumberOfEventIndicators,
+            Cuint,
+            (Ptr{Nothing}, Ptr{Csize_t}),
+            c.compAddr, nEventIndicators)
+end
+
+function fmi3GetContinuousStates(c::fmi3Component, nominals::Array{fmi3Float64}, nContinuousStates::Csize_t)
+    ccall(c.fmu.cGetContinuousStates,
+            Cuint,
+            (Ptr{Nothing}, Ptr{fmi3Float64}, Csize_t),
+            c.compAddr, nominals, nContinuousStates)
+end
+
+"""
+Source: FMISpec2.0.2[p.86]: 3.2.2 Evaluation of Model Equations
+
+Return the nominal values of the continuous states.
+"""
+function fmi3GetNominalsOfContinuousStates(c::fmi3Component, x_nominal::Array{fmi3Float64}, nx::Csize_t)
+    status = ccall(c.fmu.cGetNominalsOfContinuousStates,
+                    Cuint,
+                    (Ptr{Nothing}, Ptr{fmi3Float64}, Csize_t),
+                    c.compAddr, x_nominal, nx)
+end
+
+function fmi3EvaluateDiscreteStates(c::fmi3Component)
+    ccall(c.fmu.cEvaluateDiscreteStates,
+            Cuint,
+            (Ptr{Nothing},),
+            c.compAddr)
+end
+
+# TODO implementation in FMI3.jl and FMI3_comp.jl
+function fmi3UpdateDiscreteStates(c::fmi3Component, disreteStatesNeedUpdate::Ref{fmi3Boolean}, terminateSimulation::Ref{fmi3Boolean}, 
+                                    nominalsOfContinuousStatesChanged::Ref{fmi3Boolean}, valuesOfContinuousStatesChanged::Ref{fmi3Boolean},
+                                    nextEventTimeDefined::Ref{fmi3Boolean}, nextEventTime::Ref{fmi3Float64})
+    ccall(c.fmu.cUpdateDiscreteStates,
+            Cuint,
+            (Ptr{Nothing}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Float64}),
+            c.compAddr, disreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
+end
+
+"""
+Source: FMISpec2.0.2[p.85]: 3.2.2 Evaluation of Model Equations
+
+The model enters Continuous-Time Mode and all discrete-time equations become inactive and all relations are “frozen”.
+This function has to be called when changing from Event Mode (after the global event iteration in Event Mode over all involved FMUs and other models has converged) into Continuous-Time Mode.
+"""
+function fmi3EnterContinuousTimeMode(c::fmi3Component)
+    ccall(c.fmu.cEnterContinuousTimeMode,
+          Cuint,
+          (Ptr{Nothing},),
+          c.compAddr)
+end
+
+function fmi3EnterStepMode(c::fmi3Component)
+    ccall(c.fmu.cEnterStepMode,
+          Cuint,
+          (Ptr{Nothing},),
+          c.compAddr)
+end
+
+function fmi3ExitConfigurationMode(c::fmi3Component)
+    ccall(c.fmu.cExitConfigurationMode,
+          Cuint,
+          (Ptr{Nothing},),
+          c.compAddr)
+end
+
+"""
+Source: FMISpec2.0.2[p.83]: 3.2.1 Providing Independent Variables and Re-initialization of Caching
+
+Set a new time instant and re-initialize caching of variables that depend on time, provided the newly provided time value is different to the previously set time value (variables that depend solely on constants or parameters need not to be newly computed in the sequel, but the previously computed values can be reused).
+"""
+function fmi3SetTime(c::fmi3Component, time::fmi3Float64)
+    ccall(c.fmu.cSetTime,
+          Cuint,
+          (Ptr{Nothing}, fmi3Float64),
+          c.compAddr, time)
+end
+
+"""
+Source: FMISpec2.0.2[p.83]: 3.2.1 Providing Independent Variables and Re-initialization of Caching
+
+Set a new (continuous) state vector and re-initialize caching of variables that depend on the states. Argument nx is the length of vector x and is provided for checking purposes
+"""
+function fmi3SetContinuousStates(c::fmi3Component,
+                                 x::Array{fmi3Float64},
+                                 nx::Csize_t)
+    ccall(c.fmu.cSetContinuousStates,
+         Cuint,
+         (Ptr{Nothing}, Ptr{fmi3Float64}, Csize_t),
+         c.compAddr, x, nx)
+end
+
+"""
+Source: FMISpec2.0.2[p.86]: 3.2.2 Evaluation of Model Equations
+
+Compute state derivatives at the current time instant and for the current states.
+"""
+function fmi3GetContinuousStateDerivatives(c::fmi3Component,
+                            derivatives::Array{fmi3Float64},
+                            nx::Csize_t)
+    ccall(c.fmu.cGetContinuousStateDerivatives,
+          Cuint,
+          (Ptr{Nothing}, Ptr{fmi2Real}, Csize_t),
+          c.compAddr, derivatives, nx)
+end
+
+"""
+Source: FMISpec2.0.2[p.86]: 3.2.2 Evaluation of Model Equations
+
+Compute event indicators at the current time instant and for the current states.
+"""
+function fmi3GetEventIndicators(c::fmi3Component, eventIndicators::Array{fmi3Float64}, ni::Csize_t)
+    status = ccall(c.fmu.cGetEventIndicators,
+                    Cuint,
+                    (Ptr{Nothing}, Ptr{fmi3Float64}, Csize_t),
+                    c.compAddr, eventIndicators, ni)
+end
+
+"""
+Source: FMISpec2.0.2[p.85]: 3.2.2 Evaluation of Model Equations
+
+This function must be called by the environment after every completed step of the integrator provided the capability flag completedIntegratorStepNotNeeded = false.
+If enterEventMode == fmi2True, the event mode must be entered
+If terminateSimulation == fmi2True, the simulation shall be terminated
+"""
+function fmi3CompletedIntegratorStep!(c::fmi3Component,
+                                      noSetFMUStatePriorToCurrentPoint::fmi3Boolean,
+                                      enterEventMode::fmi3Boolean,
+                                      terminateSimulation::fmi3Boolean)
+    ccall(c.fmu.cCompletedIntegratorStep,
+          Cuint,
+          (Ptr{Nothing}, fmi3Boolean, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}),
+          c.compAddr, noSetFMUStatePriorToCurrentPoint, Ref(enterEventMode), Ref(terminateSimulation))
+end
+
+# TODO implement in FMI3.jl and FMI3_comp.jl
+"""
+Source: FMISpec2.0.2[p.84]: 3.2.2 Evaluation of Model Equations
+
+The model enters Event Mode from the Continuous-Time Mode and discrete-time equations may become active (and relations are not “frozen”).
+"""
+function fmi3EnterEventMode(c::fmi3Component, stepEvent::fmi3Boolean, stateEvent::fmi3Boolean, rootsFound::Array{fmi3Int32}, nEventIndicators::Csize_t, timeEvent::fmi3Boolean)
+    ccall(c.fmu.cEnterEventMode,
+          Cuint,
+          (Ptr{Nothing},fmi3Boolean, fmi3Boolean, Ptr{fmi3Int32}, Csize_t, fmi3Boolean),
+          c.compAddr, stepEvent, stateEvent, rootsFound, nEventIndicators, timeEvent)
+end
+
+# TODO implement in FMI3.jl and FMI3_comp.jl
+"""
+Source: FMISpec2.0.2[p.104]: 4.2.2 Computation
+
+The computation of a time step is started.
+"""
+function fmi3DoStep(c::fmi3Component, currentCommunicationPoint::fmi3Float64, communicationStepSize::fmi3Float64, noSetFMUStatePriorToCurrentPoint::fmi3Boolean,
+                    eventEncountered::Ref{fmi3Boolean}, terminateSimulation::Ref{fmi3Boolean}, earlyReturn::Ref{fmi3Boolean}, lastSuccessfulTime::Ref{fmi3Float64})
+    @assert c.fmu.cDoStep != C_NULL ["fmi2DoStep(...): This FMU does not support fmi2DoStep, probably it's a ME-FMU with no CS-support?"]
+    ccall(c.fmu.cDoStep, Cuint,
+          (Ptr{Nothing}, fmi3Float64, fmi3Float64, fmi3Boolean, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Float64}),
+          c.compAddr, currentCommunicationPoint, communicationStepSize, noSetFMUStatePriorToCurrentPoint, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
 end

@@ -857,3 +857,220 @@ function fmi3SetClock(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Un
     nvr = Csize_t(length(vr))
     fmi3SetClock(c, vr, nvr, values, nvr)
 end
+
+"""
+TODO: FMI specification reference.
+
+Get the pointer to the current FMU state.
+
+For more information call ?fmi2GetFMUstate
+"""
+function fmi3GetFMUState(c::fmi3Component)
+    state = fmi3FMUState()
+    stateRef = Ref(state)
+    fmi3GetFMUState(c, stateRef)
+    state = stateRef[]
+    state
+end
+
+"""
+TODO: FMI specification reference.
+
+Free the allocated memory for the FMU state.
+
+For more information call ?fmi2FreeFMUstate
+"""
+function fmi3FreeFMUState(c::fmi3Component, state::fmi3FMUState)
+    stateRef = Ref(state)
+    fmi3FreeFMUState(c, stateRef)
+    state = stateRef[]
+end
+
+"""
+TODO: FMI specification reference.
+
+Returns the size of a byte vector the FMU can be stored in.
+
+For more information call ?fmi2SerzializedFMUstateSize
+"""
+function fmi3SerializedFMUStateSize(c::fmi3Component, state::fmi3FMUState)
+    size = 0
+    sizeRef = Ref(Csize_t(size))
+    fmi3SerializedFMUStateSize(c, state, sizeRef)
+    size = sizeRef[]
+end
+
+"""
+TODO: FMI specification reference.
+
+Serialize the data in the FMU state pointer.
+
+For more information call ?fmi2SerzializeFMUstate
+"""
+function fmi3SerializeFMUstate(c::fmi3Component, state::fmi3FMUState)
+    size = fmi3SerializedFMUStateSize(c, state)
+    serializedState = Array{fmi3Byte}(undef, size)
+    fmi3SerializeFMUState(c, state, serializedState, size)
+    serializedState
+end
+
+"""
+TODO: FMI specification reference.
+
+Deserialize the data in the serializedState fmi2Byte field.
+
+For more information call ?fmi2DeSerzializeFMUstate
+"""
+function fmi3DeSerializeFMUState(c::fmi3Component, serializedState::Array{fmi3Byte})
+    size = length(serializedState)
+    state = fmi3FMUState()
+    stateRef = Ref(state)
+    fmi23DeSerializeFMUState(c, serializedState, Csize_t(size), stateRef)
+    state = stateRef[]
+end
+
+"""
+TODO: FMI specification reference.
+
+Computes directional derivatives.
+
+For more information call ?fmi2GetDirectionalDerivatives
+"""
+function fmi3GetDirectionalDerivative(c::fmi3Component,
+                                      unknowns::Array{fmi3ValueReference},
+                                      knowns::Array{fmi3ValueReference},
+                                      seed::Array{fmi3Float64} = Array{fmi3Float64}([]))
+    sensitivity = zeros(fmi3Float64, length(unknowns))
+
+    fmi3GetDirectionalDerivative!(c, unknowns, knowns, seed, sensitivity)
+
+    sensitivity
+end
+
+"""
+TODO: FMI specification reference.
+
+Computes directional derivatives.
+
+For more information call ?fmi2GetDirectionalDerivatives
+"""
+function fmi3GetDirectionalDerivative!(c::fmi3Component,
+                                      unknowns::Array{fmi3ValueReference},
+                                      knowns::Array{fmi3ValueReference},
+                                      seed::Array{fmi3Float64}, 
+                                      sensitivity::Array{fmi3Float64} = Array{fmi3Float64}([]))
+
+    nKnowns = Csize_t(length(knowns))
+    nUnknowns = Csize_t(length(unknowns))
+
+    if length(seed) == 0
+        seed = ones(fmi3Float64, nKnowns)
+    end
+
+    nSeed = Csize_t(length(seed))
+    nSensitivity = Csize_t(length(sensitivity))
+
+    fmi3GetDirectionalDerivative!(c, unknowns, nUnknowns, knowns, nKnowns, seed, nSeed, sensitivity, nSensitivity)
+
+    nothing
+end
+
+"""
+TODO: FMI specification reference.
+
+Computes directional derivatives.
+
+For more information call ?fmi2GetDirectionalDerivatives
+"""
+function fmi3GetDirectionalDerivative(c::fmi3Component,
+                                      unknowns::fmi3ValueReference,
+                                      knowns::fmi3ValueReference,
+                                      seed::fmi3Float64 = 1.0)
+
+    fmi3GetDirectionalDerivative(c, [unknowns], [knowns], [seed])[1]
+end
+
+"""
+TODO: FMI specification reference.
+
+Return the new (continuous) state vector x.
+
+For more information call ?fmi2GetContinuousStates
+"""
+function fmi3GetContinuousStates(c::fmi3Component)
+    nx = Csize_t(fmi3GetNumberOfContinuousStates(c))
+    x = zeros(fmi3Float64, nx)
+    fmi3GetContinuousStates(c, x, nx)
+    x
+end
+
+"""
+TODO: FMI specification reference.
+
+Set independent variable time and reinitialize chaching of variables that depend on time.
+
+For more information call ?fmi2SetTime
+"""
+function fmi3SetTime(c::fmi3Component, time::Real)
+    fmi3SetTime(c, fmi3Float64(time))
+end
+
+"""
+TODO: FMI specification reference.
+
+Set a new (continuous) state vector and reinitialize chaching of variables that depend on states.
+
+For more information call ?fmi2SetContinuousStates
+"""
+function fmi3SetContinuousStates(c::fmi3Component, x::Union{Array{Float32}, Array{Float64}})
+    nx = Csize_t(length(x))
+    fmi3SetContinuousStates(c, Array{fmi3Real}(x), nx)
+end
+
+"""
+TODO: FMI specification reference.
+
+Compute state derivatives at the current time instant and for the current states.
+
+For more information call ?fmi2GetDerivatives
+"""
+function  fmi3GetContinuousStateDerivatives(c::fmi3Component)
+    nx = Csize_t(fmi3GetNumberOfContinuousStates(fmu))
+    derivatives = zeros(fmi3Float64, nx)
+    fmi3GetContinuousStateDerivatives(c, derivatives, nx)
+    derivatives
+end
+
+"""
+TODO: FMI specification reference.
+
+Returns the event indicators of the FMU.
+
+For more information call ?fmi2GetEventIndicators
+"""
+function fmi3GetEventIndicators(c::fmi3Component)
+    ni = Csize_t(fmi3GetNumberOfEventIndicators(fmu))
+    eventIndicators = zeros(fmi3Float64, ni)
+    fmi3GetEventIndicators(c, eventIndicators, ni)
+    eventIndicators
+end
+
+"""
+TODO: FMI specification reference.
+
+This function must be called by the environment after every completed step
+If enterEventMode == fmi2True, the event mode must be entered
+If terminateSimulation == fmi2True, the simulation shall be terminated
+
+For more information call ?fmi2CompletedIntegratorStep
+"""
+function fmi3CompletedIntegratorStep(c::fmi3Component,
+                                     noSetFMUStatePriorToCurrentPoint::fmi3Boolean)
+    enterEventMode = fmi3Boolean(false)
+    terminateSimulation = fmi3Boolean(false)
+    status = fmi3CompletedIntegratorStep!(c,
+                                         noSetFMUStatePriorToCurrentPoint,
+                                         enterEventMode,
+                                         terminateSimulation)
+    (status, enterEventMode, terminateSimulation)
+end

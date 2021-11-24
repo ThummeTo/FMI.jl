@@ -39,6 +39,8 @@ mutable struct FMU3 <: FMU
     cGetVersion::Ptr{Cvoid}
     cFreeInstance::Ptr{Cvoid}
     cSetDebugLogging::Ptr{Cvoid}
+    cEnterConfigurationMode::Ptr{Cvoid}
+    cExitConfigurationMode::Ptr{Cvoid}
     cEnterInitializationMode::Ptr{Cvoid}
     cExitInitializationMode::Ptr{Cvoid}
     cTerminate::Ptr{Cvoid}
@@ -69,57 +71,55 @@ mutable struct FMU3 <: FMU
     cSetString::Ptr{Cvoid}
     cGetBinary::Ptr{Cvoid}
     cSetBinary::Ptr{Cvoid}
-    cGetFMUstate::Ptr{Cvoid}
-    cSetFMUstate::Ptr{Cvoid}
-    cFreeFMUstate::Ptr{Cvoid}
-    cSerializedFMUstateSize::Ptr{Cvoid}
-    cSerializeFMUstate::Ptr{Cvoid}
-    cDeSerializeFMUstate::Ptr{Cvoid}
+    cGetFMUState::Ptr{Cvoid}
+    cSetFMUState::Ptr{Cvoid}
+    cFreeFMUState::Ptr{Cvoid}
+    cSerializedFMUStateSize::Ptr{Cvoid}
+    cSerializeFMUState::Ptr{Cvoid}
+    cDeSerializeFMUState::Ptr{Cvoid}
     cGetDirectionalDerivative::Ptr{Cvoid}
+    cEvaluateDiscreteStates::Ptr{Cvoid}
 
     # Co Simulation function calls
-    cSetRealInputDerivatives::Ptr{Cvoid}
-    cGetRealOutputDerivatives::Ptr{Cvoid}
+    cGetOutputDerivatives::Ptr{Cvoid}
+    cEnterStepMode::Ptr{Cvoid}
     cDoStep::Ptr{Cvoid}
-    cCancelStep::Ptr{Cvoid}
-    cGetStatus::Ptr{Cvoid}
-    cGetRealStatus::Ptr{Cvoid}
-    cGetIntegerStatus::Ptr{Cvoid}
-    cGetBooleanStatus::Ptr{Cvoid}
-    cGetStringStatus::Ptr{Cvoid}
 
     # Model Exchange function calls
-    cEnterContinuousTimeMode::Ptr{Cvoid}
+    cGetNumberOfContinuousStates::Ptr{Cvoid}
+    cGetNumberOfEventIndicators::Ptr{Cvoid}
     cGetContinuousStates::Ptr{Cvoid}
-    cGetDerivatives::Ptr{Cvoid}
+    cGetNominalsOfContinuousStates::Ptr{Cvoid}
+    cEnterContinuousTimeMode::Ptr{Cvoid}
     cSetTime::Ptr{Cvoid}
     cSetContinuousStates::Ptr{Cvoid}
+    cGetContinuousStateDerivatives::Ptr{Cvoid}
+    cGetEventIndicators::Ptr{Cvoid}
     cCompletedIntegratorStep::Ptr{Cvoid}
     cEnterEventMode::Ptr{Cvoid}
-    cNewDiscreteStates::Ptr{Cvoid}
-    cGetEventIndicators::Ptr{Cvoid}
-    cGetNominalsOfContinuousStates::Ptr{Cvoid}
+    
+    
 
     # c-libraries
     libHandle::Ptr{Nothing}
 
-    # START: experimental section (to FMIFlux.jl)
-    dependencies::Matrix{fmi2Dependency}
+    # # START: experimental section (to FMIFlux.jl)
+    # dependencies::Matrix{fmi2Dependency}
 
-    t::Real         # current time
-    next_t::Real    # next time
+    # t::Real         # current time
+    # next_t::Real    # next time
 
-    x       # current state
-    next_x  # next state
+    # x       # current state
+    # next_x  # next state
 
-    dx      # current state derivative
-    simulationResult
+    # dx      # current state derivative
+    # simulationResult
 
-    jac_dxy_x::Matrix{fmi2Real}
-    jac_dxy_u::Matrix{fmi2Real}
-    jac_x::Array{fmi2Real}
-    jac_t::fmi2Real
-    # END: experimental section
+    # jac_dxy_x::Matrix{fmi2Real}
+    # jac_dxy_u::Matrix{fmi2Real}
+    # jac_x::Array{fmi2Real}
+    # jac_t::fmi2Real
+    # # END: experimental section
 
     # Constructor
     FMU3() = new()
@@ -227,10 +227,14 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
     fmu.cGetVersion                                = dlsym(fmu.libHandle, :fmi3GetVersion)
     fmu.cFreeInstance                              = dlsym(fmu.libHandle, :fmi3FreeInstance)
     fmu.cSetDebugLogging                           = dlsym(fmu.libHandle, :fmi3SetDebugLogging)
+    fmu.cEnterConfigurationMode                    = dlsym(fmu.libHandle, :fmi3EnterConfigurationMode)
+    fmu.cExitConfigurationMode                     = dlsym(fmu.libHandle, :fmi3ExitConfigurationMode)
     fmu.cEnterInitializationMode                   = dlsym(fmu.libHandle, :fmi3EnterInitializationMode)
     fmu.cExitInitializationMode                    = dlsym(fmu.libHandle, :fmi3ExitInitializationMode)
     fmu.cTerminate                                 = dlsym(fmu.libHandle, :fmi3Terminate)
     fmu.cReset                                     = dlsym(fmu.libHandle, :fmi3Reset)
+    fmu.cEvaluateDiscreteStates                    = dlsym(fmu.libHandle, :fmi3EvaluateDiscreteStates)
+
     fmu.cGetFloat32                                = dlsym(fmu.libHandle, :fmi3GetFloat32)
     fmu.cSetFloat32                                = dlsym(fmu.libHandle, :fmi3SetFloat32)
     fmu.cGetFloat64                                = dlsym(fmu.libHandle, :fmi3GetFloat64)
@@ -259,48 +263,44 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
     fmu.cGetBinary                                 = dlsym_opt(fmu.libHandle, :fmi3GetBinary)
     fmu.cSetBinary                                 = dlsym_opt(fmu.libHandle, :fmi3SetBinary)
 
-    # if fmi2CanGetSetState(fmu)
-    #     fmu.cGetFMUstate                  = dlsym_opt(fmu.libHandle, :fmi2GetFMUstate)
-    #     fmu.cSetFMUstate                  = dlsym_opt(fmu.libHandle, :fmi2SetFMUstate)
-    #     fmu.cFreeFMUstate                 = dlsym_opt(fmu.libHandle, :fmi2FreeFMUstate)
-    # end
+    if fmi3CanGetSetState(fmu)
+        fmu.cGetFMUState                           = dlsym_opt(fmu.libHandle, :fmi3GetFMUState)
+        fmu.cSetFMUState                           = dlsym_opt(fmu.libHandle, :fmi3SetFMUState)
+        fmu.cFreeFMUState                          = dlsym_opt(fmu.libHandle, :fmi3FreeFMUState)
+    end
 
-    # if fmi2CanSerializeFMUstate(fmu)
-    #     fmu.cSerializedFMUstateSize       = dlsym_opt(fmu.libHandle, :fmi2SerializedFMUstateSize)
-    #     fmu.cSerializeFMUstate            = dlsym_opt(fmu.libHandle, :fmi2SerializeFMUstate)
-    #     fmu.cDeSerializeFMUstate          = dlsym_opt(fmu.libHandle, :fmi2DeSerializeFMUstate)
-    # end
+    if fmi3CanSerializeFMUstate(fmu)
+        fmu.cSerializedFMUStateSize                = dlsym_opt(fmu.libHandle, :fmi3SerializedFMUStateSize)
+        fmu.cSerializeFMUState                     = dlsym_opt(fmu.libHandle, :fmi3SerializeFMUState)
+        fmu.cDeSerializeFMUState                   = dlsym_opt(fmu.libHandle, :fmi3DeSerializeFMUState)
+    end
 
-    # if fmi2ProvidesDirectionalDerivative(fmu)
-    #     fmu.cGetDirectionalDerivative     = dlsym_opt(fmu.libHandle, :fmi2GetDirectionalDerivative)
-    # end
+    if fmi3ProvidesDirectionalDerivatives(fmu)
+        fmu.cGetDirectionalDerivative              = dlsym_opt(fmu.libHandle, :fmi3GetDirectionalDerivative)
+    end
 
-    # # CS specific function calls
-    # if fmi2IsCoSimulation(fmu)
-    #     fmu.cSetRealInputDerivatives      = dlsym(fmu.libHandle, :fmi2SetRealInputDerivatives)
-    #     fmu.cGetRealOutputDerivatives     = dlsym(fmu.libHandle, :fmi2GetRealOutputDerivatives)
-    #     fmu.cDoStep                       = dlsym(fmu.libHandle, :fmi2DoStep)
-    #     fmu.cCancelStep                   = dlsym(fmu.libHandle, :fmi2CancelStep)
-    #     fmu.cGetStatus                    = dlsym(fmu.libHandle, :fmi2GetStatus)
-    #     fmu.cGetRealStatus                = dlsym(fmu.libHandle, :fmi2GetRealStatus)
-    #     fmu.cGetIntegerStatus             = dlsym(fmu.libHandle, :fmi2GetIntegerStatus)
-    #     fmu.cGetBooleanStatus             = dlsym(fmu.libHandle, :fmi2GetBooleanStatus)
-    #     fmu.cGetStringStatus              = dlsym(fmu.libHandle, :fmi2GetStringStatus)
-    # end
+    # CS specific function calls
+    if fmi3IsCoSimulation(fmu)
+        fmu.cGetOutputDerivatives                  = dlsym(fmu.libHandle, :fmi3GetOutputDerivatives)
+        fmu.cEnterStepMode                         = dlsym(fmu.libHandle, :fmi3EnterStepMode)
+        fmu.cDoStep                                = dlsym(fmu.libHandle, :fmi3DoStep)
+    end
 
-    # # ME specific function calls
-    # if fmi2IsModelExchange(fmu)
-    #     fmu.cEnterContinuousTimeMode      = dlsym(fmu.libHandle, :fmi2EnterContinuousTimeMode)
-    #     fmu.cGetContinuousStates          = dlsym(fmu.libHandle, :fmi2GetContinuousStates)
-    #     fmu.cGetDerivatives               = dlsym(fmu.libHandle, :fmi2GetDerivatives)
-    #     fmu.cSetTime                      = dlsym(fmu.libHandle, :fmi2SetTime)
-    #     fmu.cSetContinuousStates          = dlsym(fmu.libHandle, :fmi2SetContinuousStates)
-    #     fmu.cCompletedIntegratorStep      = dlsym(fmu.libHandle, :fmi2CompletedIntegratorStep)
-    #     fmu.cEnterEventMode               = dlsym(fmu.libHandle, :fmi2EnterEventMode)
-    #     fmu.cNewDiscreteStates            = dlsym(fmu.libHandle, :fmi2NewDiscreteStates)
-    #     fmu.cGetEventIndicators           = dlsym(fmu.libHandle, :fmi2GetEventIndicators)
-    #     fmu.cGetNominalsOfContinuousStates= dlsym(fmu.libHandle, :fmi2GetNominalsOfContinuousStates)
-    # end
+    # ME specific function calls
+    if fmi3IsModelExchange(fmu)
+        fmu.cGetNumberOfContinuousStates           = dlsym(fmu.libHandle, :fmi3GetNumberOfContinuousStates)
+        fmu.cGetNumberOfEventIndicators            = dlsym(fmu.libHandle, :fmi3GetNumberOfEventIndicators)
+        fmu.cGetContinuousStates                   = dlsym(fmu.libHandle, :fmi3GetContinuousStates)
+        fmu.cGetNominalsOfContinuousStates         = dlsym(fmu.libHandle, :fmi3GetNominalsOfContinuousStates)
+        fmu.cEnterContinuousTimeMode               = dlsym(fmu.libHandle, :fmi3EnterContinuousTimeMode)
+        fmu.cSetTime                               = dlsym(fmu.libHandle, :fmi3SetTime)
+        fmu.cGetContinuousStates                   = dlsym(fmu.libHandle, :fmi3GetContinuousStates)
+        fmu.cSetContinuousStates                   = dlsym(fmu.libHandle, :fmi3SetContinuousStates)
+        fmu.cGetContinuousStateDerivatives         = dlsym(fmu.libHandle, :fmi3GetContinuousStateDerivatives) 
+        fmu.cGetEventIndicators                    = dlsym(fmu.libHandle, :fmi3GetEventIndicators)
+        fmu.cCompletedIntegratorStep               = dlsym(fmu.libHandle, :fmi3CompletedIntegratorStep)
+        fmu.cEnterEventMode                        = dlsym(fmu.libHandle, :fmi3EnterEventMode)        
+    end
 
     # # initialize further variables TODO check if needed
     # fmu.jac_x = zeros(Float64, fmu.modelDescription.numberOfContinuousStates)
@@ -329,9 +329,6 @@ function fmi3GetGenerationDateAndTime(fmu::FMU3)
 end
 function fmi3GetVariableNamingConvention(fmu::FMU3)
     fmi3GetVariableNamingConvention(fmu.modelDescription)
-end
-function fmi3GetNumberOfEventIndicators(fmu::FMU3)
-    fmi3GetNumberOfEventIndicators(fmu.modelDescription)
 end
 
 function fmi3CanGetSetState(fmu::FMU3)
@@ -1076,4 +1073,283 @@ For more information call ?fmi2SetString
 """
 function fmi3SetClock(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Clock}, fmi3Clock})
     fmi3SetBinary(fmu.components[end], vr, values)
+end
+
+"""
+TODO: FMI specification reference.
+
+Get the pointer to the current FMU state.
+
+For more information call ?fmi2GetFMUstate
+"""
+function fmi3GetFMUState(fmu::FMU3)
+    state = fmi3FMUState()
+    stateRef = Ref(state)
+    fmi3GetFMUState(fmu.components[end], stateRef)
+    state = stateRef[]
+    state
+end
+
+"""
+TODO: FMI specification reference.
+
+Set the FMU to the given fmi2FMUstate.
+
+For more information call ?fmi2SetFMUstate
+"""
+function fmi3SetFMUState(fmu::FMU3, state::fmi3FMUState)
+    fmi3SetFMUState(fmu.components[end], state)
+end
+
+"""
+TODO: FMI specification reference.
+
+Free the allocated memory for the FMU state.
+
+For more information call ?fmi2FreeFMUstate
+"""
+function fmi3FreeFMUState(fmu::FMU3, state::fmi3FMUState)
+    stateRef = Ref(state)
+    fmi3FreeFMUState(fmu.components[end], stateRef)
+    state = stateRef[]
+end
+
+"""
+TODO: FMI specification reference.
+
+Returns the size of a byte vector the FMU can be stored in.
+
+For more information call ?fmi2SerzializedFMUstateSize
+"""
+function fmi3SerializedFMUStateSize(fmu::FMU3, state::fmi3FMUState)
+    size = 0
+    sizeRef = Ref(Csize_t(size))
+    fmi3SerializedFMUStateSize(fmu.components[end], state, sizeRef)
+    size = sizeRef[]
+end
+
+"""
+TODO: FMI specification reference.
+
+Serialize the data in the FMU state pointer.
+
+For more information call ?fmi2SerzializeFMUstate
+"""
+function fmi3SerializeFMUState(fmu::FMU3, state::fmi3FMUState)
+    size = fmi3SerializedFMUStateSize(fmu, state)
+    serializedState = Array{fmi3Byte}(undef, size)
+    fmi3SerializeFMUState(fmu.components[end], state, serializedState, size)
+    serializedState
+end
+
+"""
+TODO: FMI specification reference.
+
+Deserialize the data in the serializedState fmi2Byte field.
+
+For more information call ?fmi2DeSerzializeFMUstate
+"""
+function fmi3DeSerializeFMUstate(fmu::FMU3, serializedState::Array{fmi3Byte})
+    size = length(serializedState)
+    state = fmi3FMUState()
+    stateRef = Ref(state)
+    fmi3DeSerializeFMUState(fmu.components[end], serializedState, Csize_t(size), stateRef)
+    state = stateRef[]
+end
+
+"""
+TODO: FMI specification reference.
+
+Retrieves directional derivatives.
+
+For more information call ?fmi2GetDirectionalDerivatives
+"""
+function fmi3GetDirectionalDerivative(fmu::FMU3,
+                                      unknowns::fmi3ValueReference,
+                                      knowns::fmi3ValueReference,
+                                      seed::fmi3Float64 = 1.0)
+
+    fmi3GetDirectionalDerivative(fmu.components[end], unknowns, knowns, seed)
+end
+
+"""
+TODO: FMI specification reference.
+
+Retrieves directional derivatives.
+
+For more information call ?fmi2GetDirectionalDerivatives
+"""
+function fmi3GetDirectionalDerivative(fmu::FMU3,
+                                      unknowns::Array{fmi3ValueReference},
+                                      knowns::Array{fmi3ValueReference},
+                                      seed::Array{fmi3Float64} = Array{fmi3Float64}([]))
+
+    fmi3GetDirectionalDerivative(fmu.components[end], unknowns, knowns, seed)
+end
+
+"""
+TODO: FMI specification reference.
+
+Retrieves directional derivatives in-place.
+
+For more information call ?fmi2GetDirectionalDerivatives
+"""
+function fmi3GetDirectionalDerivative!(fmu::FMU3,
+    unknowns::Array{fmi3ValueReference},
+    knowns::Array{fmi3ValueReference},
+    seed::Array{fmi3Float64},
+    sensitivity::Array{fmi3Float64} = Array{fmi3Float64}([])) 
+
+    fmi3GetDirectionalDerivative!(fmu.components[end], unknowns, knowns, seed, sensitivity)
+end
+
+"""
+TODO: FMI specification reference.
+
+Retrieves the n-th derivative of output values.
+
+vr defines the value references of the variables
+the array order specifies the corresponding order of derivation of the variables
+
+For more information call ?fmi2GetRealOutputDerivatives
+"""
+function fmi3GetOutputDerivatives(fmu::FMU3, vr::fmi3ValueReference, nVlalueReferences::Cint, order::Integer, values::Real, nValues::Cint)
+    fmi3GetOutputDerivatives(fmu.components[end], vr, nValueReferences, fmi3Int32(order), fmi3Float64(values), nValues)
+end
+
+function fmi3EnterConfigurationMode(fmu::FMU3)
+    fmi3EnterConfigurationMode(fmu.components[end])
+end
+
+function fmi3GetNumberOfContinuousStates(fmu::FMU3)
+    size = 0
+    sizeRef = Ref(Csize_t(size))
+    fmi3GetNumberOfContinuousStates(fmu.components[end], sizeRef)
+    size = sizeRef[]
+    size
+end
+
+function fmi3GetNumberOfEventIndicators(fmu::FMU3)
+    size = 0
+    sizeRef = Ref(Csize_t(size))
+    fmi3GetNumberOfEventIndicators(fmu.components[end], sizeRef)
+    size = sizeRef[]
+    size
+end
+
+function fmi3GetContinuousStates(fmu::FMU3)
+    nx = Csize_t(fmi3GetNumberOfContinuousStates(fmu))
+    x = zeros(fmi3Float64, nx)
+    fmi3GetContinuousStates(fmu.components[end], x, nx)
+    x
+end
+
+"""
+TODO: FMI specification reference.
+
+Return the nominal values of the continuous states.
+
+For more information call ?fmi2GetNominalsOfContinuousStates
+"""
+function fmi3GetNominalsOfContinuousStates(fmu::FMU3)
+    nx = Csize_t(fmi3GetNumberOfContinuousStates(fmu))
+    x = zeros(fmi3Float64, nx)
+    fmi3GetNominalsOfContinuousStates(fmu.components[end], x, nx)
+    x
+end
+
+function fmi3EvaluateDiscreteStates(fmu::FMU3)
+    fmi3EvaluateDiscreteStates(fmu.components[end])
+end
+
+"""
+TODO: FMI specification reference.
+
+The model enters Continuous-Time Mode.
+
+For more information call ?fmi2EnterContinuousTimeMode
+"""
+function fmi3EnterContinuousTimeMode(fmu::FMU3)
+    fmi3EnterContinuousTimeMode(fmu.components[end])
+end
+
+function fmi3EnterStepMode(fmu::FMU3)
+    fmi3EnterStepMode(fmu.components[end])
+end
+
+function fmi3ExitConfigurationMode(fmu::FMU3)
+    fmi3ExitConfigurationMode(fmu.components[end])
+end
+
+"""
+TODO: FMI specification reference.
+
+Set independent variable time and reinitialize chaching of variables that depend on time.
+
+For more information call ?fmi2SetTime
+"""
+function fmi3SetTime(fmu::FMU3, time::Real)
+    fmu.t = time
+    fmi3SetTime(fmu.components[end], fmi3Float64(time))
+end
+
+"""
+TODO: FMI specification reference.
+
+Set a new (continuous) state vector and reinitialize chaching of variables that depend on states.
+
+For more information call ?fmi2SetContinuousStates
+"""
+function fmi3SetContinuousStates(fmu::FMU3, x::Union{Array{Float32}, Array{Float64}})
+    nx = Csize_t(length(x))
+    fmu.x = x
+    fmi3SetContinuousStates(fmu.components[end], Array{fmi3Float64}(x), nx)
+end
+
+"""
+TODO: FMI specification reference.
+
+Compute state derivatives at the current time instant and for the current states.
+
+For more information call ?fmi2GetDerivatives
+"""
+function  fmi3GetContinuousStateDerivatives(fmu::FMU3)
+    nx = Csize_t(fmi3GetNumberOfContinuousStates(fmu))
+    derivatives = zeros(fmi3Float64, nx)
+    fmi3GetContinuousStateDerivatives(fmu.components[end], derivatives, nx)
+    derivatives
+end
+
+"""
+TODO: FMI specification reference.
+
+Returns the event indicators of the FMU.
+
+For more information call ?fmi2GetEventIndicators
+"""
+function fmi3GetEventIndicators(fmu::FMU3)
+    ni = Csize_t(fmi3GetNumberOfEventIndicators(fmu))
+    eventIndicators = zeros(fmi3Float64, ni)
+    fmi3GetEventIndicators(fmu.components[end], eventIndicators, ni)
+    eventIndicators
+end
+
+"""
+TODO: FMI specification reference.
+
+This function must be called by the environment after every completed step
+If enterEventMode == fmi2True, the event mode must be entered
+If terminateSimulation == fmi2True, the simulation shall be terminated
+
+For more information call ?fmi2CompletedIntegratorStep
+"""
+function fmi3CompletedIntegratorStep(fmu::FMU3,
+                                     noSetFMUStatePriorToCurrentPoint::fmi3Boolean)
+    enterEventMode = fmi3Boolean(false)
+    terminateSimulation = fmi3Boolean(false)
+    status = fmi3CompletedIntegratorStep!(fmu.components[end],
+                                         noSetFMUStatePriorToCurrentPoint,
+                                         enterEventMode,
+                                         terminateSimulation)
+    (status, enterEventMode, terminateSimulation)
 end

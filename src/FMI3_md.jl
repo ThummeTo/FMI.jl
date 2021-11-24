@@ -60,7 +60,6 @@ function fmi3ReadModelDescription(pathToModellDescription::String)
     md.generationTool = parseNodeString(root, "generationTool"; onfail="[Unknown generation tool]")
     md.generationDateAndTime = parseNodeString(root, "generationDateAndTime"; onfail="[Unknown generation date and time]")
     md.variableNamingConvention = parseNodeString(root, "variableNamingConvention"; onfail="[Unknown variable naming convention]")
-    # md.numberOfEventIndicators = parseNodeInteger(root, "numberOfEventIndicators"; onfail=0) TODO not included
     md.description = parseNodeString(root, "description"; onfail="[Unknown Description]")
 
     for node in eachelement(root)
@@ -70,7 +69,7 @@ function fmi3ReadModelDescription(pathToModellDescription::String)
             md.CSmodelIdentifier                        = node["modelIdentifier"]
             md.CSneedsExecutionTool                     = parseNodeBoolean(node, "needsExecutionTool"                       ; onfail=false)
             md.CScanBeInstantiatedOnlyOncePerProcess    = parseNodeBoolean(node, "canBeInstantiatedOnlyOncePerProcess"      ; onfail=false)
-            md.CScanGetAndSetFMUstate                   = parseNodeBoolean(node, "canGetAndSetFMUstate"                     ; onfail=false)
+            md.CScanGetAndSetFMUstate                   = parseNodeBoolean(node, "canGetAndSetFMUState"                     ; onfail=false)
             md.CScanSerializeFMUstate                   = parseNodeBoolean(node, "canSerializeFMUstate"                     ; onfail=false)
             md.CSprovidesDirectionalDerivatives         = parseNodeBoolean(node, "providesDirectionalDerivatives"           ; onfail=false)
             md.CSproivdesAdjointDerivatives             = parseNodeBoolean(node, "providesAdjointDerivatives"               ; onfail=false)
@@ -179,12 +178,6 @@ function fmi3GetVariableNamingConvention(md::fmi3ModelDescription)
     md.variableNamingConvention
 end
 
-# """
-# Returns the tag 'numberOfEventIndicators' from the model description.
-# """
-# function fmi2GetNumberOfEventIndicators(md::fmi2ModelDescription)
-#     md.numberOfEventIndicators
-# end
 
 # """
 # Returns if the FMU model description contains `dependency` information.
@@ -325,7 +318,6 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi3ModelDescription, deriva
         description = ""
         causality = ""
         variability = ""
-        # initial = ""
 
         if !(ValueReference in md.valueReferences)
             push!(md.valueReferences, ValueReference)
@@ -340,10 +332,7 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi3ModelDescription, deriva
         if haskey(node, "variability")
             variability = node["variability"]
         end
-        # if haskey(node, "initial")
-        #     initial = node["initial"]
-        # end
-        datatype = fmi3setDatatypeVariables(node, md) #TODO bis hierhin
+        datatype = fmi3setDatatypeVariables(node, md)
 
         dependencies = []
         dependenciesKind = []
