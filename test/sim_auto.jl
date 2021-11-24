@@ -33,23 +33,29 @@ end
 t_start = 0.0
 t_stop = 8.0
 
-data = fmiSimulate(fmuStruct, t_start, t_stop; recordValues=["mass.s", "mass.v"], setup=true)
-@test length(data.dataPoints) == 100
-@test length(data.dataPoints[1]) == 3
+# test without recording values (but why?)
+success, _ = fmiSimulate(fmuStruct, t_start, t_stop)
+@test success
 
-t = collect(d[1] for d in data.dataPoints)
-s = collect(d[2] for d in data.dataPoints)
-v = collect(d[3] for d in data.dataPoints)
+# test with recording values
+success, savedValues = fmiSimulate(fmuStruct, t_start, t_stop; recordValues=["mass.s", "mass.v"], setup=true)
+@test success
+@test length(savedValues.saveval) == 100
+@test length(savedValues.saveval[1]) == 2
+
+t = savedValues.t
+s = collect(d[1] for d in savedValues.saveval)
+v = collect(d[2] for d in savedValues.saveval)
 @test t[1] == t_start 
 @test t[end] == t_stop 
 
 # reference values from Simulation in Dymola2020x (Dassl)
 @test s[1] == 0.5
 @test v[1] == 0.0
-#@test abs(s[end] - 0.509219) < 0.01
-#@test abs(v[end] - 0.314074) < 0.01
 
-data = fmiSimulate(fmuStruct, t_start, t_stop; setup=true)
-@test data == nothing   # nothing was recorded, recordValues=[]
+if ENV["EXPORTINGTOOL"] == "Dymola/2020x" # ToDo: Linux FMU was corrupted
+    @test abs(s[end] - 0.509219) < 0.01
+    @test abs(v[end] - 0.314074) < 0.01
+end
 
 fmiUnload(myFMU)

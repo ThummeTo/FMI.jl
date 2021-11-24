@@ -34,7 +34,7 @@ fmiInstantiate!(myFMU; loggingOn=true)
 #fmiExitInitializationMode(myFMU)
 
 # run the FMU in mode Model-Exchange (ME) with adaptive step sizes, result values are stored in `solution`
-solution = fmiSimulateME(myFMU, t_start, t_stop; setup=true)
+solution, _ = fmiSimulateME(myFMU, t_start, t_stop; setup=true)
 
 # plot the results
 fmiPlot(myFMU, solution)
