@@ -7,10 +7,21 @@ using DifferentialEquations, DiffEqCallbacks
 
 ############ Model-Exchange ############
 
-# Handles events and returns the values and nominals of the changed continuous states.
-function handleEvents(c::fmi2Component, initialEventMode)
+# Read next time event from fmu and provide it to the integrator 
+function time_choice(c::fmi2Component, integrator)
+    eventInfo = fmi2NewDiscreteStates(c)
+    fmi2EnterContinuousTimeMode(c)
+    if Bool(eventInfo.nextEventTimeDefined)
+        eventInfo.nextEventTime
+    else
+        Inf
+    end
+end
 
-    if initialEventMode == false
+# Handles events and returns the values and nominals of the changed continuous states.
+function handleEvents(c::fmi2Component, enterEventMode::Bool, exitInContinuousMode::Bool)
+
+    if enterEventMode
         fmi2EnterEventMode(c)
     end
 
@@ -33,7 +44,9 @@ function handleEvents(c::fmi2Component, initialEventMode)
         end
     end
 
-    fmi2EnterContinuousTimeMode(c)
+    if exitInContinuousMode
+        fmi2EnterContinuousTimeMode(c)
+    end
 
     return valuesOfContinuousStatesChanged, nominalsOfContinuousStatesChanged
 
@@ -51,9 +64,9 @@ function condition(c::fmi2Component, out, x, t, integrator) # Event when event_f
 end
 
 # Handles the upcoming events.
-function affect!(c::fmi2Component, integrator, idx)
+function affectFMU!(c::fmi2Component, integrator, idx)
     # Event found - handle it
-    continuousStatesChanged, nominalsChanged = handleEvents(c, false)
+    continuousStatesChanged, nominalsChanged = handleEvents(c, true, Bool(sign(idx)))
 
     if continuousStatesChanged == fmi2True
         integrator.u = fmi2GetContinuousStates(c)
@@ -62,6 +75,7 @@ function affect!(c::fmi2Component, integrator, idx)
     if nominalsChanged == fmi2True
         x_nom = fmi2GetNominalsOfContinuousStates(c)
     end
+    timeEventCb = PresetTimeCallback(2.0, (integrator) -> affect!(c, integrator, 0))
 end
 
 # Does one step in the simulation.
@@ -81,6 +95,7 @@ function fx(c::fmi2Component, x, p, t)
     dx = fmi2GetDerivatives(c)
 end
 
+
 """
 Source: FMISpec2.0.2[p.90 ff]: 3.2.4 Pseudocode Example
 
@@ -90,11 +105,11 @@ Events are handled correctly.
 Returns an ODESolution.
 """
 function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.0;
-                        solver = nothing,
-                        customFx = nothing,
-                        recordValues::fmi2ValueReferenceFormat = nothing,
-                        saveat = [],
-                        setup = true)
+    solver = nothing,
+    customFx = nothing,
+    recordValues::fmi2ValueReferenceFormat = nothing,
+    saveat = [],
+    setup = true)
 
     recordValues = prepareValueReference(c, recordValues)
 
@@ -117,37 +132,53 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
         fmi2ExitInitializationMode(c)
     end
 
-     # First evaluation of the FMU
-     x0 = fmi2GetContinuousStates(c)
-     x0_nom = fmi2GetNominalsOfContinuousStates(c)
+    eventHandling = c.fmu.modelDescription.numberOfEventIndicators > 0
+    
+    # First evaluation of the FMU
+    x0 = fmi2GetContinuousStates(c)
+    x0_nom = fmi2GetNominalsOfContinuousStates(c)
 
-     fmi2SetContinuousStates(c, x0)
-     handleEvents(c, true)
+    fmi2SetContinuousStates(c, x0)
+    
+    handleEvents(c, false, false)
 
-     # Get states of handling initial Events
-     x0 = fmi2GetContinuousStates(c)
-     x0_nom = fmi2GetNominalsOfContinuousStates(c)
+    # Get states of handling initial Events
+    x0 = fmi2GetContinuousStates(c)
+    x0_nom = fmi2GetNominalsOfContinuousStates(c)
 
-     p = []
-     problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
+    p = []
+    problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
+    solution = nothing
+    
+    if eventHandling
 
-     eventHandling = c.fmu.modelDescription.numberOfEventIndicators > 0
+        eventInfo = fmi2NewDiscreteStates(c)
+        fmi2EnterContinuousTimeMode(c)
 
-     if eventHandling
-
+        timeEvents = (eventInfo.nextEventTimeDefined == fmi2True)
+      
         eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator),
-                                       (integrator, idx) -> affect!(c, integrator, idx),
-                                       Int64(c.fmu.modelDescription.numberOfEventIndicators);
-                                       rootfind=DiffEqBase.RightRootFind)
+                                           (integrator, idx) -> affectFMU!(c, integrator, idx),
+                                           Int64(c.fmu.modelDescription.numberOfEventIndicators);
+                                           rootfind = DiffEqBase.RightRootFind)
 
         stepCb = FunctionCallingCallback((x, t, integrator) -> stepCompleted(c, x, t, integrator);
-                                     func_everystep=true,
-                                     func_start=true)
+                                         func_everystep = true,
+                                         func_start = true)
 
-        solution = solve(problem, solver, callback=CallbackSet(eventCb, stepCb), saveat=saveat)
-     else
-        solution = solve(problem, solver, saveat=saveat)
-     end
+        if timeEvents
+            timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator),
+                                            (integrator) -> affectFMU!(c, integrator, 0), Float64; initial_affect = true)
+        
+            solution = solve(problem, solver, callback = CallbackSet(eventCb, stepCb, timeEventCb), saveat = saveat)
+        else
+            solution = solve(problem, solver, callback = CallbackSet(eventCb, stepCb), saveat = saveat)
+        end
+    else
+        solution = solve(problem, solver, saveat = saveat)
+    end
+    
+    return solution
 end
 
 ############ Co-Simulation ############
