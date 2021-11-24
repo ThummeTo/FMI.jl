@@ -70,4 +70,3 @@ if ENV["EXPORTINGTOOL"] == "Dymola/2020x"
     fmiUnload(myFMU)
 end
 
-

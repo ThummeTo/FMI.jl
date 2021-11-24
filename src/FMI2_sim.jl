@@ -148,7 +148,8 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
 
     p = []
     problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
-
+    solution = nothing
+    
     if eventHandling
 
         eventInfo = fmi2NewDiscreteStates(c)
@@ -177,6 +178,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
         solution = solve(problem, solver, callback = CallbackSet(stepCb), saveat = saveat)
     end
     
+    return solution
 end
 
 ############ Co-Simulation ############
