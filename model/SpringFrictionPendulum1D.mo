@@ -1,7 +1,8 @@
 within ;
 model SpringFrictionPendulum1D
   parameter Real fricScale = 20.0;
-  parameter Modelica.SIunits.Position mass_s0 = 0.5;
+  parameter Modelica.SIunits.Position s0 = 0.5;
+  parameter Modelica.SIunits.Velocity v0 = 0.0;
   Modelica.Mechanics.Translational.Components.Fixed fixed annotation (Placement(
         transformation(
         extent={{-10,-10},{10,10}},
@@ -14,8 +15,8 @@ model SpringFrictionPendulum1D
         origin={0,0})));
   Modelica.Mechanics.Translational.Components.MassWithStopAndFriction mass(
     L=0,
-    s(fixed=true, start=mass_s0),
-    v(fixed=true, start=0),
+    s(fixed=true, start=s0),
+    v(fixed=true, start=v0),
     smax=25,
     smin=-25,
     m=1,

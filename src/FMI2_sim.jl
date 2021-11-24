@@ -132,18 +132,9 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
         fmi2ExitInitializationMode(c)
     end
 
-    eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator),
-        (integrator, idx) -> affectFMU!(c, integrator, idx),
-        Int64(c.fmu.modelDescription.numberOfEventIndicators);
-        rootfind = DiffEqBase.RightRootFind)
 
-    stepCb = FunctionCallingCallback((x, t, integrator) -> stepCompleted(c, x, t, integrator);
-        func_everystep = true,
-        func_start = true)
-
-    timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator),
-        (integrator) -> affectFMU!(c, integrator, 0), Float64; initial_affect = true)
-
+    eventHandling = c.fmu.modelDescription.numberOfEventIndicators > 0
+    
     # First evaluation of the FMU
     x0 = fmi2GetContinuousStates(c)
     x0_nom = fmi2GetNominalsOfContinuousStates(c)
@@ -162,8 +153,21 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     # TODO: Make it more elegant
     eventInfo = fmi2NewDiscreteStates(c)
     fmi2EnterContinuousTimeMode(c)
-    if Int64(c.fmu.modelDescription.numberOfEventIndicators) > 0
+    if eventHandling
+      
+        eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator),
+          (integrator, idx) -> affectFMU!(c, integrator, idx),
+          Int64(c.fmu.modelDescription.numberOfEventIndicators);
+          rootfind = DiffEqBase.RightRootFind)
+
+        stepCb = FunctionCallingCallback((x, t, integrator) -> stepCompleted(c, x, t, integrator);
+          func_everystep = true,
+          func_start = true)
+
         if Bool(eventInfo.nextEventTimeDefined)
+            timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator),
+              (integrator) -> affectFMU!(c, integrator, 0), Float64; initial_affect = true)
+        
             solution = solve(problem, solver, callback = CallbackSet(eventCb, stepCb, timeEventCb), saveat = saveat)
         else
             solution = solve(problem, solver, callback = CallbackSet(eventCb, stepCb), saveat = saveat)
@@ -171,10 +175,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     else
         solution = solve(problem, solver, callback = CallbackSet(stepCb), saveat = saveat)
     end
-
-
-
-
+    
 end
 
 ############ Co-Simulation ############
