@@ -9,10 +9,10 @@
 - 📊 parameterization, simulation & plotting of CS- and ME-FMUs
 - 🩺 event-handling for discontinuous ME-FMUs
 - 🛠️ Supports Julia Version 1.6
-- 🖥️ tested on Windows, Ubuntu, macOS
+- 🖥️ tested on: Windows, Ubuntu, macOS
 
 ## Documentation Overview
-1. ```Intorduction```
+1. [```Intorduction```](https://ThummeTo.github.io/FMI.jl/dev)
 2. ```Tutorials```
 3. ```Examples```
 4. ```Libary Funktions```
@@ -30,20 +30,20 @@ julia> ]
 (@v1.6) pkg> add FMI
 ```
 
-> To check that everything is working correctly, you can run the tests bundled with FMI.jl:
+To check that everything is working correctly, you can run the tests bundled with FMI.jl:
 ```julia
 julia> using Pkg
 
 julia> Pkg.test("FMI")
 ```
 
-> In addition, the ```status``` command allows you to check the version of FMI.jl that you have installed.
+In addition, the ```status``` command allows you to check the version of FMI.jl that you have installed.
 ```julia
 julia> ]
 (@v1.6) pkg> status FMI
 ```
 
-> For the rest of the tutorial, we will assume that you have installed the package FMI.jl and entered ``Using FMI``, which will load the package:
+For the rest of the tutorial, we will assume that you have installed the package FMI.jl and entered ``Using FMI``, which will load the package:
 
 ```julia
 julia> using FMI
