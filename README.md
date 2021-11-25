@@ -2,11 +2,12 @@
 # FMI.jl
 
 [![][docs-img]](docs-url) [![][test-img]]() 
+
 <!---Dokumentation Variablen--->
+
 [docs-img]: https://img.shields.io/badge/docs-dev-blue.svg
 [docs-url]: https://ThummeTo.github.io/FMI.jl/dev
 <!--- Run FMI.jl Tests Variablen--->
-[![][test-img]]() 
 
 [test-img]: https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg
 
