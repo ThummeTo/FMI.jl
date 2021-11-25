@@ -13,6 +13,13 @@
 
 <!--- [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://ThummeTo.github.io/FMI.jl/stable) --->
 
+!!! note
+
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod
+    nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor
+    massa, nec semper lorem quam in massa.
+
+
 ## Features
 - 📚 free-to use libraray
 - 📊 parameterization, simulation & plotting of CS- and ME-FMUs
@@ -21,7 +28,7 @@
 - 🖥️ tested on: Windows, Ubuntu, macOS
 
 ## Documentation Overview
-1. [Introduction](https://ThummeTo.github.io/FMI.jl/dev)
+1. [Introduction]()
 2. [Tutorials]()
 3. [Examples]()
 4. [Libary Funktions]()
