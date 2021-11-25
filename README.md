@@ -21,18 +21,14 @@
 - 🖥️ tested on: Windows, Ubuntu, macOS
 
 ## Documentation Overview
-1. [Intorduction](https://ThummeTo.github.io/FMI.jl/dev)
-2. Tutorials
-3. Examples
-4. Libary Funktions
-5. Relted Publications
+1. [Introduction](https://ThummeTo.github.io/FMI.jl/dev)
+2. [Tutorials]()
+3. [Examples]()
+4. [Libary Funktions]()
+5. [Relted Publications]()
 
 ## Get Started
 1. open a Julia-Command-Window, activate your preferred environment
-
-!!! info
-
-    kalsjdfklasdf
 
 1. go to package manager using ```]``` and type ```add FMI```
 ```julia
