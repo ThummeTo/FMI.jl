@@ -9,11 +9,7 @@
 - 📊 parameterization, simulation & plotting of CS- and ME-FMUs
 - 🩺 event-handling for discontinuous ME-FMUs
 - 🛠️ Supports Julia Version 1.6
-- 🖥️ tested on :
-
-| Windows | Ubuntu | IOS |
-| ------- | ------ | --- |
-| <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg"> | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Logo-ubuntu_cof-orange-hex.svg/1200px-Logo-ubuntu_cof-orange-hex.svg.png" width = "80"> | <img src = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1024px-Apple_logo_black.svg.png" width = "80">|
+- 🖥️ tested on Windows, Ubuntu, macOS
 
 ## Documentation Overview
 1. ```Intorduction```
@@ -22,7 +18,7 @@
 4. ```Libary Funktions```
 5. ```Relted Publications```
 
-> continue to the [Documentation](https://ThummeTo.github.io/FMI.jl/dev)
+continue to the [Documentation](https://ThummeTo.github.io/FMI.jl/dev)
 
 
 ## Get Started
