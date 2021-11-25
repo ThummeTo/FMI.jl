@@ -5,7 +5,7 @@
 
 !!! note
 
-    Thsi is the contetn of the note
+    This is the content of the note.
 
 ## Features
 - 📚 free-to use libraray
