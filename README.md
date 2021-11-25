@@ -18,9 +18,6 @@
 4. Libary Funktions
 5. Relted Publications
 
-continue to the [Documentation](https://ThummeTo.github.io/FMI.jl/dev)
-
-
 ## Get Started
 1. open a Julia-Command-Window, activate your preferred environment
 1. go to package manager using ```]``` and type ```add FMI```

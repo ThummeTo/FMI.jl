@@ -1,5 +1,5 @@
 
-# Introduction
+# Documentation
 This section is intended to familiarise users with the documentation environment and to provide a first detailed insight into the FMI.jl library.
 ## Documentation Overview
 ### 1. ```Introduction```
