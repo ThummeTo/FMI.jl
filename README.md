@@ -1,8 +1,14 @@
 ![FMI.jl Logo](https://github.com/ThummeTo/FMI.jl/blob/main/logo/dark/fmijl_logo_640_320.png "FMI.jl Logo")
 # FMI.jl
-[![][docs-img]](https://ThummeTo.github.io/FMI.jl/dev) [![](https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg)]() 
+<!---Dokumentation --->
+[![][docs-img]](docs-url) 
 
 [docs-img]: https://img.shields.io/badge/docs-dev-blue.svg
+[docs-url]: https://ThummeTo.github.io/FMI.jl/dev
+<!--- Run FMI.jl Tests--->
+[![][test-img]]() 
+
+[test-img]: https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg
 
 <!--- [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://ThummeTo.github.io/FMI.jl/stable) --->
 
