@@ -12,11 +12,11 @@
 - 🖥️ tested on: Windows, Ubuntu, macOS
 
 ## Documentation Overview
-1. [```Intorduction```](https://ThummeTo.github.io/FMI.jl/dev)
-2. ```Tutorials```
-3. ```Examples```
-4. ```Libary Funktions```
-5. ```Relted Publications```
+1. [Intorduction](https://ThummeTo.github.io/FMI.jl/dev)
+2. Tutorials
+3. Examples
+4. Libary Funktions
+5. Relted Publications
 
 continue to the [Documentation](https://ThummeTo.github.io/FMI.jl/dev)
 
