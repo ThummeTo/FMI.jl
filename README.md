@@ -12,13 +12,9 @@
 [test-img]: https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg
 
 <!--- [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://ThummeTo.github.io/FMI.jl/stable) --->
-```@eval
-import Markdown
-Markdown.parse("""
+
 !!! note
-    The documentation is also available in PDF format: .
-""")
-```
+    The documentation is also available in PDF format: 
 
 ## Features
 - 📚 free-to use libraray
