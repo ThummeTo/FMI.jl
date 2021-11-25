@@ -14,6 +14,7 @@
 <!--- [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://ThummeTo.github.io/FMI.jl/stable) --->
 
 !!! note
+
     The documentation is also available in PDF format: 
 
 ## Features
@@ -24,7 +25,7 @@
 - 🖥️ tested on: Windows, Ubuntu, macOS
 
 ## Documentation Overview
-1. [Introduction]()
+1. [Introduction](#Tutorial)
 2. [Tutorials]()
 3. [Examples]()
 4. [Libary Funktions]()
