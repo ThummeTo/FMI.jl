@@ -3,9 +3,9 @@
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) [![](https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg)]() 
 <!--- [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://ThummeTo.github.io/FMI.jl/stable) --->
 
- !!! info
-
-    This is the content of the note.
+ !!! info 
+ 
+     This is the content of the note.
 
 ## Features
 - 📚 free-to use libraray
