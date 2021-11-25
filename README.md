@@ -13,10 +13,6 @@
 
 <!--- [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://ThummeTo.github.io/FMI.jl/stable) --->
 
-!!! info
-
-    aksjdflöasf
-
 ## Features
 - 📚 free-to use libraray
 - 📊 parameterization, simulation & plotting of CS- and ME-FMUs
@@ -33,6 +29,11 @@
 
 ## Get Started
 1. open a Julia-Command-Window, activate your preferred environment
+
+!!! info
+
+    kalsjdfklasdf
+
 1. go to package manager using ```]``` and type ```add FMI```
 ```julia
 julia> ]
