@@ -5,18 +5,18 @@ This section is intended to familiarise users with the documentation environment
 ### 1. ```Introduction```
 - ***Prior knowledge***  
   
-  >In order to better understand the functionality of the library, a brief explanation of the most important terms is advantageous. Fundamental terms that are important to understand are `FMI` and `FMU`.  
+  In order to better understand the functionality of the library, a brief explanation of the most important terms is advantageous. Fundamental terms that are important to understand are `FMI` and `FMU`.  
 - ***Library FMI.jl***  
   
-  >describes important `properties` of the library and is intended to `answer initial questions`. 
+  describes important `properties` of the library and is intended to `answer initial questions`. 
 
-### 2. ```Tutorials```
+### 2. Tutorials
 
-### 3. ```Examples```
+### 3. Examples
 
-### 4. ```Libary Funktions```
+### 4. Libary Funktions
 
-### 5. ```Related Publications```
+### 5. Related Publications
 
 ## Prior knowledge
 
