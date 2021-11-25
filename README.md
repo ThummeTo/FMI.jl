@@ -3,6 +3,9 @@
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) [![](https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg)]() 
 <!--- [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://ThummeTo.github.io/FMI.jl/stable) --->
 
+!!! note
+
+    Thsi is the contetn of the note
 
 ## Features
 - 📚 free-to use libraray
@@ -50,4 +53,3 @@ julia> using FMI
 1. goto package manager using ```]```
 1. type ```add FMI``` or ```add "https://github.com/ThummeTo/FMI.jl"```
 1. have a look inside the ```example``` folder
-
