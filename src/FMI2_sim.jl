@@ -95,14 +95,19 @@ function fx(c::fmi2Component, x, p, t)
     dx = fmi2GetDerivatives(c)
 end
 
+# save FMU values 
+function saveValues(c::fmi2Component, recordValues, u, t, integrator)
+    Tuple(fmiGetReal(c, recordValues)...,)
+end
 
 """
 Source: FMISpec2.0.2[p.90 ff]: 3.2.4 Pseudocode Example
 
-Simulates a FMU instance for the set simulation time.
-Events are handled correctly.
+Simulates a FMU instance for the given simulation time interval.
+State- and Time-Events are handled correctly.
 
-Returns an ODESolution.
+Returns a tuple of type (ODESolution, DiffEqCallbacks.SavedValues).
+If keyword `recordValues` is not set, a tuple of type (ODESolution, nothing) is returned for consitency.
 """
 function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.0;
     solver = nothing,
@@ -112,9 +117,17 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     setup = true)
 
     recordValues = prepareValueReference(c, recordValues)
+    solution = nothing
+    callbacks = []
+    savedValues = nothing
 
     if length(recordValues) > 0
-        @warn "fmi2SimulateME(...): Recording values via `recordValues` not implemented, yet."
+        savedValues = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...})
+
+        savingCB = SavingCallback((u,t,integrator) -> saveValues(c, recordValues, u, t, integrator), 
+                                  savedValues, 
+                                  saveat=saveat)
+        push!(callbacks, savingCB)
     end
 
     if solver == nothing
@@ -148,7 +161,6 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
 
     p = []
     problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
-    solution = nothing
     
     if eventHandling
 
@@ -161,30 +173,39 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
                                            (integrator, idx) -> affectFMU!(c, integrator, idx),
                                            Int64(c.fmu.modelDescription.numberOfEventIndicators);
                                            rootfind = DiffEqBase.RightRootFind)
+        push!(callbacks, eventCb)
 
         stepCb = FunctionCallingCallback((x, t, integrator) -> stepCompleted(c, x, t, integrator);
                                          func_everystep = true,
                                          func_start = true)
+        push!(callbacks, stepCb)
 
         if timeEvents
             timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator),
                                             (integrator) -> affectFMU!(c, integrator, 0), Float64; initial_affect = true)
         
-            solution = solve(problem, solver, callback = CallbackSet(eventCb, stepCb, timeEventCb), saveat = saveat)
-        else
-            solution = solve(problem, solver, callback = CallbackSet(eventCb, stepCb), saveat = saveat)
+            push!(callbacks, timeEventCb)
         end
-    else
+    end
+
+    if length(callbacks) > 0
+        solution = solve(problem, solver, callback = CallbackSet(callbacks...), saveat = saveat)
+    else 
         solution = solve(problem, solver, saveat = saveat)
     end
-    
-    return solution
+
+    return solution, savedValues
 end
 
 ############ Co-Simulation ############
 
 """
 Starts a simulation of the Co-Simulation FMU instance.
+
+Returns a tuple of (success::Bool, DiffEqCallbacks.SavedValues) with success = `true` or `false`.
+If keyword `recordValues` is not set, a tuple of type (success::Bool, nothing) is returned for consitency.
+
+ToDo: Improove Documentation.
 """
 function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
                         recordValues::fmi2ValueReferenceFormat = nothing,
@@ -193,6 +214,9 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
 
     recordValues = prepareValueReference(c, recordValues)
     variableSteps = c.fmu.modelDescription.CScanHandleVariableCommunicationStepSize 
+
+    success = false
+    savedValues = nothing
 
     # default setup
     if length(saveat) == 0
@@ -216,21 +240,19 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
 
     t = t_start
 
-    sd = nothing
     record = length(recordValues) > 0
 
     #numDigits = length(string(round(Integer, 1/dt)))
 
     if record
-        sd = fmi2SimulationResult()
-        sd.valueReferences = recordValues
-        sd.dataPoints = []
-        sd.fmu = c.fmu
-
-        values = fmi2GetReal(c, sd.valueReferences)
-        push!(sd.dataPoints, (t, values...))
+        savedValues = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...})
 
         i = 1
+
+        values = (fmi2GetReal(c, recordValues)...,)
+        DiffEqCallbacks.copyat_or_push!(savedValues.t, i, t)
+        DiffEqCallbacks.copyat_or_push!(savedValues.saveval, i, values, Val{false})
+
         while t < t_stop
             if variableSteps
                 if length(saveat) > i
@@ -244,9 +266,12 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
             t = t + dt #round(t + dt, digits=numDigits)
             i += 1
 
-            values = fmi2GetReal(c, sd.valueReferences)
-            push!(sd.dataPoints, (t, values...))
+            values = (fmi2GetReal(c, recordValues)...,)
+            DiffEqCallbacks.copyat_or_push!(savedValues.t, i, t)
+            DiffEqCallbacks.copyat_or_push!(savedValues.saveval, i, values, Val{false})
         end
+
+        success = true
     else
         i = 1
         while t < t_stop
@@ -262,15 +287,24 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
             t = t + dt #round(t + dt, digits=numDigits)
             i += 1
         end
+
+        success = true
     end
 
-    sd
+    success, savedValues
 end
 
 ###############
 
 """
 Starts a simulation of the fmu instance for the matching fmu type, if both types are available, CS is preferred.
+
+Returns:
+    - a tuple of (success::Bool, DiffEqCallbacks.SavedValues) with success = `true` or `false` for CS-FMUs
+    - a tuple of (ODESolution, DiffEqCallbacks.SavedValues) for ME-FMUs
+    - if keyword `recordValues` is not set, a tuple of type (..., nothing)
+    
+ToDo: Improove Documentation.
 """
 function fmi2Simulate(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.0;
                       recordValues::fmi2ValueReferenceFormat = nothing,

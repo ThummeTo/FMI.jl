@@ -21,8 +21,9 @@ end
 # this is how you can quickly simulate a FMU
 myFMU = fmiLoad(pathToFMU)
 fmiInstantiate!(myFMU)
-simData = fmiSimulate(myFMU, 0.0, 10.0; recordValues=["mass.s"])
-fmiPlot(simData)
+rvs = ["mass.s"]
+_, simData = fmiSimulate(myFMU, 0.0, 10.0; recordValues=rvs)
+fmiPlot(myFMU, rvs, simData)
 fmiUnload(myFMU)
 
 # this is how you can simulate a FMU with more possibilities
