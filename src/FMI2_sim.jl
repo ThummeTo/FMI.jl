@@ -114,7 +114,8 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     customFx = nothing,
     recordValues::fmi2ValueReferenceFormat = nothing,
     saveat = [],
-    setup = true)
+    setup = true,
+    kwargs...)
 
     recordValues = prepareValueReference(c, recordValues)
     solution = nothing
@@ -189,9 +190,9 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     end
 
     if length(callbacks) > 0
-        solution = solve(problem, solver, callback = CallbackSet(callbacks...), saveat = saveat)
+        solution = solve(problem, solver, callback = CallbackSet(callbacks...), saveat = saveat; kwargs...)
     else 
-        solution = solve(problem, solver, saveat = saveat)
+        solution = solve(problem, solver, saveat = saveat; kwargs...)
     end
 
     return solution, savedValues

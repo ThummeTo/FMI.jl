@@ -262,9 +262,9 @@ end
 Simulate an ModelExchange fmu according to its standard from 0.0 to t_stop.
 """
 function fmiSimulateME(str::fmi2Struct, t_start::Real = 0.0, t_stop::Real = 1.0;
-                       recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true, solver = nothing)
+                       recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true, solver = nothing, kwargs...)
     fmi2SimulateME(str, t_start, t_stop;
-                   recordValues=recordValues, saveat=saveat, setup=setup, solver=solver)
+                   recordValues=recordValues, saveat=saveat, setup=setup, solver=solver, kwargs...)
 end
 
 """
