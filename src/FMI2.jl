@@ -641,9 +641,9 @@ end
 Starts a simulation of a FMU in ME-mode.
 """
 function fmi2SimulateME(fmu::FMU2, t_start::Real, t_stop::Real;
-                        recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true, solver = nothing)
+                        recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true, solver = nothing, kwargs...)
     fmi2SimulateME(fmu.components[end], t_start, t_stop;
-                   recordValues=recordValues, saveat=saveat, setup=setup, solver=solver)
+                   recordValues=recordValues, saveat=saveat, setup=setup, solver=solver, kwargs...)
 end
 
 """
