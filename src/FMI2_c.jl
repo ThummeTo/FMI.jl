@@ -196,13 +196,12 @@ The default of causality is “local”. A continuous-time state must have causa
 [causality = "calculatedParameter" and causality = "local" with variability = "fixed" or "tunable" are similar. The difference is that a calculatedParameter can be used in another model or slave, whereas a local variable cannot. For example, when importing an FMU in a Modelica environment, a "calculatedParameter" should be imported in a public section as final parameter, whereas a "local" variable should be imported in a protected section of the model.]
 """
 @enum fmi2causality begin
-    # parameter
-    # calculatedParameter
-    # input
-    # output
-    # _local
-    # independent
-    test
+    parameter
+    calculatedParameter
+    input
+    output
+    _local
+    independent
 end
 
 """
@@ -218,12 +217,11 @@ Enumeration that defines the time dependency of the variable, in other words, it
 The default is “continuous”.
 """
 @enum fmi2variability begin
-    # constant
-    # fixed
-    # tunable
-    # discrete
-    # continuous
-    test2
+    constant
+    fixed
+    tunable
+    discrete
+    continuous
 end
 
 """
@@ -238,10 +236,9 @@ If initial is not present, it is defined by the table below based on causality a
 If fmiSetXXX is not called on a variable with causality = ″input″, then the FMU must use the start value as value of this input.
 """
 @enum fmi2initial begin
-    # exact
-    # approx
-    # calculated
-    test3
+    exact
+    approx
+    calculated
 end
 
 """

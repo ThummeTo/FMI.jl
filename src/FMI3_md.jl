@@ -538,13 +538,9 @@ function fmi3setDatatypeVariables(node::EzXML.Node, md::fmi3ModelDescription)
     end
 
     if haskey(node, "initial")
-        if !occursin(node["initial"], string(instances(fmi3initial)))
-            display("Error: initial not known")
-        else
-            for i in 0:(length(instances(fmi3initial))-1)
-                if node["initial"] == string(fmi3initial(i))
-                    type.initial = fmi3initial(i)
-                end
+        for i in fmi3initial
+            if node["initial"] == string(i)
+                type.initial = i
             end
         end
     end

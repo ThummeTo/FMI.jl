@@ -2,6 +2,57 @@
 # Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
+
+macro scopedenum(T, syms...)
+    counter = 0 
+    function key_value(x)
+        if hasproperty(x, :args)
+            k = x.args[1]
+            v = x.args[2]
+        else
+            k = x
+            v = counter
+            counter += 1
+        end
+        return k,v
+    end
+
+    if length(syms) == 1 && syms[1] isa Expr && syms[1].head === :block
+        syms = syms[1].args
+    end
+
+    syms = Tuple(x for x in syms if ~(x isa LineNumberNode))
+    _syms = [key_value(x) for x in syms if ~(x isa LineNumberNode)]
+
+    blk = esc(:(
+        module $(Symbol("$(T)Module"))
+            using JSON3
+            export $T
+            struct $T
+                value::Int64
+            end
+            const NAME2VALUE = $(Dict(String(x[1])=>Int64(x[2]) for x in _syms))
+            $T(str::String) = $T(NAME2VALUE[str])
+            const VALUE2NAME = $(Dict(Int64(x[2])=>String(x[1]) for x in _syms))
+            Base.string(e::$T) = VALUE2NAME[e.value]
+            Base.getproperty(::Type{$T}, sym::Symbol) = haskey(NAME2VALUE, String(sym)) ? $T(String(sym)) : getfield($T, sym)
+            Base.show(io::IO, e::$T) = print(io, string($T, ".", string(e), " = ", e.value))
+            Base.propertynames(::Type{$T}) = $([x[1] for x in _syms])
+            JSON3.StructType(::Type{$T}) = JSON3.StructTypes.StringType()
+
+            function _itr(res)
+                isnothing(res) && return res
+                value, state = res
+                return ($T(value), state)
+            end
+            Base.iterate(::Type{$T}) = _itr(iterate(keys(VALUE2NAME)))
+            Base.iterate(::Type{$T}, state) = _itr(iterate(keys(VALUE2NAME), state))
+        end
+    ))
+    top = Expr(:toplevel, blk)
+    push!(top.args, :(using .$(Symbol("$(T)Module"))))
+    return top
+end
 """
 Source: FMISpec3.0, Version 5b80c29:2.2.2. Platform Dependent Definitions
 
@@ -37,7 +88,7 @@ const fmi3False = fmi3Boolean(false)
 const fmi3True = fmi3Boolean(true)
 
 # TODO docs
-@enum fmi3causality begin
+@scopedenum fmi3causality begin
     _parameter
     calculatedParameter
     input
@@ -48,7 +99,7 @@ const fmi3True = fmi3Boolean(true)
 end
 
 # TODO docs
-@enum fmi3variability begin
+@scopedenum fmi3variability begin
     constant
     fixed
     tunable
@@ -57,7 +108,7 @@ end
 end
 
 # TODO docs
-@enum fmi3initial begin
+@scopedenum fmi3initial begin
     exact
     approx
     calculated
@@ -223,31 +274,24 @@ mutable struct fmi3ModelVariable
 
     # Constructor for fully specified ScalarVariable
     function fmi3ModelVariable(name, valueReference, type, description, causalityString, variabilityString, dependencies, dependenciesKind)
-        var = continuous::fmi3variability
+        var = fmi3variability.continuous
         # if datatype.datatype == fmi3Float32 || datatype.datatype == fmi3Float64
         #     var = continuous::fmi3variability
         # else
         #     var = discretes
         # end
-        cau = _local::fmi3causality
+        cau = fmi3causality._local
         #check if causality and variability are correct
-        if !occursin(variabilityString, string(instances(fmi3variability)))
-            display("Error: variability not known")
-        else
-            for i in 0:(length(instances(fmi3variability))-1)
-                if variabilityString == string(fmi3variability(i))
-                    var = fmi3variability(i)
-                end
+    
+        for i in fmi3variability
+            if variabilityString == string(i)
+                var = i
             end
         end
 
-        if !occursin(causalityString, string(instances(fmi3causality)))
-            display("Error: causality not known")
-        else
-            for i in 0:(length(instances(fmi3causality))-1)
-                if causalityString == string(fmi3causality(i))
-                    cau = fmi3causality(i)
-                end
+        for i in fmi3causality
+            if causalityString == string(i)
+                cau = i
             end
         end
 
