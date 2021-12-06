@@ -433,11 +433,15 @@ Source: FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an 
 
 Informs the FMU to enter Initialization Mode. Before calling this function, all variables with attribute <ScalarVariable initial = "exact" or "approx"> can be set with the “fmi2SetXXX” functions (the ScalarVariable attributes are defined in the Model Description File, see section 2.2.7). Setting other variables is not allowed. Furthermore, fmi2SetupExperiment must be called at least once before calling fmi2EnterInitializationMode, in order that startTime is defined.
 """
-function fmi3EnterInitializationMode(c::fmi3Component)
+function fmi3EnterInitializationMode(c::fmi3Component,toleranceDefined::fmi3Boolean,
+    tolerance::fmi3Float64,
+    startTime::fmi3Float64,
+    stopTimeDefined::fmi3Boolean,
+    stopTime::fmi3Float64)
     ccall(c.fmu.cEnterInitializationMode,
           Cuint,
-          (Ptr{Nothing},),
-          c.compAddr)
+          (Ptr{Nothing}, fmi3Boolean, fmi3Float64, fmi3Float64, fmi3Boolean, fmi3Float64),
+          c.compAddr, toleranceDefined, tolerance, startTime, stopTimeDefined, stopTime)
 end
 
 """
@@ -1123,9 +1127,10 @@ Source: FMISpec2.0.2[p.104]: 4.2.2 Computation
 The computation of a time step is started.
 """
 function fmi3DoStep(c::fmi3Component, currentCommunicationPoint::fmi3Float64, communicationStepSize::fmi3Float64, noSetFMUStatePriorToCurrentPoint::fmi3Boolean,
-                    eventEncountered::Ref{fmi3Boolean}, terminateSimulation::Ref{fmi3Boolean}, earlyReturn::Ref{fmi3Boolean}, lastSuccessfulTime::Ref{fmi3Float64})
-    @assert c.fmu.cDoStep != C_NULL ["fmi2DoStep(...): This FMU does not support fmi2DoStep, probably it's a ME-FMU with no CS-support?"]
+                    eventEncountered::fmi3Boolean, terminateSimulation::fmi3Boolean, earlyReturn::fmi3Boolean, lastSuccessfulTime::fmi3Float64)
+    @assert c.fmu.cDoStep != C_NULL ["fmi3DoStep(...): This FMU does not support fmi3DoStep, probably it's a ME-FMU with no CS-support?"]
+
     ccall(c.fmu.cDoStep, Cuint,
           (Ptr{Nothing}, fmi3Float64, fmi3Float64, fmi3Boolean, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Float64}),
-          c.compAddr, currentCommunicationPoint, communicationStepSize, noSetFMUStatePriorToCurrentPoint, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
+          c.compAddr, currentCommunicationPoint, communicationStepSize, noSetFMUStatePriorToCurrentPoint, Ref(eventEncountered), Ref(terminateSimulation), Ref(earlyReturn), Ref(lastSuccessfulTime))
 end

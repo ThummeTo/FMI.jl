@@ -5,6 +5,16 @@
 
 # Comfort functions for fmi2 functions using fmi2Components
 
+function fmi3EnterInitializationMode(c::fmi3Component, startTime::Real = 0.0, stopTime::Real = startTime; tolerance::Real = 0.0)
+    # c.fmu.t = startTime
+
+    toleranceDefined = (tolerance > 0.0)
+    stopTimeDefined = (stopTime > startTime)
+
+    fmi3EnterInitializationMode(c, fmi3Boolean(toleranceDefined), fmi3Float64(tolerance), fmi3Float64(startTime), fmi3Boolean(stopTimeDefined), fmi3Float64(stopTime))
+
+end
+
 """
 TODO: FMI specification reference.
 

@@ -281,6 +281,7 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
 
     # CS specific function calls
     if fmi3IsCoSimulation(fmu)
+        println("IsCoSImulation")
         fmu.cGetOutputDerivatives                  = dlsym(fmu.libHandle, :fmi3GetOutputDerivatives)
         fmu.cEnterStepMode                         = dlsym(fmu.libHandle, :fmi3EnterStepMode)
         fmu.cDoStep                                = dlsym(fmu.libHandle, :fmi3DoStep)
@@ -538,7 +539,7 @@ function fmi3InstantiateCoSimulation!(fmu::FMU3; visible::Bool = false, loggingO
                                             fmi3Boolean(mode), fmi3Boolean(fmu.modelDescription.CScanReturnEarlyAfterIntermediateUpdate), fmu.modelDescription.intermediateUpdateValueReferences, Csize_t(length(fmu.modelDescription.intermediateUpdateValueReferences)), fmu.instanceEnvironment, fmu.fmi3CallbackLoggerFunction, fmu.fmi3CallbackIntermediateUpdateFunction)
 
     if compAddr == Ptr{Cvoid}(C_NULL)
-        @error "fmi2Instantiate!(...): Instantiation failed!"
+        @error "fmi3Instantiate!(...): Instantiation failed!"
         return nothing
     end
 
@@ -576,8 +577,8 @@ FMU enters Initialization mode.
 
 For more information call ?fmi2EnterInitializationMode
 """
-function fmi3EnterInitializationMode(fmu::FMU3)
-    fmi3EnterInitializationMode(fmu.components[end])
+function fmi3EnterInitializationMode(fmu::FMU3, startTime::Real = 0.0, stopTime::Real = startTime; tolerance::Real = 0.0)
+    fmi3EnterInitializationMode(fmu.components[end], startTime, stopTime; tolerance = tolerance)
 end
 
 """
@@ -1353,3 +1354,18 @@ function fmi3CompletedIntegratorStep(fmu::FMU3,
                                          terminateSimulation)
     (status, enterEventMode, terminateSimulation)
 end
+
+"""
+TODO: FMI specification reference.
+
+The computation of a time step is started.
+
+For more information call ?fmi2DoStep
+"""
+function fmi3DoStep(fmu::FMU3, currentCommunicationPoint::Real, communicationStepSize::Real, noSetFMUStatePriorToCurrentPoint::Bool, eventEncountered::Bool, terminateSimulation::Bool, earlyReturn::Bool, lastSuccessfulTime::Real)
+    fmi3DoStep(fmu.components[end], fmi3Float64(currentCommunicationPoint), fmi3Float64(communicationStepSize), fmi3Boolean(noSetFMUStatePriorToCurrentPoint), fmi3Boolean(eventEncountered), fmi3Boolean(terminateSimulation), fmi3Boolean(earlyReturn), fmi3Float64(lastSuccessfulTime))
+end
+# function fmi3DoStep(fmu::FMU3, communicationStepSize::Real)
+#     fmi3DoStep(fmu.components[end], fmi3Float64(fmu.t), fmi3Float64(communicationStepSize), fmi2True)
+#     fmu.t += communicationStepSize
+# end
