@@ -23,8 +23,8 @@ mutable struct FMU3 <: FMU
     modelDescription::fmi3ModelDescription
 
     type::fmi3Type
-    fmi3CallbackLoggerFunction::fmi3CallbackLoggerFunction
-    fmi3CallbackIntermediateUpdateFunction::fmi3CallbackIntermediateUpdateFunction
+    # fmi3CallbackLoggerFunction::fmi3CallbackLoggerFunction
+    # fmi3CallbackIntermediateUpdateFunction::fmi3CallbackIntermediateUpdateFunction
     instanceEnvironment::fmi3InstanceEnvironment
     components::Array{fmi3Component}
 
@@ -501,9 +501,9 @@ function fmi3InstantiateModelExchange!(fmu::FMU3; visible::Bool = false, logging
     # ptrAllocateMemory = @cfunction(cbAllocateMemory, Ptr{Cvoid}, (Csize_t, Csize_t))
     # ptrFreeMemory = @cfunction(cbFreeMemory, Cvoid, (Ptr{Cvoid},))
     # ptrStepFinished = C_NULL
-    fmu.fmi3CallbackLoggerFunction = fmi3CallbackLoggerFunction(ptrLogger) #, ptrAllocateMemory, ptrFreeMemory, ptrStepFinished, C_NULL)
+    # fmu.fmi3CallbackLoggerFunction = fmi3CallbackLoggerFunction(ptrLogger) #, ptrAllocateMemory, ptrFreeMemory, ptrStepFinished, C_NULL)
 
-    compAddr = fmi3InstantiateModelExchange(fmu.cInstantiateModelExchange, fmu.instanceName, fmu.modelDescription.instantiationToken, fmu.fmuResourceLocation, fmi3Boolean(visible), fmi3Boolean(loggingOn), fmu.instanceEnvironment, fmu.fmi3CallbackLoggerFunction)
+    compAddr = fmi3InstantiateModelExchange(fmu.cInstantiateModelExchange, fmu.instanceName, fmu.modelDescription.instantiationToken, fmu.fmuResourceLocation, fmi3Boolean(visible), fmi3Boolean(loggingOn), fmu.instanceEnvironment, ptrLogger)
 
     if compAddr == Ptr{Cvoid}(C_NULL)
         @error "fmi2Instantiate!(...): Instantiation failed!"
@@ -526,17 +526,17 @@ For more information call ?fmi2Instantiate
 """
 function fmi3InstantiateCoSimulation!(fmu::FMU3; visible::Bool = false, loggingOn::Bool = false, eventModeUsed::Bool = false)
 
-    ptrLogger = @cfunction(fmi3CallbackLogMessage, Cvoid, (Ptr{Cvoid}, Ptr{Cchar}, Cuint, Ptr{Cchar}, Ptr{Cchar}))
+    ptrLogger = @cfunction(fmi3CallbackLogMessage, Cvoid, (Ptr{Cvoid}, Cuint, Ptr{Cchar}, Ptr{Cchar}))
     ptrIntermediateUpdate = @cfunction(fmi3CallbackIntermediateUpdate, Cvoid, (Ptr{Cvoid}, fmi3Float64, fmi3Boolean, fmi3Boolean, fmi3Boolean, fmi3Boolean, fmi3Boolean, Ptr{fmi3Boolean}, Ptr{fmi3Float64}))
     if fmu.modelDescription.CShasEventMode 
         mode = eventModeUsed
     else
         mode = false
     end
-    fmu.fmi3CallbackLoggerFunction = fmi3CallbackLoggerFunction(ptrLogger) #, ptrAllocateMemory, ptrFreeMemory, ptrStepFinished, C_NULL)
-    fmu.fmi3CallbackIntermediateUpdateFunction = fmi3CallbackIntermediateUpdateFunction(ptrIntermediateUpdate)
+    # fmu.fmi3CallbackLoggerFunction = fmi3CallbackLoggerFunction(ptrLogger) #, ptrAllocateMemory, ptrFreeMemory, ptrStepFinished, C_NULL)
+    # fmu.fmi3CallbackIntermediateUpdateFunction = fmi3CallbackIntermediateUpdateFunction(ptrIntermediateUpdate)
     compAddr = fmi3InstantiateCoSimulation(fmu.cInstantiateCoSimulation, fmu.instanceName, fmu.modelDescription.instantiationToken, fmu.fmuResourceLocation, fmi3Boolean(visible), fmi3Boolean(loggingOn), 
-                                            fmi3Boolean(mode), fmi3Boolean(fmu.modelDescription.CScanReturnEarlyAfterIntermediateUpdate), fmu.modelDescription.intermediateUpdateValueReferences, Csize_t(length(fmu.modelDescription.intermediateUpdateValueReferences)), fmu.instanceEnvironment, fmu.fmi3CallbackLoggerFunction, fmu.fmi3CallbackIntermediateUpdateFunction)
+                                            fmi3Boolean(mode), fmi3Boolean(fmu.modelDescription.CScanReturnEarlyAfterIntermediateUpdate), fmu.modelDescription.intermediateUpdateValueReferences, Csize_t(length(fmu.modelDescription.intermediateUpdateValueReferences)), fmu.instanceEnvironment, ptrLogger, ptrIntermediateUpdate)
 
     if compAddr == Ptr{Cvoid}(C_NULL)
         @error "fmi3Instantiate!(...): Instantiation failed!"
@@ -1362,8 +1362,8 @@ The computation of a time step is started.
 
 For more information call ?fmi2DoStep
 """
-function fmi3DoStep(fmu::FMU3, currentCommunicationPoint::Real, communicationStepSize::Real, noSetFMUStatePriorToCurrentPoint::Bool, eventEncountered::Bool, terminateSimulation::Bool, earlyReturn::Bool, lastSuccessfulTime::Real)
-    fmi3DoStep(fmu.components[end], fmi3Float64(currentCommunicationPoint), fmi3Float64(communicationStepSize), fmi3Boolean(noSetFMUStatePriorToCurrentPoint), fmi3Boolean(eventEncountered), fmi3Boolean(terminateSimulation), fmi3Boolean(earlyReturn), fmi3Float64(lastSuccessfulTime))
+function fmi3DoStep(fmu::FMU3, currentCommunicationPoint::Real, communicationStepSize::Real, noSetFMUStatePriorToCurrentPoint::Bool, eventEncountered::fmi3Boolean, terminateSimulation::fmi3Boolean, earlyReturn::fmi3Boolean, lastSuccessfulTime::fmi3Float64)
+    fmi3DoStep(fmu.components[end], fmi3Float64(currentCommunicationPoint), fmi3Float64(communicationStepSize), fmi3Boolean(noSetFMUStatePriorToCurrentPoint), eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
 end
 # function fmi3DoStep(fmu::FMU3, communicationStepSize::Real)
 #     fmi3DoStep(fmu.components[end], fmi3Float64(fmu.t), fmi3Float64(communicationStepSize), fmi2True)

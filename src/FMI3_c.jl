@@ -127,18 +127,18 @@ Argument fmuType defines the type of the FMU:
 end
 
 # TODO: Callback functions
-"""
-Source: FMISpec2.0.2[p.19-22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
+# """
+# Source: FMISpec2.0.2[p.19-22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
 
-The struct contains pointers to functions provided by the environment to be used by the FMU. It is not allowed to change these functions between fmi2Instantiate(..) and fmi2Terminate(..) calls. Additionally, a pointer to the environment is provided (componentEnvironment) that needs to be passed to the “logger” function, in order that the logger function can utilize data from the environment, such as mapping a valueReference to a string. In the unlikely case that fmi2Component is also needed in the logger, it has to be passed via argument componentEnvironment. Argument componentEnvironment may be a null pointer. The componentEnvironment pointer is also passed to the stepFinished(..) function in order that the environment can provide an efficient way to identify the slave that called stepFinished(..).
-"""
-mutable struct fmi3CallbackLoggerFunction
-    logger::Ptr{Cvoid}
-end
+# The struct contains pointers to functions provided by the environment to be used by the FMU. It is not allowed to change these functions between fmi2Instantiate(..) and fmi2Terminate(..) calls. Additionally, a pointer to the environment is provided (componentEnvironment) that needs to be passed to the “logger” function, in order that the logger function can utilize data from the environment, such as mapping a valueReference to a string. In the unlikely case that fmi2Component is also needed in the logger, it has to be passed via argument componentEnvironment. Argument componentEnvironment may be a null pointer. The componentEnvironment pointer is also passed to the stepFinished(..) function in order that the environment can provide an efficient way to identify the slave that called stepFinished(..).
+# """
+# mutable struct fmi3CallbackLoggerFunction
+#     logger::Ptr{Cvoid}
+# end
 
-mutable struct fmi3CallbackIntermediateUpdateFunction
-    intermediateUpdate::Ptr{Cvoid}
-end
+# mutable struct fmi3CallbackIntermediateUpdateFunction
+#     intermediateUpdate::Ptr{Cvoid}
+# end
 """
 Source: FMISpec2.0.2[p.21]: 2.1.5 Creation, Destruction and Logging of FMU Instances
 
@@ -148,17 +148,17 @@ function fmi3CallbackLogMessage(instanceEnvironment::Ptr{Cvoid},
             status::Cuint,
             category::Ptr{Cchar},
             message::Ptr{Cchar})
-    _message = unsafe_string(message)
-    _category = unsafe_string(category)
-    _status = fmi2StatusString(status)
-
-    if status == Integer(fmi3OK)
-        @info "[$_status][$_category]: $_message"
-    elseif status == Integer(fmi3Warning)
-        @warn "[$_status][$_category]: $_message"
-    else
-        @error "[$_status][$_category]: $_message"
-    end
+    # _message = unsafe_string(message)
+    # _category = unsafe_string(category)
+    # _status = fmi2StatusString(status)
+    println("Info: LogMessage")
+    # if status == Integer(fmi3OK)
+    #     @info "[$_status][$_category]: $_message"
+    # elseif status == Integer(fmi3Warning)
+    #     @warn "[$_status][$_category]: $_message"
+    # else
+    #     @error "[$_status][$_category]: $_message"
+    # end
 
     nothing
 end
@@ -398,14 +398,14 @@ function fmi3InstantiateModelExchange(cfunc::Ptr{Nothing},
         visible::fmi3Boolean,
         loggingOn::fmi3Boolean,
         instanceEnvironment::fmi3InstanceEnvironment,
-        logMessage::fmi3CallbackLoggerFunction)
+        logMessage::Ptr{Cvoid})
 
     compAddr = ccall(cfunc,
         Ptr{Cvoid},
         (Cstring, Cstring, Cstring,
         Cint, Cint, Ptr{Cvoid}, Ptr{Cvoid}),
         instanceName, fmuinstantiationToken, fmuResourceLocation,
-        visible, loggingOn, instanceEnvironment, Ref(logMessage))
+        visible, loggingOn, instanceEnvironment, logMessage)
 
     compAddr
 end
@@ -421,8 +421,8 @@ function fmi3InstantiateCoSimulation(cfunc::Ptr{Nothing},
     requiredIntermediateVariables::Array{fmi3ValueReference},
     nRequiredIntermediateVariables::Csize_t,
     instanceEnvironment::fmi3InstanceEnvironment,
-    logMessage::fmi3CallbackLoggerFunction,
-    intermediateUpdate::fmi3CallbackIntermediateUpdateFunction)
+    logMessage::Ptr{Cvoid},
+    intermediateUpdate::Ptr{Cvoid})
 
     compAddr = ccall(cfunc,
         Ptr{Cvoid},
@@ -430,7 +430,7 @@ function fmi3InstantiateCoSimulation(cfunc::Ptr{Nothing},
         Cint, Cint, Cint, Cint, Ptr{fmi3ValueReference}, Csize_t, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}),
         instanceName, fmuinstantiationToken, fmuResourceLocation,
         visible, loggingOn, eventModeUsed, earlyReturnAllowed, requiredIntermediateVariables,
-        nRequiredIntermediateVariables, instanceEnvironment, Ref(logMessage), Ref(intermediateUpdate))
+        nRequiredIntermediateVariables, instanceEnvironment, logMessage, intermediateUpdate)
 
     compAddr
 end
