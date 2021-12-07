@@ -95,8 +95,8 @@ FMI.fmi3Terminate(fmu)
 FMI.fmi3Reset(fmu)
 FMI.fmi3Unload(fmu)
 
-# fmu = FMI.fmi3Load("model/fmi3/LinearTransform.fmu")
-# FMI.fmi3Unload(fmu)
+fmu = FMI.fmi3Load("model/fmi3/LinearTransform.fmu")
+FMI.fmi3Unload(fmu)
 
 fmu = FMI.fmi3Load("model/fmi3/Resource.fmu")
 instance = FMI.fmi3InstantiateCoSimulation!(fmu)

@@ -546,45 +546,82 @@ function fmi3setDatatypeVariables(node::EzXML.Node, md::fmi3ModelDescription)
     end
 
     if haskey(node, "start")
-        if typename == "Float32"
-            type.start = parse(fmi3Float32, node["start"])
-        elseif typename == "Float64"
-            type.start = parse(fmi3Float32, node["start"])
-        elseif typename == "Int8"
-            type.start = parse(fmi3Int8, node["start"])
-        elseif typename == "UInt8"
-            type.start = parse(fmi3UInt8, node["start"])
-        elseif typename == "Int16"
-            type.start = parse(fmi3Int16, node["start"])
-        elseif typename == "UInt16"
-            type.start = parse(fmi3UInt16, node["start"])
-        elseif typename == "Int32"
-            type.start = parse(fmi3Int32, node["start"])
-        elseif typename == "UInt32"
-            type.start = parse(fmi3UInt32, node["start"])
-        elseif typename == "Int64"
-            type.start = parse(fmi3Int64, node["start"])
-        elseif typename == "UInt64"
-            type.start = parse(fmi3UInt64, node["start"]) 
-        elseif typename == "Boolean"
-            type.start = parseFMI3Boolean(node["start"])
-        elseif typename == "Binary"
-            type.start = pointer(node["start"])
-        elseif typename == "Char"
-            type.start = parse(fmi3Char, node["start"])
-        elseif typename == "String"
-            type.start = parse(fmi3String, node["start"])
-        elseif typename == "Byte"
-            type.start = parse(fmi3Byte, node["start"])
-        elseif typename == "Enum"
-            for i in 1:length(md.enumerations)
-                if type.declaredType == md.enumerations[i][1] # identify the enum by the name
-                    type.start = md.enumerations[i][1 + parse(Int, node["start"])] # find the enum value and set it
+        if node.firstelement !== nothing && node.firstelement.name == "Dimension"
+            substrings = split(node["start"], " ")
+            if typename == "Float32"
+                type.start = Array{fmi3Float32}(undef, 0)
+                for string in substrings
+                    push!(type.start, parse(fmi3Float32, string))
                 end
+            elseif typename == "Float64"
+                type.start = Array{fmi3Float64}(undef, 0)
+                for string in substrings
+                    push!(type.start, parse(fmi3Float64, string))
+                end
+            elseif typename == "Int32"
+                type.start = Array{fmi3Int32}(undef, 0)
+                for string in substrings
+                    push!(type.start, parse(fmi3Int32, string))
+                end
+            elseif typename == "UInt32"
+                type.start = Array{fmi3UInt32}(undef, 0)
+                for string in substrings
+                    push!(type.start, parse(fmi3UInt32, string))
+                end
+            elseif typename == "Int64"
+                type.start = Array{fmi3Int64}(undef, 0)
+                for string in substrings
+                    push!(type.start, parse(fmi3Int64, string))
+                end
+            elseif typename == "UInt64"
+                type.start = Array{fmi3UInt64}(undef, 0)
+                for string in substrings
+                    push!(type.start, parse(fmi3UInt64, string))
+                end
+            else
+                @warn "More array variable types not implemented yet!"
             end
         else
-            @warn "setDatatypeVariables(...) unimplemented start value type $typename"
-            type.start = node["start"]
+            if typename == "Float32"
+                type.start = parse(fmi3Float32, node["start"])
+            elseif typename == "Float64"
+                type.start = parse(fmi3Float32, node["start"])
+            elseif typename == "Int8"
+                type.start = parse(fmi3Int8, node["start"])
+            elseif typename == "UInt8"
+                type.start = parse(fmi3UInt8, node["start"])
+            elseif typename == "Int16"
+                type.start = parse(fmi3Int16, node["start"])
+            elseif typename == "UInt16"
+                type.start = parse(fmi3UInt16, node["start"])
+            elseif typename == "Int32"
+                type.start = parse(fmi3Int32, node["start"])
+            elseif typename == "UInt32"
+                type.start = parse(fmi3UInt32, node["start"])
+            elseif typename == "Int64"
+                type.start = parse(fmi3Int64, node["start"])
+            elseif typename == "UInt64"
+                type.start = parse(fmi3UInt64, node["start"]) 
+            elseif typename == "Boolean"
+                type.start = parseFMI3Boolean(node["start"])
+            elseif typename == "Binary"
+                type.start = pointer(node["start"])
+            elseif typename == "Char"
+                type.start = parse(fmi3Char, node["start"])
+            elseif typename == "String"
+                type.start = parse(fmi3String, node["start"])
+            elseif typename == "Byte"
+                type.start = parse(fmi3Byte, node["start"])
+            elseif typename == "Enum"
+                for i in 1:length(md.enumerations)
+                    if type.declaredType == md.enumerations[i][1] # identify the enum by the name
+                        type.start = md.enumerations[i][1 + parse(Int, node["start"])] # find the enum value and set it
+                    end
+                end
+            else
+                @warn "setDatatypeVariables(...) unimplemented start value type $typename"
+                type.start = node["start"]
+            end
         end
     end
     if haskey(node, "intermediateUpdate")

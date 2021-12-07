@@ -215,7 +215,7 @@ mutable struct fmi3datatypeVariable
     previous::Union{fmi3UInt32, Nothing}
     clocks
     declaredType::Union{fmi3String, Nothing}
-    start::Union{fmi3String, fmi3Float64, fmi3Float32, fmi3Int8, fmi3UInt8, fmi3Int16, fmi3UInt16, fmi3Int32, fmi3UInt32, fmi3Int64, fmi3UInt64, fmi3Boolean, fmi3Binary, fmi3Char, fmi3Byte, fmi3Enum, Nothing}
+    start::Union{fmi3String, fmi3Float32, fmi3Float64, fmi3Int8, fmi3UInt8, fmi3Int16, fmi3UInt16, fmi3Int32, fmi3UInt32, fmi3Int64, fmi3UInt64, fmi3Boolean, fmi3Binary, fmi3Char, fmi3Byte, fmi3Enum, Array{fmi3Float32}, Array{fmi3Float64}, Array{fmi3Int32}, Array{fmi3UInt32}, Array{fmi3Int64}, Array{fmi3UInt64},  Nothing}
     min::Union{fmi3Float64,fmi3Int32, fmi3UInt32, fmi3Int64, Nothing}
     max::Union{fmi3Float64,fmi3Int32, fmi3UInt32, fmi3Int64, Nothing}
     initial::Union{fmi3initial, Nothing}
