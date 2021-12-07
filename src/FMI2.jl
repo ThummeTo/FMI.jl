@@ -641,9 +641,9 @@ end
 Starts a simulation of a FMU in ME-mode.
 """
 function fmi2SimulateME(fmu::FMU2, t_start::Real, t_stop::Real;
-                        recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true, solver = nothing)
+                        recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true, solver = nothing, kwargs...)
     fmi2SimulateME(fmu.components[end], t_start, t_stop;
-                   recordValues=recordValues, saveat=saveat, setup=setup, solver=solver)
+                   recordValues=recordValues, saveat=saveat, setup=setup, solver=solver, kwargs...)
 end
 
 """
@@ -1337,4 +1337,13 @@ function fmi2GetNominalsOfContinuousStates(fmu::FMU2)
     x = zeros(fmi2Real, nx)
     fmi2GetNominalsOfContinuousStates(fmu.components[end], x, nx)
     x
+end
+
+"""
+Returns the start/default value for a given value reference.
+
+TODO: Add this command in the documentation.
+"""
+function fmi2GetStartValue(fmu::FMU2, vr::fmi2ValueReferenceFormat)
+    fmi2GetStartValue(fmu.components[end], vr)
 end

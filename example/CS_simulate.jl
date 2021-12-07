@@ -36,11 +36,12 @@ fmiInstantiate!(myFMU; loggingOn=true)
 #fmiExitInitializationMode(myFMU)
 
 # run the FMU in mode Co-Simulation (CS) with adaptive step size (CVODE) but fixed save points dt,
-# result values are stored in `data`
-data = fmiSimulateCS(myFMU, t_start, t_stop; recordValues=["mass.s", "mass.v"], setup=true)
+# result values are stored in `savedValues`
+recordValues = ["mass.s", "mass.v"]
+success, savedValues = fmiSimulateCS(myFMU, t_start, t_stop; recordValues=recordValues, setup=true)
 
 # plot the results
-fmiPlot(data)
+fmiPlot(myFMU, recordValues, savedValues)
 
 # unload the FMU, remove unpacked data on disc ("clean up")
 fmiUnload(myFMU)

@@ -1,7 +1,5 @@
 ~FMUOutput/
-SpringPendulum1D/
-SpringDamperPendulum1D/
-SpringFrictionPendulum1D/
+Resources/
 IO/
 buildlog.txt
 dsfinal.txt
@@ -18,3 +16,4 @@ modelDescription.xml
 *.obj
 *.fmu
 fmi3/
+

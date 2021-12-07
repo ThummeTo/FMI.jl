@@ -462,8 +462,10 @@ function setDatatypeVariables(node::EzXML.Node, md::fmi2ModelDescription)
         type.datatype = fmi2Boolean
     elseif typename == "Integer"
         type.datatype = fmi2Integer
-    else
+    elseif typename == "Enumeration"
         type.datatype = fmi2Enum
+    else 
+        @warn "Unknown data type `$(type.datatype)`."
     end
 
     if haskey(typenode, "declaredType")
@@ -483,6 +485,8 @@ function setDatatypeVariables(node::EzXML.Node, md::fmi2ModelDescription)
                     type.start = md.enumerations[i][1 + parse(Int, typenode["start"])] # find the enum value and set it
                 end
             end
+        elseif typename == "String"
+            type.start = typenode["start"]
         else
             @warn "setDatatypeVariables(...) unimplemented start value type $typename"
             type.start = typenode["start"]

@@ -40,6 +40,7 @@ export fmiProvidesDirectionalDerivative
 export fmiIsCoSimulation, fmiIsModelExchange
 export fmiString2ValueReference
 export fmiGetDependencies
+export fmiGetStartValue
 
 # FMI2.jl
 export fmi2Dependency, fmi2DependencyDependent, fmi2DependencyIndependent, fmi2DependencyUnknown, fmi2DependencyFixed, fmi2GetDependencies
@@ -59,6 +60,7 @@ export fmi2GetStatus, fmi2GetRealStatus, fmi2GetIntegerStatus, fmi2GetBooleanSta
 export fmi2SetTime, fmi2SetContinuousStates
 export fmi2EnterEventMode, fmi2NewDiscreteStates, fmi2EnterContinuousTimeMode, fmi2CompletedIntegratorStep, fmi2GetDerivatives, fmi2GetEventIndicators, fmi2GetContinuousStates, fmi2GetNominalsOfContinuousStates
 export fmi2Info, fmi2PrintDependencies, fmi2DependenciesSupported, fmi2VariableDependsOnVariable
+export fmi2GetStartValue
 
 # FMI2_comp.jl
 # already exported above
@@ -69,6 +71,7 @@ export fmi2Char, fmi2String, fmi2Boolean, fmi2Real, fmi2Integer, fmi2Byte, fmi2F
 
 # FMI2_sim.jl
 export fmi2Simulate, fmi2SimulateCS, fmi2SimulateME
+# export stepCompleted, affect!, condition, handleEvents
 
 # FMI_plot.jl
 export fmiPlot
@@ -297,9 +300,9 @@ end
 Simulate an ModelExchange fmu according to its standard from 0.0 to t_stop.
 """
 function fmiSimulateME(str::fmi2Struct, t_start::Real = 0.0, t_stop::Real = 1.0;
-                       recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true, solver = nothing)
+                       recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true, solver = nothing, kwargs...)
     fmi2SimulateME(str, t_start, t_stop;
-                   recordValues=recordValues, saveat=saveat, setup=setup, solver=solver)
+                   recordValues=recordValues, saveat=saveat, setup=setup, solver=solver, kwargs...)
 end
 
 """
@@ -617,8 +620,8 @@ end
 """
 Set a time instant
 """
-function fmiSetTime(fmu2::fmi2Struct, time::Real)
-    fmi2SetTime(fmu, time)
+function fmiSetTime(c::fmi2Struct, time::Real)
+    fmi2SetTime(c, time)
 end
 
 """
@@ -631,8 +634,8 @@ end
 """
 The model enters Event Mode
 """
-function fmi2EnterEventMode(fmu2::fmi2Struct)
-    fmi2EnterEventMode(fmu2)
+function fmi2EnterEventMode(c::fmi2Struct)
+    fmi2EnterEventMode(c)
 end
 
 """
@@ -667,22 +670,31 @@ end
 """
 Returns the event indicators of the FMU
 """
-function fmiGetEventIndicators(fmu2::fmi2Struct)
-    fmi2GetEventIndicators(fmu2)
+function fmiGetEventIndicators(s::fmi2Struct)
+    fmi2GetEventIndicators(s)
 end
 
 """
 Return the new (continuous) state vector x
 """
-function fmiGetContinuousStates(fmu2::fmi2Struct)
-    fmi2GetContinuousStates(fmu2)
+function fmiGetContinuousStates(s::fmi2Struct)
+    fmi2GetContinuousStates(s)
 end
 
 """
 Return the new (continuous) state vector x
 """
-function fmiGetNominalsOfContinuousStates(fmu2::fmi2Struct)
-    fmi2GetNominalsOfContinuousStates(fmu2)
+function fmiGetNominalsOfContinuousStates(s::fmi2Struct)
+    fmi2GetNominalsOfContinuousStates(s)
+end
+
+"""
+Returns the start/default value for a given value reference.
+
+TODO: Add this command in the documentation.
+"""
+function fmiGetStartValue(s::fmi2Struct, vr::fmi2ValueReferenceFormat)
+    fmi2GetStartValue(s, vr)
 end
 
 ##### Multiple Dispatch fallback for FMUs with unsupported versions #####

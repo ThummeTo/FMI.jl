@@ -64,6 +64,13 @@ cacheString = ""
 @test fmiSetString(fmuStruct, stringValueReferences[1], rndString) == 0
 @test fmiGetString(fmuStruct, stringValueReferences[1]) == rndString
 
+# this is not supported by OMEdit-FMUs in the repository
+if ENV["EXPORTINGTOOL"] != "OpenModelica/v1.17.0"
+    @test fmiGetStartValue(fmuStruct, "p_enumeration") == "myEnumeration1"
+    @test fmiGetStartValue(fmuStruct, "p_string") == "Hello World!"
+    @test fmiGetStartValue(fmuStruct, "p_real") == 0.0
+end 
+
 ##################
 # Testing Arrays #
 ##################
@@ -111,6 +118,11 @@ fmiGetBoolean!(fmuStruct, booleanValueReferences, cacheBoolean)
 @test fmiGetString(fmuStruct, stringValueReferences) == rndString
 fmiGetString!(fmuStruct, stringValueReferences, cacheString)
 @test cacheString == rndString
+
+# this is not suppoerted by OMEdit-FMUs in the repository
+if ENV["EXPORTINGTOOL"] != "OpenModelica/v1.17.0"
+    @test fmiGetStartValue(fmuStruct, ["p_enumeration", "p_string", "p_real"]) == ["myEnumeration1", "Hello World!", 0.0]
+end 
 
 ############
 # Clean up #
