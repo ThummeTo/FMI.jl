@@ -18,6 +18,8 @@ include("assertions.jl")
 # ToDo: Submodules
 include("FMI2_sim.jl")
 include("FMI_plot.jl")
+include("FMI3_sim.jl")
+include("FMI3_plot.jl")
 
 ### EXPORTING LISTS START ###
 

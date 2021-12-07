@@ -14,6 +14,8 @@ instance2 = FMI.fmi3InstantiateCoSimulation!(fmu; loggingOn=true)
 # fmu.components
 # FMI.fmi3GetVersion(fmu)
 # FMI.fmi3SetDebugLogging(fmu)
+success, data = FMI.fmi3SimulateCS(fmu, 0.0, 3.0; recordValues=["h", "v"])
+FMI.fmiPlot(fmu,["h", "v"], data)
 FMI.fmi3EnterInitializationMode(fmu, 0.0, 3.0)
 # FMI.fmi3GetFloat64(fmu, "g")
 # FMI.fmi3SetFloat64(fmu, ["g"], [0.5])
@@ -34,7 +36,7 @@ result = []
 # FMI.fmi3EnterStepMode(fmu.components[end])
 # FMI.fmi3DoStep(fmu, 0.0, dt, false, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
 for t in ts
-    FMI.fmi3DoStep(fmu, t, dt, false, FMI.fmi3Boolean(eventEncountered), FMI.fmi3Boolean(terminateSimulation), FMI.fmi3Boolean(earlyReturn), FMI.fmi3Float64(lastSuccessfulTime))
+    FMI.fmi3DoStep(fmu, t, dt, false, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
     value = FMI.fmi3GetFloat64(fmu, "h")
     # println(result, value)
     push!(result, value)

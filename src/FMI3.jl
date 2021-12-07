@@ -281,7 +281,6 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
 
     # CS specific function calls
     if fmi3IsCoSimulation(fmu)
-        println("IsCoSImulation")
         fmu.cGetOutputDerivatives                  = dlsym(fmu.libHandle, :fmi3GetOutputDerivatives)
         fmu.cEnterStepMode                         = dlsym(fmu.libHandle, :fmi3EnterStepMode)
         fmu.cDoStep                                = dlsym(fmu.libHandle, :fmi3DoStep)
@@ -350,6 +349,55 @@ end
 function fmi3IsModelExchange(fmu::FMU3)
     fmi3IsModelExchange(fmu.modelDescription)
 end
+"""
+Struct to handle FMU simulation data / results.
+"""
+mutable struct fmi3SimulationResult
+    valueReferences::Array{fmi3ValueReference}
+    dataPoints::Array
+    fmu::FMU3
+
+    fmi3SimulationResult() = new()
+end
+
+"""
+Collects all data points for variable save index ´i´ inside a fmi3SimulationResult ´sd´.
+"""
+function fmi3SimulationResultGetValuesAtIndex(sd::fmi3SimulationResult, i)
+    collect(dataPoint[i] for dataPoint in sd.dataPoints)
+end
+
+"""
+Collects all time data points inside a fmi3SimulationResult ´sd´.
+"""
+function fmi3SimulationResultGetTime(sd::fmi3SimulationResult)
+    fmi3SimulationResultGetValuesAtIndex(sd, 1)
+end
+
+"""
+Collects all data points for variable with value reference ´tvr´ inside a fmi3SimulationResult ´sd´.
+"""
+function fmi3SimulationResultGetValues(sd::fmi3SimulationResult, tvr::fmi3ValueReference)
+    @assert tvr !== nothing ["fmi3SimulationResultGetValues(...): value reference is nothing!"]
+    @assert length(sd.dataPoints) > 0 ["fmi3SimulationResultGetValues(...): simulation results are empty!"]
+
+    numVars = length(sd.dataPoints[1])-1
+    for i in 1:numVars
+        vr = sd.valueReferences[i]
+        if vr == tvr
+            return fmi3SimulationResultGetValuesAtIndex(sd, i+1)
+        end
+    end
+
+    nothing
+end
+
+"""
+Collects all data points for variable with value name ´s´ inside a fmi3SimulationResult ´sd´.
+"""
+function fmi3SimulationResultGetValues(sd::fmi3SimulationResult, s::String)
+    fmi3SimulationResultGetValues(sd, fmi3String2ValueReference(sd.fmu, s))
+end
 
 """
 Returns an array of ValueReferences coresponding to the variable names.
@@ -383,6 +431,21 @@ end
 function fmi3String2ValueReference(fmu::FMU3, name::Union{String, Array{String}})
     fmi3String2ValueReference(fmu.modelDescription, name)
 end
+
+"""
+Returns an array of variable names matching a fmi2ValueReference.
+"""
+function fmi3ValueReference2String(md::fmi3ModelDescription, reference::fmi3ValueReference)
+    [k for (k,v) in md.stringValueReferences if v == reference]
+end
+function fmi3ValueReference2String(md::fmi3ModelDescription, reference::Int64)
+    fmi3ValueReference2String(md, fmi3ValueReference(reference))
+end
+
+function fmi3ValueReference2String(fmu::FMU3, reference::Union{fmi3ValueReference, Int64})
+    fmi3ValueReference2String(fmu.modelDescription, reference)
+end
+
 """
 Create a copy of the .fmu file as a .zip folder and unzips it.
 Returns the paths to the zipped and unzipped folders.
@@ -1369,3 +1432,12 @@ end
 #     fmi3DoStep(fmu.components[end], fmi3Float64(fmu.t), fmi3Float64(communicationStepSize), fmi2True)
 #     fmu.t += communicationStepSize
 # end
+
+"""
+Starts a simulation of a FMU in CS-mode.
+"""
+function fmi3SimulateCS(fmu::FMU3, t_start::Real, t_stop::Real;
+                        recordValues::fmi3ValueReferenceFormat = nothing, saveat=[], setup=true)
+    fmi3SimulateCS(fmu.components[end], t_start, t_stop;
+                   recordValues=recordValues, saveat=saveat, setup=setup)
+end
