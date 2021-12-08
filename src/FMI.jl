@@ -24,6 +24,7 @@ include("FMI_plot.jl")
 export FMU
 
 # FMI.jl
+export prepareValueReference
 export fmiLoad, fmiSimulate, fmiSimulateCS, fmiSimulateME, fmiUnload
 export fmiGetNumberOfStates, fmiGetTypesPlatform, fmiGetVersion, fmiInstantiate!, fmiFreeInstance!
 export fmiSetDebugLogging, fmiSetupExperiment, fmiEnterInitializationMode, fmiExitInitializationMode, fmiTerminate , fmiReset
@@ -105,7 +106,7 @@ function prepareValueReference(md::fmi2ModelDescription, vr::fmi2ValueReferenceF
     elseif tvr == Array{Int64,1}
         return fmi2ValueReference.(vr)
     elseif tvr == Nothing
-        return []
+        return Array{fmi2ValueReference,1}()
     end
 
     @assert false "prepareValueReference(...): Unknown value reference structure `$tvr`."
@@ -243,28 +244,22 @@ end
 """
 Simulate an fmu according to its standard from 0.0 to t_stop.
 """
-function fmiSimulate(str::fmi2Struct, t_start::Real = 0.0, t_stop::Real = 1.0;
-                     recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true)
-    fmi2Simulate(str, t_start, t_stop;
-                 recordValues=recordValues, saveat=saveat, setup=setup)
+function fmiSimulate(str::fmi2Struct, t_start::Real = 0.0, t_stop::Real = 1.0; kwargs...)
+    fmi2Simulate(str, t_start, t_stop; kwargs...)
 end
 
 """
 Simulate an CoSimulation fmu according to its standard from 0.0 to t_stop.
 """
-function fmiSimulateCS(str::fmi2Struct, t_start::Real = 0.0, t_stop::Real = 1.0;
-                       recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true)
-    fmi2SimulateCS(str, t_start, t_stop;
-                   recordValues=recordValues, saveat=saveat, setup=setup)
+function fmiSimulateCS(str::fmi2Struct, t_start::Real = 0.0, t_stop::Real = 1.0; kwargs...)
+    fmi2SimulateCS(str, t_start, t_stop; kwargs...)
 end
 
 """
 Simulate an ModelExchange fmu according to its standard from 0.0 to t_stop.
 """
-function fmiSimulateME(str::fmi2Struct, t_start::Real = 0.0, t_stop::Real = 1.0;
-                       recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true, solver = nothing)
-    fmi2SimulateME(str, t_start, t_stop;
-                   recordValues=recordValues, saveat=saveat, setup=setup, solver=solver)
+function fmiSimulateME(str::fmi2Struct, t_start::Real = 0.0, t_stop::Real = 1.0; kwargs...)
+    fmi2SimulateME(str, t_start, t_stop; kwargs...)
 end
 
 """
