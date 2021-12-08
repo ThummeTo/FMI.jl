@@ -1008,7 +1008,23 @@ Return the new (continuous) state vector x.
 For more information call ?fmi2GetContinuousStates
 """
 function fmi3GetContinuousStates(c::fmi3Component)
-    nx = Csize_t(fmi3GetNumberOfContinuousStates(c))
+    nx = Csize_t(0)
+    fmi3GetNumberOfContinuousStates(c, nx)
+    x = zeros(fmi3Float64, nx)
+    fmi3GetContinuousStates(c, x, nx)
+    x
+end
+
+"""
+TODO: FMI specification reference.
+
+Return the new (continuous) state vector x.
+
+For more information call ?fmi2GetNominalsOfContinuousStates
+"""
+function fmi3GetNominalsOfContinuousStates(c::fmi3Component)
+    nx = Csize_t(0)
+    fmi3GetNumberOfContinuousStates(c, nx)
     x = zeros(fmi3Float64, nx)
     fmi3GetContinuousStates(c, x, nx)
     x
@@ -1034,7 +1050,7 @@ For more information call ?fmi2SetContinuousStates
 """
 function fmi3SetContinuousStates(c::fmi3Component, x::Union{Array{Float32}, Array{Float64}})
     nx = Csize_t(length(x))
-    fmi3SetContinuousStates(c, Array{fmi3Real}(x), nx)
+    fmi3SetContinuousStates(c, Array{fmi3Float64}(x), nx)
 end
 
 """

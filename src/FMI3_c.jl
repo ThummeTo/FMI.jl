@@ -1005,11 +1005,11 @@ function fmi3EnterConfigurationMode(c::fmi3Component)
             c.compAddr)
 end
 
-function fmi3GetNumberOfContinuousStates(c::fmi3Component, nContinuousStates::Ref{Csize_t})
+function fmi3GetNumberOfContinuousStates(c::fmi3Component, nContinuousStates::Csize_t)
     ccall(c.fmu.cGetNumberOfContinuousStates,
             Cuint,
             (Ptr{Nothing}, Ptr{Csize_t}),
-            c.compAddr, nContinuousStates)
+            c.compAddr, Ref(nContinuousStates))
 end
 
 function fmi3GetNumberOfEventIndicators(c::fmi3Component, nEventIndicators::Ref{Csize_t})
@@ -1046,13 +1046,13 @@ function fmi3EvaluateDiscreteStates(c::fmi3Component)
 end
 
 # TODO implementation in FMI3.jl and FMI3_comp.jl
-function fmi3UpdateDiscreteStates(c::fmi3Component, disreteStatesNeedUpdate::Ref{fmi3Boolean}, terminateSimulation::Ref{fmi3Boolean}, 
-                                    nominalsOfContinuousStatesChanged::Ref{fmi3Boolean}, valuesOfContinuousStatesChanged::Ref{fmi3Boolean},
-                                    nextEventTimeDefined::Ref{fmi3Boolean}, nextEventTime::Ref{fmi3Float64})
+function fmi3UpdateDiscreteStates(c::fmi3Component, disreteStatesNeedUpdate::fmi3Boolean, terminateSimulation::fmi3Boolean, 
+                                    nominalsOfContinuousStatesChanged::fmi3Boolean, valuesOfContinuousStatesChanged::fmi3Boolean,
+                                    nextEventTimeDefined::fmi3Boolean, nextEventTime::fmi3Float64)
     ccall(c.fmu.cUpdateDiscreteStates,
             Cuint,
             (Ptr{Nothing}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Float64}),
-            c.compAddr, disreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
+            c.compAddr, Ref(disreteStatesNeedUpdate), Ref(terminateSimulation), Ref(nominalsOfContinuousStatesChanged), Ref(valuesOfContinuousStatesChanged), Ref(nextEventTimeDefined), Ref(nextEventTime))
 end
 
 """

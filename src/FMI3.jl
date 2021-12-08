@@ -97,8 +97,7 @@ mutable struct FMU3 <: FMU
     cGetEventIndicators::Ptr{Cvoid}
     cCompletedIntegratorStep::Ptr{Cvoid}
     cEnterEventMode::Ptr{Cvoid}
-    
-    
+    cUpdateDiscreteStates::Ptr{Cvoid}
 
     # c-libraries
     libHandle::Ptr{Nothing}
@@ -300,6 +299,7 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
         fmu.cGetEventIndicators                    = dlsym(fmu.libHandle, :fmi3GetEventIndicators)
         fmu.cCompletedIntegratorStep               = dlsym(fmu.libHandle, :fmi3CompletedIntegratorStep)
         fmu.cEnterEventMode                        = dlsym(fmu.libHandle, :fmi3EnterEventMode)        
+        fmu.cUpdateDiscreteStates                  = dlsym(fmu.libHandle, :fmi3UpdateDiscreteStates)
     end
 
     # # initialize further variables TODO check if needed
@@ -560,7 +560,7 @@ For more information call ?fmi2Instantiate
 """
 function fmi3InstantiateModelExchange!(fmu::FMU3; visible::Bool = false, loggingOn::Bool = false)
 
-    ptrLogger = @cfunction(fmi3CallbackLogMessage, Cvoid, (Ptr{Cvoid}, Ptr{Cchar}, Cuint, Ptr{Cchar}, Ptr{Cchar}))
+    ptrLogger = @cfunction(fmi3CallbackLogMessage, Cvoid, (Ptr{Cvoid}, Cuint, Ptr{Cchar}, Ptr{Cchar}))
     # ptrAllocateMemory = @cfunction(cbAllocateMemory, Ptr{Cvoid}, (Csize_t, Csize_t))
     # ptrFreeMemory = @cfunction(cbFreeMemory, Cvoid, (Ptr{Cvoid},))
     # ptrStepFinished = C_NULL
@@ -1421,6 +1421,17 @@ end
 """
 TODO: FMI specification reference.
 
+The model enters Event Mode.
+
+For more information call ?fmi2EnterEventMode
+"""
+function fmi3EnterEventMode(fmu::FMU3)
+    fmi3EnterEventMode(fmu.components[end])
+end
+
+"""
+TODO: FMI specification reference.
+
 The computation of a time step is started.
 
 For more information call ?fmi2DoStep
@@ -1432,7 +1443,14 @@ end
 #     fmi3DoStep(fmu.components[end], fmi3Float64(fmu.t), fmi3Float64(communicationStepSize), fmi2True)
 #     fmu.t += communicationStepSize
 # end
-
+"""
+Starts a simulation of the fmu instance for the matching fmu type. If both types are available, CS is preferred over ME.
+"""
+function fmi3Simulate(fmu::FMU3, t_start::Real = 0.0, t_stop::Real = 1.0;
+                      recordValues::fmi3ValueReferenceFormat = nothing, saveat=[], setup=true)
+    fmi3Simulate(fmu.components[end], t_start, t_stop;
+                 recordValues=recordValues, saveat=saveat, setup=setup)
+end
 """
 Starts a simulation of a FMU in CS-mode.
 """
@@ -1440,4 +1458,11 @@ function fmi3SimulateCS(fmu::FMU3, t_start::Real, t_stop::Real;
                         recordValues::fmi3ValueReferenceFormat = nothing, saveat=[], setup=true)
     fmi3SimulateCS(fmu.components[end], t_start, t_stop;
                    recordValues=recordValues, saveat=saveat, setup=setup)
+end
+
+"""
+Starts a simulation of a FMU in ME-mode.
+"""
+function fmi3SimulateME(fmu::FMU3, t_start::Real, t_stop::Real; kwargs...)
+    fmi3SimulateME(fmu.components[end], t_start, t_stop; kwargs...)
 end
