@@ -33,7 +33,7 @@ fmiSetupExperiment(fmuComp, 0.0, 10.0)
 fmiEnterInitializationMode(fmuComp)
 fmiExitInitializationMode(fmuComp)
 dt = 0.1
-ts = 0.0:dt:10.0
+ts = 0.0:dt:(10.0-dt)
 for t in ts
     fmiDoStep(fmuComp, t, dt)
 end
