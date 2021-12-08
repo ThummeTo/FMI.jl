@@ -231,7 +231,7 @@ end
 """
 Starts a simulation of the Co-Simulation FMU instance.
 
-Via the optional keyword arguemnts `inputValues` and `inputFunction`, a custom input function of the time `t` can be defined, that should return a array of values for `fmi2SetReal(..., inputValues, inputFunction(t))`.
+Via the optional keyword arguments `inputValues` and `inputFunction`, a custom input function of the time `t` can be defined, that should return a array of values for `fmi2SetReal(..., inputValues, inputFunction(t))`.
 
 Returns:
     - If keyword `recordValues` is not set, a boolean `success` is returned (simulation success).
@@ -315,7 +315,6 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
         success = true
 
         return success, savedValues
-
     else
         i = 1
         while t < t_stop
