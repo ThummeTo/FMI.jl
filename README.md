@@ -23,7 +23,7 @@ fmiInstantiate!(myFMU)
 success, simData = fmiSimulate(myFMU, 0.0, 10.0; recordValues=["mass.s"])
 
 # plot it!
-plot(simData, ["mass.s"], simData)
+plot(myFMU, ["mass.s"], simData)
 
 # free memory
 fmiUnload(myFMU)
