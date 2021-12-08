@@ -34,7 +34,7 @@ t_start = 0.0
 t_stop = 8.0
 
 # test without recording values (but why?)
-success, _ = fmiSimulate(fmuStruct, t_start, t_stop)
+success = fmiSimulate(fmuStruct, t_start, t_stop)
 @test success
 
 # test with recording values

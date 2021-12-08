@@ -120,6 +120,7 @@ function cbLogger(componentEnvironment::Ptr{Cvoid},
         @info "[$_status][$_category][$_instanceName]: $_message"
     elseif status == Integer(fmi2Warning)
         @warn "[$_status][$_category][$_instanceName]: $_message"
+        #@assert false ["[$_status][$_category][$_instanceName]: $_message"]
     else
         @error "[$_status][$_category][$_instanceName]: $_message"
     end

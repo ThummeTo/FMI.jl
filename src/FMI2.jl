@@ -108,6 +108,12 @@ mutable struct FMU2 <: FMU
     dx      # current state derivative
     simulationResult
 
+    # linearization jacobians
+    A::Matrix{fmi2Real}
+    B::Matrix{fmi2Real}
+    C::Matrix{fmi2Real}
+    D::Matrix{fmi2Real}
+
     jac_dxy_x::Matrix{fmi2Real}
     jac_dxy_u::Matrix{fmi2Real}
     jac_x::Array{fmi2Real}
@@ -152,58 +158,6 @@ function fmi2IsCoSimulation(fmu::FMU2)
 end
 function fmi2IsModelExchange(fmu::FMU2)
     fmi2IsModelExchange(fmu.modelDescription)
-end
-
-# TODO: add to documentation and export list, if not already done
-
-"""
-Struct to handle FMU simulation data / results.
-"""
-mutable struct fmi2SimulationResult
-    valueReferences::Array{fmi2ValueReference}
-    dataPoints::Array
-    fmu::FMU2
-
-    fmi2SimulationResult() = new()
-end
-
-"""
-Collects all data points for variable save index ´i´ inside a fmi2SimulationResult ´sd´.
-"""
-function fmi2SimulationResultGetValuesAtIndex(sd::fmi2SimulationResult, i)
-    collect(dataPoint[i] for dataPoint in sd.dataPoints)
-end
-
-"""
-Collects all time data points inside a fmi2SimulationResult ´sd´.
-"""
-function fmi2SimulationResultGetTime(sd::fmi2SimulationResult)
-    fmi2SimulationResultGetValuesAtIndex(sd, 1)
-end
-
-"""
-Collects all data points for variable with value reference ´tvr´ inside a fmi2SimulationResult ´sd´.
-"""
-function fmi2SimulationResultGetValues(sd::fmi2SimulationResult, tvr::fmi2ValueReference)
-    @assert tvr != nothing ["fmi2SimulationResultGetValues(...): value reference is nothing!"]
-    @assert length(sd.dataPoints) > 0 ["fmi2SimulationResultGetValues(...): simulation results are empty!"]
-
-    numVars = length(sd.dataPoints[1])-1
-    for i in 1:numVars
-        vr = sd.valueReferences[i]
-        if vr == tvr
-            return fmi2SimulationResultGetValuesAtIndex(sd, i+1)
-        end
-    end
-
-    nothing
-end
-
-"""
-Collects all data points for variable with value name ´s´ inside a fmi2SimulationResult ´sd´.
-"""
-function fmi2SimulationResultGetValues(sd::fmi2SimulationResult, s::String)
-    fmi2SimulationResultGetValues(sd, fmi2String2ValueReference(sd.fmu, s))
 end
 
 """
@@ -622,28 +576,22 @@ end
 """
 Starts a simulation of the fmu instance for the matching fmu type. If both types are available, CS is preferred over ME.
 """
-function fmi2Simulate(fmu::FMU2, t_start::Real = 0.0, t_stop::Real = 1.0;
-                      recordValues::fmi2ValueReferenceFormat = nothing, saveat=[], setup=true)
-    fmi2Simulate(fmu.components[end], t_start, t_stop;
-                 recordValues=recordValues, saveat=saveat, setup=setup)
+function fmi2Simulate(fmu::FMU2, t_start::Real = 0.0, t_stop::Real = 1.0; kwargs...)
+    fmi2Simulate(fmu.components[end], t_start, t_stop; kwargs...)
 end
 
 """
 Starts a simulation of a FMU in CS-mode.
 """
-function fmi2SimulateCS(fmu::FMU2, t_start::Real, t_stop::Real;
-                        recordValues::fmi2ValueReferenceFormat = nothing, saveat=[], setup=true)
-    fmi2SimulateCS(fmu.components[end], t_start, t_stop;
-                   recordValues=recordValues, saveat=saveat, setup=setup)
+function fmi2SimulateCS(fmu::FMU2, t_start::Real, t_stop::Real; kwargs...)
+    fmi2SimulateCS(fmu.components[end], t_start, t_stop; kwargs...)
 end
 
 """
 Starts a simulation of a FMU in ME-mode.
 """
-function fmi2SimulateME(fmu::FMU2, t_start::Real, t_stop::Real;
-                        recordValues::fmi2ValueReferenceFormat = nothing, saveat = [], setup = true, solver = nothing, kwargs...)
-    fmi2SimulateME(fmu.components[end], t_start, t_stop;
-                   recordValues=recordValues, saveat=saveat, setup=setup, solver=solver, kwargs...)
+function fmi2SimulateME(fmu::FMU2, t_start::Real, t_stop::Real; kwargs...)
+    fmi2SimulateME(fmu.components[end], t_start, t_stop; kwargs...)
 end
 
 """
