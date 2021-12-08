@@ -49,15 +49,13 @@ function handleEvents(c::fmi2Component, enterEventMode::Bool, exitInContinuousMo
 end
 
 # Returns the event indicators for an FMU.
-function condition(c::fmi2Component, out, x, t, integrator, setTime, inputFunction, inputValues::Array{fmi2ValueReference}) 
+function condition(c::fmi2Component, out, x, t, integrator, inputFunction, inputValues::Array{fmi2ValueReference}) 
 
     if inputFunction != nothing
         fmi2SetReal(c, inputValues, inputFunction(integrator.t))
     end
 
-    if setTime
-        fmi2SetTime(c, t)
-    end
+    fmi2SetTime(c, t)
     fmi2SetContinuousStates(c, x)
     indicators = fmi2GetEventIndicators(c)
 
@@ -96,10 +94,8 @@ function stepCompleted(c::fmi2Component, x, t, integrator, inputFunction, inputV
 end
 
 # Returns the state derivatives of the FMU.
-function fx(c::fmi2Component, x, p, t, setTime)
-    if setTime
-        fmi2SetTime(c, t) 
-    end
+function fx(c::fmi2Component, x, p, t)
+    fmi2SetTime(c, t) 
     fmi2SetContinuousStates(c, x)
     dx = fmi2GetDerivatives(c)
 end
@@ -168,13 +164,11 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
 
     if eventHandling
         eventInfo = fmi2NewDiscreteStates(c)
-        fmi2EnterContinuousTimeMode(c)
-
         timeEventHandling = (eventInfo.nextEventTimeDefined == fmi2True)
     end
 
     if customFx == nothing
-        customFx = (x, p, t) -> fx(c, x, p, t, timeEventHandling)
+        customFx = (x, p, t) -> fx(c, x, p, t)
     end
     
     # First evaluation of the FMU
@@ -189,6 +183,8 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
     x0 = fmi2GetContinuousStates(c)
     x0_nom = fmi2GetNominalsOfContinuousStates(c)
 
+    fmi2EnterContinuousTimeMode(c)
+
     p = []
     problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
 
@@ -201,7 +197,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
 
     if eventHandling
 
-        eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator, timeEventHandling, inputFunction, inputValues),
+        eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator, inputFunction, inputValues),
                                            (integrator, idx) -> affectFMU!(c, integrator, idx, inputFunction, inputValues),
                                            Int64(c.fmu.modelDescription.numberOfEventIndicators);
                                            rootfind = DiffEqBase.RightRootFind,
