@@ -13,9 +13,6 @@
 
 <!--- [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://ThummeTo.github.io/FMI.jl/stable) --->
 
-!!! note
-
-    The documentation is also available in PDF format: 
 
 ## Features
 - 📚 free-to use libraray
