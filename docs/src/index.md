@@ -22,7 +22,18 @@ This section is intended to familiarise users with the documentation environment
 
 
 ### FMI
-The Functional Mock-up Interface (FMI) is an open standard for the tool-independent exchange and integration of track models from different manufactures. FMI simplifies the use of the best tools for specific modeling tasks and the consistent reuse of models in different development phases and across departmental boundaries. This way you can choose the most suitable tool for each type of analysis while keeping the same model.  
+The Functional Mock-up Interface (FMI) is an open standard for the tool-independent exchange and integration of track models from different manufactures. FMI simplifies the use of the best tools for specific modeling tasks and the consistent reuse of models in different development phases and across departmental boundaries. This way you can choose the most suitable tool for each type of analysis while keeping the same model.
+
+```@eval
+file = "FMI-Specification-2.0.3.pdf"
+url = "https://raw.githubusercontent.com/JuliaLang/docs.julialang.org/assets/$(file)"
+import Markdown
+Markdown.parse("""
+!!! note
+    Für eine genaurer
+    The documentation is also available in PDF format: [$file]($url).
+""")
+```
 
 
 ### FMU
