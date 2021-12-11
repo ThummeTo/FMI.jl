@@ -38,3 +38,4 @@ makedocs(sitename="FMI.jl",
          )
 
 deploydocs(repo = "github.com/adribrune/FMI.jl.git", devbranch = "main")
+#github.com/ThummeTo/FMI.jl.git
