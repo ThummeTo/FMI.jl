@@ -26,11 +26,11 @@ The Functional Mock-up Interface (FMI) is an open standard for the tool-independ
 
 ```@eval
 file = "FMI-Specification-2.0.3.pdf"
-url = "https://raw.githubusercontent.com/JuliaLang/docs.julialang.org/assets/$(file)"
+url = "https://github.com/adribrune/FMI.jl/blob/main/docs/src/assets/$(file).pdf"
 import Markdown
 Markdown.parse("""
 !!! note
-    Für eine genaurer
+    More detailed information about the Mock-up Interface (FMI) can be found on the following website [fmi-standard.org](http://fmi-standard.org/)
     The documentation is also available in PDF format: [$file]($url).
 """)
 ```
