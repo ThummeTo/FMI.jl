@@ -14,6 +14,7 @@ makedocs(sitename="FMI.jl",
             "Introduction" => "index.md"
             "Tutorials" => [
                 "tutorials/overview.md"
+                "Get Started" => "tutorials/get_started.md"
                 "Load/Unload a FMU" => "tutorials/load_unload.md"
                 "Simulate a FMU" => "tutorials/simulate.md"
             ]
