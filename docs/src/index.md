@@ -37,6 +37,8 @@ Markdown.parse("""
 
 
 ### FMU
+Die Functional Mock-up Unit
+
 
 ## Library FMI.jl
 FMI.jl is a free-to-use software library for the Julia programming language, which integrates FMI ([fmi-standard.org](http://fmi-standard.org/)): load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
@@ -44,39 +46,6 @@ FMI.jl is a free-to-use software library for the Julia programming language, whi
 
 
 
-
-
-
-## What is FMI.jl?
-FMI.jl is a free-to-use software library for the Julia programming language, which integrates FMI ([fmi-standard.org](http://fmi-standard.org/)): load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
-
-## How can I install FMI.jl?
-1. open a Julia-Command-Window, activate your preferred environment
-1. go to package manager using ```]``` and type ```add FMI```
-```julia
-julia> ]
-
-(@v1.6) pkg> add FMI
-```
-
-If you want to check that everything works correctly, you can run the tests bundled with FMI.jl:
-```julia
-julia> using Pkg
-
-julia> Pkg.test("FMI")
-```
-
-Additionally, you can check the version of FMI.jl that you have installed with the ```status``` command.
-```julia
-julia> ]
-(@v1.6) pkg> status FMI
-```
-
-Throughout the rest of the tutorial we assume that you have installed the FMI.jl package and have typed ```using FMI``` which loads the package:
-
-```julia
-julia> using FMI
-```
 
 ## How the documentation is structured?
 Having a high-level overview of how this documentation is structured will help you know where to look for certain things. The xxx main parts of the documentation are :
