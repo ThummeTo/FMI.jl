@@ -59,8 +59,3 @@ For the rest of the tutorial, we will assume that you have installed the package
 ```julia
 julia> using FMI
 ```
-## How can I use FMI.jl?
-1. open a Julia-Command-Window, activate your prefered environment
-1. goto package manager using ```]```
-1. type ```add FMI``` or ```add "https://github.com/ThummeTo/FMI.jl"```
-1. have a look inside the ```example``` folder

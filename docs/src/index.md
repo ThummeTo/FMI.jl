@@ -2,7 +2,7 @@
 # Documentation
 This section is intended to familiarise users with the documentation environment and to provide a first detailed insight into the FMI.jl library.
 ## Documentation Overview
-### 1. ```Introduction```
+### 1. Introduction
 - ***Prior knowledge***  
   
   In order to better understand the functionality of the library, a brief explanation of the most important terms is advantageous. Fundamental terms that are important to understand are `FMI` and `FMU`.  
