@@ -499,7 +499,11 @@ mutable struct fmi3Component
     fmu
 end
 
-# TODO: 
+"""
+Source: FMISpec3.0, Version D5ef1c1:: 2.3.1. Super State: FMU State Setable
+
+The struct contains pointers to functions provided by the environment to be used by the FMU. This function instantiates a Model Exchange FMU (see Section 3). It is allowed to call this function only if modelDescription.xml includes a <ModelExchange> element.
+"""
 function fmi3InstantiateModelExchange(cfunc::Ptr{Nothing},
         instanceName::fmi3String,
         fmuinstantiationToken::fmi3String,
@@ -519,6 +523,11 @@ function fmi3InstantiateModelExchange(cfunc::Ptr{Nothing},
     compAddr
 end
 
+"""
+Source: FMISpec3.0, Version D5ef1c1:: 2.3.1. Super State: FMU State Setable
+
+The struct contains pointers to functions provided by the environment to be used by the FMU. This function instantiates a Co-Simulation FMU (see Section 4). It is allowed to call this function only if modelDescription.xml includes a <CoSimulation> element.
+"""
 function fmi3InstantiateCoSimulation(cfunc::Ptr{Nothing},
     instanceName::fmi3String,
     fmuinstantiationToken::fmi3String,
@@ -544,7 +553,11 @@ function fmi3InstantiateCoSimulation(cfunc::Ptr{Nothing},
     compAddr
 end
 
-# TODO docs
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.3.1. Super State: FMU State Setable
+
+Disposes the given instance, unloads the loaded model, and frees all the allocated memory and other resources that have been allocated by the functions of the FMU interface. If a NULL pointer is provided for argument instance, the function call is ignored (does not have an effect).
+"""
 function fmi3FreeInstance!(c::fmi3Component)
 
     ind = findall(x->x==c, c.fmu.components)
@@ -555,9 +568,11 @@ function fmi3FreeInstance!(c::fmi3Component)
 end
 
 """
-Source: FMISpec2.0.2[p.22]: 2.1.4 Inquire Platform and Version Number of Header Files
+Source: FMISpec3.0, Version D5ef1c1: 2.2.4. Inquire Version Number of Header Files
 
-Returns the version of the “fmi2Functions.h” header file which was used to compile the functions of the FMU. The function returns “fmiVersion” which is defined in this header file. The standard header file as documented in this specification has version “2.0”
+This function returns fmi3Version of the fmi3Functions.h header file which was used to compile the functions of the FMU. This function call is allowed always and in all interface types.
+
+The standard header file as documented in this specification has version "3.0", so this function returns "3.0".
 """
 function fmi3GetVersion(cfunc::Ptr{Nothing})
 
@@ -569,9 +584,9 @@ function fmi3GetVersion(cfunc::Ptr{Nothing})
 end
 
 """
-Source: FMISpec2.0.2[p.22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
+Source: FMISpec3.0, Version D5ef1c1: 2.3.1. Super State: FMU State Setable
 
-The function controls debug logging that is output via the logger function callback. If loggingOn = fmi2True, debug logging is enabled, otherwise it is switched off.
+The function controls debug logging that is output via the logger function callback. If loggingOn = fmi3True, debug logging is enabled, otherwise it is switched off.
 """
 function fmi3SetDebugLogging(c::fmi3Component, logginOn::fmi3Boolean, nCategories::Unsigned, categories::Ptr{Nothing})
     status = ccall(c.fmu.cSetDebugLogging,
@@ -582,9 +597,9 @@ function fmi3SetDebugLogging(c::fmi3Component, logginOn::fmi3Boolean, nCategorie
 end
 
 """
-Source: FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
+Source: FMISpec3.0, Version D5ef1c1: 2.3.2. State: Instantiated
 
-Informs the FMU to enter Initialization Mode. Before calling this function, all variables with attribute <ScalarVariable initial = "exact" or "approx"> can be set with the “fmi2SetXXX” functions (the ScalarVariable attributes are defined in the Model Description File, see section 2.2.7). Setting other variables is not allowed. Furthermore, fmi2SetupExperiment must be called at least once before calling fmi2EnterInitializationMode, in order that startTime is defined.
+Informs the FMU to enter Initialization Mode. Before calling this function, all variables with attribute <Datatype initial = "exact" or "approx"> can be set with the “fmi3SetXXX” functions (the ScalarVariable attributes are defined in the Model Description File, see section 2.4.7). Setting other variables is not allowed.
 """
 function fmi3EnterInitializationMode(c::fmi3Component,toleranceDefined::fmi3Boolean,
     tolerance::fmi3Float64,
@@ -598,7 +613,7 @@ function fmi3EnterInitializationMode(c::fmi3Component,toleranceDefined::fmi3Bool
 end
 
 """
-Source: FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
+Source: FMISpec3.0, Version D5ef1c1: 2.3.3. State: Initialization Mode
 
 Informs the FMU to exit Initialization Mode.
 """
@@ -610,7 +625,7 @@ function fmi3ExitInitializationMode(c::fmi3Component)
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.6 Initialization, Termination, and Resetting an FMU
+Source: FMISpec3.0, Version D5ef1c1: 2.3.4. Super State: Initialized
 
 Informs the FMU that the simulation run is terminated.
 """
@@ -619,16 +634,16 @@ function fmi3Terminate(c::fmi3Component)
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.6 Initialization, Termination, and Resetting an FMU
+Source: FMISpec3.0, Version D5ef1c1: 2.3.1. Super State: FMU State Setable
 
-Is called by the environment to reset the FMU after a simulation run. The FMU goes into the same state as if fmi2Instantiate would have been called.
+Is called by the environment to reset the FMU after a simulation run. The FMU goes into the same state as if fmi3InstantiateXXX would have been called.
 """
 function fmi3Reset(c::fmi3Component)
     ccall(c.fmu.cReset, Cuint, (Ptr{Nothing},), c.compAddr)
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -641,7 +656,7 @@ end
 
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -654,7 +669,7 @@ function fmi3SetFloat32(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Cs
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -667,7 +682,7 @@ end
 
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -680,7 +695,7 @@ function fmi3SetFloat64(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Cs
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -693,7 +708,7 @@ end
 
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -706,7 +721,7 @@ function fmi3SetInt8(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -719,7 +734,7 @@ end
 
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -732,7 +747,7 @@ function fmi3SetUInt8(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csiz
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -745,7 +760,7 @@ end
 
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -758,7 +773,7 @@ function fmi3SetInt16(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csiz
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -769,9 +784,8 @@ function fmi3GetUInt16!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Cs
           c.compAddr, vr, nvr, value, nvalue)
 end
 
-
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -784,7 +798,7 @@ function fmi3SetUInt16(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csi
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -797,7 +811,7 @@ end
 
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -810,7 +824,7 @@ function fmi3SetInt32(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csiz
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -823,7 +837,7 @@ end
 
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -836,7 +850,7 @@ function fmi3SetUInt32(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csi
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -849,7 +863,7 @@ end
 
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -862,7 +876,7 @@ function fmi3SetInt64(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csiz
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -875,7 +889,7 @@ end
 
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -888,7 +902,7 @@ function fmi3SetUInt64(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csi
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -901,7 +915,7 @@ end
 
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -914,7 +928,7 @@ function fmi3SetBoolean(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Cs
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -927,10 +941,10 @@ function fmi3GetString!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Cs
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
-"""
+"""     
 function fmi3SetString(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Union{Array{Ptr{Cchar}}, Array{Ptr{UInt8}}}, nvalue::Csize_t)
     status = ccall(c.fmu.cSetString,
                 Cuint,
@@ -941,7 +955,7 @@ end
 
 # TODO not working yet
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -954,7 +968,7 @@ function fmi3GetBinary!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Cs
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -967,7 +981,7 @@ function fmi3SetBinary(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csi
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -980,7 +994,7 @@ function fmi3GetClock!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csi
 end
 
 """
-Source: FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
@@ -993,9 +1007,9 @@ function fmi3SetClock(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csiz
 end
 
 """
-Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.4. Getting and Setting the Complete FMU State
 
-fmi2GetFMUstate makes a copy of the internal FMU state and returns a pointer to this copy
+fmi3GetFMUstate makes a copy of the internal FMU state and returns a pointer to this copy
 """
 function fmi3GetFMUState(c::fmi3Component, FMUstate::Ref{fmi3FMUState})
     status = ccall(c.fmu.cGetFMUState,
@@ -1006,9 +1020,9 @@ function fmi3GetFMUState(c::fmi3Component, FMUstate::Ref{fmi3FMUState})
 end
 
 """
-Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.4. Getting and Setting the Complete FMU State
 
-fmi2SetFMUstate copies the content of the previously copied FMUstate back and uses it as actual new FMU state.
+fmi3SetFMUstate copies the content of the previously copied FMUstate back and uses it as actual new FMU state.
 """
 function fmi3SetFMUState(c::fmi3Component, FMUstate::fmi3FMUState)
     status = ccall(c.fmu.cSetFMUState,
@@ -1019,9 +1033,9 @@ function fmi3SetFMUState(c::fmi3Component, FMUstate::fmi3FMUState)
 end
 
 """
-Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.4. Getting and Setting the Complete FMU State
 
-fmi2FreeFMUstate frees all memory and other resources allocated with the fmi2GetFMUstate call for this FMUstate.
+fmi3FreeFMUstate frees all memory and other resources allocated with the fmi3GetFMUstate call for this FMUstate.
 """
 function fmi3FreeFMUState(c::fmi3Component, FMUstate::Ref{fmi3FMUState})
     status = ccall(c.fmu.cFreeFMUState,
@@ -1033,9 +1047,9 @@ end
 
 # TODO keeps crashing Julia
 """
-Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.4. Getting and Setting the Complete FMU State
 
-fmi2SerializedFMUstateSize returns the size of the byte vector, in order that FMUstate can be stored in it.
+fmi3SerializedFMUstateSize returns the size of the byte vector, in order that FMUstate can be stored in it.
 """
 function fmi3SerializedFMUStateSize(c::fmi3Component, FMUstate::fmi3FMUState, size::Ref{Csize_t})
     status = ccall(c.fmu.cSerializedFMUStateSize,
@@ -1045,9 +1059,9 @@ function fmi3SerializedFMUStateSize(c::fmi3Component, FMUstate::fmi3FMUState, si
 end
 
 """
-Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.4. Getting and Setting the Complete FMU State
 
-fmi2SerializeFMUstate serializes the data which is referenced by pointer FMUstate and copies this data in to the byte vector serializedState of length size
+fmi3SerializeFMUstate serializes the data which is referenced by pointer FMUstate and copies this data in to the byte vector serializedState of length size
 """
 function fmi3SerializeFMUState(c::fmi3Component, FMUstate::fmi3FMUState, serialzedState::Array{fmi3Byte}, size::Csize_t)
     status = ccall(c.fmu.cSerializeFMUState,
@@ -1057,9 +1071,9 @@ function fmi3SerializeFMUState(c::fmi3Component, FMUstate::fmi3FMUState, serialz
 end
 
 """
-Source: FMISpec2.0.2[p.26]: 2.1.8 Getting and Setting the Complete FMU State
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.4. Getting and Setting the Complete FMU State
 
-fmi2DeSerializeFMUstate deserializes the byte vector serializedState of length size, constructs a copy of the FMU state and returns FMUstate, the pointer to this copy.
+fmi3DeSerializeFMUstate deserializes the byte vector serializedState of length size, constructs a copy of the FMU state and returns FMUstate, the pointer to this copy.
 """
 function fmi3DeSerializeFMUState(c::fmi3Component, serialzedState::Array{fmi3Byte}, size::Csize_t, FMUstate::Ref{fmi3FMUState})
     status = ccall(c.fmu.cDeSerializeFMUState,
@@ -1070,9 +1084,8 @@ end
 
 # TODO Clocks and dependencies functions
 
-# TODO Modeldescription for testing anpassen
 """
-Source: FMISpec2.0.2[p.26]: 2.1.9 Getting Partial Derivatives
+Source: FMISpec3.0, Version D5ef1c1: 2.2.11. Getting Partial Derivatives
 
 This function computes the directional derivatives of an FMU.
 """
@@ -1094,7 +1107,29 @@ function fmi3GetDirectionalDerivative!(c::fmi3Component,
 end
 
 """
-Source: FMISpec2.0.2[p.104]: 4.2.1 Transfer of Input / Output Values and Parameters
+Source: FMISpec3.0, Version D5ef1c1: 2.2.11. Getting Partial Derivatives
+
+This function computes the directional derivatives of an FMU.
+"""
+function fmi3GetAdjointDerivative!(c::fmi3Component,
+                                       unknowns::Array{fmi3ValueReference},
+                                       nUnknowns::Csize_t,
+                                       knowns::Array{fmi3ValueReference},
+                                       nKnowns::Csize_t,
+                                       seed::Array{fmi3Float64},
+                                       nSeed::Csize_t,
+                                       sensitivity::Array{fmi3Float64},
+                                       nSensitivity::Csize_t)
+    @assert fmi3ProvidesAdjointDerivative(c.fmu) ["fmi3GetAdjointDerivative!(...): This FMU does not support build-in adjoint derivatives!"]
+    ccall(c.fmu.cGetAdjointDerivative,
+          Cuint,
+          (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Float64}, Csize_t, Ptr{fmi3Float64}, Csize_t),
+          c.compAddr, unknowns, nUnknowns, knowns, nKnowns, seed, nSeed, sensitivity, nSensitivity)
+    
+end
+
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.2.12. Getting Derivatives of Continuous Outputs
 
 Retrieves the n-th derivative of output values.
 vr defines the value references of the variables
@@ -1107,6 +1142,11 @@ function fmi3GetOutputDerivatives(c::fmi3Component,  vr::fmi3ValueReference, nVa
                 c.compAddr, Ref(vr), nValueReferences, Ref(order), Ref(values), nValues)
 end
 
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.3.2. State: Instantiated
+
+If the importer needs to change structural parameters, it must move the FMU into Configuration Mode using fmi3EnterConfigurationMode.
+"""
 function fmi3EnterConfigurationMode(c::fmi3Component)
     ccall(c.fmu.cEnterConfigurationMode,
             Cuint,
@@ -1114,6 +1154,12 @@ function fmi3EnterConfigurationMode(c::fmi3Component)
             c.compAddr)
 end
 
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.3.2. State: Instantiated
+
+This function returns the number of continuous states.
+This function can only be called in Model Exchange. 
+"""
 function fmi3GetNumberOfContinuousStates(c::fmi3Component, nContinuousStates::Csize_t)
     ccall(c.fmu.cGetNumberOfContinuousStates,
             Cuint,
@@ -1121,6 +1167,12 @@ function fmi3GetNumberOfContinuousStates(c::fmi3Component, nContinuousStates::Cs
             c.compAddr, Ref(nContinuousStates))
 end
 
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.3.2. State: Instantiated
+
+This function returns the number of event indicators.
+This function can only be called in Model Exchange. 
+"""
 function fmi3GetNumberOfEventIndicators(c::fmi3Component, nEventIndicators::Csize_t)
     ccall(c.fmu.cGetNumberOfEventIndicators,
             Cuint,
@@ -1128,6 +1180,11 @@ function fmi3GetNumberOfEventIndicators(c::fmi3Component, nEventIndicators::Csiz
             c.compAddr, Ref(nEventIndicators))
 end
 
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.3.3. State: Initialization Mode
+
+Return the states at the current time instant.
+"""
 function fmi3GetContinuousStates(c::fmi3Component, nominals::Array{fmi3Float64}, nContinuousStates::Csize_t)
     ccall(c.fmu.cGetContinuousStates,
             Cuint,
@@ -1136,7 +1193,7 @@ function fmi3GetContinuousStates(c::fmi3Component, nominals::Array{fmi3Float64},
 end
 
 """
-Source: FMISpec2.0.2[p.86]: 3.2.2 Evaluation of Model Equations
+Source: FMISpec3.0, Version D5ef1c1: 2.3.3. State: Initialization Mode
 
 Return the nominal values of the continuous states.
 """
@@ -1146,7 +1203,12 @@ function fmi3GetNominalsOfContinuousStates(c::fmi3Component, x_nominal::Array{fm
                     (Ptr{Nothing}, Ptr{fmi3Float64}, Csize_t),
                     c.compAddr, x_nominal, nx)
 end
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.3.3. State: Initialization Mode
 
+This function is called to trigger the evaluation of fdisc to compute the current values of discrete states from previous values. 
+The FMU signals the support of fmi3EvaluateDiscreteStates via the capability flag providesEvaluateDiscreteStates.
+"""
 function fmi3EvaluateDiscreteStates(c::fmi3Component)
     ccall(c.fmu.cEvaluateDiscreteStates,
             Cuint,
@@ -1154,18 +1216,17 @@ function fmi3EvaluateDiscreteStates(c::fmi3Component)
             c.compAddr)
 end
 
-# TODO implementation in FMI3.jl and FMI3_comp.jl
-function fmi3UpdateDiscreteStates(c::fmi3Component, disreteStatesNeedUpdate::fmi3Boolean, terminateSimulation::fmi3Boolean, 
+function fmi3UpdateDiscreteStates(c::fmi3Component, discreteStatesNeedUpdate::fmi3Boolean, terminateSimulation::fmi3Boolean, 
                                     nominalsOfContinuousStatesChanged::fmi3Boolean, valuesOfContinuousStatesChanged::fmi3Boolean,
                                     nextEventTimeDefined::fmi3Boolean, nextEventTime::fmi3Float64)
     ccall(c.fmu.cUpdateDiscreteStates,
             Cuint,
             (Ptr{Nothing}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Float64}),
-            c.compAddr, Ref(disreteStatesNeedUpdate), Ref(terminateSimulation), Ref(nominalsOfContinuousStatesChanged), Ref(valuesOfContinuousStatesChanged), Ref(nextEventTimeDefined), Ref(nextEventTime))
+            c.compAddr, Ref(discreteStatesNeedUpdate), Ref(terminateSimulation), Ref(nominalsOfContinuousStatesChanged), Ref(valuesOfContinuousStatesChanged), Ref(nextEventTimeDefined), Ref(nextEventTime))
 end
 
 """
-Source: FMISpec2.0.2[p.85]: 3.2.2 Evaluation of Model Equations
+Source: FMISpec3.0, Version D5ef1c1: 2.3.5. State: Event Mode
 
 The model enters Continuous-Time Mode and all discrete-time equations become inactive and all relations are “frozen”.
 This function has to be called when changing from Event Mode (after the global event iteration in Event Mode over all involved FMUs and other models has converged) into Continuous-Time Mode.
@@ -1177,6 +1238,11 @@ function fmi3EnterContinuousTimeMode(c::fmi3Component)
           c.compAddr)
 end
 
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.3.5. State: Event Mode
+
+This function must be called to change from Event Mode into Step Mode in Co-Simulation.
+"""
 function fmi3EnterStepMode(c::fmi3Component)
     ccall(c.fmu.cEnterStepMode,
           Cuint,
@@ -1184,6 +1250,11 @@ function fmi3EnterStepMode(c::fmi3Component)
           c.compAddr)
 end
 
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.3.6. State: Configuration Mode
+
+Exits the Configuration Mode and returns to state Instantiated.
+"""
 function fmi3ExitConfigurationMode(c::fmi3Component)
     ccall(c.fmu.cExitConfigurationMode,
           Cuint,
@@ -1192,7 +1263,7 @@ function fmi3ExitConfigurationMode(c::fmi3Component)
 end
 
 """
-Source: FMISpec2.0.2[p.83]: 3.2.1 Providing Independent Variables and Re-initialization of Caching
+Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 
 Set a new time instant and re-initialize caching of variables that depend on time, provided the newly provided time value is different to the previously set time value (variables that depend solely on constants or parameters need not to be newly computed in the sequel, but the previously computed values can be reused).
 """
@@ -1204,7 +1275,7 @@ function fmi3SetTime(c::fmi3Component, time::fmi3Float64)
 end
 
 """
-Source: FMISpec2.0.2[p.83]: 3.2.1 Providing Independent Variables and Re-initialization of Caching
+Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 
 Set a new (continuous) state vector and re-initialize caching of variables that depend on the states. Argument nx is the length of vector x and is provided for checking purposes
 """
@@ -1218,9 +1289,9 @@ function fmi3SetContinuousStates(c::fmi3Component,
 end
 
 """
-Source: FMISpec2.0.2[p.86]: 3.2.2 Evaluation of Model Equations
+Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 
-Compute state derivatives at the current time instant and for the current states.
+Compute first-oder state derivatives at the current time instant and for the current states.
 """
 function fmi3GetContinuousStateDerivatives(c::fmi3Component,
                             derivatives::Array{fmi3Float64},
@@ -1232,7 +1303,7 @@ function fmi3GetContinuousStateDerivatives(c::fmi3Component,
 end
 
 """
-Source: FMISpec2.0.2[p.86]: 3.2.2 Evaluation of Model Equations
+Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 
 Compute event indicators at the current time instant and for the current states.
 """
@@ -1244,11 +1315,11 @@ function fmi3GetEventIndicators(c::fmi3Component, eventIndicators::Array{fmi3Flo
 end
 
 """
-Source: FMISpec2.0.2[p.85]: 3.2.2 Evaluation of Model Equations
+Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 
-This function must be called by the environment after every completed step of the integrator provided the capability flag completedIntegratorStepNotNeeded = false.
-If enterEventMode == fmi2True, the event mode must be entered
-If terminateSimulation == fmi2True, the simulation shall be terminated
+This function must be called by the environment after every completed step of the integrator provided the capability flag needsCompletedIntegratorStep = true.
+If enterEventMode == fmi3True, the event mode must be entered
+If terminateSimulation == fmi3True, the simulation shall be terminated
 """
 function fmi3CompletedIntegratorStep!(c::fmi3Component,
                                       noSetFMUStatePriorToCurrentPoint::fmi3Boolean,
@@ -1260,9 +1331,8 @@ function fmi3CompletedIntegratorStep!(c::fmi3Component,
           c.compAddr, noSetFMUStatePriorToCurrentPoint, Ref(enterEventMode), Ref(terminateSimulation))
 end
 
-# TODO implement in FMI3.jl and FMI3_comp.jl
 """
-Source: FMISpec2.0.2[p.84]: 3.2.2 Evaluation of Model Equations
+Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 
 The model enters Event Mode from the Continuous-Time Mode and discrete-time equations may become active (and relations are not “frozen”).
 """
@@ -1273,9 +1343,8 @@ function fmi3EnterEventMode(c::fmi3Component, stepEvent::fmi3Boolean, stateEvent
           c.compAddr, stepEvent, stateEvent, rootsFound, nEventIndicators, timeEvent)
 end
 
-# TODO implement in FMI3.jl and FMI3_comp.jl
 """
-Source: FMISpec2.0.2[p.104]: 4.2.2 Computation
+Source: FMISpec3.0, Version D5ef1c1: 4.2.1. State: Step Mode
 
 The computation of a time step is started.
 """

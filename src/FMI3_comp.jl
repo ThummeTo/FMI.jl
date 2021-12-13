@@ -1077,6 +1077,13 @@ function  fmi3GetContinuousStateDerivatives(c::fmi3Component)
     derivatives
 end
 
+function fmi3UpdateDiscreteStates(c::fmi3Component, discreteStatesNeedUpdate::Bool, terminateSimulation::Bool, 
+    nominalsOfContinuousStatesChanged::Bool, valuesOfContinuousStatesChanged::Bool,
+    nextEventTimeDefined::Bool, nextEventTime::Real)
+    fmi3UpdateDiscreteStates(c, fmi3Boolean(discreteStatesNeedUpdate), fmi3Boolean(terminateSimulation), fmi3Boolean(nominalsOfContinuousStatesChanged), 
+    fmi3Boolean(valuesOfContinuousStatesChanged), fmi3Boolean(nextEventTimeDefined), fmi3Float64(nextEventTime))
+end
+
 """
 TODO: FMI specification reference.
 
