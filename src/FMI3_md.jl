@@ -17,6 +17,7 @@ function fmi3ReadModelDescription(pathToModellDescription::String)
     md.stateValueReferences = Array{fmi3ValueReference}(undef, 0)
     md.derivativeValueReferences = Array{fmi3ValueReference}(undef, 0)
     md.intermediateUpdateValueReferences = Array{fmi3ValueReference}(undef, 0)
+    md.numberOfEventIndicators = 0
 
     # CS specific entries
     md.CSmodelIdentifier = ""
@@ -114,15 +115,18 @@ function fmi3ReadModelDescription(pathToModellDescription::String)
     md.valueReferences = []
     md.valueReferenceIndicies = Dict{Integer,Integer}()
 
-    derivativeindices = getDerivativeIndices(modelstructure)
+    derivativeindices = fmi3getDerivativeIndices(modelstructure)
     md.modelVariables = parseModelVariables(modelvariables, md, derivativeindices)
 
     # parse model dependencies (if available)
     for element in eachelement(modelstructure)
-        if element.name == "Derivatives" || element.name == "InitialUnknowns"
+        if element.name == "Derivatives" || element.name == "InitialUnknown"
             parseDependencies(element, md)
-        elseif element.name == "Outputs"
+        # elseif element.name == "Output"
 
+        elseif element.name == "EventIndicator"
+            println("test")
+            md.numberOfEventIndicators += 1
         else
             @warn "Unknown tag `$(element.name)` for node `ModelStructure`."
         end
@@ -178,6 +182,12 @@ function fmi3GetVariableNamingConvention(md::fmi3ModelDescription)
     md.variableNamingConvention
 end
 
+"""
+Returns the number of EventIndicators from the model description.
+"""
+function fmi3GetEventIndicators(md::fmi3ModelDescription)
+    md.numberOfEventIndicators
+end
 
 # """
 # Returns if the FMU model description contains `dependency` information.
@@ -271,28 +281,26 @@ end
 function fmi3getDerivativeIndices(node::EzXML.Node)
     indices = []
     for element in eachelement(node)
-        if element.name == "Derivatives"
-            for derivative in eachelement(element)
-                ind = parse(Int, derivative["index"])
-                der = nothing 
-                derKind = nothing 
+        if element.name == "InitialUnknown"
+            ind = parse(Int, element["valueReference"])
+            der = nothing 
+            derKind = nothing 
 
-                if haskey(derivative, "dependencies")
-                    der = split(derivative["dependencies"], " ")
+            if haskey(element, "dependencies")
+                der = split(element["dependencies"], " ")
 
-                    if der[1] == ""
-                        der = fmi3Integer[]
-                    else
-                        der = collect(parse(fmi3Integer, e) for e in der)
-                    end
-                end 
+                if der[1] == ""
+                    der = fmi3Int32[]
+                else
+                    der = collect(parse(fmi3Int32, e) for e in der)
+                end
+            end 
 
-                if haskey(derivative, "dependenciesKind")
-                    derKind = split(derivative["dependenciesKind"], " ")
-                end 
+            if haskey(element, "dependenciesKind")
+                derKind = split(element["dependenciesKind"], " ")
+            end 
 
-                push!(indices, (ind, der, derKind))
-            end
+            push!(indices, (ind, der, derKind))
         end
     end
     sort!(indices, rev=true)
@@ -300,6 +308,8 @@ end
 
 # Parses the model variables of the FMU model description.
 function parseModelVariables(nodes::EzXML.Node, md::fmi3ModelDescription, derivativeIndices)
+    println(derivativeIndices)
+    println(typeof(derivativeIndices))
     lastValueReference = fmi3ValueReference(0)
     derivativeIndex = nothing
     if derivativeIndices != []
@@ -364,56 +374,56 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi3ModelDescription, deriva
     modelVariables
 end
 
-# # Parses the model variables of the FMU model description.
-# function parseDependencies(nodes::EzXML.Node, md::fmi2ModelDescription)
-#     for node in eachelement(nodes)
+# Parses the model variables of the FMU model description.
+function parseDependencies(nodes::EzXML.Node, md::fmi3ModelDescription)
+    for node in eachelement(nodes)
         
-#         if node.name == "Unknown"
+        if node.name == "InitialUnknown"
 
-#             index = 0
-#             dependencies = nothing
-#             dependenciesKind = nothing
+            index = 0
+            dependencies = nothing
+            dependenciesKind = nothing
 
-#             if haskey(node, "index") && haskey(node, "dependencies") && haskey(node, "dependenciesKind")
-#                 index = parseInteger(node["index"])
-#                 dependencies = node["dependencies"]
-#                 dependenciesKind = node["dependenciesKind"]
+            if haskey(node, "valueReference") && haskey(node, "dependencies") && haskey(node, "dependenciesKind")
+                index = fmi3parseInteger(node["valueReference"])
+                dependencies = node["dependencies"]
+                dependenciesKind = node["dependenciesKind"]
 
-#                 if length(dependencies) > 0 && length(dependenciesKind) > 0
-#                     dependenciesSplit = split(dependencies, " ")
-#                     dependenciesKindSplit = split(dependenciesKind, " ")
+                if length(dependencies) > 0 && length(dependenciesKind) > 0
+                    dependenciesSplit = split(dependencies, " ")
+                    dependenciesKindSplit = split(dependenciesKind, " ")
 
-#                     if length(dependenciesSplit) != length(dependenciesKindSplit)
-#                         @warn "Length of field dependencies ($(length(dependenciesSplit))) doesn't match length of dependenciesKind ($(length(dependenciesKindSplit)))."
-#                     else
-#                         md.modelVariables[index].dependencies = vcat(md.modelVariables[index].dependencies, collect(parseInteger(s) for s in dependenciesSplit)) 
-#                         md.modelVariables[index].dependenciesKind = vcat(md.modelVariables[index].dependenciesKind,  dependenciesKindSplit)
-#                     end
-#                 else 
-#                     md.modelVariables[index].dependencies = []
-#                     md.modelVariables[index].dependenciesKind = []
-#                 end
-#             else 
-#                 @warn "Invalid entry for node `Unknown` in `ModelStructure`."
-#             end
-#         else 
-#             @warn "Unknown entry in `ModelStructure` named `$(node.name)`."
-#         end 
-#     end
-# end
+                    if length(dependenciesSplit) != length(dependenciesKindSplit)
+                        @warn "Length of field dependencies ($(length(dependenciesSplit))) doesn't match length of dependenciesKind ($(length(dependenciesKindSplit)))."
+                    else
+                        md.modelVariables[index].dependencies = vcat(md.modelVariables[index].dependencies, collect(fmi3parseInteger(s) for s in dependenciesSplit)) 
+                        md.modelVariables[index].dependenciesKind = vcat(md.modelVariables[index].dependenciesKind,  dependenciesKindSplit)
+                    end
+                else 
+                    md.modelVariables[index].dependencies = []
+                    md.modelVariables[index].dependenciesKind = []
+                end
+            else 
+                @warn "Invalid entry for node `Unknown` in `ModelStructure`."
+            end
+        else 
+            @warn "Unknown entry in `ModelStructure` named `$(node.name)`."
+        end 
+    end
+end
 
-# """ 
-# Returns the model variable(s) fitting the value reference.
-# """
-# function fmi2ModelVariablesForValueReference(md::fmi2ModelDescription, vr::fmi2ValueReference)
-#     ar = []
-#     for modelVariable in md.modelVariables
-#         if modelVariable.valueReference == vr 
-#             push!(ar, modelVariable)
-#         end 
-#     end 
-#     ar
-# end
+""" 
+Returns the model variable(s) fitting the value reference.
+"""
+function fmi3ModelVariablesForValueReference(md::fmi3ModelDescription, vr::fmi3ValueReference)
+    ar = []
+    for modelVariable in md.modelVariables
+        if modelVariable.valueReference == vr 
+            push!(ar, modelVariable)
+        end 
+    end 
+    ar
+end
 
 # Parses a Bool value represented by a string.
 function fmi3parseBoolean(s::Union{String, SubString{String}}; onfail=nothing)

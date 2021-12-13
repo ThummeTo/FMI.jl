@@ -990,14 +990,26 @@ TODO: FMI specification reference.
 
 Computes directional derivatives.
 
-For more information call ?fmi2GetDirectionalDerivatives
+For more information call ?fmi2GetAdjointDerivatives
 """
-function fmi3GetDirectionalDerivative(c::fmi3Component,
+function fmi3GetAdjointDerivative(c::fmi3Component,
                                       unknowns::fmi3ValueReference,
                                       knowns::fmi3ValueReference,
                                       seed::fmi3Float64 = 1.0)
 
-    fmi3GetDirectionalDerivative(c, [unknowns], [knowns], [seed])[1]
+    fmi3GetAdjointDerivative(c, [unknowns], [knowns], [seed])[1]
+end
+
+function fmi3GetNumberOfContinuousStates(c::fmi3Component)
+    size = Csize_t(0)
+    fmi3GetNumberOfContinuousStates(c, size)
+    size
+end
+
+function fmi3GetNumberOfEventIndicators(c::fmi3Component)
+    size = Csize_t(0)
+    fmi3GetNumberOfEventIndicators(c, size)
+    size
 end
 
 """
@@ -1008,8 +1020,7 @@ Return the new (continuous) state vector x.
 For more information call ?fmi2GetContinuousStates
 """
 function fmi3GetContinuousStates(c::fmi3Component)
-    nx = Csize_t(0)
-    fmi3GetNumberOfContinuousStates(c, nx)
+    nx = Csize_t(c.fmu.modelDescription.numberOfContinuousStates)
     x = zeros(fmi3Float64, nx)
     fmi3GetContinuousStates(c, x, nx)
     x
@@ -1023,8 +1034,7 @@ Return the new (continuous) state vector x.
 For more information call ?fmi2GetNominalsOfContinuousStates
 """
 function fmi3GetNominalsOfContinuousStates(c::fmi3Component)
-    nx = Csize_t(0)
-    fmi3GetNumberOfContinuousStates(c, nx)
+    nx = Csize_t(c.fmu.modelDescription.numberOfContinuousStates)
     x = zeros(fmi3Float64, nx)
     fmi3GetContinuousStates(c, x, nx)
     x
@@ -1061,7 +1071,7 @@ Compute state derivatives at the current time instant and for the current states
 For more information call ?fmi2GetDerivatives
 """
 function  fmi3GetContinuousStateDerivatives(c::fmi3Component)
-    nx = Csize_t(fmi3GetNumberOfContinuousStates(fmu))
+    nx = Csize_t(c.fmu.modelDescription.numberOfContinuousStates)
     derivatives = zeros(fmi3Float64, nx)
     fmi3GetContinuousStateDerivatives(c, derivatives, nx)
     derivatives
@@ -1075,7 +1085,7 @@ Returns the event indicators of the FMU.
 For more information call ?fmi2GetEventIndicators
 """
 function fmi3GetEventIndicators(c::fmi3Component)
-    ni = Csize_t(fmi3GetNumberOfEventIndicators(fmu))
+    ni = Csize_t(c.fmu.modelDescription.numberOfEventIndicators)
     eventIndicators = zeros(fmi3Float64, ni)
     fmi3GetEventIndicators(c, eventIndicators, ni)
     eventIndicators
@@ -1099,4 +1109,15 @@ function fmi3CompletedIntegratorStep(c::fmi3Component,
                                          enterEventMode,
                                          terminateSimulation)
     (status, enterEventMode, terminateSimulation)
+end
+
+"""
+TODO: FMI specification reference.
+
+The model enters Event Mode.
+
+For more information call ?fmi2EnterEventMode
+"""
+function fmi3EnterEventMode(c::fmi3Component, stepEvent::Bool, stateEvent::Bool, rootsFound::Array{fmi3Int32}, nEventIndicators::Integer, timeEvent::Bool)
+    fmi3EnterEventMode(c, fmi3Boolean(stepEvent), fmi3Boolean(stateEvent), rootsFound, Csize_t(nEventIndicators), fmi3Boolean(timeEvent))
 end

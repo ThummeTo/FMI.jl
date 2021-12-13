@@ -9,13 +9,12 @@ using FMI
 
 fmu = FMI.fmi3Load("model/fmi3/BouncingBall.fmu")
 instance1 = FMI.fmi3InstantiateModelExchange!(fmu; loggingOn=true)
-
-instance2 = FMI.fmi3InstantiateCoSimulation!(fmu; loggingOn=true)
+# instance2 = FMI.fmi3InstantiateCoSimulation!(fmu; loggingOn=true)
 # fmu.components
 # FMI.fmi3GetVersion(fmu)
-FMI.fmi3SetDebugLogging(fmu)
-success, data = FMI.fmi3SimulateCS(fmu, 0.0, 3.0; recordValues=["h", "v"])
-success, data = FMI.fmi3SimulateME(fmu, 0.0, 3.0; recordValues=["h", "v"])
+# FMI.fmi3SetDebugLogging(fmu)
+# success, data = FMI.fmi3SimulateCS(fmu, 0.0, 3.0; recordValues=["h", "v"])
+success, data = FMI.fmi3SimulateME(fmu, 0.0, 20.0; recordValues=["h", "v"])
 FMI.fmiPlot(fmu,["h", "v"], data)
 FMI.fmi3EnterInitializationMode(fmu, 0.0, 3.0)
 # FMI.fmi3GetFloat64(fmu, "g")
@@ -77,11 +76,54 @@ FMI.fmi3Unload(fmu)
 # FMI.fmi3Unload(fmu)
 
 fmu = FMI.fmi3Load("model/fmi3/Dahlquist.fmu")
-# instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
-# instance2 = FMI.fmi3InstantiateCoSimulation!(fmu)
-instance = FMI.fmi3InstantiateCoSimulation!(fmu; loggingOn=true)
-success, data = FMI.fmi3SimulateCS(fmu, 0.0, 3.0; recordValues=["x"])
+instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
+success, data = FMI.fmi3SimulateME(fmu, 0.0, 3.0)
 FMI.fmiPlot(fmu,["x"], data)
+test1 = FMI.fmi3GetNumberOfContinuousStates(fmu)
+test2 = FMI.fmi3GetNumberOfEventIndicators(fmu)
+test3 = FMI.fmi3GetNumberOfContinuousStates(instance1)
+test4 = FMI.fmi3GetNumberOfEventIndicators(instance1)
+test1
+test2
+test3
+test4
+FMI.fmi3EnterInitializationMode(fmu, 0.0, 10.0)
+x0 = FMI.fmi3GetContinuousStates(fmu)
+x0_nom = FMI.fmi3GetNominalsOfContinuousStates(fmu)
+
+# FMI.fmi3SetContinuousStates(instance1, x0)
+FMI.fmi3ExitInitializationMode(fmu)
+x0 = FMI.fmi3GetContinuousStates(fmu)
+x0_nom = FMI.fmi3GetNominalsOfContinuousStates(fmu)
+# FMI.fmi3SetContinuousStates(fmu, x0)
+FMI.fmi3EnterContinuousTimeMode(fmu)
+FMI.fmi3SetContinuousStates(fmu, x0)
+x0 = FMI.fmi3GetContinuousStates(fmu)
+x0_nom = FMI.fmi3GetNominalsOfContinuousStates(fmu)
+FMI.fmi3EnterEventMode(fmu, true, false, [FMI.fmi3Int32(2)], 0, false)
+x0 = FMI.fmi3GetContinuousStates(fmu)
+x0_nom = FMI.fmi3GetNominalsOfContinuousStates(fmu)
+discreteStatesNeedUpdate = FMI.fmi3False
+terminateSimulation = FMI.fmi3False
+nominalsOfContinuousStatesChanged = FMI.fmi3False
+valuesOfContinuousStatesChanged = FMI.fmi3False
+nextEventTimeDefined = FMI.fmi3False
+nextEventTime = FMI.fmi3Float64(0.0)
+
+FMI.fmi3UpdateDiscreteStates(instance1, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
+discreteStatesNeedUpdate
+terminateSimulation
+nominalsOfContinuousStatesChanged
+valuesOfContinuousStatesChanged
+nextEventTimeDefined
+nextEventTime
+FMI.fmi3SetTime(instance1, 0.1)
+indicators = FMI.fmi3GetEventIndicators(instance1)
+# FMI.fmi3SetContinuousStates(fmu, x0)
+# instance2 = FMI.fmi3InstantiateCoSimulation!(fmu)
+# instance = FMI.fmi3InstantiateCoSimulation!(fmu; loggingOn=true)
+# success, data = FMI.fmi3SimulateCS(fmu, 0.0, 3.0; recordValues=["x"])
+# FMI.fmiPlot(fmu,["x"], data)
 # FMI.fmi3EnterInitializationMode(fmu)
 # FMI.fmi3ExitInitializationMode(fmu)
 # FMI.fmi3GetFMUstate(fmu)
@@ -104,8 +146,8 @@ FMI.fmi3GetBoolean(fmu, ["bool_in"])
 FMI.fmi3GetString(fmu, "string_param")
 FMI.fmi3SetString(fmu, ["string_param"], ["Test!"])
 FMI.fmi3GetString(fmu, ["string_param"])
-FMI.fmi3GetBinary(fmu, "binary_in")
-FMI.fmi3SetBinary(fmu, ["binary_in"], [536574206d652c20746f6f21])
+binary = FMI.fmi3GetBinary(fmu, "binary_in")
+FMI.fmi3SetBinary(fmu, ["binary_in"], [binary])
 FMI.fmi3GetBinary(fmu, ["binary_in"])
 FMI.fmi3ExitInitializationMode(fmu)
 FMI.fmi3GetFMUState(fmu)
@@ -146,6 +188,7 @@ fmu = FMI.fmi3Load("model/fmi3/VanDerPol.fmu")
 instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
 instance = FMI.fmi3InstantiateCoSimulation!(fmu; loggingOn=true)
 success, data = FMI.fmi3SimulateCS(fmu, 0.0, 3.0; recordValues=["x0", "x1"])
+success, data = FMI.fmi3SimulateME(fmu, 0.0, 3.0; recordValues=["x0", "x1"])
 FMI.fmiPlot(fmu,["x0", "x1"], data)
 
 FMI.fmi3GetFMUState(fmu)

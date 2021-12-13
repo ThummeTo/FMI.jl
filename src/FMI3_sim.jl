@@ -30,7 +30,7 @@ end
 function handleEvents(c::fmi3Component, enterEventMode::Bool, exitInContinuousMode::Bool)
 
     if enterEventMode
-        fmi3EnterEventMode(c)
+        fmi3EnterEventMode(c, true, false, [fmi3Int32(2)], 0, false)
     end
 
     discreteStatesNeedUpdate = fmi3False
@@ -118,12 +118,12 @@ end
 function fx(c::fmi3Component, x, p, t)
     fmi3SetTime(c, t)
     fmi3SetContinuousStates(c, x)
-    dx = fmi3GetDerivatives(c)
+    dx = fmi3GetContinuousStateDerivatives(c)
 end
 
 # save FMU values 
 function saveValues(c::fmi3Component, recordValues, u, t, integrator)
-    Tuple(fmi3GetFloat64(c, recordValues)...,)
+    (fmi3GetFloat64(c, recordValues)...,)
 end
 
 """
@@ -157,11 +157,11 @@ function fmi3SimulateME(c::fmi3Component, t_start::Real = 0.0, t_stop::Real = 1.
         push!(callbacks, savingCB)
     end
 
-    if solver == nothing
+    if solver === nothing
         solver = Tsit5()
     end
 
-    if customFx == nothing
+    if customFx === nothing
         customFx = (x, p, t) -> fx(c, x, p, t)
     end
 
@@ -177,6 +177,7 @@ function fmi3SimulateME(c::fmi3Component, t_start::Real = 0.0, t_stop::Real = 1.
     x0 = fmi3GetContinuousStates(c)
     x0_nom = fmi3GetNominalsOfContinuousStates(c)
 
+    # can only be called in ContinuousTimeMode
     fmi3SetContinuousStates(c, x0)
     
     handleEvents(c, false, false)

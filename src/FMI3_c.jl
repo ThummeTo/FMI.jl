@@ -54,7 +54,7 @@ macro scopedenum(T, syms...)
     return top
 end
 """
-Source: FMISpec3.0, Version Fe7f04b:2.2.2. Platform Dependent Definitions
+Source: FMISpec3.0, Version D5ef1c1:2.2.2. Platform Dependent Definitions
 
 To simplify porting, no C types are used in the function interfaces, but the alias types are defined in this section. 
 All definitions in this section are provided in the header file fmi3PlatformTypes.h. It is required to use this definition for all binary FMUs.
@@ -87,7 +87,7 @@ fmi3ValueReferenceFormat = Union{Nothing, String, Array{String,1}, fmi3ValueRefe
 const fmi3False = fmi3Boolean(false)
 const fmi3True = fmi3Boolean(true)
 """
-Source: FMISpec3.0, Version Fe7f04b: 2.2.3. Status Returned by Functions
+Source: FMISpec3.0, Version D5ef1c1: 2.2.3. Status Returned by Functions
 Defines the status flag (an enumeration of type fmi3Status defined in file fmi3FunctionTypes.h) that is returned by functions to indicate the success of the function call:
 """
 @enum fmi3Status begin
@@ -138,7 +138,45 @@ function fmi3StatusString(status::Integer)
     end
 end
 
-# TODO docs
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.4.7.4. Variable Attributes
+Enumeration that defines the causality of the variable. Allowed values of this enumeration:
+
+= parameter: A data value that is constant during the simulation (except for tunable parameters, see there) and is provided by the environment and cannot be used in connections, except for parameter propagation in terminals as described in Section 2.4.9.2.6. variability must be fixed or tunable. These parameters can be changed independently, unlike calculated parameters. initial must be exact or not present (meaning exact).
+
+= calculatedParameter: A data value that is constant during the simulation and is computed during initialization or when tunable parameters change. variability must be fixed or tunable. initial must be approx, calculated or not present (meaning calculated).
+
+= input: The variable value can be provided by the importer.
+[For example, the importer could forward the output of another FMU into this input.]
+
+= output: The variable value can be used by the importer.
+[For example, this value can be forwarded to an input of another FMU.]
+The algebraic relationship to the inputs can be defined via the dependencies attribute of <fmiModelDescription><ModelStructure><Output>.
+
+= local: Local variables are:
+
+- continuous states and their ContinuousStateDerivatives, ClockedStates, EventIndicators or InitialUnknowns. These variables are listed in the <fmiModelDescription><ModelStructure>.
+
+- internal, intermediate variables or local clocks which can be read for debugging purposes and are not listed in the <fmiModelDescription><ModelStructure>.
+
+Setting of local variables:
+
+- In Initialization Mode and before, local variables need to be set if they do have start values or are listed as <InitialUnknown>.
+
+- In super state Initialized, fmi3Set{VariableType} must not be called on any of the local variables. Only in Model Exchange, continuous states can be set with fmi3SetContinuousStates. Local variable values must not be used as input to another model or FMU.
+
+= independent: The independent variable (usually time [but could also be, for example, angle]). All variables are a function of this independent variable. variability must be continuous. Exactly one variable of an FMU must be defined as independent. For Model Exchange the value is the last value set by fmi3SetTime. For Co-Simulation the value of the independent variable is lastSuccessfulTime return by the last call to fmi3DoStep or the value of argument intermediateUpdateTime of fmi3CallbackIntermediateUpdate. For Scheduled Execution the value of the independent variable is not defined. [The main purpose of this variable in Scheduled Execution is to define a quantity and unit for the independent variable.] The initial value of the independent variable is the value of the argument startTime of fmi3EnterInitializationMode for both Co-Simulation and Model Exchange. If the unit for the independent variable is not defined, it is implicitly s (seconds). If one variable is defined as independent, it must be defined with a floating point type without a start attribute. It is not allowed to call function fmi3Set{VariableType} on an independent variable. Instead, its value is initialized with fmi3EnterInitializationMode and after initialization set by fmi3SetTime for Model Exchange and by arguments currentCommunicationPoint and communicationStepSize of fmi3DoStep for Co-Simulation FMUs. [The actual value can be inquired with fmi3Get{VariableType}.]
+
+= structuralParameter: The variable value can only be changed in Configuration Mode or Reconfiguration Mode. The variability attribute must be fixed or tunable. The initial attribute must be exact or not present (meaning exact). The start attribute is mandatory. A structural parameter must not have a <Dimension> element. A structural parameter may be referenced in <Dimension> elements. If a structural parameters is referenced in <Dimension> elements, it must be of type <UInt64> and its start attribute must be larger than 0. The min attribute might still be 0.
+
+The default of causality is local.
+A continuous-time state or an event indicator must have causality = local or output, see also Section 2.4.8.
+
+[causality = calculatedParameter and causality = local with variability = fixed or tunable are similar. The difference is that a calculatedParameter can be used in another model or FMU, whereas a local variable cannot. For example, when importing an FMU in a Modelica environment, a calculatedParameter should be imported in a public section as final parameter, whereas a local variable should be imported in a protected section of the model.]
+
+The causality of variables of type Clock must be either input or output.
+"""
+
 @scopedenum fmi3causality begin
     _parameter
     calculatedParameter
@@ -148,8 +186,30 @@ end
     independent
     structuralParameter
 end
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.4.7.4. Variable Attributes
+Enumeration that defines the time dependency of the variable, in other words, it defines the time instants when a variable can change its value. [The purpose of this attribute is to define when a result value needs to be inquired and to be stored. For example, discrete variables change their values only at event instants (ME) or at a communication point (CS and SE) and it is therefore only necessary to inquire them with fmi3Get{VariableType} and store them at event times.] Allowed values of this enumeration:
 
-# TODO docs
+= constant: The value of the variable never changes.
+
+= fixed: The value of the variable is fixed after initialization, in other words, after fmi3ExitInitializationMode was called the variable value does not change anymore.
+
+= tunable: The value of the variable is constant between events (ME) and between communication points (CS and SE) due to changing variables with causality = parameter and variability = tunable. Whenever a parameter with variability = tunable changes, an event is triggered externally (ME or CS if events are supported), or the change is performed at the next communication point (CS and SE) and the variables with variability = tunable and causality = calculatedParameter or output must be newly computed. [tunable inputs are not allowed, see Table 18.]
+
+= discrete:
+Model Exchange: The value of the variable is constant between external and internal events (= time, state, step events defined implicitly in the FMU).
+Co-Simulation: By convention, the variable is from a real sampled data system and its value is only changed at communication points (including event handling). During intermediateUpdate, discrete variables are not allowed to change. [If the simulation algorithm notices a change in a discrete variable during intermediateUpdate, the simulation algorithm will delay the change, raise an event with earlyReturnRequested == fmi3True and during the communication point it can change the discrete variable, followed by event handling.]
+
+= continuous: Only a variable of type == fmi3GetFloat32 or type == fmi3GetFloat64 can be continuous.
+Model Exchange: No restrictions on value changes (see Section 4.1.1).
+
+The default is continuous for variables of type <Float32> and <Float64>, and discrete for all other types.
+
+For variables of type Clock and clocked variables the variability is always discrete or tunable.
+
+[Note that the information about continuous states is defined with elements <ContinuousStateDerivative> in <ModelStructure>.]
+"""
+
 @scopedenum fmi3variability begin
     constant
     fixed
@@ -158,18 +218,39 @@ end
     continuous
 end
 
-# TODO docs
+"""
+Source: FMISpec3.0, Version D5ef1c1:2.4.7.5. Type specific properties
+Enumeration that defines how the variable is initialized, i.e. if a fmi3Set{VariableType} is allowed and how the FMU internally treats this value in Instantiated and Initialization Mode.
+
+For the variable with causality = independent, the attribute initial must not be provided, because its start value is set with the startTime parameter of fmi3EnterInitializationMode.
+
+The attribute initial for other variables can have the following values and meanings:
+
+= exact: The variable is initialized with the start value (provided under the variable type element).
+
+= approx: The start value provides an approximation that may be modified during initialization, e.g., if the FMU is part of an algebraic loop where the variable might be an iteration variable and start value is taken as initial value for an iterative solution process.
+
+= calculated: The variable is calculated from other variables during initialization. It is not allowed to provide a start value.
+
+If initial is not present, it is defined by Table 22 based on causality and variability. If initial = exact or approx, or causality = input, a start value must be provided. If initial = calculated, or causality = independent, it is not allowed to provide a start value.
+
+[The environment decides when to use the start value of a variable with causality = input. Examples: * Automatic tests of FMUs are performed, and the FMU is tested by providing the start value as constant input. * For a Model Exchange FMU, the FMU might be part of an algebraic loop. If the input variable is iteration variable of this algebraic loop, then initialization starts with its start value.]
+
+If fmi3Set{VariableType} is not called on a variable with causality = input, then the FMU must use the start value as value of this input.
+"""
+
 @scopedenum fmi3initial begin
     exact
     approx
     calculated
 end
 """
-Source: FMISpec2.0.2[p.19]: 2.1.5 Creation, Destruction and Logging of FMU Instances
+Source: FMISpec3.0, Version D5ef1c1: 2.3.1. Super State: FMU State Setable
 
 Argument fmuType defines the type of the FMU:
-- fmi2ModelExchange: FMU with initialization and events; between events simulation of continuous systems is performed with external integrators from the environment.
-- fmi2CoSimulation: Black box interface for co-simulation.
+- fmi3ModelExchange: FMU with initialization and events; between events simulation of continuous systems is performed with external integrators from the environment.
+- fmi3CoSimulation: Black box interface for co-simulation.
+- fmi3ScheduledExecution: Concurrent computation of model partitions on a single computational resource (e.g. CPU-core)
 """
 @enum fmi3Type begin
     fmi3ModelExchange
@@ -177,32 +258,17 @@ Argument fmuType defines the type of the FMU:
     fmi3ScheduledExecution
 end
 
-# TODO: Callback functions
-# """
-# Source: FMISpec2.0.2[p.19-22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
-
-# The struct contains pointers to functions provided by the environment to be used by the FMU. It is not allowed to change these functions between fmi2Instantiate(..) and fmi2Terminate(..) calls. Additionally, a pointer to the environment is provided (componentEnvironment) that needs to be passed to the “logger” function, in order that the logger function can utilize data from the environment, such as mapping a valueReference to a string. In the unlikely case that fmi2Component is also needed in the logger, it has to be passed via argument componentEnvironment. Argument componentEnvironment may be a null pointer. The componentEnvironment pointer is also passed to the stepFinished(..) function in order that the environment can provide an efficient way to identify the slave that called stepFinished(..).
-# """
-# mutable struct fmi3CallbackLoggerFunction
-#     logger::Ptr{Cvoid}
-# end
-
-# mutable struct fmi3CallbackIntermediateUpdateFunction
-#     intermediateUpdate::Ptr{Cvoid}
-# end
 """
-Source: FMISpec2.0.2[p.21]: 2.1.5 Creation, Destruction and Logging of FMU Instances
+Source: FMISpec3.0, Version D5ef1c1: 2.3.1. Super State: FMU State Setable
 
-Function that is called in the FMU, usually if an fmi2XXX function, does not behave as desired. If “logger” is called with “status = fmi2OK”, then the message is a pure information message. “instanceName” is the instance name of the model that calls this function. “category” is the category of the message. The meaning of “category” is defined by the modeling environment that generated the FMU. Depending on this modeling environment, none, some or all allowed values of “category” for this FMU are defined in the modelDescription.xml file via element “<fmiModelDescription><LogCategories>”, see section 2.2.4. Only messages are provided by function logger that have a category according to a call to fmi2SetDebugLogging (see below). Argument “message” is provided in the same way and with the same format control as in function “printf” from the C standard library. [Typically, this function prints the message and stores it optionally in a log file.]
+Function that is called in the FMU, usually if an fmi3XXX function, does not behave as desired. If “logger” is called with “status = fmi3OK”, then the message is a pure information message. “instanceEnvironment” is the instance name of the model that calls this function. “category” is the category of the message. The meaning of “category” is defined by the modeling environment that generated the FMU. Depending on this modeling environment, none, some or all allowed values of “category” for this FMU are defined in the modelDescription.xml file via element “<fmiModelDescription><LogCategories>”, see section 2.4.5. Only messages are provided by function logger that have a category according to a call to fmi3SetDebugLogging (see below). Argument “message” is provided in the same way and with the same format control as in function “printf” from the C standard library. [Typically, this function prints the message and stores it optionally in a log file.]
 """
+# TODO error in the specification
 function fmi3CallbackLogMessage(instanceEnvironment::Ptr{Cvoid},
-            status::Cuint,
             category::Ptr{Cchar},
+            status::Cuint,
             message::Ptr{Cchar})
     
-    println(message)
-    println(status)
-    println(category)
     if message != C_NULL
         _message = unsafe_string(message)
     else
@@ -210,30 +276,30 @@ function fmi3CallbackLogMessage(instanceEnvironment::Ptr{Cvoid},
     end
 
     if category != C_NULL
-        # _category = unsafe_string(category)
+        _category = unsafe_string(category)
     else
         _category = "No category"
     end
     _status = fmi3StatusString(status)
     # println("Info: LogMessage")
     if status == Integer(fmi3OK)
-        # @info "[$_status][$_category]: $_message"
-        @info "[$_status][]: $_message"
+        @info "[$_status][$_category]: $_message"
+        # @info "[$_status][]: $_message"
     elseif status == Integer(fmi3Warning)
-        # @warn "[$_status][$_category]: $_message"
-        @warn "[$_status][]: $_message"
+        @warn "[$_status][$_category]: $_message"
+        # @warn "[$_status][]: $_message"
     else
-        # @error "[$_status][$_category]: $_message"
-        @error "[$_status][]: $_message"
+        @error "[$_status][$_category]: $_message"
+        # @error "[$_status][]: $_message"
     end
 
     nothing
 end
 
 """
-TODO UPdate Source: FMISpec2.0.2[p.21-22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
+Source: FMISpec3.0, Version D5ef1c1: 4.2.2. State: Intermediate Update Mode
 
-Function that is called in the FMU if memory needs to be allocated. If attribute “canNotUseMemoryManagementFunctions = true” in <fmiModelDescription><ModelExchange / CoSimulation>, then function allocateMemory is not used in the FMU and a void pointer can be provided. If this attribute has a value of “false” (which is the default), the FMU must not use malloc, calloc or other memory allocation functions. One reason is that these functions might not be available for embedded systems on the target machine. Another reason is that the environment may have optimized or specialized memory allocation functions. allocateMemory returns a pointer to space for a vector of nobj objects, each of size “size” or NULL, if the request cannot be satisfied. The space is initialized to zero bytes [(a simple implementation is to use calloc from the C standard library)].
+Function that is called in the FMU if intermediate updates for inputs or outputs during a communication step are provided by the FMU.
 """
 function fmi3CallbackIntermediateUpdate(instanceEnvironment::Ptr{Cvoid},
     intermediateUpdateTime::fmi3Float64,
@@ -247,29 +313,6 @@ function fmi3CallbackIntermediateUpdate(instanceEnvironment::Ptr{Cvoid},
     @warn "To be implemented!"
     #display("$ptr: Allocated $nobj x $size bytes.")
 end
-
-# """
-# Source: FMISpec2.0.2[p.22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
-
-# Function that must be called in the FMU if memory is freed that has been allocated with allocateMemory. If a null pointer is provided as input argument obj, the function shall perform no action [(a simple implementation is to use free from the C standard library; in ANSI C89 and C99, the null pointer handling is identical as defined here)]. If attribute “canNotUseMemoryManagementFunctions = true” in <fmiModelDescription><ModelExchange / CoSimulation>, then function freeMemory is not used in the FMU and a null pointer can be provided.
-# """
-# function cbFreeMemory(obj::Ptr{Cvoid})
-#     #display("$obj: Freed.")
-# 	Libc.free(obj)
-#     nothing
-# end
-
-# """
-# Source: FMISpec2.0.2[p.22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
-
-# Optional call back function to signal if the computation of a communication step of a co-simulation slave is finished. A null pointer can be provided. In this case the master must use fmiGetStatus(..) to query the status of fmi2DoStep. If a pointer to a function is provided, it must be called by the FMU after a completed communication step.
-# """
-# function cbStepFinished(componentEnvironment::Ptr{Cvoid}, status::Cuint)
-#     #display("Step finished.")
-#     nothing
-# end
-
-
 
 mutable struct fmi3datatypeVariable
     # mandatory TODO clock
@@ -375,7 +418,6 @@ mutable struct fmi3ModelVariable
     end
 end
 
-# TODO: Model description
 mutable struct fmi3ModelDescription
     # FMI model description
     fmiVersion::String
@@ -448,9 +490,9 @@ end
 
 # TODO update docs
 """
-Source: FMISpec2.0.2[p.19]: 2.1.5 Creation, Destruction and Logging of FMU Instances
+Source: FMISpec3.0, Version D5ef1c1:: 2.2.1. Header Files and Naming of Functions
 
-The mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
+The mutable struct represents an instantiated instance of an FMU in the FMI 3.0 Standard.
 """
 mutable struct fmi3Component
     compAddr::Ptr{Nothing}
@@ -1079,11 +1121,11 @@ function fmi3GetNumberOfContinuousStates(c::fmi3Component, nContinuousStates::Cs
             c.compAddr, Ref(nContinuousStates))
 end
 
-function fmi3GetNumberOfEventIndicators(c::fmi3Component, nEventIndicators::Ref{Csize_t})
+function fmi3GetNumberOfEventIndicators(c::fmi3Component, nEventIndicators::Csize_t)
     ccall(c.fmu.cGetNumberOfEventIndicators,
             Cuint,
             (Ptr{Nothing}, Ptr{Csize_t}),
-            c.compAddr, nEventIndicators)
+            c.compAddr, Ref(nEventIndicators))
 end
 
 function fmi3GetContinuousStates(c::fmi3Component, nominals::Array{fmi3Float64}, nContinuousStates::Csize_t)

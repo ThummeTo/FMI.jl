@@ -293,7 +293,6 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
         fmu.cGetNominalsOfContinuousStates         = dlsym(fmu.libHandle, :fmi3GetNominalsOfContinuousStates)
         fmu.cEnterContinuousTimeMode               = dlsym(fmu.libHandle, :fmi3EnterContinuousTimeMode)
         fmu.cSetTime                               = dlsym(fmu.libHandle, :fmi3SetTime)
-        fmu.cGetContinuousStates                   = dlsym(fmu.libHandle, :fmi3GetContinuousStates)
         fmu.cSetContinuousStates                   = dlsym(fmu.libHandle, :fmi3SetContinuousStates)
         fmu.cGetContinuousStateDerivatives         = dlsym(fmu.libHandle, :fmi3GetContinuousStateDerivatives) 
         fmu.cGetEventIndicators                    = dlsym(fmu.libHandle, :fmi3GetEventIndicators)
@@ -560,7 +559,7 @@ For more information call ?fmi2Instantiate
 """
 function fmi3InstantiateModelExchange!(fmu::FMU3; visible::Bool = false, loggingOn::Bool = false)
 
-    ptrLogger = @cfunction(fmi3CallbackLogMessage, Cvoid, (Ptr{Cvoid}, Cuint, Ptr{Cchar}, Ptr{Cchar}))
+    ptrLogger = @cfunction(fmi3CallbackLogMessage, Cvoid, (Ptr{Cvoid}, Ptr{Cchar}, Cuint, Ptr{Cchar}))
     # ptrAllocateMemory = @cfunction(cbAllocateMemory, Ptr{Cvoid}, (Csize_t, Csize_t))
     # ptrFreeMemory = @cfunction(cbFreeMemory, Cvoid, (Ptr{Cvoid},))
     # ptrStepFinished = C_NULL
@@ -589,7 +588,7 @@ For more information call ?fmi2Instantiate
 """
 function fmi3InstantiateCoSimulation!(fmu::FMU3; visible::Bool = false, loggingOn::Bool = false, eventModeUsed::Bool = false)
 
-    ptrLogger = @cfunction(fmi3CallbackLogMessage, Cvoid, (Ptr{Cvoid}, Cuint, Ptr{Cchar}, Ptr{Cchar}))
+    ptrLogger = @cfunction(fmi3CallbackLogMessage, Cvoid, (Ptr{Cvoid}, Ptr{Cchar}, Cuint, Ptr{Cchar}))
     ptrIntermediateUpdate = @cfunction(fmi3CallbackIntermediateUpdate, Cvoid, (Ptr{Cvoid}, fmi3Float64, fmi3Boolean, fmi3Boolean, fmi3Boolean, fmi3Boolean, fmi3Boolean, Ptr{fmi3Boolean}, Ptr{fmi3Float64}))
     if fmu.modelDescription.CShasEventMode 
         mode = eventModeUsed
@@ -1243,12 +1242,12 @@ Retrieves directional derivatives.
 
 For more information call ?fmi2GetDirectionalDerivatives
 """
-function fmi3GetDirectionalDerivative(fmu::FMU3,
+function fmi3GetAdjointDerivative(fmu::FMU3,
                                       unknowns::Array{fmi3ValueReference},
                                       knowns::Array{fmi3ValueReference},
                                       seed::Array{fmi3Float64} = Array{fmi3Float64}([]))
 
-    fmi3GetDirectionalDerivative(fmu.components[end], unknowns, knowns, seed)
+    fmi3GetAdjointDerivative(fmu.components[end], unknowns, knowns, seed)
 end
 
 """
@@ -1286,23 +1285,19 @@ function fmi3EnterConfigurationMode(fmu::FMU3)
 end
 
 function fmi3GetNumberOfContinuousStates(fmu::FMU3)
-    size = 0
-    sizeRef = Ref(Csize_t(size))
-    fmi3GetNumberOfContinuousStates(fmu.components[end], sizeRef)
-    size = sizeRef[]
+    size = Csize_t(0)
+    fmi3GetNumberOfContinuousStates(fmu.components[end], size)
     size
 end
 
 function fmi3GetNumberOfEventIndicators(fmu::FMU3)
-    size = 0
-    sizeRef = Ref(Csize_t(size))
-    fmi3GetNumberOfEventIndicators(fmu.components[end], sizeRef)
-    size = sizeRef[]
+    size = Csize_t(0)
+    fmi3GetNumberOfEventIndicators(fmu.components[end], size)
     size
 end
 
 function fmi3GetContinuousStates(fmu::FMU3)
-    nx = Csize_t(fmi3GetNumberOfContinuousStates(fmu))
+    nx = Csize_t(fmu.modelDescription.numberOfContinuousStates)
     x = zeros(fmi3Float64, nx)
     fmi3GetContinuousStates(fmu.components[end], x, nx)
     x
@@ -1316,7 +1311,7 @@ Return the nominal values of the continuous states.
 For more information call ?fmi2GetNominalsOfContinuousStates
 """
 function fmi3GetNominalsOfContinuousStates(fmu::FMU3)
-    nx = Csize_t(fmi3GetNumberOfContinuousStates(fmu))
+    nx = Csize_t(fmu.modelDescription.numberOfContinuousStates)
     x = zeros(fmi3Float64, nx)
     fmi3GetNominalsOfContinuousStates(fmu.components[end], x, nx)
     x
@@ -1366,7 +1361,7 @@ For more information call ?fmi2SetContinuousStates
 """
 function fmi3SetContinuousStates(fmu::FMU3, x::Union{Array{Float32}, Array{Float64}})
     nx = Csize_t(length(x))
-    fmu.x = x
+    # fmu.x = x
     fmi3SetContinuousStates(fmu.components[end], Array{fmi3Float64}(x), nx)
 end
 
@@ -1378,7 +1373,7 @@ Compute state derivatives at the current time instant and for the current states
 For more information call ?fmi2GetDerivatives
 """
 function  fmi3GetContinuousStateDerivatives(fmu::FMU3)
-    nx = Csize_t(fmi3GetNumberOfContinuousStates(fmu))
+    nx = Csize_t(fmu.modelDescription.numberOfContinuousStates)
     derivatives = zeros(fmi3Float64, nx)
     fmi3GetContinuousStateDerivatives(fmu.components[end], derivatives, nx)
     derivatives
@@ -1392,7 +1387,7 @@ Returns the event indicators of the FMU.
 For more information call ?fmi2GetEventIndicators
 """
 function fmi3GetEventIndicators(fmu::FMU3)
-    ni = Csize_t(fmi3GetNumberOfEventIndicators(fmu))
+    ni = Csize_t(fmu.modelDescription.numberOfEventIndicators)
     eventIndicators = zeros(fmi3Float64, ni)
     fmi3GetEventIndicators(fmu.components[end], eventIndicators, ni)
     eventIndicators
@@ -1425,8 +1420,8 @@ The model enters Event Mode.
 
 For more information call ?fmi2EnterEventMode
 """
-function fmi3EnterEventMode(fmu::FMU3)
-    fmi3EnterEventMode(fmu.components[end])
+function fmi3EnterEventMode(fmu::FMU3, stepEvent::Bool, stateEvent::Bool, rootsFound::Array{fmi3Int32}, nEventIndicators::Integer, timeEvent::Bool)
+    fmi3EnterEventMode(fmu.components[end], stepEvent, stateEvent, rootsFound, nEventIndicators, timeEvent)
 end
 
 """
