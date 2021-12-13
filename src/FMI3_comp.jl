@@ -21,7 +21,7 @@ TODO: FMI specification reference.
 Set the DebugLogger for the FMU.
 """
 function fmi3SetDebugLogging(c::fmi3Component)
-    fmi3SetDebugLogging(c, fmi2False, Unsigned(0), C_NULL)
+    fmi3SetDebugLogging(c, fmi3False, Unsigned(0), C_NULL)
 end
 
 """

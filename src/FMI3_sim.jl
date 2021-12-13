@@ -9,10 +9,18 @@ using DifferentialEquations, DiffEqCallbacks
 
 # Read next time event from fmu and provide it to the integrator 
 function time_choice(c::fmi3Component, integrator)
-    eventInfo = fmi2NewDiscreteStates(c)
-    fmi2EnterContinuousTimeMode(c)
-    if Bool(eventInfo.nextEventTimeDefined)
-        eventInfo.nextEventTime
+    discreteStatesNeedUpdate = fmi3False
+    terminateSimulation = fmi3False
+    nominalsOfContinuousStatesChanged = fmi3False
+    valuesOfContinuousStatesChanged = fmi3False
+    nextEventTimeDefined = fmi3False
+    nextEventTime = fmi3Float64(0.0)
+
+    fmi3UpdateDiscreteStates(c, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
+    # eventInfo = fmi2NewDiscreteStates(c)
+    fmi3EnterContinuousTimeMode(c)
+    if Bool(nextEventTimeDefined)
+        nextEventTime
     else
         Inf
     end

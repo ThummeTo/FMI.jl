@@ -54,7 +54,7 @@ macro scopedenum(T, syms...)
     return top
 end
 """
-Source: FMISpec3.0, Version 5b80c29:2.2.2. Platform Dependent Definitions
+Source: FMISpec3.0, Version Fe7f04b:2.2.2. Platform Dependent Definitions
 
 To simplify porting, no C types are used in the function interfaces, but the alias types are defined in this section. 
 All definitions in this section are provided in the header file fmi3PlatformTypes.h. It is required to use this definition for all binary FMUs.
@@ -86,6 +86,57 @@ fmi3ValueReferenceFormat = Union{Nothing, String, Array{String,1}, fmi3ValueRefe
 
 const fmi3False = fmi3Boolean(false)
 const fmi3True = fmi3Boolean(true)
+"""
+Source: FMISpec3.0, Version Fe7f04b: 2.2.3. Status Returned by Functions
+Defines the status flag (an enumeration of type fmi3Status defined in file fmi3FunctionTypes.h) that is returned by functions to indicate the success of the function call:
+"""
+@enum fmi3Status begin
+    fmi3OK
+    fmi3Warning
+    fmi3Discard
+    fmi3Error
+    fmi3Fatal
+    fmi3Pending
+end
+
+"""
+Format the fmi3Status into a String
+"""
+function fmi3StatusString(status::fmi3Status)
+    if status == fmi3OK
+        return "OK"
+    elseif status == fmi3Warning
+        return "Warning"
+    elseif status == fmi3Discard
+        return "Discard"
+    elseif status == fmi3Error
+        return "Error"
+    elseif status == fmi3Fatal
+        return "Fatal"
+    elseif status == fmi3Pending
+        return "Pending"
+    else
+        return "Unknown"
+    end
+end
+
+function fmi3StatusString(status::Integer)
+    if status == Integer(fmi3OK)
+        return "OK"
+    elseif status == Integer(fmi3Warning)
+        return "Warning"
+    elseif status == Integer(fmi3Discard)
+        return "Discard"
+    elseif status == Integer(fmi3Error)
+        return "Error"
+    elseif status == Integer(fmi3Fatal)
+        return "Fatal"
+    elseif status == Integer(fmi3Pending)
+        return "Pending"
+    else
+        return "Unknown"
+    end
+end
 
 # TODO docs
 @scopedenum fmi3causality begin
@@ -148,17 +199,33 @@ function fmi3CallbackLogMessage(instanceEnvironment::Ptr{Cvoid},
             status::Cuint,
             category::Ptr{Cchar},
             message::Ptr{Cchar})
-    # _message = unsafe_string(message)
-    # _category = unsafe_string(category)
-    # _status = fmi2StatusString(status)
-    println("Info: LogMessage")
-    # if status == Integer(fmi3OK)
-    #     @info "[$_status][$_category]: $_message"
-    # elseif status == Integer(fmi3Warning)
-    #     @warn "[$_status][$_category]: $_message"
-    # else
-    #     @error "[$_status][$_category]: $_message"
-    # end
+    
+    println(message)
+    println(status)
+    println(category)
+    if message != C_NULL
+        _message = unsafe_string(message)
+    else
+        _message = ""
+    end
+
+    if category != C_NULL
+        # _category = unsafe_string(category)
+    else
+        _category = "No category"
+    end
+    _status = fmi3StatusString(status)
+    # println("Info: LogMessage")
+    if status == Integer(fmi3OK)
+        # @info "[$_status][$_category]: $_message"
+        @info "[$_status][]: $_message"
+    elseif status == Integer(fmi3Warning)
+        # @warn "[$_status][$_category]: $_message"
+        @warn "[$_status][]: $_message"
+    else
+        # @error "[$_status][$_category]: $_message"
+        @error "[$_status][]: $_message"
+    end
 
     nothing
 end
@@ -839,7 +906,7 @@ Functions to get and set values of variables idetified by their valueReference
 function fmi3GetBinary!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Binary}, nvalue::Csize_t)
     status = ccall(c.fmu.cGetBinary,
                 Cuint,
-                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t,  fmi3Binary, Csize_t),
+                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t,  Ptr{fmi3Binary}, Csize_t),
                 c.compAddr, vr, nvr, value, nvalue)
     status
 end
