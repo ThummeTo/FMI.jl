@@ -6,7 +6,7 @@
 <!---Dokumentation Variablen--->
 
 [docs-img]: https://img.shields.io/badge/docs-dev-blue.svg
-[docs-url]: https://ThummeTo.github.io/FMI.jl/dev
+[docs-url]: https://github.com/adribrune.io/FMI.jl/dev
 <!---https://ThummeTo.github.io/FMI.jl/dev--->
 <!--- Run FMI.jl Tests Variablen--->
 
