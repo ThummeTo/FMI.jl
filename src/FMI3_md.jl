@@ -122,10 +122,9 @@ function fmi3ReadModelDescription(pathToModellDescription::String)
     for element in eachelement(modelstructure)
         if element.name == "Derivatives" || element.name == "InitialUnknown"
             parseDependencies(element, md)
-        # elseif element.name == "Output"
+        elseif element.name == "Output"
 
         elseif element.name == "EventIndicator"
-            println("test")
             md.numberOfEventIndicators += 1
         else
             @warn "Unknown tag `$(element.name)` for node `ModelStructure`."
@@ -308,8 +307,6 @@ end
 
 # Parses the model variables of the FMU model description.
 function parseModelVariables(nodes::EzXML.Node, md::fmi3ModelDescription, derivativeIndices)
-    println(derivativeIndices)
-    println(typeof(derivativeIndices))
     lastValueReference = fmi3ValueReference(0)
     derivativeIndex = nothing
     if derivativeIndices != []
