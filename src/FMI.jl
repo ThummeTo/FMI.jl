@@ -135,7 +135,7 @@ function prepareValueReference(md::fmi3ModelDescription, vr::fmi3ValueReferenceF
     elseif tvr == Array{Int64,1}
         return fmi3ValueReference.(vr)
     elseif tvr == Nothing
-        return []
+        return Array{fmi3ValueReference,1}()
     end
 
     @assert false "prepareValueReference(...): Unknown value reference structure `$tvr`."

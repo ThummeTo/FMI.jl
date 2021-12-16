@@ -674,6 +674,7 @@ Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Value
 Functions to get and set values of variables idetified by their valueReference
 """
 function fmi3GetFloat64!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Float64}, nvalue::Csize_t)
+    println("test getFloat64")
     ccall(c.fmu.cGetFloat64,
           Cuint,
           (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Float64}, Csize_t),
@@ -1161,6 +1162,7 @@ This function returns the number of continuous states.
 This function can only be called in Model Exchange. 
 """
 function fmi3GetNumberOfContinuousStates(c::fmi3Component, nContinuousStates::Csize_t)
+    println("test cGetNumberOfContinuousStates")
     ccall(c.fmu.cGetNumberOfContinuousStates,
             Cuint,
             (Ptr{Nothing}, Ptr{Csize_t}),
@@ -1174,6 +1176,7 @@ This function returns the number of event indicators.
 This function can only be called in Model Exchange. 
 """
 function fmi3GetNumberOfEventIndicators(c::fmi3Component, nEventIndicators::Csize_t)
+    println("test cGetNumberOfEventIndicators")
     ccall(c.fmu.cGetNumberOfEventIndicators,
             Cuint,
             (Ptr{Nothing}, Ptr{Csize_t}),
@@ -1186,6 +1189,7 @@ Source: FMISpec3.0, Version D5ef1c1: 2.3.3. State: Initialization Mode
 Return the states at the current time instant.
 """
 function fmi3GetContinuousStates(c::fmi3Component, nominals::Array{fmi3Float64}, nContinuousStates::Csize_t)
+    println("test cGetContinuousStates")
     ccall(c.fmu.cGetContinuousStates,
             Cuint,
             (Ptr{Nothing}, Ptr{fmi3Float64}, Csize_t),
@@ -1198,6 +1202,7 @@ Source: FMISpec3.0, Version D5ef1c1: 2.3.3. State: Initialization Mode
 Return the nominal values of the continuous states.
 """
 function fmi3GetNominalsOfContinuousStates(c::fmi3Component, x_nominal::Array{fmi3Float64}, nx::Csize_t)
+    println("test cGetNominalsOfContinuousStates")
     status = ccall(c.fmu.cGetNominalsOfContinuousStates,
                     Cuint,
                     (Ptr{Nothing}, Ptr{fmi3Float64}, Csize_t),
@@ -1210,6 +1215,7 @@ This function is called to trigger the evaluation of fdisc to compute the curren
 The FMU signals the support of fmi3EvaluateDiscreteStates via the capability flag providesEvaluateDiscreteStates.
 """
 function fmi3EvaluateDiscreteStates(c::fmi3Component)
+    println("test cEvaluateDiscreteStates")
     ccall(c.fmu.cEvaluateDiscreteStates,
             Cuint,
             (Ptr{Nothing},),
@@ -1219,6 +1225,7 @@ end
 function fmi3UpdateDiscreteStates(c::fmi3Component, discreteStatesNeedUpdate::fmi3Boolean, terminateSimulation::fmi3Boolean, 
                                     nominalsOfContinuousStatesChanged::fmi3Boolean, valuesOfContinuousStatesChanged::fmi3Boolean,
                                     nextEventTimeDefined::fmi3Boolean, nextEventTime::fmi3Float64)
+    println("test cUpdateDiscreteStates")
     ccall(c.fmu.cUpdateDiscreteStates,
             Cuint,
             (Ptr{Nothing}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Float64}),
@@ -1232,6 +1239,7 @@ The model enters Continuous-Time Mode and all discrete-time equations become ina
 This function has to be called when changing from Event Mode (after the global event iteration in Event Mode over all involved FMUs and other models has converged) into Continuous-Time Mode.
 """
 function fmi3EnterContinuousTimeMode(c::fmi3Component)
+    println("test continuoustimemode")
     ccall(c.fmu.cEnterContinuousTimeMode,
           Cuint,
           (Ptr{Nothing},),
@@ -1268,6 +1276,7 @@ Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 Set a new time instant and re-initialize caching of variables that depend on time, provided the newly provided time value is different to the previously set time value (variables that depend solely on constants or parameters need not to be newly computed in the sequel, but the previously computed values can be reused).
 """
 function fmi3SetTime(c::fmi3Component, time::fmi3Float64)
+    println("test settime")
     ccall(c.fmu.cSetTime,
           Cuint,
           (Ptr{Nothing}, fmi3Float64),
@@ -1282,6 +1291,7 @@ Set a new (continuous) state vector and re-initialize caching of variables that 
 function fmi3SetContinuousStates(c::fmi3Component,
                                  x::Array{fmi3Float64},
                                  nx::Csize_t)
+    println("test cSetContinuousStates")
     ccall(c.fmu.cSetContinuousStates,
          Cuint,
          (Ptr{Nothing}, Ptr{fmi3Float64}, Csize_t),
@@ -1296,6 +1306,7 @@ Compute first-oder state derivatives at the current time instant and for the cur
 function fmi3GetContinuousStateDerivatives(c::fmi3Component,
                             derivatives::Array{fmi3Float64},
                             nx::Csize_t)
+    println("test cGetContinuousStateDerivatives")
     ccall(c.fmu.cGetContinuousStateDerivatives,
           Cuint,
           (Ptr{Nothing}, Ptr{fmi2Real}, Csize_t),
@@ -1308,6 +1319,7 @@ Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 Compute event indicators at the current time instant and for the current states.
 """
 function fmi3GetEventIndicators(c::fmi3Component, eventIndicators::Array{fmi3Float64}, ni::Csize_t)
+    println("test EventIndicators")
     status = ccall(c.fmu.cGetEventIndicators,
                     Cuint,
                     (Ptr{Nothing}, Ptr{fmi3Float64}, Csize_t),
@@ -1325,6 +1337,7 @@ function fmi3CompletedIntegratorStep!(c::fmi3Component,
                                       noSetFMUStatePriorToCurrentPoint::fmi3Boolean,
                                       enterEventMode::fmi3Boolean,
                                       terminateSimulation::fmi3Boolean)
+    println("test CompletedINtegratorStep")
     ccall(c.fmu.cCompletedIntegratorStep,
           Cuint,
           (Ptr{Nothing}, fmi3Boolean, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}),
@@ -1337,6 +1350,7 @@ Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 The model enters Event Mode from the Continuous-Time Mode and discrete-time equations may become active (and relations are not “frozen”).
 """
 function fmi3EnterEventMode(c::fmi3Component, stepEvent::fmi3Boolean, stateEvent::fmi3Boolean, rootsFound::Array{fmi3Int32}, nEventIndicators::Csize_t, timeEvent::fmi3Boolean)
+    println("test EVEntMode")
     ccall(c.fmu.cEnterEventMode,
           Cuint,
           (Ptr{Nothing},fmi3Boolean, fmi3Boolean, Ptr{fmi3Int32}, Csize_t, fmi3Boolean),

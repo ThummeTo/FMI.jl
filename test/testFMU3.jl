@@ -8,13 +8,17 @@ using FMI
 # xml = FMI.fmi3ReadModelDescription("model/fmi3/VanDerPol/modelDescription.xml")
 
 fmu = FMI.fmi3Load("model/fmi3/BouncingBall.fmu")
-instance1 = FMI.fmi3InstantiateModelExchange!(fmu; loggingOn=true)
-# instance2 = FMI.fmi3InstantiateCoSimulation!(fmu; loggingOn=true)
+# instance1 = FMI.fmi3InstantiateModelExchange!(fmu; loggingOn=true)
+instance2 = FMI.fmi3InstantiateCoSimulation!(fmu; loggingOn=true)
 # fmu.components
 # FMI.fmi3GetVersion(fmu)
 # FMI.fmi3SetDebugLogging(fmu)
-# success, data = FMI.fmi3SimulateCS(fmu, 0.0, 3.0; recordValues=["h", "v"])
-success, data = FMI.fmi3SimulateME(fmu, 0.0, 20.0; recordValues=["h", "v"])
+t_start = 0.0
+t_stop = 3.0
+dt = 0.01
+saveat = t_start:dt:t_stop
+success, data = FMI.fmi3SimulateCS(fmu, t_start, t_stop; recordValues=["h", "v"], saveat = saveat)
+# success, data = FMI.fmi3SimulateME(fmu, 0.0, 20.0; recordValues=["h", "v"])
 FMI.fmiPlot(fmu,["h", "v"], data)
 # FMI.fmi3EnterInitializationMode(fmu, 0.0, 3.0)
 # FMI.fmi3GetFloat64(fmu, "g")
@@ -77,8 +81,8 @@ FMI.fmi3Unload(fmu)
 
 fmu = FMI.fmi3Load("model/fmi3/Dahlquist.fmu")
 instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
-success, data = FMI.fmi3SimulateME(fmu, 0.0, 3.0)
-FMI.fmiPlot(fmu,["x"], data)
+# success, data = FMI.fmi3SimulateME(fmu, 0.0, 3.0)
+# FMI.fmiPlot(fmu,["x"], data)
 test1 = FMI.fmi3GetNumberOfContinuousStates(fmu)
 test2 = FMI.fmi3GetNumberOfEventIndicators(fmu)
 test3 = FMI.fmi3GetNumberOfContinuousStates(instance1)
@@ -97,12 +101,15 @@ x0 = FMI.fmi3GetContinuousStates(fmu)
 x0_nom = FMI.fmi3GetNominalsOfContinuousStates(fmu)
 # FMI.fmi3SetContinuousStates(fmu, x0)
 FMI.fmi3EnterContinuousTimeMode(fmu)
+FMI.fmi3CompletedIntegratorStep(instance1, FMI.fmi3True)
 FMI.fmi3SetContinuousStates(fmu, x0)
 x0 = FMI.fmi3GetContinuousStates(fmu)
 x0_nom = FMI.fmi3GetNominalsOfContinuousStates(fmu)
 FMI.fmi3EnterEventMode(fmu, true, false, [FMI.fmi3Int32(2)], 0, false)
 x0 = FMI.fmi3GetContinuousStates(fmu)
 x0_nom = FMI.fmi3GetNominalsOfContinuousStates(fmu)
+dx = FMI.fmi3GetContinuousStateDerivatives(fmu)
+
 discreteStatesNeedUpdate = FMI.fmi3False
 terminateSimulation = FMI.fmi3False
 nominalsOfContinuousStatesChanged = FMI.fmi3False
@@ -119,6 +126,7 @@ nextEventTimeDefined
 nextEventTime
 FMI.fmi3SetTime(instance1, 0.1)
 indicators = FMI.fmi3GetEventIndicators(instance1)
+# FMI.fmi3CompletedIntegratorStep(instance1, FMI.fmi3True)
 # FMI.fmi3SetContinuousStates(fmu, x0)
 # instance2 = FMI.fmi3InstantiateCoSimulation!(fmu)
 # instance = FMI.fmi3InstantiateCoSimulation!(fmu; loggingOn=true)
@@ -189,9 +197,13 @@ FMI.fmi3GetFMUstate(fmu)
 FMI.fmi3Unload(fmu)
 
 fmu = FMI.fmi3Load("model/fmi3/VanDerPol.fmu")
-instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
+instance1 = FMI.fmi3InstantiateModelExchange!(fmu; loggingOn = true)
 instance = FMI.fmi3InstantiateCoSimulation!(fmu; loggingOn=true)
-success, data = FMI.fmi3SimulateCS(fmu, 0.0, 3.0; recordValues=["x0", "x1"])
+t_start = 0.0
+t_stop = 10.0
+dt = 0.01
+saveat = t_start:dt:t_stop
+success, data = FMI.fmi3SimulateCS(fmu, 0.0, 10.0; recordValues=["x0", "x1"], saveat=saveat)
 success, data = FMI.fmi3SimulateME(fmu, 0.0, 3.0; recordValues=["x0", "x1"])
 FMI.fmiPlot(fmu,["x0", "x1"], data)
 
