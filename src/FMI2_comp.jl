@@ -462,6 +462,26 @@ end
 """
 TODO: FMI specification reference.
 
+"""
+function fmi2GetRealOutputDerivatives(c::fmi2Component, vr::fmi2ValueReferenceFormat, order)
+    vr = prepareValueReference(c, vr)
+    order = prepareValue(order)
+    nvr = Csize_t(length(vr))
+    values = zeros(fmi2Real, nvr)
+    # @assert length(vr) == length(values) "fmi2SetReal(...): `vr` and `values` need to be the same length."
+    
+    fmi2GetRealOutputDerivatives(c, vr, nvr, Array{fmi2Integer}(order), values)
+    
+    if length(values) == 1
+        return values[1]
+    else
+        return values
+    end
+end
+
+"""
+TODO: FMI specification reference.
+
 The computation of a time step is started.
 
 For more information call ?fmi2DoStep

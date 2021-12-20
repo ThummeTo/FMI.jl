@@ -1052,8 +1052,8 @@ the array order specifies the corresponding order of derivation of the variables
 
 For more information call ?fmi2SetRealInputDerivatives
 """
-function fmi2SetRealInputDerivatives(fmu::FMU2, vr::fmi2ValueReference, nvr::Cint, order::Integer, value::Real)
-    fmi2SetRealInputDerivatives(fmu.components[end], vr, nvr, fmi2Integer(order), fmi2Real(value))
+function fmi2SetRealInputDerivatives(fmu::FMU2, vr::fmi2ValueReferenceFormat, order::Union{Array{<:Integer}, <:Integer}, value::Union{Array{<:Real}, <:Real})
+    fmi2SetRealInputDerivatives(fmu.components[end], vr, order, value)
 end
 
 """
@@ -1066,8 +1066,8 @@ the array order specifies the corresponding order of derivation of the variables
 
 For more information call ?fmi2GetRealOutputDerivatives
 """
-function fmi2GetRealOutputDerivatives(fmu::FMU2, vr::fmi2ValueReference, nvr::Cint, order::Integer, value::Real)
-    fmi2GetRealOutputDerivatives(fmu.components[end], vr, nvr, fmi2Integer(order), fmi2Real(value))
+function fmi2GetRealOutputDerivatives(fmu::FMU2, vr::fmi2ValueReferenceFormat, order::Union{Array{<:Integer}, <:Integer})
+    fmi2GetRealOutputDerivatives(fmu.components[end], vr, order)
 end
 
 """
