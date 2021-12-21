@@ -194,7 +194,7 @@ end
 Returns the tag 'modelIdentifier' from CS or ME section.
 """
 function fmiGetModelIdentifier(fmu::FMU2)
-    fmi2GetModelIdentifier(fmu)
+    fmi2GetModelIdentifier(fmu.modelDescription; type=fmu.type)
 end
 
 """
@@ -237,8 +237,8 @@ end
 """
 Load FMUs independent of the FMI version, currently supporting version 2.0.X.
 """
-function fmiLoad(pathToFMU::String; unpackPath=nothing)
-    fmi2Load(pathToFMU; unpackPath=unpackPath)
+function fmiLoad(pathToFMU::String; unpackPath=nothing, type=nothing)
+    fmi2Load(pathToFMU; unpackPath=unpackPath, type=type)
 end
 
 """
