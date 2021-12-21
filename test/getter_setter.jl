@@ -119,23 +119,27 @@ fmiGetBoolean!(fmuStruct, booleanValueReferences, cacheBoolean)
 fmiGetString!(fmuStruct, stringValueReferences, cacheString)
 @test cacheString == rndString
 
-if envFMUSTRUCT == "FMUCOMPONENT"
-    dirs = fmi2GetRealOutputDerivatives(fmuStruct, realValueReferences, ones(2))
-    @test dirs isa AbstractArray{<:Real}
-    @test dirs |> length == 2
-
-    st = fmi2SetRealInputDerivatives(fmuStruct, realValueReferences, ones(2), zeros(2))
-    @test_broken st == FMI.fmi2OK
-end
 # this is not suppoerted by OMEdit-FMUs in the repository
 if ENV["EXPORTINGTOOL"] != "OpenModelica/v1.17.0"
-    @test fmiGetStartValue(fmuStruct, ["p_enumeration", "p_string", "p_real"]) == ["myEnumeration1", "Hello World!", 0.0]
-end 
+    @test fmiGetStartValue(fmuStruct, ["p_enumeration", "p_string", "p_real"]) == ["myEnumeration1", "Hello World!", 0.0] 
+
+    # Testing input/output derivatives
+    dirs = fmiGetRealOutputDerivatives(fmuStruct, ["y_real"], ones(Int, 1))
+    @test dirs == -Inf # at this point, derivative is undefined
+    @test fmiSetRealInputDerivatives(fmuStruct, ["u_real"], ones(Int, 1), zeros(1)) == 0
+
+    @test fmiExitInitializationMode(fmuStruct) == 0
+    @test fmiDoStep(fmuStruct, 0.1) == 0.1
+
+    dirs = fmiGetRealOutputDerivatives(fmuStruct, ["y_real"], ones(Int, 1))
+    @test dirs == 0.0
+else 
+    @test fmiExitInitializationMode(fmuStruct) == 0
+    @test fmiDoStep(fmuStruct, 0.1) == 0.1
+end
 
 ############
 # Clean up #
 ############
-
-@test fmiExitInitializationMode(fmuStruct) == 0
 
 fmiUnload(myFMU)
