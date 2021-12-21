@@ -294,7 +294,7 @@ Returns the instance of the FMU struct.
 
 Via optional argument ```unpackPath```, a path to unpack the FMU can be specified (default: system temporary directory).
 """
-function fmi2Load(pathToFMU::String; unpackPath=nothing)
+function fmi2Load(pathToFMU::String; unpackPath=nothing, type=nothing)
     # Create uninitialized FMU
     fmu = FMU2()
     fmu.components = []
@@ -312,7 +312,20 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
     fmu.modelDescription = fmi2ReadModelDescription(pathToModelDescription)
     fmu.modelName = fmu.modelDescription.modelName
     fmu.instanceName = fmu.modelDescription.modelName
-    fmuName = fmi2GetModelIdentifier(fmu.modelDescription) # tmpName[length(tmpName)]
+
+    if (fmi2IsCoSimulation(fmu) && fmi2IsModelExchange(fmu) && type==:CS) 
+        fmu.type = fmi2CoSimulation::fmi2Type
+    elseif (fmi2IsCoSimulation(fmu) && fmi2IsModelExchange(fmu) && type==:ME)
+        fmu.type = fmi2ModelExchange::fmi2Type
+    elseif fmi2IsCoSimulation(fmu) && (type===nothing || type==:CS)
+        fmu.type = fmi2CoSimulation::fmi2Type
+    elseif fmi2IsModelExchange(fmu) && (type===nothing || type==:ME)
+        fmu.type = fmi2ModelExchange::fmi2Type
+    else
+        error(unknownFMUType)
+    end
+
+    fmuName = fmi2GetModelIdentifier(fmu.modelDescription; type=fmu.type) # tmpName[length(tmpName)]
 
     directoryBinary = ""
     pathToBinary = ""
@@ -358,14 +371,6 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
     fmu.libHandle = dlopen(pathToBinary)
 
     cd(lastDirectory)
-
-    if fmi2IsCoSimulation(fmu)
-        fmu.type = fmi2CoSimulation::fmi2Type
-    elseif fmi2IsModelExchange(fmu)
-        fmu.type = fmi2ModelExchange::fmi2Type
-    else
-        error(unknownFMUType)
-    end
 
     if fmi2IsCoSimulation(fmu) && fmi2IsModelExchange(fmu)
         @info "fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified."

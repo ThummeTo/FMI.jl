@@ -368,9 +368,9 @@ ToDo: Improove Documentation.
 """
 function fmi2Simulate(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.0; kwargs...)
 
-    if fmi2IsCoSimulation(c.fmu)
+    if c.fmu.type == fmi2CoSimulation
         return fmi2SimulateCS(c, t_start, t_stop; kwargs...)
-    elseif fmi2IsModelExchange(c.fmu)
+    elseif c.fmu.type == fmi2ModelExchange
         return fmi2SimulateME(c, t_start, t_stop; kwargs...)
     else
         error(unknownFMUType)
