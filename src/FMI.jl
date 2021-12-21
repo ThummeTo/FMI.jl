@@ -29,6 +29,7 @@ export fmiLoad, fmiSimulate, fmiSimulateCS, fmiSimulateME, fmiUnload
 export fmiGetNumberOfStates, fmiGetTypesPlatform, fmiGetVersion, fmiInstantiate!, fmiFreeInstance!
 export fmiSetDebugLogging, fmiSetupExperiment, fmiEnterInitializationMode, fmiExitInitializationMode, fmiTerminate , fmiReset
 export fmiGetReal, fmiSetReal, fmiGetInteger, fmiSetInteger, fmiGetBoolean, fmiSetBoolean, fmiGetString, fmiSetString, fmiGetReal!, fmiGetInteger!, fmiGetBoolean!, fmiGetString!
+export fmiSetRealInputDerivatives, fmiGetRealOutputDerivatives
 export fmiGetFMUstate, fmiSetFMUstate, fmiFreeFMUstate, fmiSerializedFMUstateSize, fmiSerializeFMUstate, fmiDeSerializeFMUstate
 export fmiGetDirectionalDerivative, fmiSampleDirectionalDerivative, fmiGetDirectionalDerivative!, fmiSampleDirectionalDerivative! 
 export fmiDoStep, fmiSetTime, fmiSetContinuousStates, fmi2EnterEventMode, fmiNewDiscreteStates
@@ -372,6 +373,10 @@ function fmiGetReal(fmu::fmi2Struct, vr::fmi2ValueReferenceFormat)
     fmi2GetReal(fmu, vr)
 end
 
+function fmiGetRealOutputDerivatives(str::fmi2Struct, vr::fmi2ValueReferenceFormat, order::Union{Array{<:Integer}, <:Integer})
+    fmi2GetRealOutputDerivatives(str, vr, order)
+end
+
 """
 Writes the real values of an array of variables in the given field
 """
@@ -384,6 +389,13 @@ Set the values of an array of real variables
 """
 function fmiSetReal(fmu::fmi2Struct, vr::fmi2ValueReferenceFormat, values::Union{Array{<:Real}, <:Real})
     fmi2SetReal(fmu, vr, values)
+end
+
+"""
+ToDo
+"""
+function fmiSetRealInputDerivatives(str::fmi2Struct, vr::fmi2ValueReferenceFormat, order, values)
+    fmi2SetRealInputDerivatives(str, vr, order, values)
 end
 
 """
