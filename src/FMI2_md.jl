@@ -54,23 +54,25 @@ function fmi2ReadModelDescription(pathToModellDescription::String)
 
     for node in eachelement(root)
 
-        if node.name == "CoSimulation"
-            md.isCoSimulation = true
-            md.CSmodelIdentifier                        = node["modelIdentifier"]
-            md.CScanHandleVariableCommunicationStepSize = parseNodeBoolean(node, "canHandleVariableCommunicationStepSize"   ; onfail=false)
-            md.CScanInterpolateInputs                   = parseNodeBoolean(node, "canInterpolateInputs"                     ; onfail=false)
-            md.CSmaxOutputDerivativeOrder               = parseNodeInteger(node, "maxOutputDerivativeOrder"                 ; onfail=-1)
-            md.CScanGetAndSetFMUstate                   = parseNodeBoolean(node, "canGetAndSetFMUstate"                     ; onfail=false)
-            md.CScanSerializeFMUstate                   = parseNodeBoolean(node, "canSerializeFMUstate"                     ; onfail=false)
-            md.CSprovidesDirectionalDerivative          = parseNodeBoolean(node, "providesDirectionalDerivative"            ; onfail=false)
+        if node.name == "CoSimulation" || node.name == "ModelExchange"
+            if node.name == "CoSimulation"
+                md.isCoSimulation = true
+                md.CSmodelIdentifier                        = node["modelIdentifier"]
+                md.CScanHandleVariableCommunicationStepSize = parseNodeBoolean(node, "canHandleVariableCommunicationStepSize"   ; onfail=false)
+                md.CScanInterpolateInputs                   = parseNodeBoolean(node, "canInterpolateInputs"                     ; onfail=false)
+                md.CSmaxOutputDerivativeOrder               = parseNodeInteger(node, "maxOutputDerivativeOrder"                 ; onfail=-1)
+                md.CScanGetAndSetFMUstate                   = parseNodeBoolean(node, "canGetAndSetFMUstate"                     ; onfail=false)
+                md.CScanSerializeFMUstate                   = parseNodeBoolean(node, "canSerializeFMUstate"                     ; onfail=false)
+                md.CSprovidesDirectionalDerivative          = parseNodeBoolean(node, "providesDirectionalDerivative"            ; onfail=false)
+            end
 
-        elseif node.name == "ModelExchange"
-            md.isModelExchange = true
-            md.MEmodelIdentifier                        = node["modelIdentifier"]
-            md.MEcanGetAndSetFMUstate                   = parseNodeBoolean(node, "canGetAndSetFMUstate"                     ; onfail=false)
-            md.MEcanSerializeFMUstate                   = parseNodeBoolean(node, "canSerializeFMUstate"                     ; onfail=false)
-            md.MEprovidesDirectionalDerivative          = parseNodeBoolean(node, "providesDirectionalDerivative"            ; onfail=false)
-
+            if node.name == "ModelExchange"
+                md.isModelExchange = true
+                md.MEmodelIdentifier                        = node["modelIdentifier"]
+                md.MEcanGetAndSetFMUstate                   = parseNodeBoolean(node, "canGetAndSetFMUstate"                     ; onfail=false)
+                md.MEcanSerializeFMUstate                   = parseNodeBoolean(node, "canSerializeFMUstate"                     ; onfail=false)
+                md.MEprovidesDirectionalDerivative          = parseNodeBoolean(node, "providesDirectionalDerivative"            ; onfail=false)
+            end
         elseif node.name == "TypeDefinitions"
             typedefinitions = node
 
@@ -171,13 +173,20 @@ end
 """
 Returns the tag 'modelIdentifier' from CS or ME section.
 """
-function fmi2GetModelIdentifier(md::fmi2ModelDescription)
-    if fmi2IsCoSimulation(md)
+function fmi2GetModelIdentifier(md::fmi2ModelDescription; type=nothing)
+    
+    if type === nothing
+        if fmi2IsCoSimulation(md)
+            return md.CSmodelIdentifier
+        elseif fmi2IsModelExchange(md)
+            return md.MEmodelIdentifier
+        else
+            @assert false "fmi2GetModelName(...): FMU does not support ME or CS!"
+        end
+    elseif type == fmi2CoSimulation
         return md.CSmodelIdentifier
-    elseif fmi2IsModelExchange(md)
+    elseif type == fmi2ModelExchange
         return md.MEmodelIdentifier
-    else
-        @assert false "fmi2GetModelName(...): FMU does not support ME or CS!"
     end
 end
 
