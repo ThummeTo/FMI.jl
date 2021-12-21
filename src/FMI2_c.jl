@@ -812,7 +812,6 @@ vr defines the value references of the variables
 the array order specifies the corresponding order of derivation of the variables
 """
 function fmi2GetRealOutputDerivatives(c::fmi2Component,  vr::Array{fmi2ValueReference}, nvr::Csize_t, order::Array{fmi2Integer}, value::Array{fmi2Real})
-    c.fmu.cGetRealOutputDerivatives     = dlsym(c.fmu.libHandle, :fmi2GetRealOutputDerivatives)
     ccall(c.fmu.cGetRealOutputDerivatives,
                 Cuint,
                 (Ptr{Nothing}, Ptr{Cint}, Csize_t, Ptr{Cint}, Ptr{Cdouble}),
