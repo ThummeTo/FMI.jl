@@ -801,7 +801,7 @@ function fmi2SetRealInputDerivatives(c::fmi2Component, vr::Array{fmi2ValueRefere
     status = ccall(c.fmu.cSetRealInputDerivatives,
                 Cuint,
                 (Ptr{Nothing}, Ptr{Cint}, Csize_t, Ptr{Cint}, Ptr{Cdouble}),
-                c.compAddr, Ref(vr), nvr, Ref(order), Ref(value))
+                c.compAddr, vr, nvr, order, value)
 end
 
 """

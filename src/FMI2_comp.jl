@@ -458,10 +458,28 @@ function fmi2GetDirectionalDerivative(c::fmi2Component,
 end
 
 # CoSimulation specific functions
+"""
+TODO: FMI specification reference.
+
+Sets the n-th time derivative of real input variables.
+vr defines the value references of the variables
+the array order specifies the corresponding order of derivation of the variables
+"""
+function fmi2SetRealInputDerivatives(c::fmi2Component, vr::fmi2ValueReferenceFormat, order, values)
+    vr = prepareValueReference(c, vr)
+    order = prepareValue(order)
+    values = prepareValue(values)
+    nvr = Csize_t(length(vr))
+    fmi2SetRealInputDerivatives(c, vr, nvr, Array{fmi2Integer}(order), Array{fmi2Real}(values))
+end
 
 """
 TODO: FMI specification reference.
 
+vr defines the value references of the variables
+the array order specifies the corresponding order of derivation of the variables
+
+For more information call ?fmi2GetRealOutputDerivatives
 """
 function fmi2GetRealOutputDerivatives(c::fmi2Component, vr::fmi2ValueReferenceFormat, order)
     vr = prepareValueReference(c, vr)
