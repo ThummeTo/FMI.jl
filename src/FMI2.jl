@@ -313,9 +313,13 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing, type=nothing)
     fmu.modelName = fmu.modelDescription.modelName
     fmu.instanceName = fmu.modelDescription.modelName
 
-    if (fmi2IsCoSimulation(fmu) && fmi2IsModelExchange(fmu) && (type===nothing || type==:CS)) || fmi2IsCoSimulation(fmu)
+    if (fmi2IsCoSimulation(fmu) && fmi2IsModelExchange(fmu) && type==:CS) 
         fmu.type = fmi2CoSimulation::fmi2Type
-    elseif (fmi2IsCoSimulation(fmu) && fmi2IsModelExchange(fmu) && type==:ME) || fmi2IsModelExchange(fmu)
+    elseif (fmi2IsCoSimulation(fmu) && fmi2IsModelExchange(fmu) && type==:ME)
+        fmu.type = fmi2ModelExchange::fmi2Type
+    elseif fmi2IsCoSimulation(fmu) && (type===nothing || type==:CS)
+        fmu.type = fmi2CoSimulation::fmi2Type
+    elseif fmi2IsModelExchange(fmu) && (type===nothing || type==:ME)
         fmu.type = fmi2ModelExchange::fmi2Type
     else
         error(unknownFMUType)
