@@ -797,11 +797,11 @@ Sets the n-th time derivative of real input variables.
 vr defines the value references of the variables
 the array order specifies the corresponding order of derivation of the variables
 """
-function fmi2SetRealInputDerivatives(c::fmi2Component, vr::fmi2ValueReference, nvr::Unsigned, order::fmi2Integer, value::fmi2Real)
+function fmi2SetRealInputDerivatives(c::fmi2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, order::Array{fmi2Integer}, value::Array{fmi2Real})
     status = ccall(c.fmu.cSetRealInputDerivatives,
                 Cuint,
                 (Ptr{Nothing}, Ptr{Cint}, Csize_t, Ptr{Cint}, Ptr{Cdouble}),
-                c.compAddr, Ref(vr), nvr, Ref(order), Ref(value))
+                c.compAddr, vr, nvr, order, value)
 end
 
 """
@@ -811,11 +811,11 @@ Retrieves the n-th derivative of output values.
 vr defines the value references of the variables
 the array order specifies the corresponding order of derivation of the variables
 """
-function fmi2GetRealOutputDerivatives(c::fmi2Component,  vr::fmi2ValueReference, nvr::Unsigned, order::fmi2Integer, value::fmi2Real)
-    status = ccall(c.fmu.cGetRealOutputDerivatives,
+function fmi2GetRealOutputDerivatives(c::fmi2Component,  vr::Array{fmi2ValueReference}, nvr::Csize_t, order::Array{fmi2Integer}, value::Array{fmi2Real})
+    ccall(c.fmu.cGetRealOutputDerivatives,
                 Cuint,
                 (Ptr{Nothing}, Ptr{Cint}, Csize_t, Ptr{Cint}, Ptr{Cdouble}),
-                c.compAddr, Ref(vr), nvr, Ref(order), Ref(value))
+                c.compAddr, vr, nvr, order, value)
 end
 
 """

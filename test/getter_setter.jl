@@ -119,6 +119,14 @@ fmiGetBoolean!(fmuStruct, booleanValueReferences, cacheBoolean)
 fmiGetString!(fmuStruct, stringValueReferences, cacheString)
 @test cacheString == rndString
 
+if envFMUSTRUCT == "FMUCOMPONENT"
+    dirs = fmi2GetRealOutputDerivatives(fmuStruct, realValueReferences, ones(2))
+    @test dirs isa AbstractArray{<:Real}
+    @test dirs |> length == 2
+
+    st = fmi2SetRealInputDerivatives(fmuStruct, realValueReferences, ones(2), zeros(2))
+    @test_broken st == FMI.fmi2OK
+end
 # this is not suppoerted by OMEdit-FMUs in the repository
 if ENV["EXPORTINGTOOL"] != "OpenModelica/v1.17.0"
     @test fmiGetStartValue(fmuStruct, ["p_enumeration", "p_string", "p_real"]) == ["myEnumeration1", "Hello World!", 0.0]
