@@ -71,7 +71,7 @@ function fmi3ReadModelDescription(pathToModellDescription::String)
             md.CSneedsExecutionTool                     = parseNodeBoolean(node, "needsExecutionTool"                       ; onfail=false)
             md.CScanBeInstantiatedOnlyOncePerProcess    = parseNodeBoolean(node, "canBeInstantiatedOnlyOncePerProcess"      ; onfail=false)
             md.CScanGetAndSetFMUstate                   = parseNodeBoolean(node, "canGetAndSetFMUState"                     ; onfail=false)
-            md.CScanSerializeFMUstate                   = parseNodeBoolean(node, "canSerializeFMUstate"                     ; onfail=false)
+            md.CScanSerializeFMUstate                   = parseNodeBoolean(node, "canSerializeFMUState"                     ; onfail=false)
             md.CSprovidesDirectionalDerivatives         = parseNodeBoolean(node, "providesDirectionalDerivatives"           ; onfail=false)
             md.CSproivdesAdjointDerivatives             = parseNodeBoolean(node, "providesAdjointDerivatives"               ; onfail=false)
             md.CSprovidesPerElementDependencies         = parseNodeBoolean(node, "providesPerElementDependencies"           ; onfail=false)
@@ -545,9 +545,9 @@ function fmi3setDatatypeVariables(node::EzXML.Node, md::fmi3ModelDescription)
     end
 
     if haskey(node, "initial")
-        for i in fmi3initial
-            if node["initial"] == string(i)
-                type.initial = i
+        for i in 0:(length(instances(fmi3initial))-1)
+            if "fmi3" * node["initial"] == string(fmi3initial(i))
+                type.initial = fmi3initial(i)
             end
         end
     end

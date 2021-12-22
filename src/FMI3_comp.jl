@@ -917,7 +917,7 @@ Serialize the data in the FMU state pointer.
 
 For more information call ?fmi2SerzializeFMUstate
 """
-function fmi3SerializeFMUstate(c::fmi3Component, state::fmi3FMUState)
+function fmi3SerializeFMUState(c::fmi3Component, state::fmi3FMUState)
     size = fmi3SerializedFMUStateSize(c, state)
     serializedState = Array{fmi3Byte}(undef, size)
     fmi3SerializeFMUState(c, state, serializedState, size)
@@ -952,7 +952,7 @@ function fmi3GetDirectionalDerivative(c::fmi3Component,
                                       seed::Array{fmi3Float64} = Array{fmi3Float64}([]))
     sensitivity = zeros(fmi3Float64, length(unknowns))
 
-    fmi3GetDirectionalDerivative!(c, unknowns, knowns, seed, sensitivity)
+    fmi3GetDirectionalDerivative!(c, unknowns, knowns, sensitivity, seed)
 
     sensitivity
 end
@@ -967,8 +967,8 @@ For more information call ?fmi2GetDirectionalDerivatives
 function fmi3GetDirectionalDerivative!(c::fmi3Component,
                                       unknowns::Array{fmi3ValueReference},
                                       knowns::Array{fmi3ValueReference},
-                                      seed::Array{fmi3Float64}, 
-                                      sensitivity::Array{fmi3Float64} = Array{fmi3Float64}([]))
+                                      sensitivity::AbstractArray,
+                                      seed::Array{fmi3Float64}= Array{fmi3Float64}([]))
 
     nKnowns = Csize_t(length(knowns))
     nUnknowns = Csize_t(length(unknowns))

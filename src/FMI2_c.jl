@@ -195,14 +195,15 @@ Enumeration that defines the causality of the variable. Allowed values of this e
 "independent": The independent variable (usually “time”). All variables are a function of this independent variable. variability must be "continuous". At most one ScalarVariable of an FMU can be defined as "independent". If no variable is defined as "independent", it is implicitly present with name = "time" and unit = "s". If one variable is defined as "independent", it must be defined as "Real" without a "start" attribute. It is not allowed to call function fmi2SetReal on an "independent" variable. Instead, its value is initialized with fmi2SetupExperiment and after initialization set by fmi2SetTime for ModelExchange and by arguments currentCommunicationPoint and communicationStepSize of fmi2DoStep for CoSimulation. [The actual value can be inquired with fmi2GetReal.]
 The default of causality is “local”. A continuous-time state must have causality = "local" or "output", see also section 2.2.8.
 [causality = "calculatedParameter" and causality = "local" with variability = "fixed" or "tunable" are similar. The difference is that a calculatedParameter can be used in another model or slave, whereas a local variable cannot. For example, when importing an FMU in a Modelica environment, a "calculatedParameter" should be imported in a public section as final parameter, whereas a "local" variable should be imported in a protected section of the model.]
+Added prefix "fmi2" to help with redefinition of constans in enums.
 """
 @enum fmi2causality begin
-    parameter
-    calculatedParameter
-    input
-    output
-    _local
-    independent
+    fmi2parameter
+    fmi2calculatedParameter
+    fmi2input
+    fmi2output
+    fmi2local
+    fmi2independent
 end
 
 """
@@ -216,13 +217,14 @@ Enumeration that defines the time dependency of the variable, in other words, it
 "discrete": ModelExchange: The value of the variable is constant between external and internal events (= time, state, step events defined implicitly in the FMU). Co-Simulation: By convention, the variable is from a “real” sampled data system and its value is only changed at Communication Points (also inside the slave).
 "continuous": Only a variable of type = “Real” can be “continuous”. ModelExchange: No restrictions on value changes. Co-Simulation: By convention, the variable is from a differential
 The default is “continuous”.
+Added prefix "fmi2" to help with redefinition of constans in enums.
 """
 @enum fmi2variability begin
-    constant
-    fixed
-    tunable
-    discrete
-    continuous
+    fmi2constant
+    fmi2fixed
+    fmi2tunable
+    fmi2discrete
+    fmi2continuous
 end
 
 """
@@ -235,11 +237,12 @@ Enumeration that defines how the variable is initialized. It is not allowed to p
 "calculated": The variable is calculated from other variables during initialization. It is not allowed to provide a “start” value.
 If initial is not present, it is defined by the table below based on causality and variability. If initial = exact or approx, or causality = ″input″, a start value must be provided. If initial = calculated, or causality = ″independent″, it is not allowed to provide a start value.
 If fmiSetXXX is not called on a variable with causality = ″input″, then the FMU must use the start value as value of this input.
+Added prefix "fmi2" to help with redefinition of constans in enums.
 """
 @enum fmi2initial begin
-    exact
-    approx
-    calculated
+    fmi2exact
+    fmi2approx
+    fmi2calculated
 end
 
 """
@@ -355,7 +358,7 @@ mutable struct fmi2ScalarVariable
             display("Error: variability not known")
         else
             for i in 0:(length(instances(fmi2variability))-1)
-                if variabilityString == string(fmi2variability(i))
+                if "fmi2" * variabilityString == string(fmi2variability(i))
                     var = fmi2variability(i)
                 end
             end
@@ -365,7 +368,7 @@ mutable struct fmi2ScalarVariable
             display("Error: causality not known")
         else
             for i in 0:(length(instances(fmi2causality))-1)
-                if causalityString == string(fmi2causality(i))
+                if "fmi2" * causalityString == string(fmi2causality(i))
                     cau = fmi2causality(i)
                 end
             end
@@ -375,7 +378,7 @@ mutable struct fmi2ScalarVariable
             display("Error: initial not known")
         else
             for i in 0:(length(instances(fmi2initial))-1)
-                if initialString == string(fmi2initial(i))
+                if "fmi2" * initialString == string(fmi2initial(i))
                     init = fmi2initial(i)
                 end
             end

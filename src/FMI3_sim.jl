@@ -80,15 +80,14 @@ function handleEvents(c::fmi3Component, enterEventMode::Bool, exitInContinuousMo
 end
 
 # Returns the event indicators for an FMU.
-function condition(c::fmi3Component, out, x, t, integrator, setTime, inputFunction, inputValues::Array{fmi3ValueReference}) # Event when event_f(u,t) == 0
+function condition(c::fmi3Component, out, x, t, integrator, inputFunction, inputValues::Array{fmi3ValueReference}) # Event when event_f(u,t) == 0
 
     if inputFunction !== nothing
         fmi3SetFloat64(c, inputValues, inputFunction(integrator.t))
     end
 
-    if setTime
-        fmi3SetTime(c, t)
-    end
+
+    fmi3SetTime(c, t)
     fmi3SetContinuousStates(c, x)
     indicators = fmi3GetEventIndicators(c)
 
@@ -118,22 +117,20 @@ end
 # Does one step in the simulation.
 function stepCompleted(c::fmi3Component, x, t, integrator, inputFunction, inputValues::Array{fmi3ValueReference})
 
-     (status, enterEventMode, terminateSimulation) = fmi3CompletedIntegratorStep(c, fmi3True)
-     if enterEventMode == fmi3True
+    (status, enterEventMode, terminateSimulation) = fmi3CompletedIntegratorStep(c, fmi3True)
+    if enterEventMode == fmi3True
         affect!(c, integrator, 0, inputFunction, inputValues)
     else
         if inputFunction !== nothing
             fmi3SetFloat64(c, inputValues, inputFunction(integrator.t))
         end
-     end
+    end
 
 end
 
 # Returns the state derivatives of the FMU.
-function fx(c::fmi3Component, x, p, t, setTime)
-    if setTime
-        fmi3SetTime(c, t) 
-    end
+function fx(c::fmi3Component, x, p, t)
+    fmi3SetTime(c, t) 
     fmi3SetContinuousStates(c, x)
     dx = fmi3GetContinuousStateDerivatives(c)
 end
@@ -158,7 +155,7 @@ function fmi3SimulateME(c::fmi3Component, t_start::Real = 0.0, t_stop::Real = 1.
     recordValues::fmi3ValueReferenceFormat = nothing,
     saveat = [],
     setup = true,
-    reset = true,
+    reset = nothing, # nothing = auto
     inputValues::fmi3ValueReferenceFormat = nothing,
     inputFunction = nothing,
     kwargs...)
@@ -177,6 +174,7 @@ function fmi3SimulateME(c::fmi3Component, t_start::Real = 0.0, t_stop::Real = 1.
 
 
     savingValues = (length(recordValues) > 0)
+    hasInputs = (length(inputValues) > 0)
 
     if savingValues
         savedValues = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...})
@@ -190,6 +188,13 @@ function fmi3SimulateME(c::fmi3Component, t_start::Real = 0.0, t_stop::Real = 1.
     if solver === nothing
         solver = Tsit5()
     end
+
+    # auto correct reset if only setup is given
+    if reset === nothing 
+        reset = setup
+    end
+    @assert !(setup==false && reset==true) "fmi3SimulateME(...): keyword argument `setup=false`, but `reset=true`. This may cause a FMU crash."
+
 
     if reset
         fmi3Reset(c)
@@ -206,13 +211,11 @@ function fmi3SimulateME(c::fmi3Component, t_start::Real = 0.0, t_stop::Real = 1.
     if eventHandling
         println("test EventHandling")
         fmi3UpdateDiscreteStates(c, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
-        fmi3EnterContinuousTimeMode(c)
-
         timeEventHandling = (nextEventTimeDefined == fmi3True)
     end
     
     if customFx === nothing
-        customFx = (x, p, t) -> fx(c, x, p, t, timeEventHandling)
+        customFx = (x, p, t) -> fx(c, x, p, t)
     end
 
     # First evaluation of the FMU
@@ -228,19 +231,24 @@ function fmi3SimulateME(c::fmi3Component, t_start::Real = 0.0, t_stop::Real = 1.
     x0 = fmi3GetContinuousStates(c)
     x0_nom = fmi3GetNominalsOfContinuousStates(c)
 
+    fmi3EnterContinuousTimeMode(c)
+
     p = []
     problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
     
     # callback functions
 
-    stepCb = FunctionCallingCallback((x, t, integrator) -> stepCompleted(c, x, t, integrator, inputFunction, inputValues);
-                                         func_everystep = true,
-                                         func_start = true)
-    push!(callbacks, stepCb)
+    # use step callback always if we have inputs or need evenet handling
+    if hasInputs || eventHandling
+        stepCb = FunctionCallingCallback((x, t, integrator) -> stepCompleted(c, x, t, integrator, inputFunction, inputValues);
+                                            func_everystep = true,
+                                            func_start = true)
+        push!(callbacks, stepCb)
+    end
 
     if eventHandling
 
-        eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator, timeEventHandling, inputFunction, inputValues),
+        eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator, inputFunction, inputValues),
                                            (integrator, idx) -> affectFMU!(c, integrator, idx, inputFunction, inputValues),
                                            Int64(c.fmu.modelDescription.numberOfEventIndicators);
                                            rootfind = DiffEqBase.RightRootFind,
@@ -276,8 +284,8 @@ ToDo: Improove Documentation.
 function fmi3SimulateCS(c::fmi3Component, t_start::Real, t_stop::Real;
                         recordValues::fmi3ValueReferenceFormat = nothing,
                         saveat = [],
-                        setup = true,
-                        reset = true,
+                        setup::Bool = true,
+                        reset = nothing,
                         inputValues::fmi3ValueReferenceFormat = nothing,
                         inputFunction = nothing)
 
@@ -300,6 +308,13 @@ function fmi3SimulateCS(c::fmi3Component, t_start::Real, t_stop::Real;
             dt = saveat[2] - saveat[1]
         end
     end
+
+    # auto correct reset if only setup is given
+    if reset === nothing 
+        reset = setup
+    end
+    @assert !(setup==false && reset==true) "fmi3SimulateME(...): keyword argument `setup=false`, but `reset=true`. This may cause a FMU crash."
+
 
     if reset
         fmi3Reset(c)
@@ -348,7 +363,7 @@ function fmi3SimulateCS(c::fmi3Component, t_start::Real, t_stop::Real;
                 @warn "Event handling"
             end
             if terminateSimulation == fmi3True
-                @warn "terminate Simulation"
+                @error "fmi3DoStep returned error!"
             end
             if earlyReturn == fmi3True
                 @warn "early Return"
@@ -383,7 +398,7 @@ function fmi3SimulateCS(c::fmi3Component, t_start::Real, t_stop::Real;
                 @warn "Event handling"
             end
             if terminateSimulation == fmi3True
-                @warn "terminate Simulation"
+                @error "fmi3DoStep returned error!"
             end
             if earlyReturn == fmi3True
                 @warn "early Return"
@@ -407,15 +422,12 @@ Returns:
     
 ToDo: Improove Documentation.
 """
-function fmi3Simulate(c::fmi3Component, t_start::Real = 0.0, t_stop::Real = 1.0;
-                      recordValues::fmi3ValueReferenceFormat = nothing,
-                      saveat = [],
-                      setup = true)
+function fmi3Simulate(c::fmi3Component, t_start::Real = 0.0, t_stop::Real = 1.0;kwargs...)
 
     if fmi3IsCoSimulation(c.fmu)
-        return fmi3SimulateCS(c, t_start, t_stop; recordValues=recordValues, saveat=saveat, setup=setup)
+        return fmi3SimulateCS(c, t_start, t_stop; kwargs...)
     elseif fmi3IsModelExchange(c.fmu)
-        return fmi3SimulateME(c, t_start, t_stop; recordValues=recordValues, saveat=saveat, setup=setup)
+        return fmi3SimulateME(c, t_start, t_stop; kwargs...)
     else
         error(unknownFMUType)
     end

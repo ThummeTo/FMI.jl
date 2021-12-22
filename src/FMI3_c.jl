@@ -3,58 +3,58 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-macro scopedenum(T, syms...)
-    counter = 0 
-    function key_value(x)
-        if hasproperty(x, :args)
-            k = x.args[1]
-            v = x.args[2]
-        else
-            k = x
-            v = counter
-            counter += 1
-        end
-        return k,v
-    end
+# macro scopedenum(T, syms...)
+#     counter = 0 
+#     function key_value(x)
+#         if hasproperty(x, :args)
+#             k = x.args[1]
+#             v = x.args[2]
+#         else
+#             k = x
+#             v = counter
+#             counter += 1
+#         end
+#         return k,v
+#     end
 
-    if length(syms) == 1 && syms[1] isa Expr && syms[1].head === :block
-        syms = syms[1].args
-    end
+#     if length(syms) == 1 && syms[1] isa Expr && syms[1].head === :block
+#         syms = syms[1].args
+#     end
 
-    syms = Tuple(x for x in syms if ~(x isa LineNumberNode))
-    _syms = [key_value(x) for x in syms if ~(x isa LineNumberNode)]
+#     syms = Tuple(x for x in syms if ~(x isa LineNumberNode))
+#     _syms = [key_value(x) for x in syms if ~(x isa LineNumberNode)]
 
-    blk = esc(:(
-        module $(Symbol("$(T)Module"))
-            using JSON3
-            export $T
-            struct $T
-                value::Int64
-            end
-            const NAME2VALUE = $(Dict(String(x[1])=>Int64(x[2]) for x in _syms))
-            $T(str::String) = $T(NAME2VALUE[str])
-            const VALUE2NAME = $(Dict(Int64(x[2])=>String(x[1]) for x in _syms))
-            Base.string(e::$T) = VALUE2NAME[e.value]
-            Base.getproperty(::Type{$T}, sym::Symbol) = haskey(NAME2VALUE, String(sym)) ? $T(String(sym)) : getfield($T, sym)
-            Base.show(io::IO, e::$T) = print(io, string($T, ".", string(e), " = ", e.value))
-            Base.propertynames(::Type{$T}) = $([x[1] for x in _syms])
-            JSON3.StructType(::Type{$T}) = JSON3.StructTypes.StringType()
+#     blk = esc(:(
+#         module $(Symbol("$(T)Module"))
+#             using JSON3
+#             export $T
+#             struct $T
+#                 value::Int64
+#             end
+#             const NAME2VALUE = $(Dict(String(x[1])=>Int64(x[2]) for x in _syms))
+#             $T(str::String) = $T(NAME2VALUE[str])
+#             const VALUE2NAME = $(Dict(Int64(x[2])=>String(x[1]) for x in _syms))
+#             Base.string(e::$T) = VALUE2NAME[e.value]
+#             Base.getproperty(::Type{$T}, sym::Symbol) = haskey(NAME2VALUE, String(sym)) ? $T(String(sym)) : getfield($T, sym)
+#             Base.show(io::IO, e::$T) = print(io, string($T, ".", string(e), " = ", e.value))
+#             Base.propertynames(::Type{$T}) = $([x[1] for x in _syms])
+#             JSON3.StructType(::Type{$T}) = JSON3.StructTypes.StringType()
 
-            function _itr(res)
-                isnothing(res) && return res
-                value, state = res
-                return ($T(value), state)
-            end
-            Base.iterate(::Type{$T}) = _itr(iterate(keys(VALUE2NAME)))
-            Base.iterate(::Type{$T}, state) = _itr(iterate(keys(VALUE2NAME), state))
-        end
-    ))
-    top = Expr(:toplevel, blk)
-    push!(top.args, :(using .$(Symbol("$(T)Module"))))
-    return top
-end
+#             function _itr(res)
+#                 isnothing(res) && return res
+#                 value, state = res
+#                 return ($T(value), state)
+#             end
+#             Base.iterate(::Type{$T}) = _itr(iterate(keys(VALUE2NAME)))
+#             Base.iterate(::Type{$T}, state) = _itr(iterate(keys(VALUE2NAME), state))
+#         end
+#     ))
+#     top = Expr(:toplevel, blk)
+#     push!(top.args, :(using .$(Symbol("$(T)Module"))))
+#     return top
+# end
 """
-Source: FMISpec3.0, Version D5ef1c1:2.2.2. Platform Dependent Definitions
+Source: FMISpec3.0-dev, Version D5ef1c1:2.2.2. Platform Dependent Definitions
 
 To simplify porting, no C types are used in the function interfaces, but the alias types are defined in this section. 
 All definitions in this section are provided in the header file fmi3PlatformTypes.h. It is required to use this definition for all binary FMUs.
@@ -175,16 +175,18 @@ A continuous-time state or an event indicator must have causality = local or out
 [causality = calculatedParameter and causality = local with variability = fixed or tunable are similar. The difference is that a calculatedParameter can be used in another model or FMU, whereas a local variable cannot. For example, when importing an FMU in a Modelica environment, a calculatedParameter should be imported in a public section as final parameter, whereas a local variable should be imported in a protected section of the model.]
 
 The causality of variables of type Clock must be either input or output.
+
+Added prefix "fmi3" to help with redefinition of constans in enums.
 """
 
-@scopedenum fmi3causality begin
-    _parameter
-    calculatedParameter
-    input
-    output
-    _local
-    independent
-    structuralParameter
+@enum fmi3causality begin
+    fmi3parameter
+    fmi3calculatedParameter
+    fmi3input
+    fmi3output
+    fmi3local
+    fmi3independent
+    fmi3structuralParameter
 end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.4.7.4. Variable Attributes
@@ -208,14 +210,16 @@ The default is continuous for variables of type <Float32> and <Float64>, and dis
 For variables of type Clock and clocked variables the variability is always discrete or tunable.
 
 [Note that the information about continuous states is defined with elements <ContinuousStateDerivative> in <ModelStructure>.]
+
+Added prefix "fmi3" to help with redefinition of constans in enums.
 """
 
-@scopedenum fmi3variability begin
-    constant
-    fixed
-    tunable
-    discrete
-    continuous
+@enum fmi3variability begin
+    fmi3constant
+    fmi3fixed
+    fmi3tunable
+    fmi3discrete
+    fmi3continuous
 end
 
 """
@@ -237,12 +241,14 @@ If initial is not present, it is defined by Table 22 based on causality and vari
 [The environment decides when to use the start value of a variable with causality = input. Examples: * Automatic tests of FMUs are performed, and the FMU is tested by providing the start value as constant input. * For a Model Exchange FMU, the FMU might be part of an algebraic loop. If the input variable is iteration variable of this algebraic loop, then initialization starts with its start value.]
 
 If fmi3Set{VariableType} is not called on a variable with causality = input, then the FMU must use the start value as value of this input.
+
+Added prefix "fmi3" to help with redefinition of constans in enums.
 """
 
-@scopedenum fmi3initial begin
-    exact
-    approx
-    calculated
+@enum fmi3initial begin
+    fmi3exact
+    fmi3approx
+    fmi3calculated
 end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.3.1. Super State: FMU State Setable
@@ -258,12 +264,27 @@ Argument fmuType defines the type of the FMU:
     fmi3ScheduledExecution
 end
 
+@enum fmi3IntervalQualifier begin
+    fmi3IntervalNotYetKnown
+    fmi3IntervalUnchanged
+    fmi3IntervalChanged
+end
+
+@enum fmi3DependencyKind begin
+    fmi3Independent
+    fmi3Constant
+    fmi3Fixed
+    fmi3Tunable
+    fmi3Discrete
+    fmi3Dependent
+end
+
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.3.1. Super State: FMU State Setable
 
 Function that is called in the FMU, usually if an fmi3XXX function, does not behave as desired. If “logger” is called with “status = fmi3OK”, then the message is a pure information message. “instanceEnvironment” is the instance name of the model that calls this function. “category” is the category of the message. The meaning of “category” is defined by the modeling environment that generated the FMU. Depending on this modeling environment, none, some or all allowed values of “category” for this FMU are defined in the modelDescription.xml file via element “<fmiModelDescription><LogCategories>”, see section 2.4.5. Only messages are provided by function logger that have a category according to a call to fmi3SetDebugLogging (see below). Argument “message” is provided in the same way and with the same format control as in function “printf” from the C standard library. [Typically, this function prints the message and stores it optionally in a log file.]
 """
-# TODO error in the specification
+# TODO error in the specification??
 function fmi3CallbackLogMessage(instanceEnvironment::Ptr{Cvoid},
             category::Ptr{Cchar},
             status::Cuint,
@@ -379,7 +400,7 @@ mutable struct fmi3ModelVariable
 
     # Constructor for not further specified Model variable
     function fmi3ModelVariable(name, valueReference)
-        new(name, Clonglong(valueReference), fmi3datatypeVariable(), "", _local::fmi3causality, continuous::fmi3variability)
+        new(name, Clonglong(valueReference), fmi3datatypeVariable(), "", fmi3local::fmi3causality, fmi3continuous::fmi3variability)
     end
 
     # Constructor for fully specified ScalarVariable
@@ -392,16 +413,23 @@ mutable struct fmi3ModelVariable
         # end
         cau = fmi3causality._local
         #check if causality and variability are correct
-    
-        for i in fmi3variability
-            if variabilityString == string(i)
-                var = i
+        if !occursin("fmi3" * variabilityString, string(instances(fmi3variability)))
+            display("Error: variability not known")
+        else
+            for i in 0:(length(instances(fmi3variability))-1)
+                if "fmi3" * variabilityString == string(fmi3variability(i))
+                    var = fmi3variability(i)
+                end
             end
         end
 
-        for i in fmi3causality
-            if causalityString == string(i)
-                cau = i
+        if !occursin("fmi3" * causalityString, string(instances(fmi3causality)))
+            display("Error: variability not known")
+        else
+            for i in 0:(length(instances(fmi3causality))-1)
+                if "fmi3" * causalityString == string(fmi3causality(i))
+                    cau = fmi3causality(i)
+                end
             end
         end
 
@@ -642,6 +670,7 @@ function fmi3Reset(c::fmi3Component)
     ccall(c.fmu.cReset, Cuint, (Ptr{Nothing},), c.compAddr)
 end
 
+# TODO test, no variable in FMUs
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
@@ -695,6 +724,7 @@ function fmi3SetFloat64(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Cs
     status
 end
 
+# TODO test, no variable in FMUs
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
@@ -721,6 +751,7 @@ function fmi3SetInt8(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize
     status
 end
 
+# TODO test, no variable in FMUs
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
@@ -746,7 +777,7 @@ function fmi3SetUInt8(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csiz
                 c.compAddr, vr, nvr, value, nvalue)
     status
 end
-
+# TODO test, no variable in FMUs
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
@@ -772,7 +803,7 @@ function fmi3SetInt16(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csiz
                 c.compAddr, vr, nvr, value, nvalue)
     status
 end
-
+# TODO test, no variable in FMUs
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
@@ -823,7 +854,7 @@ function fmi3SetInt32(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csiz
                 c.compAddr, vr, nvr, value, nvalue)
     status
 end
-
+# TODO test, no variable in FMUs
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
@@ -849,7 +880,7 @@ function fmi3SetUInt32(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csi
                 c.compAddr, vr, nvr, value, nvalue)
     status
 end
-
+# TODO test, no variable in FMUs
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
@@ -875,7 +906,7 @@ function fmi3SetInt64(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csiz
                 c.compAddr, vr, nvr, value, nvalue)
     status
 end
-
+# TODO test, no variable in FMUs
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
@@ -901,17 +932,18 @@ function fmi3SetUInt64(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csi
                 c.compAddr, vr, nvr, value, nvalue)
     status
 end
-
+# TODO weird behaviour, spukt oft sehr große Zahlen raus, könnten Speicheradressen sein, Werte oft gleich, variieren aber auch
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
 function fmi3GetBoolean!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Boolean}, nvalue::Csize_t)
-    ccall(c.fmu.cGetBoolean,
+    status = ccall(c.fmu.cGetBoolean,
           Cuint,
           (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Boolean}, Csize_t),
           c.compAddr, vr, nvr, value, nvalue)
+    status
 end
 
 
@@ -954,18 +986,19 @@ function fmi3SetString(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csi
     status
 end
 
-# TODO not working yet
+# TODO not working yet, readOnlyMemoryError()
+# The strings returned by fmi3GetString, as well as the binary values returned by fmi3GetBinary, must be copied by the importer 
+# because the allocated memory for these strings might be deallocated or overwritten by the next call of an FMU function.
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
 function fmi3GetBinary!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Binary}, nvalue::Csize_t)
-    status = ccall(c.fmu.cGetBinary,
+    ccall(c.fmu.cGetBinary,
                 Cuint,
                 (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t,  Ptr{fmi3Binary}, Csize_t),
                 c.compAddr, vr, nvr, value, nvalue)
-    status
 end
 
 """
@@ -980,17 +1013,17 @@ function fmi3SetBinary(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csi
                 c.compAddr, vr, nvr, value, nvalue)
     status
 end
-
+# TODO, Clocks not implemented so far thus not tested
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Functions to get and set values of variables idetified by their valueReference
 """
-function fmi3GetClock!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Clock}, nvalue::Csize_t)
+function fmi3GetClock!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Clock})
     status = ccall(c.fmu.cGetClock,
                 Cuint,
-                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t,  Ptr{fmi3Clock}, Csize_t),
-                c.compAddr, vr, nvr, value, nvalue)
+                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t,  Ptr{fmi3Clock}),
+                c.compAddr, vr, nvr, value)
     status
 end
 
@@ -999,11 +1032,11 @@ Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Value
 
 Functions to get and set values of variables idetified by their valueReference
 """
-function fmi3SetClock(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Clock}, nvalue::Csize_t)
+function fmi3SetClock(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Clock})
     status = ccall(c.fmu.cSetBinary,
                 Cuint,
-                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Clock}, Csize_t),
-                c.compAddr, vr, nvr, value, nvalue)
+                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Clock}),
+                c.compAddr, vr, nvr, value)
     status
 end
 
@@ -1046,7 +1079,6 @@ function fmi3FreeFMUState(c::fmi3Component, FMUstate::Ref{fmi3FMUState})
     status
 end
 
-# TODO keeps crashing Julia
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.4. Getting and Setting the Complete FMU State
 
@@ -1084,7 +1116,80 @@ function fmi3DeSerializeFMUState(c::fmi3Component, serialzedState::Array{fmi3Byt
 end
 
 # TODO Clocks and dependencies functions
+function fmi3SetIntervalDecimal(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, intervals::Array{fmi3Float64})
+    @assert false "Not tested"
+    status = ccall(c.fmu.cSetIntervalDecimal,
+                Cuint,
+                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Float64}),
+                c.compAddr, vr, nvr, intervals)
+end
 
+function fmi3SetIntervalFraction(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, intervalCounters::Array{fmi3UInt64}, resolutions::Array{fmi3UInt64})
+    @assert false "Not tested"
+    status = ccall(c.fmu.cSetIntervalFraction,
+                Cuint,
+                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3UInt64}, Ptr{fmi3UInt64}),
+                c.compAddr, vr, nvr, intervalCounters, resolutions)
+end
+
+function fmi3GetIntervalDecimal(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, intervals::Array{fmi3Float64}, qualifiers::fmi3IntervalQualifier)
+    @assert false "Not tested"
+    status = ccall(c.fmu.cGetIntervalDecimal,
+                Cuint,
+                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Float64}, Ptr{fmi3IntervalQualifier}),
+                c.compAddr, vr, nvr, intervals, qualifiers)
+end
+
+function fmi3GetIntervalFraction(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, intervalCounters::Array{fmi3UInt64}, resolutions::Array{fmi3UInt64}, qualifiers::fmi3IntervalQualifier)
+    @assert false "Not tested"
+    status = ccall(c.fmu.cGetIntervalFraction,
+                Cuint,
+                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3UInt64}, Ptr{fmi3UInt64}, Ptr{fmi3IntervalQualifier}),
+                c.compAddr, vr, nvr, intervalCounters, resolutions, qualifiers)
+end
+
+function fmi3GetShiftDecimal(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, shifts::Array{fmi3Float64})
+    @assert false "Not tested"
+    status = ccall(c.fmu.cGetShiftDecimal,
+                Cuint,
+                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Float64}),
+                c.compAddr, vr, nvr, shifts)
+end
+
+function fmi3GetShiftFraction(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, shiftCounters::Array{fmi3UInt64}, resolutions::Array{fmi3UInt64})
+    @assert false "Not tested"
+    status = ccall(c.fmu.cGetShiftFraction,
+                Cuint,
+                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3UInt64}, Ptr{fmi3UInt64}),
+                c.compAddr, vr, nvr, shiftCounters, resolutions)
+end
+
+function fmi3ActivateModelPartition(c::fmi3Component, vr::fmi3ValueReference, activationTime::Array{fmi3Float64})
+    @assert false "Not tested"
+    status = ccall(c.fmu.cGetShiftFraction,
+                Cuint,
+                (Ptr{Nothing}, fmi3ValueReference, Ptr{fmi3Float64}),
+                c.compAddr, vr, activationTime)
+end
+
+# TODO not tested
+function fmi3GetNumberOfVariableDependencies(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Ref{Csize_t})
+    @assert false "Not tested"
+    status = ccall(c.fmu.cGetNumberOfVariableDependencies,
+                Cuint,
+                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Ptr{Csize_t}),
+                c.compAddr, vr, nvr)
+end
+
+function fmi3GetVariableDependencies(c::fmi3Component, vr::fmi3ValueReference, elementIndiceOfDependents::Array{Csize_t}, independents::Array{fmi3ValueReference},  elementIndiceOfInpendents::Array{Csize_t}, dependencyKind::Array{fmi3DependencyKind}, ndependencies::Csize_t)
+    @assert false "Not tested"
+    status = ccall(c.fmu.cGetVariableDependencies,
+                Cuint,
+                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Ptr{Csize_t}, Ptr{fmi3ValueReference}, Ptr{Csize_t}, Ptr{fmi3DependencyKind}, Csize_t),
+                c.compAddr, vr, elementIndiceOfDependents, independents, elementIndiceOfInpendents, dependencyKind, ndependencies)
+end
+
+# TODO continue from here
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.11. Getting Partial Derivatives
 
@@ -1099,7 +1204,7 @@ function fmi3GetDirectionalDerivative!(c::fmi3Component,
                                        nSeed::Csize_t,
                                        sensitivity::Array{fmi3Float64},
                                        nSensitivity::Csize_t)
-    @assert fmi3ProvidesDirectionalDerivative(c.fmu) ["fmi3GetDirectionalDerivative!(...): This FMU does not support build-in directional derivatives!"]
+    @assert fmi3ProvidesDirectionalDerivatives(c.fmu) ["fmi3GetDirectionalDerivative!(...): This FMU does not support build-in directional derivatives!"]
     ccall(c.fmu.cGetDirectionalDerivative,
           Cuint,
           (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Float64}, Csize_t, Ptr{fmi3Float64}, Csize_t),

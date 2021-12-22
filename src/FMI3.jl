@@ -1212,7 +1212,7 @@ Deserialize the data in the serializedState fmi2Byte field.
 
 For more information call ?fmi2DeSerzializeFMUstate
 """
-function fmi3DeSerializeFMUstate(fmu::FMU3, serializedState::Array{fmi3Byte})
+function fmi3DeSerializeFMUState(fmu::FMU3, serializedState::Array{fmi3Byte})
     size = length(serializedState)
     state = fmi3FMUState()
     stateRef = Ref(state)
@@ -1242,12 +1242,12 @@ Retrieves directional derivatives.
 
 For more information call ?fmi2GetDirectionalDerivatives
 """
-function fmi3GetAdjointDerivative(fmu::FMU3,
+function fmi3GetDirectionalDerivative(fmu::FMU3,
                                       unknowns::Array{fmi3ValueReference},
                                       knowns::Array{fmi3ValueReference},
                                       seed::Array{fmi3Float64} = Array{fmi3Float64}([]))
 
-    fmi3GetAdjointDerivative(fmu.components[end], unknowns, knowns, seed)
+    fmi3GetDirectionalDerivative(fmu.components[end], unknowns, knowns, seed)
 end
 
 """
@@ -1260,10 +1260,10 @@ For more information call ?fmi2GetDirectionalDerivatives
 function fmi3GetDirectionalDerivative!(fmu::FMU3,
     unknowns::Array{fmi3ValueReference},
     knowns::Array{fmi3ValueReference},
-    seed::Array{fmi3Float64},
-    sensitivity::Array{fmi3Float64} = Array{fmi3Float64}([])) 
+    sensitivity::Array{fmi3Float64},
+    seed::Array{fmi3Float64} = Array{fmi3Float64}([])) 
 
-    fmi3GetDirectionalDerivative!(fmu.components[end], unknowns, knowns, seed, sensitivity)
+    fmi3GetDirectionalDerivative!(fmu.components[end], unknowns, knowns, sensitivity, seed)
 end
 
 """
