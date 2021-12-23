@@ -20,6 +20,11 @@ This section is intended to familiarise users with the documentation environment
 ### 5. Related Publications
 
 
+## Documentation Overview
+
+Die ***Introduction*** soll einen ersten Überblick über die Strukur der Documentation bringen. Wobei zusätzlich zum besseren verständis der Funktionalitäten der Bibliothek , eine kurze erklärung der wichtigsten Begrifflichkeiten 
+
+
 ## Prior knowledge(@id Prior knowledge)
 
 
