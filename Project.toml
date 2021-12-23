@@ -1,7 +1,7 @@
 name = "FMI"
 uuid = "14a09403-18e3-468f-ad8a-74f8dda2d9ac"
 authors = ["TT <tobias.thummerer@informatik.uni-augsburg.de>", "LM <lars.mikelsons@informatik.uni-augsburg.de>", "JK <josef.kircher@student.uni-augsburg.de>"]
-version = "0.3.4"
+version = "0.3.5"
 
 [deps]
 DiffEqCallbacks = "459566f4-90b8-5000-8ac3-15dfb0a30def"
@@ -10,6 +10,7 @@ EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+SciMLBase = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
 ZipFile = "a5390f91-8eb1-5f08-bee0-b1d1ffed6cea"
 
 [compat]
@@ -18,5 +19,6 @@ DifferentialEquations = "6.16.0"
 EzXML = "1.1.0"
 OrdinaryDiffEq = "5.53.1"
 Plots = "1.14.0"
+SciMLBase = "1.23.1"
 ZipFile = "0.9.3"
 julia = "1.6"

@@ -4,6 +4,7 @@
 #
 
 using DifferentialEquations, DiffEqCallbacks
+import SciMLBase: RightRootFind
 
 ############ Model-Exchange ############
 
@@ -106,12 +107,20 @@ function saveValues(c::fmi2Component, recordValues, u, t, integrator)
 end
 
 """
-Source: FMISpec2.0.2[p.90 ff]: 3.2.4 Pseudocode Example
-
 Simulates a FMU instance for the given simulation time interval.
 State- and Time-Events are handled correctly.
 
 Via the optional keyword arguemnts `inputValues` and `inputFunction`, a custom input function of the time `t` can be defined, that should return a array of values for `fmi2SetReal(..., inputValues, inputFunction(t))`.
+
+Keywords:
+    - solver: Any Julia-supported ODE-solver (default is Tsit5)
+    - customFx: [deperecated] Ability to give a custom state derivative function ẋ=f(x,t)
+    - recordValues: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
+    - saveat: Time points to save values at (interpolated)
+    - setup: Boolean, if FMU should be setup (default=true)
+    - reset: Boolean, if FMU should be reset before simulation (default reset=setup)
+    - inputValues: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
+    - inputFunction: Function to retrieve the values to set the inputs to 
 
 Returns:
     - If keyword `recordValues` is not set, a struct of type `ODESolution`.
@@ -210,7 +219,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
         eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator, inputFunction, inputValues),
                                            (integrator, idx) -> affectFMU!(c, integrator, idx, inputFunction, inputValues),
                                            Int64(c.fmu.modelDescription.numberOfEventIndicators);
-                                           rootfind = DiffEqBase.RightRootFind,
+                                           rootfind = RightRootFind,
                                            save_positions=(false,false))
         push!(callbacks, eventCb)
 
@@ -238,6 +247,14 @@ end
 Starts a simulation of the Co-Simulation FMU instance.
 
 Via the optional keyword arguments `inputValues` and `inputFunction`, a custom input function of the time `t` can be defined, that should return a array of values for `fmi2SetReal(..., inputValues, inputFunction(t))`.
+
+Keywords:
+    - recordValues: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
+    - saveat: Time points to save values at (interpolated)
+    - setup: Boolean, if FMU should be setup (default=true)
+    - reset: Boolean, if FMU should be reset before simulation (default reset=setup)
+    - inputValues: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
+    - inputFunction: Function to retrieve the values to set the inputs to 
 
 Returns:
     - If keyword `recordValues` is not set, a boolean `success` is returned (simulation success).
@@ -290,8 +307,6 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
     t = t_start
 
     record = length(recordValues) > 0
-
-    #numDigits = length(string(round(Integer, 1/dt)))
 
     if record
         savedValues = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...} )
@@ -353,18 +368,26 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
     end
 end
 
-###############
+##### CS & ME #####
 
 """
 Starts a simulation of the FMU instance for the matching FMU type, if both types are available, CS is preferred.
+
+Keywords:
+    - recordValues: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
+    - setup: Boolean, if FMU should be setup (default=true)
+    - reset: Boolean, if FMU should be reset before simulation (default reset=setup)
+    - inputValues: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
+    - inputFunction: Function to retrieve the values to set the inputs to 
+    - saveat: [ME only] Time points to save values at (interpolated)
+    - solver: [ME only] Any Julia-supported ODE-solver (default is Tsit5)
+    - customFx: [ME only, deperecated] Ability to give a custom state derivative function ẋ=f(x,t)
 
 Returns:
     - `success::Bool` for CS-FMUs
     - `ODESolution` for ME-FMUs
     - if keyword `recordValues` is set, a tuple of type (success::Bool, DiffEqCallbacks.SavedValues) for CS-FMUs
     - if keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues) for ME-FMUs
-    
-ToDo: Improove Documentation.
 """
 function fmi2Simulate(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.0; kwargs...)
 
