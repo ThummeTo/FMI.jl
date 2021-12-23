@@ -2,43 +2,30 @@
 # Documentation (@id Doumentation)
 This section is intended to familiarise users with the documentation environment and to provide a first detailed insight into the FMI.jl library.
 
-## Documentation Overview (@id Documentation Overview)
-### 1. Introduction
-- ***Prior knowledge***  
-  
-  In order to better understand the functionality of the library, a brief explanation of the most important terms is advantageous. Fundamental terms that are important to understand are `FMI` and `FMU`.  
-- ***Library FMI.jl***  
-  
-  describes important `properties` of the library and is intended to `answer initial questions`. 
-
-### 2. Tutorials
-
-### 3. Examples
-
-### 4. Libary Funktions
-
-### 5. Related Publications
-
-
 ## Documentation Overview
 ### 1. Introduction
-The __Introduction__ is intended to provide an initial `overview of the structure` of the documentation. Thereby the most `important terms` are briefly explained for a better understanding of the functionalities of the library. In addition, the characteristic `features and functions of our FMI.jl library` are specifically described to answer users initial questions before using the library for the first time.  
+The [Introduction]() is intended to provide an initial `overview of the structure` of the documentation. Thereby the most `important terms` are briefly explained for a better understanding of the functionalities of the library. In addition, the characteristic `features and functions of our FMI.jl library` are specifically described to answer users initial questions before using the library for the first time.  
 
 ### 2. Tutorials
-Guidance on how to use the library correctly is provided in the __Tutorial__ sections. Various topics are `explained step by step` and `illustrated` with the help of `code snippets`.  
+Guidance on how to use the library correctly is provided in the [Tutorial]() sections. Various topics are `explained step by step` and `illustrated` with the help of `code snippets`.  
 
 Until now, tutorials have been organized on the following topics:
-- Get Started:  Für die ersten Schritte zur initialisierung der Bibliothek
-- 
-- asdg
+- [Get Started]()
+- [load and upload]()
+- [simulate]()
 - 
 
 ### 3. Examples
-By using __Examples__, the use of the library can be shown best. Here, `short and easy` to understand `code blocks` are explained which should make the use of the functions a little easier.
+By using [Examples](), the use of the library can be shown best. Here, `short and easy` to understand `code blocks` are explained which should make the use of the functions a little easier.
+
+
+### 4. Libary Funktions
+The [Library Functions]() sections contains all the documentation to the functions provided by this library.  
 
 
 
 
+### 5. Related Publications
 
 
 
@@ -68,15 +55,6 @@ Die Functional Mock-up Unit
 FMI.jl is a free-to-use software library for the Julia programming language, which integrates FMI ([fmi-standard.org](http://fmi-standard.org/)): load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
 
 
-
-
-
-## How the documentation is structured?
-Having a high-level overview of how this documentation is structured will help you know where to look for certain things. The xxx main parts of the documentation are :
-- The __Tutorials__ section explains all the necessary steps to work with the library.
-- The __examples__ section gives insight in what is possible with this Library while using short and easily understandable code snippets
-- The __library functions__ sections contains all the documentation to the functions provided by this library
-
 ## What is currently supported in FMI.jl?
 - simulation / plotting of CS- and ME-FMUs
 - event-handling for discontinuous ME-FMUs
@@ -87,14 +65,3 @@ Having a high-level overview of how this documentation is structured will help y
 - FMI Cross Checks
 - more examples
 - ...
-
-## What Platforms are supported?
-FMI.jl is tested (and testing) under Julia Version 1.6 and latest on Windows (latest) and Ubuntu (latest). Mac should work, but untested.
-
-## How to cite? Related publications?
-Tobias Thummerer, Josef Kircher, Lars Mikelsons 2021 **NeuralFMU: Towards Structural Integration of FMUs into Neural Networks** (14th Modelica Conference, Preprint, Accepted) [arXiv:2109.04351](https://arxiv.org/abs/2109.04351)
-
-Tobias Thummerer, Johannes Tintenherr, Lars Mikelsons 2021 **Hybrid modeling of the human cardiovascular system using NeuralFMUs** (10th International Conference on Mathematical Modeling in Physical Sciences, Preprint, Accepted) [arXiv:2109.04880](https://arxiv.org/abs/2109.04880)
-
-## Interested in Hybrid Modeling in Julia using FMUs?
-See [FMIFlux.jl](https://github.com/ThummeTo/FMIFlux.jl).
