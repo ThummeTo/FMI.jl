@@ -26,8 +26,7 @@ The [Library Functions]() sections contains all the documentation to the functio
 
 
 ### 5. Related Publications
-
-
+If you are interested in [related publications](), you can browse through the list of references and gather more information. 
 
 ## Prior knowledge(@id Prior knowledge)
 
