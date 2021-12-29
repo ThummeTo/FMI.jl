@@ -1,5 +1,5 @@
 
-# Documentation (@id Doumentation)
+# Documentation 
 This section is intended to familiarise users with the documentation environment and to provide a first detailed insight into the FMI.jl library.
 
 ## Documentation Overview
@@ -33,7 +33,7 @@ If you are interested in [related publications](), you can browse through the li
 ### Julia Programming Language
 
 
-### FMI (@id FMI)
+### FMI 
 The Functional Mock-up Interface (FMI) is an open standard for the tool-independent exchange and integration of track models from different manufactures. FMI simplifies the use of the best tools for specific modeling tasks and the consistent reuse of models in different development phases and across departmental boundaries.
 
 ```@eval
