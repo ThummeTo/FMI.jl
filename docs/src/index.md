@@ -30,9 +30,11 @@ If you are interested in [related publications](), you can browse through the li
 
 ## Prior knowledge(@id Prior knowledge)
 
+### Julia Programming Language
+
 
 ### FMI (@id FMI)
-The Functional Mock-up Interface (FMI) is an open standard for the tool-independent exchange and integration of track models from different manufactures. FMI simplifies the use of the best tools for specific modeling tasks and the consistent reuse of models in different development phases and across departmental boundaries. This way you can choose the most suitable tool for each type of analysis while keeping the same model.
+The Functional Mock-up Interface (FMI) is an open standard for the tool-independent exchange and integration of track models from different manufactures. FMI simplifies the use of the best tools for specific modeling tasks and the consistent reuse of models in different development phases and across departmental boundaries.
 
 ```@eval
 file = "FMI-Specification-2.0.3.pdf"
@@ -43,14 +45,14 @@ Markdown.parse("""
     More detailed information about the Mock-up Interface (FMI) can be found on the following website [fmi-standard.org](http://fmi-standard.org/)
     The documentation is also available in PDF format: [$file]($url).
 """)
-```
+```  
 
-
-### FMU (@id FMU)
-Die Functional Mock-up Unit
-
+An exported model container that fulfills the FMI requirements is referred to as a Functional Mock-up Unit (FMU).They can be applied in diverse simulation environments and sometimes even in entire co-simulations. So FMUs can be divided into two main application classes: model-exchange and co-simulation.
 
 ## Library FMI.jl
+
+
+
 FMI.jl is a free-to-use software library for the Julia programming language, which integrates FMI ([fmi-standard.org](http://fmi-standard.org/)): load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
 
 
