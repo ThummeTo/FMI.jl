@@ -31,7 +31,7 @@ function handleEvents(c::fmi3Component, enterEventMode::Bool, exitInContinuousMo
 
     if enterEventMode
         # TODO check the parameters
-        fmi3EnterEventMode(c, true, false, [fmi3Int32(1)], 0, false)
+        fmi3EnterEventMode(c, true, false, c.fmu.rootsFound, fmi3GetNumberOfEventIndicators(c.fmu), false)
     end
 
     discreteStatesNeedUpdate = fmi3False
@@ -90,7 +90,20 @@ function condition(c::fmi3Component, out, x, t, integrator, inputFunction, input
     fmi3SetTime(c, t)
     fmi3SetContinuousStates(c, x)
     indicators = fmi3GetEventIndicators(c)
+    # TODO rootsFound
+    if length(indicators) > 0
+        for i in 1:length(indicators)
+            if c.fmu.previous_z[i] < 0 && indicators[i] >= 0
+                c.fmu.rootsFound[i] = 1
+            elseif c.fmu.previous_z[i] >= 0 && indicators[i] < 0
+                c.fmu.rootsFound[i] = -1
+            else
+                c.fmu.rootsFound[i] = 0
+            end
 
+            c.fmu.previous_z[i] = indicators[i]
+        end
+    end
     copy!(out, indicators)
 
 end

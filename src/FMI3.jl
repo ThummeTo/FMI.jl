@@ -28,6 +28,9 @@ mutable struct FMU3 <: FMU
     instanceEnvironment::fmi3InstanceEnvironment
     components::Array{fmi3Component}
 
+    previous_z::Array{fmi3Float64}
+    rootsFound::Array{fmi3Int32}
+
     # paths of ziped and unziped FMU folders
     path::String
     zipPath::String
@@ -299,6 +302,9 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
         fmu.cCompletedIntegratorStep               = dlsym(fmu.libHandle, :fmi3CompletedIntegratorStep)
         fmu.cEnterEventMode                        = dlsym(fmu.libHandle, :fmi3EnterEventMode)        
         fmu.cUpdateDiscreteStates                  = dlsym(fmu.libHandle, :fmi3UpdateDiscreteStates)
+
+        fmu.previous_z  = zeros(fmi3Float64, fmi3GetEventIndicators(fmu.modelDescription))
+        fmu.rootsFound  = zeros(fmi3Int32, fmi3GetEventIndicators(fmu.modelDescription))
     end
 
     # # initialize further variables TODO check if needed

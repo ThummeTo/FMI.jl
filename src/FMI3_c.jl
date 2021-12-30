@@ -69,7 +69,7 @@ const fmi3Int32 = Cint
 const fmi3UInt32 = Cuint
 const fmi3Int64 = Clonglong
 const fmi3UInt64 = Culonglong
-const fmi3Boolean = Cint
+const fmi3Boolean = Cuchar
 const fmi3Char = Cchar
 const fmi3String = String # TODO: correct it
 const fmi3Byte = Cuchar
@@ -405,13 +405,13 @@ mutable struct fmi3ModelVariable
 
     # Constructor for fully specified ScalarVariable
     function fmi3ModelVariable(name, valueReference, type, description, causalityString, variabilityString, dependencies, dependenciesKind)
-        var = fmi3variability.continuous
+        var = fmi3continuous::fmi3variability
         # if datatype.datatype == fmi3Float32 || datatype.datatype == fmi3Float64
         #     var = continuous::fmi3variability
         # else
         #     var = discretes
         # end
-        cau = fmi3causality._local
+        cau = fmi3local::fmi3causality
         #check if causality and variability are correct
         if !occursin("fmi3" * variabilityString, string(instances(fmi3variability)))
             display("Error: variability not known")
@@ -986,7 +986,7 @@ function fmi3SetString(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csi
     status
 end
 
-# TODO not working yet, readOnlyMemoryError()
+# TODO not working yet, readOnlyMemoryError(), valueSize is missing
 # The strings returned by fmi3GetString, as well as the binary values returned by fmi3GetBinary, must be copied by the importer 
 # because the allocated memory for these strings might be deallocated or overwritten by the next call of an FMU function.
 """

@@ -344,15 +344,15 @@ mutable struct fmi2ScalarVariable
 
     # Constructor for not further specified ScalarVariables
     function fmi2ScalarVariable(name, valueReference)
-        new(name, Cint(valueReference), datatypeVariable(), "", _local::fmi2causality, continuous::fmi2variability, calculated::fmi2initial)
+        new(name, Cint(valueReference), datatypeVariable(), "", fmi2local::fmi2causality, fmi2continuous::fmi2variability, fmi2calculated::fmi2initial)
     end
 
     # Constructor for fully specified ScalarVariable
     function fmi2ScalarVariable(name, valueReference, datatype, description, causalityString, variabilityString, initialString, dependencies, dependenciesKind)
 
-        var = continuous::fmi2variability
-        cau = _local::fmi2causality
-        init = calculated::fmi2initial
+        var = fmi2continuous::fmi2variability
+        cau = fmi2local::fmi2causality
+        init = fmi2calculated::fmi2initial
         #check if causality, variability and initial are correct
         if !occursin(variabilityString, string(instances(fmi2variability)))
             display("Error: variability not known")

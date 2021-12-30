@@ -6,7 +6,7 @@ using FMI
 # xml = FMI.fmi3ReadModelDescription("model/fmi3/LinearTransform/modelDescription.xml")
 # xml = FMI.fmi3ReadModelDescription("model/fmi3/Stair/modelDescription.xml")
 # xml = FMI.fmi3ReadModelDescription("model/fmi3/VanDerPol/modelDescription.xml")
-if true == true
+# if true == true
     fmu = FMI.fmi3Load("model/fmi3/BouncingBall.fmu")
     instance1 = FMI.fmi3InstantiateModelExchange!(fmu; loggingOn=true)
     instance2 = FMI.fmi3InstantiateCoSimulation!(fmu; loggingOn=true)
@@ -85,7 +85,7 @@ if true == true
     # FMI.fmi3Terminate(fmu)
     # FMI.fmi3Reset(fmu)
     FMI.fmi3Unload(fmu)
-end
+# end
 
 if true == true
     fmu = FMI.fmi3Load("model/fmi3/Dahlquist.fmu")
@@ -162,14 +162,14 @@ end
     FMI.fmi3GetInt32(fmu, "int_in")
     FMI.fmi3SetInt32(fmu, ["int_in"], [FMI.fmi3Int32(2)])
     FMI.fmi3GetInt32(fmu, ["int_in"])
-    Csize_t(FMI.fmi3GetBoolean(fmu, "bool_in"))
-    FMI.fmi3SetBoolean(fmu, ["bool_in"], [false])
+    FMI.fmi3GetBoolean(fmu, "bool_in")
+    FMI.fmi3SetBoolean(fmu, ["bool_in"], [true])
     FMI.fmi3GetBoolean(fmu, ["bool_in", "bool_out"])
     FMI.fmi3GetString(fmu, "string_param")
     FMI.fmi3SetString(fmu, ["string_param"], ["Test!"])
     FMI.fmi3GetString(fmu, ["string_param"])
     binary = FMI.fmi3GetBinary(fmu, "binary_in")
-    FMI.fmi3SetBinary(fmu, ["binary_in"], [binary])
+    FMI.fmi3SetBinary(fmu, ["binary_in"], [FMI.fmi3Binary(0x000000000534)])
     FMI.fmi3GetBinary(fmu, ["binary_in"])
     FMI.fmi3ExitInitializationMode(fmu)
     FMI.fmi3GetFMUState(fmu)
@@ -214,7 +214,7 @@ if true == true
 end
 
 
-if true == true
+# if true == true
     fmu = FMI.fmi3Load("model/fmi3/VanDerPol.fmu")
     instance1 = FMI.fmi3InstantiateModelExchange!(fmu; loggingOn = true)
     instance = FMI.fmi3InstantiateCoSimulation!(fmu; loggingOn=true)
@@ -228,4 +228,4 @@ if true == true
 
     FMI.fmi3GetFMUState(fmu)
     FMI.fmi3Unload(fmu)
-end
+# end
