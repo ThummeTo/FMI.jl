@@ -294,7 +294,7 @@ Returns the instance of the FMU struct.
 
 Via optional argument ```unpackPath```, a path to unpack the FMU can be specified (default: system temporary directory).
 """
-function fmi2Load(pathToFMU::String; unpackPath=nothing)
+function fmi2Load(pathToFMU::String; unpackPath=nothing, type=nothing)
     # Create uninitialized FMU
     fmu = FMU2()
     fmu.components = []
@@ -312,7 +312,20 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
     fmu.modelDescription = fmi2ReadModelDescription(pathToModelDescription)
     fmu.modelName = fmu.modelDescription.modelName
     fmu.instanceName = fmu.modelDescription.modelName
-    fmuName = fmi2GetModelIdentifier(fmu.modelDescription) # tmpName[length(tmpName)]
+
+    if (fmi2IsCoSimulation(fmu) && fmi2IsModelExchange(fmu) && type==:CS) 
+        fmu.type = fmi2CoSimulation::fmi2Type
+    elseif (fmi2IsCoSimulation(fmu) && fmi2IsModelExchange(fmu) && type==:ME)
+        fmu.type = fmi2ModelExchange::fmi2Type
+    elseif fmi2IsCoSimulation(fmu) && (type===nothing || type==:CS)
+        fmu.type = fmi2CoSimulation::fmi2Type
+    elseif fmi2IsModelExchange(fmu) && (type===nothing || type==:ME)
+        fmu.type = fmi2ModelExchange::fmi2Type
+    else
+        error(unknownFMUType)
+    end
+
+    fmuName = fmi2GetModelIdentifier(fmu.modelDescription; type=fmu.type) # tmpName[length(tmpName)]
 
     directoryBinary = ""
     pathToBinary = ""
@@ -358,14 +371,6 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing)
     fmu.libHandle = dlopen(pathToBinary)
 
     cd(lastDirectory)
-
-    if fmi2IsCoSimulation(fmu)
-        fmu.type = fmi2CoSimulation::fmi2Type
-    elseif fmi2IsModelExchange(fmu)
-        fmu.type = fmi2ModelExchange::fmi2Type
-    else
-        error(unknownFMUType)
-    end
 
     if fmi2IsCoSimulation(fmu) && fmi2IsModelExchange(fmu)
         @info "fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified."
@@ -782,6 +787,13 @@ function fmi2GetReal!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Arr
 end
 
 """
+TODO
+"""
+function fmi2GetRealOutputDerivatives(fmu::FMU2, vr::fmi2ValueReferenceFormat, order)
+    fmi2GetRealOutputDerivatives(fmu.components[end], vr, order)
+end
+
+"""
 TODO: FMI specification reference.
 
 Set the values of an array of fmi2Real variables.
@@ -790,6 +802,13 @@ For more information call ?fmi2SetReal
 """
 function fmi2SetReal(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{<:Real}, <:Real})
     fmi2SetReal(fmu.components[end], vr, values)
+end
+
+""" 
+ToDO 
+"""
+function fmi2SetRealInputDerivatives(fmu::FMU2, vr::fmi2ValueReferenceFormat, order, values)
+    fmi2SetRealInputDerivatives(fmu.components[end], vr, order, values)
 end
 
 """
@@ -1052,8 +1071,8 @@ the array order specifies the corresponding order of derivation of the variables
 
 For more information call ?fmi2SetRealInputDerivatives
 """
-function fmi2SetRealInputDerivatives(fmu::FMU2, vr::fmi2ValueReference, nvr::Cint, order::Integer, value::Real)
-    fmi2SetRealInputDerivatives(fmu.components[end], vr, nvr, fmi2Integer(order), fmi2Real(value))
+function fmi2SetRealInputDerivatives(fmu::FMU2, vr::fmi2ValueReferenceFormat, order::Union{Array{<:Integer}, <:Integer}, value::Union{Array{<:Real}, <:Real})
+    fmi2SetRealInputDerivatives(fmu.components[end], vr, order, value)
 end
 
 """
@@ -1066,8 +1085,8 @@ the array order specifies the corresponding order of derivation of the variables
 
 For more information call ?fmi2GetRealOutputDerivatives
 """
-function fmi2GetRealOutputDerivatives(fmu::FMU2, vr::fmi2ValueReference, nvr::Cint, order::Integer, value::Real)
-    fmi2GetRealOutputDerivatives(fmu.components[end], vr, nvr, fmi2Integer(order), fmi2Real(value))
+function fmi2GetRealOutputDerivatives(fmu::FMU2, vr::fmi2ValueReferenceFormat, order::Union{Array{<:Integer}, <:Integer})
+    fmi2GetRealOutputDerivatives(fmu.components[end], vr, order)
 end
 
 """

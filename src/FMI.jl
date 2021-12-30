@@ -31,6 +31,7 @@ export fmiLoad, fmiSimulate, fmiSimulateCS, fmiSimulateME, fmiUnload
 export fmiGetNumberOfStates, fmiGetTypesPlatform, fmiGetVersion, fmiInstantiate!, fmiFreeInstance!
 export fmiSetDebugLogging, fmiSetupExperiment, fmiEnterInitializationMode, fmiExitInitializationMode, fmiTerminate , fmiReset
 export fmiGetReal, fmiSetReal, fmiGetInteger, fmiSetInteger, fmiGetBoolean, fmiSetBoolean, fmiGetString, fmiSetString, fmiGetReal!, fmiGetInteger!, fmiGetBoolean!, fmiGetString!
+export fmiSetRealInputDerivatives, fmiGetRealOutputDerivatives
 export fmiGetFMUstate, fmiSetFMUstate, fmiFreeFMUstate, fmiSerializedFMUstateSize, fmiSerializeFMUstate, fmiDeSerializeFMUstate
 export fmiGetDirectionalDerivative, fmiSampleDirectionalDerivative, fmiGetDirectionalDerivative!, fmiSampleDirectionalDerivative! 
 export fmiDoStep, fmiSetTime, fmiSetContinuousStates, fmi2EnterEventMode, fmiNewDiscreteStates
@@ -234,7 +235,7 @@ end
 Returns the tag 'modelIdentifier' from CS or ME section.
 """
 function fmiGetModelIdentifier(fmu::FMU2)
-    fmi2GetModelIdentifier(fmu)
+    fmi2GetModelIdentifier(fmu.modelDescription; type=fmu.type)
 end
 
 """
@@ -277,8 +278,8 @@ end
 """
 Load FMUs independent of the FMI version, currently supporting version 2.0.X.
 """
-function fmiLoad(pathToFMU::String; unpackPath=nothing)
-    fmi2Load(pathToFMU; unpackPath=unpackPath)
+function fmiLoad(pathToFMU::String; unpackPath=nothing, type=nothing)
+    fmi2Load(pathToFMU; unpackPath=unpackPath, type=type)
 end
 
 """
@@ -412,6 +413,10 @@ function fmiGetReal(fmu::fmi2Struct, vr::fmi2ValueReferenceFormat)
     fmi2GetReal(fmu, vr)
 end
 
+function fmiGetRealOutputDerivatives(str::fmi2Struct, vr::fmi2ValueReferenceFormat, order::Union{Array{<:Integer}, <:Integer})
+    fmi2GetRealOutputDerivatives(str, vr, order)
+end
+
 """
 Writes the real values of an array of variables in the given field
 """
@@ -424,6 +429,13 @@ Set the values of an array of real variables
 """
 function fmiSetReal(fmu::fmi2Struct, vr::fmi2ValueReferenceFormat, values::Union{Array{<:Real}, <:Real})
     fmi2SetReal(fmu, vr, values)
+end
+
+"""
+ToDo
+"""
+function fmiSetRealInputDerivatives(str::fmi2Struct, vr::fmi2ValueReferenceFormat, order, values)
+    fmi2SetRealInputDerivatives(str, vr, order, values)
 end
 
 """

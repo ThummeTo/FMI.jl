@@ -1,6 +1,9 @@
 ~FMUOutput/
 Resources/
 IO/
+Distribution/
+platforms/
+tmp/
 buildlog.txt
 dsfinal.txt
 dsin.txt
@@ -17,3 +20,5 @@ modelDescription.xml
 *.fmu
 fmi3/
 
+*.dll
+stop
