@@ -761,7 +761,9 @@ function fmi3GetBinary(c::fmi3Component, vr::fmi3ValueReferenceFormat)
 
     nvr = Csize_t(length(vr))
     values = Array{fmi3Binary}(undef, nvr)
-    fmi3GetBinary!(c, vr, nvr, values, nvr)
+    valueSizes = Array{Csize_t}(undef, nvr)
+    fill!(valueSizes, Csize_t(8))
+    fmi3GetBinary!(c, vr, nvr, valueSizes, values, nvr)
 
     if length(values) == 1
         return values[1]
@@ -784,7 +786,9 @@ function fmi3GetBinary!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::
     @assert length(vr) == length(values) "fmi3GetString!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(vr))
-    fmi3GetBinary!(c, vr, nvr, values, nvr)
+    valueSizes = Array{Csize_t}(undef, nvr)
+    fill!(valueSizes, Csize_t(8))
+    fmi3GetBinary!(c, vr, nvr, valueSizes, values, nvr)
     nothing
 end
 function fmi3GetBinary!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::fmi3Binary)
@@ -805,7 +809,9 @@ function fmi3SetBinary(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::U
     @assert length(vr) == length(values) "fmi3SetBinary(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(vr))
-    fmi3SetBinary(c, vr, nvr, values, nvr)
+    valueSizes = Array{Csize_t}(undef, nvr)
+    fill!(valueSizes, Csize_t(8))
+    fmi3SetBinary(c, vr, nvr, valueSizes, values, nvr)
 end
 
 """
@@ -990,6 +996,21 @@ TODO: FMI specification reference.
 
 Computes directional derivatives.
 
+For more information call ?fmi2GetDirectionalDerivatives
+"""
+function fmi3GetDirectionalDerivative(c::fmi3Component,
+                                      unknown::fmi3ValueReference,
+                                      known::fmi3ValueReference,
+                                      seed::fmi3Float64 = 1.0)
+
+    fmi3GetDirectionalDerivative(c, [unknown], [known], [seed])[1]
+end
+
+"""
+TODO: FMI specification reference.
+
+Computes directional derivatives.
+
 For more information call ?fmi2GetAdjointDerivatives
 """
 function fmi3GetAdjointDerivative(c::fmi3Component,
@@ -1000,16 +1021,90 @@ function fmi3GetAdjointDerivative(c::fmi3Component,
     fmi3GetAdjointDerivative(c, [unknowns], [knowns], [seed])[1]
 end
 
+"""
+TODO: FMI specification reference.
+
+Computes directional derivatives.
+
+For more information call ?fmi2GetDirectionalDerivatives
+"""
+function fmi3GetAdjointDerivative(c::fmi3Component,
+                                      unknowns::Array{fmi3ValueReference},
+                                      knowns::Array{fmi3ValueReference},
+                                      seed::Array{fmi3Float64} = Array{fmi3Float64}([]))
+    sensitivity = zeros(fmi3Float64, length(unknowns))
+
+    fmi3GetAdjointDerivative!(c, unknowns, knowns, sensitivity, seed)
+
+    sensitivity
+end
+
+"""
+TODO: FMI specification reference.
+
+Computes directional derivatives.
+
+For more information call ?fmi2GetDirectionalDerivatives
+"""
+function fmi3GetAdjointDerivative!(c::fmi3Component,
+                                      unknowns::Array{fmi3ValueReference},
+                                      knowns::Array{fmi3ValueReference},
+                                      sensitivity::AbstractArray,
+                                      seed::Array{fmi3Float64}= Array{fmi3Float64}([]))
+
+    nKnowns = Csize_t(length(knowns))
+    nUnknowns = Csize_t(length(unknowns))
+
+    if length(seed) == 0
+        seed = ones(fmi3Float64, nKnowns)
+    end
+
+    nSeed = Csize_t(length(seed))
+    nSensitivity = Csize_t(length(sensitivity))
+
+    fmi3GetAdjointDerivative!(c, unknowns, nUnknowns, knowns, nKnowns, seed, nSeed, sensitivity, nSensitivity)
+
+    nothing
+end
+
 function fmi3GetNumberOfContinuousStates(c::fmi3Component)
-    size = Csize_t(0)
-    fmi3GetNumberOfContinuousStates(c, size)
-    size
+    size = 0
+    sizeRef = Ref(Csize_t(size))
+    fmi3GetNumberOfContinuousStates(c, sizeRef)
+    size = sizeRef[]
+    Int32(size)
 end
 
 function fmi3GetNumberOfEventIndicators(c::fmi3Component)
-    size = Csize_t(0)
-    fmi3GetNumberOfEventIndicators(c, size)
-    size
+    size = 0
+    sizeRef = Ref(Csize_t(size))
+    fmi3GetNumberOfEventIndicators(c, sizeRef)
+    size = sizeRef[]
+    Int32(size)
+end
+
+function fmi3GetNumberOfVariableDependencies(c::fmi3Component, vr::Union{fmi3ValueReference, String})
+    if typeof(vr) == String
+        vr = fmi3String2ValueReference(c.fmu.modelDescription, vr)
+    end
+    size = 0
+    sizeRef = Ref(Csize_t(size))
+    fmi3GetNumberOfVariableDependencies(c, vr, sizeRef)
+    size = sizeRef[]
+    Int32(size)
+end
+
+function fmi3GetVariableDependencies(c::fmi3Component, vr::Union{fmi3ValueReference, String})
+    if typeof(vr) == String
+        vr = fmi3String2ValueReference(c.fmu.modelDescription, vr)
+    end
+    nDependencies = fmi3GetNumberOfVariableDependencies(c, vr)
+    elementIndiceOfDependents = Array{Csize_t}(undef, nDependencies)
+    independents = Array{fmi3ValueReference}(undef, nDependencies)
+    elementIndiceOfIndependents = Array{Csize_t}(undef, nDependencies)
+    dependencyKinds = Array{fmi3DependencyKind}(undef, nDependencies)
+    fmi3GetVariableDependencies(c, vr, elementIndiceOfDependents, independents, elementIndiceOfIndependents, dependencyKinds, nDependencies)
+    elementIndiceOfDependents, independents, elementIndiceOfIndependents, dependencyKinds
 end
 
 """

@@ -932,7 +932,7 @@ function fmi3SetUInt64(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csi
                 c.compAddr, vr, nvr, value, nvalue)
     status
 end
-# TODO weird behaviour, spukt oft sehr große Zahlen raus, könnten Speicheradressen sein, Werte oft gleich, variieren aber auch
+
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
@@ -986,7 +986,7 @@ function fmi3SetString(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csi
     status
 end
 
-# TODO not working yet, readOnlyMemoryError(), valueSize is missing
+# TODO working might check result
 # The strings returned by fmi3GetString, as well as the binary values returned by fmi3GetBinary, must be copied by the importer 
 # because the allocated memory for these strings might be deallocated or overwritten by the next call of an FMU function.
 """
@@ -994,11 +994,11 @@ Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Value
 
 Functions to get and set values of variables idetified by their valueReference
 """
-function fmi3GetBinary!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Binary}, nvalue::Csize_t)
+function fmi3GetBinary!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, valueSizes::Array{Csize_t}, value::Array{fmi3Binary}, nvalue::Csize_t)
     ccall(c.fmu.cGetBinary,
                 Cuint,
-                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t,  Ptr{fmi3Binary}, Csize_t),
-                c.compAddr, vr, nvr, value, nvalue)
+                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{Csize_t}, Ptr{fmi3Binary}, Csize_t),
+                c.compAddr, vr, nvr, valueSizes, value, nvalue)
 end
 
 """
@@ -1006,11 +1006,11 @@ Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Value
 
 Functions to get and set values of variables idetified by their valueReference
 """
-function fmi3SetBinary(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Binary}, nvalue::Csize_t)
+function fmi3SetBinary(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, valueSizes::Array{Csize_t}, value::Array{fmi3Binary}, nvalue::Csize_t)
     status = ccall(c.fmu.cSetBinary,
                 Cuint,
-                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Binary}, Csize_t),
-                c.compAddr, vr, nvr, value, nvalue)
+                (Ptr{Nothing},Ptr{fmi3ValueReference}, Csize_t, Ptr{Csize_t}, Ptr{fmi3Binary}, Csize_t),
+                c.compAddr, vr, nvr, valueSizes, value, nvalue)
     status
 end
 # TODO, Clocks not implemented so far thus not tested
@@ -1166,18 +1166,18 @@ end
 
 function fmi3ActivateModelPartition(c::fmi3Component, vr::fmi3ValueReference, activationTime::Array{fmi3Float64})
     @assert false "Not tested"
-    status = ccall(c.fmu.cGetShiftFraction,
+    status = ccall(c.fmu.cActivateModelPartition,
                 Cuint,
                 (Ptr{Nothing}, fmi3ValueReference, Ptr{fmi3Float64}),
                 c.compAddr, vr, activationTime)
 end
 
 # TODO not tested
-function fmi3GetNumberOfVariableDependencies(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Ref{Csize_t})
+function fmi3GetNumberOfVariableDependencies(c::fmi3Component, vr::fmi3ValueReference, nvr::Ref{Csize_t})
     @assert false "Not tested"
     status = ccall(c.fmu.cGetNumberOfVariableDependencies,
                 Cuint,
-                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Ptr{Csize_t}),
+                (Ptr{Nothing}, fmi3ValueReference, Ptr{Csize_t}),
                 c.compAddr, vr, nvr)
 end
 
@@ -1185,11 +1185,11 @@ function fmi3GetVariableDependencies(c::fmi3Component, vr::fmi3ValueReference, e
     @assert false "Not tested"
     status = ccall(c.fmu.cGetVariableDependencies,
                 Cuint,
-                (Ptr{Nothing}, Ptr{fmi3ValueReference}, Ptr{Csize_t}, Ptr{fmi3ValueReference}, Ptr{Csize_t}, Ptr{fmi3DependencyKind}, Csize_t),
+                (Ptr{Nothing}, fmi3ValueReference, Ptr{Csize_t}, Ptr{fmi3ValueReference}, Ptr{Csize_t}, Ptr{fmi3DependencyKind}, Csize_t),
                 c.compAddr, vr, elementIndiceOfDependents, independents, elementIndiceOfInpendents, dependencyKind, ndependencies)
 end
 
-# TODO continue from here
+# TODO call works but result is wrong
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.11. Getting Partial Derivatives
 
@@ -1211,7 +1211,7 @@ function fmi3GetDirectionalDerivative!(c::fmi3Component,
           c.compAddr, unknowns, nUnknowns, knowns, nKnowns, seed, nSeed, sensitivity, nSensitivity)
     
 end
-
+# TODO call works but result is wrong
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.11. Getting Partial Derivatives
 
@@ -1226,7 +1226,7 @@ function fmi3GetAdjointDerivative!(c::fmi3Component,
                                        nSeed::Csize_t,
                                        sensitivity::Array{fmi3Float64},
                                        nSensitivity::Csize_t)
-    @assert fmi3ProvidesAdjointDerivative(c.fmu) ["fmi3GetAdjointDerivative!(...): This FMU does not support build-in adjoint derivatives!"]
+    @assert fmi3ProvidesAdjointDerivatives(c.fmu) ["fmi3GetAdjointDerivative!(...): This FMU does not support build-in adjoint derivatives!"]
     ccall(c.fmu.cGetAdjointDerivative,
           Cuint,
           (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3Float64}, Csize_t, Ptr{fmi3Float64}, Csize_t),
@@ -1266,12 +1266,12 @@ Source: FMISpec3.0, Version D5ef1c1: 2.3.2. State: Instantiated
 This function returns the number of continuous states.
 This function can only be called in Model Exchange. 
 """
-function fmi3GetNumberOfContinuousStates(c::fmi3Component, nContinuousStates::Csize_t)
+function fmi3GetNumberOfContinuousStates(c::fmi3Component, nContinuousStates::Ref{Csize_t})
     println("test cGetNumberOfContinuousStates")
     ccall(c.fmu.cGetNumberOfContinuousStates,
             Cuint,
             (Ptr{Nothing}, Ptr{Csize_t}),
-            c.compAddr, Ref(nContinuousStates))
+            c.compAddr, nContinuousStates)
 end
 
 """
@@ -1280,12 +1280,12 @@ Source: FMISpec3.0, Version D5ef1c1: 2.3.2. State: Instantiated
 This function returns the number of event indicators.
 This function can only be called in Model Exchange. 
 """
-function fmi3GetNumberOfEventIndicators(c::fmi3Component, nEventIndicators::Csize_t)
+function fmi3GetNumberOfEventIndicators(c::fmi3Component, nEventIndicators::Ref{Csize_t})
     println("test cGetNumberOfEventIndicators")
     ccall(c.fmu.cGetNumberOfEventIndicators,
             Cuint,
             (Ptr{Nothing}, Ptr{Csize_t}),
-            c.compAddr, Ref(nEventIndicators))
+            c.compAddr, nEventIndicators)
 end
 
 """
@@ -1313,6 +1313,8 @@ function fmi3GetNominalsOfContinuousStates(c::fmi3Component, x_nominal::Array{fm
                     (Ptr{Nothing}, Ptr{fmi3Float64}, Csize_t),
                     c.compAddr, x_nominal, nx)
 end
+
+# TODO not testable not supported by FMU
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.3.3. State: Initialization Mode
 

@@ -6,6 +6,34 @@ using FMI
 # xml = FMI.fmi3ReadModelDescription("model/fmi3/LinearTransform/modelDescription.xml")
 # xml = FMI.fmi3ReadModelDescription("model/fmi3/Stair/modelDescription.xml")
 # xml = FMI.fmi3ReadModelDescription("model/fmi3/VanDerPol/modelDescription.xml")
+#
+    fmu=FMI.fmi3Load("model/fmi3/BouncingBall/BouncingBall.fmu")
+    # instance1 = FMI.fmi3InstantiateModelExchange!(fmu; loggingOn=true)
+    instance2 = FMI.fmi3InstantiateCoSimulation!(fmu; loggingOn=true)
+    t_start = 0.0
+    t_stop = 3.0
+    dt = 0.01
+    saveat = t_start:dt:t_stop
+    success, data = FMI.fmi3SimulateCS(fmu, t_start, t_stop; recordValues=["h", "v"], saveat = saveat)
+    FMI.fmi3EnterInitializationMode(fmu, 0.0, 10.0)
+    FMI.fmi3GetDirectionalDerivative(fmu, fmu.modelDescription.derivativeValueReferences[1], fmu.modelDescription.stateValueReferences[2])
+    FMI.fmi3GetAdjointDerivative(fmu, fmu.modelDescription.derivativeValueReferences[1], fmu.modelDescription.stateValueReferences[1])
+    FMI.fmi3ExitInitializationMode(fmu)
+    FMI.fmi3GetOutputDerivatives(fmu,)
+    FMI.fmi3EnterEventMode(fmu, true, false, [FMI.fmi3Int32(2)], 0, false)
+    # test1 = FMI.fmi3GetNumberOfContinuousStates(fmu)
+    # test2 = FMI.fmi3GetNumberOfEventIndicators(fmu)
+    FMI.fmi3GetDirectionalDerivative(fmu, fmu.modelDescription.derivativeValueReferences[1], fmu.modelDescription.stateValueReferences[1])
+    FMI.fmi3GetAdjointDerivative(fmu, fmu.modelDescription.derivativeValueReferences, fmu.modelDescription.stateValueReferences[1])
+    FMI.fmi3EnterStepMode(fmu)
+    FMI.fmi3GetDirectionalDerivative(fmu, fmu.modelDescription.derivativeValueReferences[1], fmu.modelDescription.stateValueReferences[2])
+    FMI.fmi3GetAdjointDerivative(fmu, fmu.modelDescription.derivativeValueReferences, fmu.modelDescription.stateValueReferences[1])
+    FMI.fmi3Terminate(fmu)
+    test = 0.0
+    FMI.fmi3GetOutputDerivatives(fmu, Int32(1), Int32(1), 1, test, Int32(1))
+    FMI.fmi3Unload(fmu)
+#
+
 # if true == true
     fmu = FMI.fmi3Load("model/fmi3/BouncingBall.fmu")
     instance1 = FMI.fmi3InstantiateModelExchange!(fmu; loggingOn=true)
@@ -87,16 +115,20 @@ using FMI
     FMI.fmi3Unload(fmu)
 # end
 
-if true == true
+#
     fmu = FMI.fmi3Load("model/fmi3/Dahlquist.fmu")
     instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
-    success, data = FMI.fmi3SimulateME(fmu, 0.0, 3.0; recordValues=["x"])
-    FMI.fmiPlot(fmu,["x"], data)
+    FMI.fmi3EnterInitializationMode(fmu, 0.0, 10.0)
+    FMI.fmi3ExitInitializationMode(fmu)
+    # success, data = FMI.fmi3SimulateME(fmu, 0.0, 3.0; recordValues=["x"])
+    # FMI.fmiPlot(fmu,["x"], data)
     test1 = FMI.fmi3GetNumberOfContinuousStates(fmu)
     test2 = FMI.fmi3GetNumberOfEventIndicators(fmu)
-    test3 = FMI.fmi3GetNumberOfContinuousStates(instance1)
-    test4 = FMI.fmi3GetNumberOfEventIndicators(instance1)
+    test3 = FMI.fmi3GetNumberOfVariableDependencies(fmu, "x")
+    FMI.fmi3GetVariableDependencies(fmu, "x")
+    fmu.modelDescription.numberOfContinuousStates
     test1
+    fmu.modelDescription.numberOfEventIndicators
     test2
     test3
     test4
@@ -147,7 +179,7 @@ if true == true
     # FMI.fmi3Terminate(fmu)
     # FMI.fmi3Reset(fmu)
     FMI.fmi3Unload(fmu)
-end
+#
 # if true == true
     fmu = FMI.fmi3Load("model/fmi3/Feedthrough.fmu")
     instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
@@ -168,8 +200,8 @@ end
     FMI.fmi3GetString(fmu, "string_param")
     FMI.fmi3SetString(fmu, ["string_param"], ["Test!"])
     FMI.fmi3GetString(fmu, ["string_param"])
-    binary = FMI.fmi3GetBinary(fmu, "binary_in")
-    FMI.fmi3SetBinary(fmu, ["binary_in"], [FMI.fmi3Binary(0x000000000534)])
+    binary = FMI.fmi3GetBinary(fmu, "binary_out")
+    FMI.fmi3SetBinary(fmu, ["binary_in"], binary)
     FMI.fmi3GetBinary(fmu, ["binary_in"])
     FMI.fmi3ExitInitializationMode(fmu)
     FMI.fmi3GetFMUState(fmu)

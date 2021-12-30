@@ -81,7 +81,10 @@ mutable struct FMU3 <: FMU
     cSerializeFMUState::Ptr{Cvoid}
     cDeSerializeFMUState::Ptr{Cvoid}
     cGetDirectionalDerivative::Ptr{Cvoid}
+    cGetAdjointDerivative::Ptr{Cvoid}
     cEvaluateDiscreteStates::Ptr{Cvoid}
+    cGetNumberOfVariableDependencies::Ptr{Cvoid}
+    cGetVariableDependencies::Ptr{Cvoid}
 
     # Co Simulation function calls
     cGetOutputDerivatives::Ptr{Cvoid}
@@ -101,6 +104,15 @@ mutable struct FMU3 <: FMU
     cCompletedIntegratorStep::Ptr{Cvoid}
     cEnterEventMode::Ptr{Cvoid}
     cUpdateDiscreteStates::Ptr{Cvoid}
+
+    # Scheduled Execution function calls
+    cSetIntervalDecimal::Ptr{Cvoid}
+    cSetIntervalFraction::Ptr{Cvoid}
+    cGetIntervalDecimal::Ptr{Cvoid}
+    cGetIntervalFraction::Ptr{Cvoid}
+    cGetShiftDecimal::Ptr{Cvoid}
+    cGetShiftFraction::Ptr{Cvoid}
+    cActivateModelPartition::Ptr{Cvoid}
 
     # c-libraries
     libHandle::Ptr{Nothing}
@@ -236,6 +248,8 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
     fmu.cTerminate                                 = dlsym(fmu.libHandle, :fmi3Terminate)
     fmu.cReset                                     = dlsym(fmu.libHandle, :fmi3Reset)
     fmu.cEvaluateDiscreteStates                    = dlsym(fmu.libHandle, :fmi3EvaluateDiscreteStates)
+    fmu.cGetNumberOfVariableDependencies           = dlsym(fmu.libHandle, :fmi3GetNumberOfVariableDependencies)
+    fmu.cGetVariableDependencies                   = dlsym(fmu.libHandle, :fmi3GetVariableDependencies)
 
     fmu.cGetFloat32                                = dlsym(fmu.libHandle, :fmi3GetFloat32)
     fmu.cSetFloat32                                = dlsym(fmu.libHandle, :fmi3SetFloat32)
@@ -281,6 +295,10 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
         fmu.cGetDirectionalDerivative              = dlsym_opt(fmu.libHandle, :fmi3GetDirectionalDerivative)
     end
 
+    if fmi3ProvidesAdjointDerivatives(fmu)
+        fmu.cGetAdjointDerivative              = dlsym_opt(fmu.libHandle, :fmi3GetAdjointDerivative)
+    end
+
     # CS specific function calls
     if fmi3IsCoSimulation(fmu)
         fmu.cGetOutputDerivatives                  = dlsym(fmu.libHandle, :fmi3GetOutputDerivatives)
@@ -307,6 +325,15 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
         fmu.rootsFound  = zeros(fmi3Int32, fmi3GetEventIndicators(fmu.modelDescription))
     end
 
+    if fmi3IsScheduledExecution(fmu)
+        fmu.cSetIntervalDecimal                    = dlsym(fmu.libHandle, :fmi3SetIntervalDecimal)
+        fmu.cSetIntervalFraction                   = dlsym(fmu.libHandle, :fmi3SetIntervalFraction)
+        fmu.cGetIntervalDecimal                    = dlsym(fmu.libHandle, :fmi3GetIntervalDecimal)
+        fmu.cGetIntervalFraction                   = dlsym(fmu.libHandle, :fmi3GetIntervalFraction)
+        fmu.cGetShiftDecimal                       = dlsym(fmu.libHandle, :fmi3GetShiftDecimal)
+        fmu.cGetShiftFraction                      = dlsym(fmu.libHandle, :fmi3GetShiftFraction)
+        fmu.cActivateModelPartition                = dlsym(fmu.libHandle, :fmi3ActivateModelPartition)
+    end
     # # initialize further variables TODO check if needed
     # fmu.jac_x = zeros(Float64, fmu.modelDescription.numberOfContinuousStates)
     # fmu.jac_t = -1.0
@@ -353,6 +380,9 @@ function fmi3IsCoSimulation(fmu::FMU3)
 end
 function fmi3IsModelExchange(fmu::FMU3)
     fmi3IsModelExchange(fmu.modelDescription)
+end
+function fmi3IsScheduledExecution(fmu::FMU3)
+    fmi3IsScheduledExecution(fmu.modelDescription)
 end
 """
 Struct to handle FMU simulation data / results.
@@ -1275,6 +1305,51 @@ end
 """
 TODO: FMI specification reference.
 
+Retrieves directional derivatives.
+
+For more information call ?fmi2GetDirectionalDerivatives
+"""
+function fmi3GetAdjointDerivative(fmu::FMU3,
+                                      unknowns::fmi3ValueReference,
+                                      knowns::fmi3ValueReference,
+                                      seed::fmi3Float64 = 1.0)
+
+    fmi3GetAdjointDerivative(fmu.components[end], unknowns, knowns, seed)
+end
+
+"""
+TODO: FMI specification reference.
+
+Retrieves directional derivatives.
+
+For more information call ?fmi2GetDirectionalDerivatives
+"""
+function fmi3GetAdjointDerivative(fmu::FMU3,
+                                      unknowns::Array{fmi3ValueReference},
+                                      knowns::Array{fmi3ValueReference},
+                                      seed::Array{fmi3Float64} = Array{fmi3Float64}([]))
+
+    fmi3GetAdjointDerivative(fmu.components[end], unknowns, knowns, seed)
+end
+
+"""
+TODO: FMI specification reference.
+
+Retrieves directional derivatives in-place.
+
+For more information call ?fmi2GetDirectionalDerivatives
+"""
+function fmi3GetAdjointDerivative!(fmu::FMU3,
+    unknowns::Array{fmi3ValueReference},
+    knowns::Array{fmi3ValueReference},
+    sensitivity::Array{fmi3Float64},
+    seed::Array{fmi3Float64} = Array{fmi3Float64}([])) 
+
+    fmi3GetAdjointDerivative!(fmu.components[end], unknowns, knowns, sensitivity, seed)
+end
+"""
+TODO: FMI specification reference.
+
 Retrieves the n-th derivative of output values.
 
 vr defines the value references of the variables
@@ -1282,8 +1357,8 @@ the array order specifies the corresponding order of derivation of the variables
 
 For more information call ?fmi2GetRealOutputDerivatives
 """
-function fmi3GetOutputDerivatives(fmu::FMU3, vr::fmi3ValueReference, nVlalueReferences::Cint, order::Integer, values::Real, nValues::Cint)
-    fmi3GetOutputDerivatives(fmu.components[end], vr, nValueReferences, fmi3Int32(order), fmi3Float64(values), nValues)
+function fmi3GetOutputDerivatives(fmu::FMU3, vr::fmi3ValueReference, nValueReferences::Cint, order::Integer, values::Real, nValues::Cint)
+    fmi3GetOutputDerivatives(fmu.components[end], vr, Csize_t(nValueReferences), fmi3Int32(order), fmi3Float64(values), Csize_t(nValues))
 end
 
 function fmi3EnterConfigurationMode(fmu::FMU3)
@@ -1291,15 +1366,15 @@ function fmi3EnterConfigurationMode(fmu::FMU3)
 end
 
 function fmi3GetNumberOfContinuousStates(fmu::FMU3)
-    size = Csize_t(0)
-    fmi3GetNumberOfContinuousStates(fmu.components[end], size)
-    size
+    fmi3GetNumberOfContinuousStates(fmu.components[end])
 end
 
 function fmi3GetNumberOfEventIndicators(fmu::FMU3)
-    size = Csize_t(0)
-    fmi3GetNumberOfEventIndicators(fmu.components[end], size)
-    size
+    fmi3GetNumberOfEventIndicators(fmu.components[end])
+end
+
+function fmi3GetNumberOfVariableDependencies(fmu::FMU3, vr::Union{fmi3ValueReference, String})
+    fmi3GetNumberOfVariableDependencies(fmu.components[end], vr)
 end
 
 function fmi3GetContinuousStates(fmu::FMU3)
@@ -1307,6 +1382,10 @@ function fmi3GetContinuousStates(fmu::FMU3)
     x = zeros(fmi3Float64, nx)
     fmi3GetContinuousStates(fmu.components[end], x, nx)
     x
+end
+
+function fmi3GetVariableDependencies(fmu::FMU3, vr::Union{fmi3ValueReference, String})
+    fmi3GetVariableDependencies(fmu.components[end], vr)
 end
 
 """
