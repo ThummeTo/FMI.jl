@@ -264,7 +264,7 @@ function fmi3SimulateME(c::fmi3Component, t_start::Real = 0.0, t_stop::Real = 1.
         eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator, inputFunction, inputValues),
                                            (integrator, idx) -> affectFMU!(c, integrator, idx, inputFunction, inputValues),
                                            Int64(c.fmu.modelDescription.numberOfEventIndicators);
-                                           rootfind = DiffEqBase.RightRootFind,
+                                           rootfind = RightRootFind,
                                            save_positions=(false,false))
         push!(callbacks, eventCb)
 

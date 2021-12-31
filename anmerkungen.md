@@ -1,5 +1,4 @@
 - Benutzerdaten rauswerfen
-- PUsh auf eigenen FMI.jl branch im Fork
 
 
 Seminar:
@@ -18,4 +17,4 @@ clocks funktionen rein, leerer Rumpf assertions -DONE
 
 kein CoSimulations Eventmode, etc.
 
-Docstrings ..., deployment of docs
+Docstrings ..., deployment of docs - DONE(docstrings)
