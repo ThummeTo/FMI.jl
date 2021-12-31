@@ -468,7 +468,7 @@ function fmi3String2ValueReference(fmu::FMU3, name::Union{String, Array{String}}
 end
 
 """
-Returns an array of variable names matching a fmi2ValueReference.
+Returns an array of variable names matching a fmi3ValueReference.
 """
 function fmi3ValueReference2String(md::fmi3ModelDescription, reference::fmi3ValueReference)
     [k for (k,v) in md.stringValueReferences if v == reference]
@@ -533,18 +533,18 @@ function fmi3Unzip(pathToFMU::String; unpackPath=nothing)
                 numBytes = write(fileAbsPath, read(f))
                 
                 if numBytes == 0
-                    @info "fmi2Unzip(...): Written file `$(f.name)`, but file is empty."
+                    @info "fmi3Unzip(...): Written file `$(f.name)`, but file is empty."
                 end
 
-                @assert isfile(fileAbsPath) ["fmi2Unzip(...): Can't unzip file `$(f.name)` at `$(fileAbsPath)`."]
+                @assert isfile(fileAbsPath) ["fmi3Unzip(...): Can't unzip file `$(f.name)` at `$(fileAbsPath)`."]
                 numFiles += 1
             end
         end
         close(zarchive)
     end
 
-    @assert isdir(unzippedAbsPath) ["fmi2Unzip(...): ZIP-Archive couldn't be unzipped at `$(unzippedPath)`."]
-    @info "fmi2Unzip(...): Successfully unzipped $numFiles files at `$unzippedAbsPath`."
+    @assert isdir(unzippedAbsPath) ["fmi3Unzip(...): ZIP-Archive couldn't be unzipped at `$(unzippedPath)`."]
+    @info "fmi3Unzip(...): Successfully unzipped $numFiles files at `$unzippedAbsPath`."
 
     (unzippedAbsPath, zipAbsPath)
 end
@@ -571,7 +571,7 @@ function fmi3Unload(fmu::FMU3, cleanUp::Bool = true)
 
     dlclose(fmu.libHandle)
 
-    # the components are removed from the component list via call to fmi2FreeInstance!
+    # the components are removed from the component list via call to fmi3FreeInstance!
     @assert length(fmu.components) == 0 "fmi3Unload(...): Failure during deleting components, $(length(fmu.components)) remaining in stack."
 
     if cleanUp
@@ -591,7 +591,7 @@ Create a new instance of the given fmu, adds a logger if logginOn == true.
 
 Returns the instance of a new FMU component.
 
-For more information call ?fmi2Instantiate
+For more information call ?fmi3InstantiateModelExchange
 """
 function fmi3InstantiateModelExchange!(fmu::FMU3; visible::Bool = false, loggingOn::Bool = false)
 
@@ -604,7 +604,7 @@ function fmi3InstantiateModelExchange!(fmu::FMU3; visible::Bool = false, logging
     compAddr = fmi3InstantiateModelExchange(fmu.cInstantiateModelExchange, fmu.instanceName, fmu.modelDescription.instantiationToken, fmu.fmuResourceLocation, fmi3Boolean(visible), fmi3Boolean(loggingOn), fmu.instanceEnvironment, ptrLogger)
 
     if compAddr == Ptr{Cvoid}(C_NULL)
-        @error "fmi2Instantiate!(...): Instantiation failed!"
+        @error "fmi3Instantiate!(...): Instantiation failed!"
         return nothing
     end
 
@@ -620,7 +620,7 @@ Create a new instance of the given fmu, adds a logger if logginOn == true.
 
 Returns the instance of a new FMU component.
 
-For more information call ?fmi2Instantiate
+For more information call ?fmi3InstantiateCoSimulation
 """
 function fmi3InstantiateCoSimulation!(fmu::FMU3; visible::Bool = false, loggingOn::Bool = false, eventModeUsed::Bool = false)
 
@@ -651,7 +651,7 @@ TODO: FMI specification reference.
 
 Returns the version of the FMI Standard used in this FMU.
 
-For more information call ?fmi2GetVersion
+For more information call ?fmi3GetVersion
 """
 function fmi3GetVersion(fmu::FMU3)
     fmi3GetVersion(fmu.cGetVersion)
@@ -662,7 +662,7 @@ TODO: FMI specification reference.
 
 Sets debug logging for the FMU.
 
-For more information call ?fmi2SetDebugLogging
+For more information call ?fmi3SetDebugLogging
 """
 function fmi3SetDebugLogging(fmu::FMU3)
     fmi3SetDebugLogging(fmu.components[end])
@@ -673,7 +673,7 @@ TODO: FMI specification reference.
 
 FMU enters Initialization mode.
 
-For more information call ?fmi2EnterInitializationMode
+For more information call ?fmi3EnterInitializationMode
 """
 function fmi3EnterInitializationMode(fmu::FMU3, startTime::Real = 0.0, stopTime::Real = startTime; tolerance::Real = 0.0)
     fmi3EnterInitializationMode(fmu.components[end], startTime, stopTime; tolerance = tolerance)
@@ -684,7 +684,7 @@ TODO: FMI specification reference.
 
 FMU exits Initialization mode.
 
-For more information call ?fmi2ExitInitializationMode
+For more information call ?fmi3ExitInitializationMode
 """
 function fmi3ExitInitializationMode(fmu::FMU3)
     fmi3ExitInitializationMode(fmu.components[end])
@@ -695,7 +695,7 @@ TODO: FMI specification reference.
 
 Informs FMU that simulation run is terminated.
 
-For more information call ?fmi2Terminate
+For more information call ?fmi3Terminate
 """
 function fmi3Terminate(fmu::FMU3)
     fmi3Terminate(fmu.components[end])
@@ -706,7 +706,7 @@ TODO: FMI specification reference.
 
 Resets FMU.
 
-For more information call ?fmi2Reset
+For more information call ?fmi3Reset
 """
 function fmi3Reset(fmu::FMU3)
     fmi3Reset(fmu.components[end])
@@ -715,9 +715,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3Float32 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetFloat32
 """
 function fmi3GetFloat32(fmu::FMU3, vr::fmi3ValueReferenceFormat)
     fmi3GetFloat32(fmu.components[end], vr)
@@ -726,20 +726,20 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3Float32 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetFloat32!
 """
 function fmi3GetFloat32!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Float32}, fmi3Float32})
-    fmi2GetFloat32!(fmu.components[end], vr, values)
+    fmi3GetFloat32!(fmu.components[end], vr, values)
 end
 
 """
 TODO: FMI specification reference.
 
-Set the values of an array of fmi2Real variables.
+Set the values of an array of fmi3Float32 variables.
 
-For more information call ?fmi2SetReal
+For more information call ?fmi3SetFloat32
 """
 function fmi3SetFloat32(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Float32}, fmi3Float32})
     fmi3SetFloat32(fmu.components[end], vr, values)
@@ -748,9 +748,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3Float64 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetFloat64
 """
 function fmi3GetFloat64(fmu::FMU3, vr::fmi3ValueReferenceFormat)
     fmi3GetFloat64(fmu.components[end], vr)
@@ -759,20 +759,20 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3Float64 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetFloat64!
 """
 function fmi3GetFloat64!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Float64}, fmi3Float64})
-    fmi2GetFloat64!(fmu.components[end], vr, values)
+    fmi3GetFloat64!(fmu.components[end], vr, values)
 end
 
 """
 TODO: FMI specification reference.
 
-Set the values of an array of fmi2Real variables.
+Set the values of an array of fmi3Float64 variables.
 
-For more information call ?fmi2SetReal
+For more information call ?fmi3SetFloat64
 """
 function fmi3SetFloat64(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Float64}, fmi3Float64})
     fmi3SetFloat64(fmu.components[end], vr, values)
@@ -781,9 +781,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3Int8 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetInt8
 """
 function fmi3GetInt8(fmu::FMU3, vr::fmi3ValueReferenceFormat)
     fmi3GetInt8(fmu.components[end], vr)
@@ -792,20 +792,20 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3Int8 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetInt8!
 """
 function fmi3GetInt8!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int8}, fmi3Int8})
-    fmi2GetInt8!(fmu.components[end], vr, values)
+    fmi3GetInt8!(fmu.components[end], vr, values)
 end
 
 """
 TODO: FMI specification reference.
 
-Set the values of an array of fmi2Real variables.
+Set the values of an array of fmi3Int8 variables.
 
-For more information call ?fmi2SetReal
+For more information call ?fmi3SetInt8
 """
 function fmi3SetInt8(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int8}, fmi3Int8})
     fmi3SetInt8(fmu.components[end], vr, values)
@@ -814,9 +814,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3UInt8 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetUInt8
 """
 function fmi3GetUInt8(fmu::FMU3, vr::fmi3ValueReferenceFormat)
     fmi3GetUInt8(fmu.components[end], vr)
@@ -825,20 +825,20 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3UInt8 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetUInt8!
 """
 function fmi3GetUInt8!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt8}, fmi3UInt8})
-    fmi2GetUInt8!(fmu.components[end], vr, values)
+    fmi3GetUInt8!(fmu.components[end], vr, values)
 end
 
 """
 TODO: FMI specification reference.
 
-Set the values of an array of fmi2Real variables.
+Set the values of an array of fmi3UInt8 variables.
 
-For more information call ?fmi2SetReal
+For more information call ?fmi3SetUInt8
 """
 function fmi3SetUInt8(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt8}, fmi3UInt8})
     fmi3SetUInt8(fmu.components[end], vr, values)
@@ -847,9 +847,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3Int16 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetInt16
 """
 function fmi3GetInt16(fmu::FMU3, vr::fmi3ValueReferenceFormat)
     fmi3GetInt16(fmu.components[end], vr)
@@ -858,20 +858,20 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3Int16 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetInt16!
 """
 function fmi3GetInt16!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int16}, fmi3Int16})
-    fmi2GetInt16!(fmu.components[end], vr, values)
+    fmi3GetInt16!(fmu.components[end], vr, values)
 end
 
 """
 TODO: FMI specification reference.
 
-Set the values of an array of fmi2Real variables.
+Set the values of an array of fmi3Int16 variables.
 
-For more information call ?fmi2SetReal
+For more information call ?fmi3SetInt16
 """
 function fmi3SetInt16(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int16}, fmi3Int16})
     fmi3SetInt16(fmu.components[end], vr, values)
@@ -880,9 +880,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3UInt16 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetUInt16
 """
 function fmi3GetUInt16(fmu::FMU3, vr::fmi3ValueReferenceFormat)
     fmi3GetUInt16(fmu.components[end], vr)
@@ -891,20 +891,20 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3UInt16 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetUInt16!
 """
 function fmi3GetUInt16!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt16}, fmi3UInt16})
-    fmi2GetUInt16!(fmu.components[end], vr, values)
+    fmi3GetUInt16!(fmu.components[end], vr, values)
 end
 
 """
 TODO: FMI specification reference.
 
-Set the values of an array of fmi2Real variables.
+Set the values of an array of fmi3UInt16 variables.
 
-For more information call ?fmi2SetReal
+For more information call ?fmi3SetUInt16
 """
 function fmi3SetUInt16(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt16}, fmi3UInt16})
     fmi3SetUInt16(fmu.components[end], vr, values)
@@ -913,9 +913,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3Int32 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetInt32
 """
 function fmi3GetInt32(fmu::FMU3, vr::fmi3ValueReferenceFormat)
     fmi3GetInt32(fmu.components[end], vr)
@@ -924,20 +924,20 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3Int32 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetInt32!
 """
 function fmi3GetInt32!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int32}, fmi3Int32})
-    fmi2GetInt32!(fmu.components[end], vr, values)
+    fmi3GetInt32!(fmu.components[end], vr, values)
 end
 
 """
 TODO: FMI specification reference.
 
-Set the values of an array of fmi2Real variables.
+Set the values of an array of fmi3Int32 variables.
 
-For more information call ?fmi2SetReal
+For more information call ?fmi3SetInt32
 """
 function fmi3SetInt32(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int32}, fmi3Int32})
     fmi3SetInt32(fmu.components[end], vr, values)
@@ -946,9 +946,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3UInt32 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetUInt32
 """
 function fmi3GetUInt32(fmu::FMU3, vr::fmi3ValueReferenceFormat)
     fmi3GetUInt32(fmu.components[end], vr)
@@ -957,20 +957,20 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3UInt32 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetUInt32!
 """
 function fmi3GetUInt32!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt32}, fmi3UInt32})
-    fmi2GetUInt32!(fmu.components[end], vr, values)
+    fmi3GetUInt32!(fmu.components[end], vr, values)
 end
 
 """
 TODO: FMI specification reference.
 
-Set the values of an array of fmi2Real variables.
+Set the values of an array of fmi3UInt32 variables.
 
-For more information call ?fmi2SetReal
+For more information call ?fmi3SetUInt32
 """
 function fmi3SetUInt32(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt32}, fmi3UInt32})
     fmi3SetUInt32(fmu.components[end], vr, values)
@@ -979,9 +979,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3Int64 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetInt64
 """
 function fmi3GetInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat)
     fmi3GetInt64(fmu.components[end], vr)
@@ -990,20 +990,20 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3Int64 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetInt64!
 """
 function fmi3GetInt64!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int64}, fmi3Int64})
-    fmi2GetInt64!(fmu.components[end], vr, values)
+    fmi3GetInt64!(fmu.components[end], vr, values)
 end
 
 """
 TODO: FMI specification reference.
 
-Set the values of an array of fmi2Real variables.
+Set the values of an array of fmi3Int64 variables.
 
-For more information call ?fmi2SetReal
+For more information call ?fmi3SetInt64
 """
 function fmi3SetInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int64}, fmi3Int64})
     fmi3SetInt64(fmu.components[end], vr, values)
@@ -1012,9 +1012,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3UInt64 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetUInt64
 """
 function fmi3GetUInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat)
     fmi3GetUInt64(fmu.components[end], vr)
@@ -1023,20 +1023,20 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Real variables.
+Get the values of an array of fmi3UInt64 variables.
 
-For more information call ?fmi2GetReal!
+For more information call ?fmi3GetUInt64!
 """
 function fmi3GetUInt64!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt64}, fmi3UInt64})
-    fmi2GetUInt64!(fmu.components[end], vr, values)
+    fmi3GetUInt64!(fmu.components[end], vr, values)
 end
 
 """
 TODO: FMI specification reference.
 
-Set the values of an array of fmi2Real variables.
+Set the values of an array of fmi3UInt64 variables.
 
-For more information call ?fmi2SetReal
+For more information call ?fmi3SetUInt64
 """
 function fmi3SetUInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt64}, fmi3UInt64})
     fmi3SetUInt64(fmu.components[end], vr, values)
@@ -1045,9 +1045,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Boolean variables.
+Get the values of an array of fmi3Boolean variables.
 
-For more information call ?fmi2GetBoolean!
+For more information call ?fmi3GetBoolean
 """
 function fmi3GetBoolean(fmu::FMU3, vr::fmi3ValueReferenceFormat)
     fmi3GetBoolean(fmu.components[end], vr)
@@ -1056,9 +1056,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2Boolean variables.
+Get the values of an array of fmi3Boolean variables.
 
-For more information call ?fmi2GetBoolean!
+For more information call ?fmi3GetBoolean!
 """
 function fmi3GetBoolean!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{Bool}, Bool, Array{fmi3Boolean}})
     fmi3GetBoolean!(fmu.components[end], vr, values)
@@ -1067,9 +1067,9 @@ end
 """
 TODO: FMI specification reference.
 
-Set the values of an array of fmi2Boolean variables.
+Set the values of an array of fmi3Boolean variables.
 
-For more information call ?fmi2SetBoolean
+For more information call ?fmi3SetBoolean
 """
 function fmi3SetBoolean(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{Bool}, Bool})
     fmi3SetBoolean(fmu.components[end], vr, values)
@@ -1078,9 +1078,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2String variables.
+Get the values of an array of fmi3String variables.
 
-For more information call ?fmi2GetString!
+For more information call ?fmi3GetString
 """
 function fmi3GetString(fmu::FMU3, vr::fmi3ValueReferenceFormat)
     fmi3GetString(fmu.components[end], vr)
@@ -1089,9 +1089,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2String variables.
+Get the values of an array of fmi3String variables.
 
-For more information call ?fmi2GetString!
+For more information call ?fmi3GetString!
 """
 function fmi3GetString!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{String}, String})
     fmi3GetString!(fmu.components[end], vr, values)
@@ -1100,9 +1100,9 @@ end
 """
 TODO: FMI specification reference.
 
-Set the values of an array of fmi2String variables.
+Set the values of an array of fmi3String variables.
 
-For more information call ?fmi2SetString
+For more information call ?fmi3SetString
 """
 function fmi3SetString(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{String}, String})
     fmi3SetString(fmu.components[end], vr, values)
@@ -1111,9 +1111,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2String variables.
+Get the values of an array of fmi3Binary variables.
 
-For more information call ?fmi2GetString!
+For more information call ?fmi3GetBinary
 """
 function fmi3GetBinary(fmu::FMU3, vr::fmi3ValueReferenceFormat)
     fmi3GetBinary(fmu.components[end], vr)
@@ -1122,9 +1122,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2String variables.
+Get the values of an array of fmi3Binary variables.
 
-For more information call ?fmi2GetString!
+For more information call ?fmi3GetBinary!
 """
 function fmi3GetBinary!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Binary}, fmi3Binary})
     fmi3GetBinary!(fmu.components[end], vr, values)
@@ -1133,9 +1133,9 @@ end
 """
 TODO: FMI specification reference.
 
-Set the values of an array of fmi2String variables.
+Set the values of an array of fmi3Binary variables.
 
-For more information call ?fmi2SetString
+For more information call ?fmi3SetBinary
 """
 function fmi3SetBinary(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Binary}, fmi3Binary})
     fmi3SetBinary(fmu.components[end], vr, values)
@@ -1144,9 +1144,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2String variables.
+Get the values of an array of fmi3Clock variables.
 
-For more information call ?fmi2GetString!
+For more information call ?fmi3GetClock
 """
 function fmi3GetClock(fmu::FMU3, vr::fmi3ValueReferenceFormat)
     fmi3GetClock(fmu.components[end], vr)
@@ -1155,9 +1155,9 @@ end
 """
 TODO: FMI specification reference.
 
-Get the values of an array of fmi2String variables.
+Get the values of an array of fmi3Clock variables.
 
-For more information call ?fmi2GetString!
+For more information call ?fmi3GetClock!
 """
 function fmi3GetClock!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Clock}, fmi3Clock})
     fmi3GetClock!(fmu.components[end], vr, values)
@@ -1166,9 +1166,9 @@ end
 """
 TODO: FMI specification reference.
 
-Set the values of an array of fmi2String variables.
+Set the values of an array of fmi3Clock variables.
 
-For more information call ?fmi2SetString
+For more information call ?fmi3SetClock
 """
 function fmi3SetClock(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Clock}, fmi3Clock})
     fmi3SetBinary(fmu.components[end], vr, values)
@@ -1179,7 +1179,7 @@ TODO: FMI specification reference.
 
 Get the pointer to the current FMU state.
 
-For more information call ?fmi2GetFMUstate
+For more information call ?fmi3GetFMUState
 """
 function fmi3GetFMUState(fmu::FMU3)
     state = fmi3FMUState()
@@ -1192,9 +1192,9 @@ end
 """
 TODO: FMI specification reference.
 
-Set the FMU to the given fmi2FMUstate.
+Set the FMU to the given fmi3FMUstate.
 
-For more information call ?fmi2SetFMUstate
+For more information call ?fmi3SetFMUState
 """
 function fmi3SetFMUState(fmu::FMU3, state::fmi3FMUState)
     fmi3SetFMUState(fmu.components[end], state)
@@ -1205,7 +1205,7 @@ TODO: FMI specification reference.
 
 Free the allocated memory for the FMU state.
 
-For more information call ?fmi2FreeFMUstate
+For more information call ?fmi3FreeFMUState
 """
 function fmi3FreeFMUState(fmu::FMU3, state::fmi3FMUState)
     stateRef = Ref(state)
@@ -1218,7 +1218,7 @@ TODO: FMI specification reference.
 
 Returns the size of a byte vector the FMU can be stored in.
 
-For more information call ?fmi2SerzializedFMUstateSize
+For more information call ?fmi3SerzializedFMUStateSize
 """
 function fmi3SerializedFMUStateSize(fmu::FMU3, state::fmi3FMUState)
     size = 0
@@ -1232,7 +1232,7 @@ TODO: FMI specification reference.
 
 Serialize the data in the FMU state pointer.
 
-For more information call ?fmi2SerzializeFMUstate
+For more information call ?fmi3SerializeFMUState
 """
 function fmi3SerializeFMUState(fmu::FMU3, state::fmi3FMUState)
     size = fmi3SerializedFMUStateSize(fmu, state)
@@ -1244,9 +1244,9 @@ end
 """
 TODO: FMI specification reference.
 
-Deserialize the data in the serializedState fmi2Byte field.
+Deserialize the data in the serializedState fmi3Byte field.
 
-For more information call ?fmi2DeSerzializeFMUstate
+For more information call ?fmi3DeSerializeFMUState
 """
 function fmi3DeSerializeFMUState(fmu::FMU3, serializedState::Array{fmi3Byte})
     size = length(serializedState)
@@ -1261,7 +1261,7 @@ TODO: FMI specification reference.
 
 Retrieves directional derivatives.
 
-For more information call ?fmi2GetDirectionalDerivatives
+For more information call ?fmi3GetDirectionalDerivative
 """
 function fmi3GetDirectionalDerivative(fmu::FMU3,
                                       unknowns::fmi3ValueReference,
@@ -1276,7 +1276,7 @@ TODO: FMI specification reference.
 
 Retrieves directional derivatives.
 
-For more information call ?fmi2GetDirectionalDerivatives
+For more information call ?fmi3GetDirectionalDerivative
 """
 function fmi3GetDirectionalDerivative(fmu::FMU3,
                                       unknowns::Array{fmi3ValueReference},
@@ -1291,7 +1291,7 @@ TODO: FMI specification reference.
 
 Retrieves directional derivatives in-place.
 
-For more information call ?fmi2GetDirectionalDerivatives
+For more information call ?fmi3GetDirectionalDerivative
 """
 function fmi3GetDirectionalDerivative!(fmu::FMU3,
     unknowns::Array{fmi3ValueReference},
@@ -1305,9 +1305,9 @@ end
 """
 TODO: FMI specification reference.
 
-Retrieves directional derivatives.
+Retrieves adjoint derivatives.
 
-For more information call ?fmi2GetDirectionalDerivatives
+For more information call ?fmi3GetAdjointDerivative
 """
 function fmi3GetAdjointDerivative(fmu::FMU3,
                                       unknowns::fmi3ValueReference,
@@ -1320,9 +1320,9 @@ end
 """
 TODO: FMI specification reference.
 
-Retrieves directional derivatives.
+Retrieves adjoint derivatives.
 
-For more information call ?fmi2GetDirectionalDerivatives
+For more information call ?fmi3GetAdjointDerivative
 """
 function fmi3GetAdjointDerivative(fmu::FMU3,
                                       unknowns::Array{fmi3ValueReference},
@@ -1335,9 +1335,9 @@ end
 """
 TODO: FMI specification reference.
 
-Retrieves directional derivatives in-place.
+Retrieves adjoint derivatives.
 
-For more information call ?fmi2GetDirectionalDerivatives
+For more information call ?fmi3GetAdjointDerivative
 """
 function fmi3GetAdjointDerivative!(fmu::FMU3,
     unknowns::Array{fmi3ValueReference},
@@ -1355,28 +1355,60 @@ Retrieves the n-th derivative of output values.
 vr defines the value references of the variables
 the array order specifies the corresponding order of derivation of the variables
 
-For more information call ?fmi2GetRealOutputDerivatives
+For more information call ?fmi3GetOutputDerivatives
 """
 function fmi3GetOutputDerivatives(fmu::FMU3, vr::fmi3ValueReference, nValueReferences::Cint, order::Integer, values::Real, nValues::Cint)
     fmi3GetOutputDerivatives(fmu.components[end], vr, Csize_t(nValueReferences), fmi3Int32(order), fmi3Float64(values), Csize_t(nValues))
 end
 
+"""
+TODO: FMI specification reference.
+
+If the importer needs to change structural parameters, it must move the FMU into Configuration Mode using fmi3EnterConfigurationMode.
+For more information call ?fmi3EnterConfigurationMode
+"""
 function fmi3EnterConfigurationMode(fmu::FMU3)
     fmi3EnterConfigurationMode(fmu.components[end])
 end
 
+"""
+TODO: FMI specification reference.
+
+This function returns the number of continuous states.
+This function can only be called in Model Exchange. 
+For more information call ?fmi3GetNumberOfContinuousStates
+"""
 function fmi3GetNumberOfContinuousStates(fmu::FMU3)
     fmi3GetNumberOfContinuousStates(fmu.components[end])
 end
 
+"""
+TODO: FMI specification reference.
+
+This function returns the number of event indicators.
+This function can only be called in Model Exchange.
+For more information call ?fmi3GetNumberOfEventIndicators
+"""
 function fmi3GetNumberOfEventIndicators(fmu::FMU3)
     fmi3GetNumberOfEventIndicators(fmu.components[end])
 end
 
+"""
+TODO: FMI specification reference.
+
+The number of dependencies of a given variable, which may change if structural parameters are changed, can be retrieved by calling the following function:
+For more information call ?fmi3GetNumberOfVariableDependencies
+"""
 function fmi3GetNumberOfVariableDependencies(fmu::FMU3, vr::Union{fmi3ValueReference, String})
     fmi3GetNumberOfVariableDependencies(fmu.components[end], vr)
 end
 
+"""
+TODO: FMI specification reference.
+
+Return the states at the current time instant.
+For more information call ?fmi3GetContinuousStates
+"""
 function fmi3GetContinuousStates(fmu::FMU3)
     nx = Csize_t(fmu.modelDescription.numberOfContinuousStates)
     x = zeros(fmi3Float64, nx)
@@ -1384,6 +1416,12 @@ function fmi3GetContinuousStates(fmu::FMU3)
     x
 end
 
+"""
+TODO: FMI specification reference.
+
+The actual dependencies (of type dependenciesKind) can be retrieved by calling the function fmi3GetVariableDependencies:
+For more information call ?fmi3GetVariableDependencies
+"""
 function fmi3GetVariableDependencies(fmu::FMU3, vr::Union{fmi3ValueReference, String})
     fmi3GetVariableDependencies(fmu.components[end], vr)
 end
@@ -1393,7 +1431,7 @@ TODO: FMI specification reference.
 
 Return the nominal values of the continuous states.
 
-For more information call ?fmi2GetNominalsOfContinuousStates
+For more information call ?fmi3GetNominalsOfContinuousStates
 """
 function fmi3GetNominalsOfContinuousStates(fmu::FMU3)
     nx = Csize_t(fmu.modelDescription.numberOfContinuousStates)
@@ -1402,31 +1440,61 @@ function fmi3GetNominalsOfContinuousStates(fmu::FMU3)
     x
 end
 
+"""
+TODO: FMI specification reference.
+
+This function is called to trigger the evaluation of fdisc to compute the current values of discrete states from previous values. 
+The FMU signals the support of fmi3EvaluateDiscreteStates via the capability flag providesEvaluateDiscreteStates.
+    
+For more information call ?fmi3EvaluateDiscreteStates
+"""
 function fmi3EvaluateDiscreteStates(fmu::FMU3)
     fmi3EvaluateDiscreteStates(fmu.components[end])
 end
 
+"""
+TODO: FMI specification reference.
+
+This function is called to signal a converged solution at the current super-dense time instant. fmi3UpdateDiscreteStates must be called at least once per super-dense time instant.
+
+For more information call ?fmi3UpdateDiscreteStates
+"""
 function fmi3UpdateDiscreteStates(fmu::FMU3, discreteStatesNeedUpdate::Bool, terminateSimulation::Bool, 
     nominalsOfContinuousStatesChanged::Bool, valuesOfContinuousStatesChanged::Bool,
     nextEventTimeDefined::Bool, nextEventTime::Real)
     fmi3UpdateDiscreteStates(fmu.components[end], fmi3Boolean(discreteStatesNeedUpdate), fmi3Boolean(terminateSimulation), fmi3Boolean(nominalsOfContinuousStatesChanged), 
     fmi3Boolean(valuesOfContinuousStatesChanged), fmi3Boolean(nextEventTimeDefined), fmi3Float64(nextEventTime))
 end
+
 """
 TODO: FMI specification reference.
 
 The model enters Continuous-Time Mode.
 
-For more information call ?fmi2EnterContinuousTimeMode
+For more information call ?fmi3EnterContinuousTimeMode
 """
 function fmi3EnterContinuousTimeMode(fmu::FMU3)
     fmi3EnterContinuousTimeMode(fmu.components[end])
 end
 
+"""
+TODO: FMI specification reference.
+
+This function must be called to change from Event Mode into Step Mode in Co-Simulation.
+
+For more information call ?fmi3EnterStepMode
+"""
 function fmi3EnterStepMode(fmu::FMU3)
     fmi3EnterStepMode(fmu.components[end])
 end
 
+"""
+TODO: FMI specification reference.
+
+Exits the Configuration Mode and returns to state Instantiated.
+
+For more information call ?fmi3ExitConfigurationMode
+"""
 function fmi3ExitConfigurationMode(fmu::FMU3)
     fmi3ExitConfigurationMode(fmu.components[end])
 end
@@ -1436,7 +1504,7 @@ TODO: FMI specification reference.
 
 Set independent variable time and reinitialize chaching of variables that depend on time.
 
-For more information call ?fmi2SetTime
+For more information call ?fmi3SetTime
 """
 function fmi3SetTime(fmu::FMU3, time::Real)
     fmu.t = time
@@ -1448,7 +1516,7 @@ TODO: FMI specification reference.
 
 Set a new (continuous) state vector and reinitialize chaching of variables that depend on states.
 
-For more information call ?fmi2SetContinuousStates
+For more information call ?fmi3SetContinuousStates
 """
 function fmi3SetContinuousStates(fmu::FMU3, x::Union{Array{Float32}, Array{Float64}})
     nx = Csize_t(length(x))
@@ -1461,7 +1529,7 @@ TODO: FMI specification reference.
 
 Compute state derivatives at the current time instant and for the current states.
 
-For more information call ?fmi2GetDerivatives
+For more information call ?fmi3GetContinuousStateDerivatives
 """
 function  fmi3GetContinuousStateDerivatives(fmu::FMU3)
     nx = Csize_t(fmu.modelDescription.numberOfContinuousStates)
@@ -1475,7 +1543,7 @@ TODO: FMI specification reference.
 
 Returns the event indicators of the FMU.
 
-For more information call ?fmi2GetEventIndicators
+For more information call ?fmi3GetEventIndicators
 """
 function fmi3GetEventIndicators(fmu::FMU3)
     ni = Csize_t(fmu.modelDescription.numberOfEventIndicators)
@@ -1488,10 +1556,10 @@ end
 TODO: FMI specification reference.
 
 This function must be called by the environment after every completed step
-If enterEventMode == fmi2True, the event mode must be entered
-If terminateSimulation == fmi2True, the simulation shall be terminated
+If enterEventMode == fmi3True, the event mode must be entered
+If terminateSimulation == fmi3True, the simulation shall be terminated
 
-For more information call ?fmi2CompletedIntegratorStep
+For more information call ?fmi3CompletedIntegratorStep
 """
 function fmi3CompletedIntegratorStep(fmu::FMU3,
                                      noSetFMUStatePriorToCurrentPoint::fmi3Boolean)
@@ -1509,7 +1577,7 @@ TODO: FMI specification reference.
 
 The model enters Event Mode.
 
-For more information call ?fmi2EnterEventMode
+For more information call ?fmi3EnterEventMode
 """
 function fmi3EnterEventMode(fmu::FMU3, stepEvent::Bool, stateEvent::Bool, rootsFound::Array{fmi3Int32}, nEventIndicators::Integer, timeEvent::Bool)
     fmi3EnterEventMode(fmu.components[end], stepEvent, stateEvent, rootsFound, nEventIndicators, timeEvent)
@@ -1520,7 +1588,7 @@ TODO: FMI specification reference.
 
 The computation of a time step is started.
 
-For more information call ?fmi2DoStep
+For more information call ?fmi3DoStep
 """
 function fmi3DoStep(fmu::FMU3, currentCommunicationPoint::Real, communicationStepSize::Real, noSetFMUStatePriorToCurrentPoint::Bool, eventEncountered::fmi3Boolean, terminateSimulation::fmi3Boolean, earlyReturn::fmi3Boolean, lastSuccessfulTime::fmi3Float64)
     fmi3DoStep(fmu.components[end], fmi3Float64(currentCommunicationPoint), fmi3Float64(communicationStepSize), fmi3Boolean(noSetFMUStatePriorToCurrentPoint), eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)

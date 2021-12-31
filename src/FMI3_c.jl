@@ -1115,6 +1115,11 @@ function fmi3DeSerializeFMUState(c::fmi3Component, serialzedState::Array{fmi3Byt
                 c.compAddr, serialzedState, size, FMUstate)
 end
 
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.2.9. Clocks
+
+For some Clock types, the interval is set by the environment for the current time instant by the function fmi3SetIntervalDecimal or fmi3SetIntervalFraction
+"""
 # TODO Clocks and dependencies functions
 function fmi3SetIntervalDecimal(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, intervals::Array{fmi3Float64})
     @assert false "Not tested"
@@ -1124,6 +1129,11 @@ function fmi3SetIntervalDecimal(c::fmi3Component, vr::Array{fmi3ValueReference},
                 c.compAddr, vr, nvr, intervals)
 end
 
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.2.9. Clocks
+
+For some Clock types, the interval is set by the environment for the current time instant by the function fmi3SetIntervalDecimal or fmi3SetIntervalFraction
+"""
 function fmi3SetIntervalFraction(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, intervalCounters::Array{fmi3UInt64}, resolutions::Array{fmi3UInt64})
     @assert false "Not tested"
     status = ccall(c.fmu.cSetIntervalFraction,
@@ -1132,6 +1142,11 @@ function fmi3SetIntervalFraction(c::fmi3Component, vr::Array{fmi3ValueReference}
                 c.compAddr, vr, nvr, intervalCounters, resolutions)
 end
 
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.2.9. Clocks
+
+For other Clock types, the importer calls fmi3GetIntervalDecimal or fmi3GetIntervalFraction to query the next Clock interval:
+"""
 function fmi3GetIntervalDecimal(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, intervals::Array{fmi3Float64}, qualifiers::fmi3IntervalQualifier)
     @assert false "Not tested"
     status = ccall(c.fmu.cGetIntervalDecimal,
@@ -1140,6 +1155,11 @@ function fmi3GetIntervalDecimal(c::fmi3Component, vr::Array{fmi3ValueReference},
                 c.compAddr, vr, nvr, intervals, qualifiers)
 end
 
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.2.9. Clocks
+
+For other Clock types, the importer calls fmi3GetIntervalDecimal or fmi3GetIntervalFraction to query the next Clock interval:
+"""
 function fmi3GetIntervalFraction(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, intervalCounters::Array{fmi3UInt64}, resolutions::Array{fmi3UInt64}, qualifiers::fmi3IntervalQualifier)
     @assert false "Not tested"
     status = ccall(c.fmu.cGetIntervalFraction,
@@ -1148,6 +1168,11 @@ function fmi3GetIntervalFraction(c::fmi3Component, vr::Array{fmi3ValueReference}
                 c.compAddr, vr, nvr, intervalCounters, resolutions, qualifiers)
 end
 
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.2.9. Clocks
+
+For some Clocks, the importer has to query the delay to the first Clock tick from the FMU using the following functions:
+"""
 function fmi3GetShiftDecimal(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, shifts::Array{fmi3Float64})
     @assert false "Not tested"
     status = ccall(c.fmu.cGetShiftDecimal,
@@ -1156,6 +1181,11 @@ function fmi3GetShiftDecimal(c::fmi3Component, vr::Array{fmi3ValueReference}, nv
                 c.compAddr, vr, nvr, shifts)
 end
 
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.2.9. Clocks
+
+For some Clocks, the importer has to query the delay to the first Clock tick from the FMU using the following functions:
+"""
 function fmi3GetShiftFraction(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, shiftCounters::Array{fmi3UInt64}, resolutions::Array{fmi3UInt64})
     @assert false "Not tested"
     status = ccall(c.fmu.cGetShiftFraction,
@@ -1163,7 +1193,11 @@ function fmi3GetShiftFraction(c::fmi3Component, vr::Array{fmi3ValueReference}, n
                 (Ptr{Nothing}, Ptr{fmi3ValueReference}, Csize_t, Ptr{fmi3UInt64}, Ptr{fmi3UInt64}),
                 c.compAddr, vr, nvr, shiftCounters, resolutions)
 end
+"""
+Source: FMISpec3.0, Version D5ef1c1: 5.2.2. State: Clock Activation Mode
 
+Each fmi3ActivateModelPartition call is associated with the computation of an exposed model partition of the FMU and therefore to an input Clock.
+"""
 function fmi3ActivateModelPartition(c::fmi3Component, vr::fmi3ValueReference, activationTime::Array{fmi3Float64})
     @assert false "Not tested"
     status = ccall(c.fmu.cActivateModelPartition,
@@ -1171,7 +1205,11 @@ function fmi3ActivateModelPartition(c::fmi3Component, vr::fmi3ValueReference, ac
                 (Ptr{Nothing}, fmi3ValueReference, Ptr{fmi3Float64}),
                 c.compAddr, vr, activationTime)
 end
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.2.10. Dependencies of Variables
 
+The number of dependencies of a given variable, which may change if structural parameters are changed, can be retrieved by calling the following function:
+"""
 # TODO not tested
 function fmi3GetNumberOfVariableDependencies(c::fmi3Component, vr::fmi3ValueReference, nvr::Ref{Csize_t})
     @assert false "Not tested"
@@ -1180,7 +1218,11 @@ function fmi3GetNumberOfVariableDependencies(c::fmi3Component, vr::fmi3ValueRefe
                 (Ptr{Nothing}, fmi3ValueReference, Ptr{Csize_t}),
                 c.compAddr, vr, nvr)
 end
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.2.10. Dependencies of Variables
 
+The actual dependencies (of type dependenciesKind) can be retrieved by calling the function fmi3GetVariableDependencies:
+"""
 function fmi3GetVariableDependencies(c::fmi3Component, vr::fmi3ValueReference, elementIndiceOfDependents::Array{Csize_t}, independents::Array{fmi3ValueReference},  elementIndiceOfInpendents::Array{Csize_t}, dependencyKind::Array{fmi3DependencyKind}, ndependencies::Csize_t)
     @assert false "Not tested"
     status = ccall(c.fmu.cGetVariableDependencies,
@@ -1329,6 +1371,11 @@ function fmi3EvaluateDiscreteStates(c::fmi3Component)
             c.compAddr)
 end
 
+"""
+Source: FMISpec3.0, Version D5ef1c1: 2.3.5. State: Event Mode
+
+This function is called to signal a converged solution at the current super-dense time instant. fmi3UpdateDiscreteStates must be called at least once per super-dense time instant.
+"""
 function fmi3UpdateDiscreteStates(c::fmi3Component, discreteStatesNeedUpdate::fmi3Boolean, terminateSimulation::fmi3Boolean, 
                                     nominalsOfContinuousStatesChanged::fmi3Boolean, valuesOfContinuousStatesChanged::fmi3Boolean,
                                     nextEventTimeDefined::fmi3Boolean, nextEventTime::fmi3Float64)

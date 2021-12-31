@@ -318,7 +318,6 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi3ModelDescription, deriva
     end
     modelVariables = Array{fmi3ModelVariable}(undef, numberOfVariables)
     index = 1
-    # TODO bis hhierierher
     for node in eachelement(nodes)
         name = node["name"]
         ValueReference = parse(fmi3ValueReference, (node["valueReference"]))
@@ -429,7 +428,7 @@ function fmi3parseBoolean(s::Union{String, SubString{String}}; onfail=nothing)
     elseif s == "false"
         return false
     else
-        @assert onfail != nothing ["parseBoolean(...) unknown boolean value '$s'."]
+        @assert onfail !== nothing ["parseBoolean(...) unknown boolean value '$s'."]
         return onfail
     end
 end
@@ -471,7 +470,7 @@ function fmi3parseNodeString(node, key; onfail=nothing)
     end
 end
 
-# Parses a fmi2Boolean value represented by a string.
+# Parses a fmi3Boolean value represented by a string.
 function parseFMI3Boolean(s::Union{String, SubString{String}})
     if fmi3parseBoolean(s)
         return fmi3True
@@ -526,7 +525,7 @@ function fmi3setDatatypeVariables(node::EzXML.Node, md::fmi3ModelDescription)
         type.datatype = fmi3UInt64
     elseif typename == "Boolean"
         type.datatype = fmi3Boolean
-    elseif typename == "Binary" # nicht sicher wie diese Datentypen in der modelDescription ausschauen
+    elseif typename == "Binary" 
         type.datatype = fmi3Binary
     elseif typename == "Char"
         type.datatype = fmi3Char

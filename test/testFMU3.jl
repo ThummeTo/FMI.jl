@@ -10,6 +10,8 @@ using FMI
     fmu=FMI.fmi3Load("model/fmi3/BouncingBall/BouncingBall.fmu")
     # instance1 = FMI.fmi3InstantiateModelExchange!(fmu; loggingOn=true)
     instance2 = FMI.fmi3InstantiateCoSimulation!(fmu; loggingOn=true)
+    FMI.fmi3EnterConfigurationMode(fmu)
+    FMI.fmi3ExitConfigurationMode(fmu)
     t_start = 0.0
     t_stop = 3.0
     dt = 0.01

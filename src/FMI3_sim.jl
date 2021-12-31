@@ -154,7 +154,7 @@ function saveValues(c::fmi3Component, recordValues, u, t, integrator)
 end
 
 """
-Source: FMISpec2.0.2[p.90 ff]: 3.2.4 Pseudocode Example
+Source: FMISpec3.0, Version D5ef1c1: 3.3. Code Example
 
 Simulates a FMU instance for the given simulation time interval.
 State- and Time-Events are handled correctly.
@@ -287,12 +287,14 @@ function fmi3SimulateME(c::fmi3Component, t_start::Real = 0.0, t_stop::Real = 1.
 end
 
 """
+Source: FMISpec3.0, Version D5ef1c1: 4.3. Code Examples
+
 Starts a simulation of the Co-Simulation FMU instance.
 
 Returns a tuple of (success::Bool, DiffEqCallbacks.SavedValues) with success = `true` or `false`.
 If keyword `recordValues` is not set, a tuple of type (success::Bool, nothing) is returned for consitency.
 
-ToDo: Improove Documentation.
+ToDo: Improve Documentation.
 """
 function fmi3SimulateCS(c::fmi3Component, t_start::Real, t_stop::Real;
                         recordValues::fmi3ValueReferenceFormat = nothing,
@@ -433,7 +435,7 @@ Returns:
     - a tuple of (ODESolution, DiffEqCallbacks.SavedValues) for ME-FMUs
     - if keyword `recordValues` is not set, a tuple of type (..., nothing)
     
-ToDo: Improove Documentation.
+ToDo: Improve Documentation.
 """
 function fmi3Simulate(c::fmi3Component, t_start::Real = 0.0, t_stop::Real = 1.0;kwargs...)
 
