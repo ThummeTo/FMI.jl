@@ -55,6 +55,16 @@ As @Proir knowllage points out, the common standard in both business and researc
   
 FMI.jl: load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
 
+```@eval
+file = "NeuralFMU_ Towards Structural Integration of FMUs into Neural Networks.pdf"
+url = "https://github.com/adribrune/FMI.jl/blob/main/docs/src/assets/$(file).pdf"
+import Markdown
+Markdown.parse("""
+!!! note
+    More detailed information about the FMI.jl can be found in the paper [NeuralFMU: Towards Structural Integration of FMUs into Neural Networks](https://arxiv.org/abs/2109.04351)
+    The documentation is also available in PDF format: [$file]($url).
+""")
+```  
 
 ## What is currently supported in FMI.jl?
 - simulation / plotting of CS- and ME-FMUs
