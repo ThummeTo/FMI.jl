@@ -28,12 +28,12 @@ The [Library Functions]() sections contains all the documentation to the functio
 ### 5. Related Publications
 If you are interested in [related publications](), you can browse through the list of references and gather more information. 
 
-## Prior knowledge(@id Prior knowledge)
+## [Prior knowledge](@id prior_knowledge)
 
 ### Julia Programming Language
 
 
-### FMI 
+### [FMI](@id FMI) 
 The Functional Mock-up Interface (FMI) is an open standard for the tool-independent exchange and integration of track models from different manufactures. FMI simplifies the use of the best tools for specific modeling tasks and the consistent reuse of models in different development phases and across departmental boundaries.
 
 ```@eval
@@ -50,8 +50,7 @@ Markdown.parse("""
 An exported model container that fulfills the FMI requirements is referred to as a Functional Mock-up Unit (FMU).They can be applied in diverse simulation environments and sometimes even in entire co-simulations. So FMUs can be divided into two main application classes: model-exchange and co-simulation.
 
 ## Library FMI.jl
-Models within closed simulation tools complicate hybrid modeling, because for training purposes of data-driven model parts the loss gradient must be determined by neural networks (NN) and the model itself is required. Nevertheless, the structural integration of models in NNs is a sought-after field of research in which some approaches have already been made. For example, progress by integrating alogiritmic numerical solvers for ordenary differential equations (ODEs) in NNs. Another approach was to integrate physical models into mashine learning processes, where physical models are evaluated during training as part of the loss fuction. Besides, the focus here is not only on cost function but above all on the structural intergration of FMUs. For this purpose, the combination of physical and data-driven models is suitable as an overall industrial tool, which so far cannot be implemented in reality. By exporting the models to a more suitable environment, a alternative can be created, which serves as an approach to this freely usable library. 
-As @Proir knowllage points out, the common standard in both business and research is the usage of FMI, in our application this serves as an excellent candidate. By providing the library, it should now be possible to make the subject area of neuronalODEs more attractive for industrial applications and introduce the state of the art of mashine learning techniques closer to production.  
+Models within closed simulation tools complicate hybrid modeling, because for training purposes of data-driven model parts the loss gradient must be determined by neural networks (NN) and the model itself is required. Nevertheless, the structural integration of models in NNs is a sought-after field of research in which some approaches have already been made. For example, progress by integrating alogiritmic numerical solvers for ordenary differential equations (ODEs) in NNs. Another approach was to integrate physical models into mashine learning processes, where physical models are evaluated during training as part of the loss fuction. Besides, the focus here is not only on cost function but above all on the structural intergration of FMUs. For this purpose, the combination of physical and data-driven models is suitable as an overall industrial tool, which so far cannot be implemented in reality. By exporting the models to a more suitable environment, a alternative can be created, which serves as an approach to this freely usable library.As [prior knowlage](@ref prior_knowledge) points out, the common standard in both business and research is the usage of FMI, in our application this serves as an excellent candidate. By providing the library, it should now be possible to make the subject area of neuronalODEs more attractive for industrial applications and introduce the state of the art of mashine learning techniques closer to production.  
   
 FMI.jl: load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
 
