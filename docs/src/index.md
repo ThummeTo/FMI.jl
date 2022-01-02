@@ -33,6 +33,17 @@ If you are interested in [related publications](), you can browse through the li
 ### Julia Programming Language
 
 
+```@eval
+file = "NeuralFMU_ Towards Structural Integration of FMUs into Neural Networks.pdf"
+url = "https://github.com/adribrune/FMI.jl/blob/main/docs/src/assets/$(file).pdf"
+import Markdown
+Markdown.parse("""
+!!! note
+    More detailed information about the FMI.jl can be found in the paper [NeuralFMU: Towards Structural Integration of FMUs into Neural Networks](https://arxiv.org/abs/2109.04351)
+    The documentation is also available in PDF format: [$file]($url).
+""")
+```  
+
 ### [FMI](@id FMI) 
 The Functional Mock-up Interface (FMI) is an open standard for the tool-independent exchange and integration of track models from different manufactures. FMI simplifies the use of the best tools for specific modeling tasks and the consistent reuse of models in different development phases and across departmental boundaries.
 
@@ -52,8 +63,11 @@ An exported model container that fulfills the FMI requirements is referred to as
 ## Library FMI.jl
 Models within closed simulation tools complicate hybrid modeling, because for training purposes of data-driven model parts the loss gradient must be determined by neural networks (NN) and the model itself is required. Nevertheless, the structural integration of models in NNs is a sought-after field of research in which some approaches have already been made. For example, progress by integrating alogiritmic numerical solvers for ordenary differential equations (ODEs) in NNs. Another approach was to integrate physical models into mashine learning processes, where physical models are evaluated during training as part of the loss fuction. Besides, the focus here is not only on cost function but above all on the structural intergration of FMUs. For this purpose, the combination of physical and data-driven models is suitable as an overall industrial tool, which so far cannot be implemented in reality. By exporting the models to a more suitable environment, a alternative can be created, which serves as an approach to this freely usable library.As [prior knowlage](@ref prior_knowledge) points out, the common standard in both business and research is the usage of FMI, in our application this serves as an excellent candidate. By providing the library, it should now be possible to make the subject area of neuronalODEs more attractive for industrial applications and bring the state of the art of mashine learning techniques closer to production.  
 
+Werden phsikalsiche Systeme modlliert stellt dies oft eine vereinfachung zugrunde, welche eine parameterisierung aller physikalischen Aspekte ausschließt. Beispielsweise wird die Reibung in vielen modelloierung von mechanischen, elektrischen oder hydrolischen Systemen vernachlässigt. Selbst bei bentzung von Reibungmodellen ist die parameterisoierung feheleranfällig. Hier setzt die hybride modellierungstechnik an, wobei ihre Vorteile in der Anwendung in .
+
 The Julia library provides a number of useful commands for use. Among the main applications is the unpacking, assigning, parameterising and simulating of entire FMUs with additional display of the results.
 Because FMI is under development, a version-independent FMU simulation with the same user interface must be ensured.  In addition, the aim is to ensure a pleasant user experience for any user, which is why small but high-level Julia command sets are provided as well as low-level commands defined by the FMI standard.  
+
 
 ```@eval
 file = "NeuralFMU_ Towards Structural Integration of FMUs into Neural Networks.pdf"
