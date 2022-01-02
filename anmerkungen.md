@@ -1,4 +1,4 @@
-- Benutzerdaten rauswerfen
+- Benutzerdaten rauswerfen - DONE
 
 
 Seminar:
