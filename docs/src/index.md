@@ -66,7 +66,7 @@ Models within closed simulation tools complicate hybrid modeling, because for tr
 Werden phsikalsiche Systeme modlliert stellt dies oft eine vereinfachung zugrunde, welche eine parameterisierung aller physikalischen Aspekte ausschließt. Beispielsweise wird die Reibung in vielen modelloierung von mechanischen, elektrischen oder hydrolischen Systemen vernachlässigt. Selbst bei bentzung von Reibungmodellen ist die parameterisoierung feheleranfällig. Hier setzt die hybride modellierungstechnik an, wobei ihre Vorteile in der Anwendung in einem kurzen Beispeiel verdeutlicht werden können.
 
 The Julia library provides a number of useful commands for use. Among the main applications is the unpacking, assigning, parameterising and simulating of entire FMUs with additional display of the results.
-Because FMI is under development, a version-independent FMU simulation with the same user interface must be ensured.  In addition, the aim is to ensure a pleasant user experience for any user, which is why small but high-level Julia command sets are provided as well as low-level commands defined by the FMI standard.  
+Because FMI is under development, a version-independent FMU simulation with the same user interface must be ensured. In addition, the aim is to ensure a pleasant user experience for any user, which is why small but high-level Julia command sets are provided as well as low-level commands defined by the FMI standard.  
 
 
 ```@eval
