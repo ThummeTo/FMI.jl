@@ -4,10 +4,10 @@ This section is intended to familiarise users with the documentation environment
 
 ## Documentation Overview
 ### 1. Introduction
-The [Introduction]() is intended to provide an initial `overview of the structure` of the documentation. Thereby the most `important terms` are briefly explained for a better understanding of the functionalities of the library. In addition, the characteristic `features and functions of our FMI.jl library` are specifically described to answer users initial questions before using the library for the first time.  
+The [Introduction]() is intended to provide an initial overview of the structure of the documentation. Thereby the most important terms are briefly explained for a better understanding of the functionalities of the library. In addition, the characteristic features and functions of our FMI.jl library` are specifically described to answer users initial questions before using the library for the first time.  
 
 ### 2. Tutorials
-Guidance on how to use the library correctly is provided in the [Tutorial]() sections. Various topics are `explained step by step` and `illustrated` with the help of `code snippets`.  
+Guidance on how to use the library correctly is provided in the [Tutorial]() sections. Various topics are explained step by step and illustrated with the help of code snippets.  
 
 Until now, tutorials have been organized on the following topics:
 - [Get Started]()
@@ -16,7 +16,7 @@ Until now, tutorials have been organized on the following topics:
 - 
 
 ### 3. Examples
-By using [Examples](), the use of the library can be shown best. Here, `short and easy` to understand `code blocks` are explained which should make the use of the functions a little easier.
+By using [Examples](), the use of the library can be shown best. Here, short and easy to understand code blocks are explained which should make the use of the functions a little easier.
 
 
 ### 4. Libary Funktions
