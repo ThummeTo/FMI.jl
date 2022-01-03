@@ -58,7 +58,15 @@ Markdown.parse("""
 """)
 ```  
 
-An exported model container that fulfills the FMI requirements is referred to as a Functional Mock-up Unit (FMU).They can be applied in diverse simulation environments and sometimes even in entire co-simulations. So FMUs can be divided into two main application classes: model-exchange and co-simulation.
+An exported model container that fulfills the FMI requirements is referred to as a Functional Mock-up Unit (FMU).They can be applied in diverse simulation environments and sometimes even in entire co-simulations. So FMUs can be divided into two main application classes: model-exchange(ME) and co-simulation(CS).
+
+- model-exchange(ME):  
+
+ME-FMUs provide an interface to the system dynamics, allowing a system state derivative of a system state to be calculated. Then outside the FMU, the next system state can be derived by numerical integration.
+
+- co-simulation(CS):
+
+
 
 ## Library FMI.jl
 Models within closed simulation tools complicate hybrid modeling, because for training purposes of data-driven model parts the loss gradient must be determined by neural networks (NN) and the model itself is required. Nevertheless, the structural integration of models in NNs is a sought-after field of research in which some approaches have already been made. For example, progress by integrating alogiritmic numerical solvers for ordenary differential equations (ODEs) in NNs. Another approach was to integrate physical models into mashine learning processes, where physical models are evaluated during training as part of the loss fuction. Besides, the focus here is not only on cost function but above all on the structural intergration of FMUs. For this purpose, the combination of physical and data-driven models is suitable as an overall industrial tool, which so far cannot be implemented in reality. By exporting the models to a more suitable environment, a alternative can be created, which serves as an approach to this freely usable library.As [prior knowlage](@ref prior_knowledge) points out, the common standard in both business and research is the usage of FMI, in our application this serves as an excellent candidate. By providing the library, it should now be possible to make the subject area of neuronalODEs more attractive for industrial applications and bring the state of the art of mashine learning techniques closer to production.  
