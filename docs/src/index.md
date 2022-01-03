@@ -62,7 +62,7 @@ An exported model container that fulfills the FMI requirements is referred to as
 
 - <ins>model-exchange(ME)</ins>:  ME-FMUs provide an interface to the system dynamics, allowing a system state derivative of a system state to be calculated. Then outside the FMU, the next system state can be derived by numerical integration.
 
-- <ins>co-simulation(CS)</ins>:
+- <ins>co-simulation(CS)</ins>: The inclusion of a numerical solver for ordenary differential equations (ODEs) simplifies the simulation considerably and also prevents further manipulation before numerical integration.
 
 
 
