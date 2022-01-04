@@ -1459,11 +1459,11 @@ This function is called to signal a converged solution at the current super-dens
 
 For more information call ?fmi3UpdateDiscreteStates
 """
-function fmi3UpdateDiscreteStates(fmu::FMU3, discreteStatesNeedUpdate::Bool, terminateSimulation::Bool, 
-    nominalsOfContinuousStatesChanged::Bool, valuesOfContinuousStatesChanged::Bool,
-    nextEventTimeDefined::Bool, nextEventTime::Real)
-    fmi3UpdateDiscreteStates(fmu.components[end], fmi3Boolean(discreteStatesNeedUpdate), fmi3Boolean(terminateSimulation), fmi3Boolean(nominalsOfContinuousStatesChanged), 
-    fmi3Boolean(valuesOfContinuousStatesChanged), fmi3Boolean(nextEventTimeDefined), fmi3Float64(nextEventTime))
+function fmi3UpdateDiscreteStates(fmu::FMU3, discreteStatesNeedUpdate::fmi3Boolean, terminateSimulation::fmi3Boolean, 
+    nominalsOfContinuousStatesChanged::fmi3Boolean, valuesOfContinuousStatesChanged::fmi3Boolean,
+    nextEventTimeDefined::fmi3Boolean, nextEventTime::fmi3Float64)
+    fmi3UpdateDiscreteStates(fmu.components[end], discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, 
+    valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
 end
 
 """

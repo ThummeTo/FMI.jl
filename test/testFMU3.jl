@@ -17,9 +17,15 @@ using FMI
     dt = 0.01
     saveat = t_start:dt:t_stop
     success, data = FMI.fmi3SimulateCS(fmu, t_start, t_stop; recordValues=["h", "v"], saveat = saveat)
+    FMI.fmiPlot(fmu,["h", "v"], data)
     FMI.fmi3EnterInitializationMode(fmu, 0.0, 10.0)
-    FMI.fmi3GetDirectionalDerivative(fmu, fmu.modelDescription.derivativeValueReferences, fmu.modelDescription.stateValueReferences)
-    FMI.fmi3GetAdjointDerivative(fmu, fmu.modelDescription.derivativeValueReferences, fmu.modelDescription.stateValueReferences)
+    # TODO adding test for directional& adjoint derivatives
+    for i in 1:2
+        for j in 1:2
+            println(FMI.fmi3GetDirectionalDerivative(fmu, fmu.modelDescription.derivativeValueReferences[i], fmu.modelDescription.stateValueReferences[j]))
+            println(FMI.fmi3GetAdjointDerivative(fmu, fmu.modelDescription.derivativeValueReferences[i], fmu.modelDescription.stateValueReferences[j]))
+        end
+    end
     FMI.fmi3ExitInitializationMode(fmu)
     FMI.fmi3GetOutputDerivatives(fmu,)
     FMI.fmi3EnterEventMode(fmu, true, false, [FMI.fmi3Int32(2)], 0, false)
@@ -45,7 +51,7 @@ using FMI
     # FMI.fmi3GetVersion(fmu)
     # FMI.fmi3SetDebugLogging(fmu)
     t_start = 0.0
-    t_stop = 3.0
+    t_stop = 1.0
     dt = 0.01
     saveat = t_start:dt:t_stop
     # success, data = FMI.fmi3SimulateCS(fmu, t_start, t_stop; recordValues=["h", "v"], saveat = saveat)
@@ -202,7 +208,7 @@ using FMI
     FMI.fmi3GetString(fmu, "string_param")
     FMI.fmi3SetString(fmu, ["string_param"], ["Test!"])
     FMI.fmi3GetString(fmu, ["string_param"])
-    binary = FMI.fmi3GetBinary(fmu, "binary_out")
+    binary = FMI.fmi3GetBinary(fmu, "binary_in")
     FMI.fmi3SetBinary(fmu, ["binary_in"], binary)
     FMI.fmi3GetBinary(fmu, ["binary_in"])
     FMI.fmi3ExitInitializationMode(fmu)

@@ -765,7 +765,7 @@ function fmi3GetBinary(c::fmi3Component, vr::fmi3ValueReferenceFormat)
     nvr = Csize_t(length(vr))
     values = Array{fmi3Binary}(undef, nvr)
     valueSizes = Array{Csize_t}(undef, nvr)
-    fill!(valueSizes, Csize_t(8))
+    fill!(valueSizes, Csize_t(1))
     fmi3GetBinary!(c, vr, nvr, valueSizes, values, nvr)
 
     if length(values) == 1
@@ -790,7 +790,7 @@ function fmi3GetBinary!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::
 
     nvr = Csize_t(length(vr))
     valueSizes = Array{Csize_t}(undef, nvr)
-    fill!(valueSizes, Csize_t(8))
+    fill!(valueSizes, Csize_t(1))
     fmi3GetBinary!(c, vr, nvr, valueSizes, values, nvr)
     nothing
 end
@@ -813,7 +813,7 @@ function fmi3SetBinary(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::U
 
     nvr = Csize_t(length(vr))
     valueSizes = Array{Csize_t}(undef, nvr)
-    fill!(valueSizes, Csize_t(8))
+    fill!(valueSizes, Csize_t(1))
     fmi3SetBinary(c, vr, nvr, valueSizes, values, nvr)
 end
 
@@ -1208,12 +1208,12 @@ This function is called to signal a converged solution at the current super-dens
 
 For more information call ?fmi3UpdateDiscreteStates
 """
-function fmi3UpdateDiscreteStates(c::fmi3Component, discreteStatesNeedUpdate::Bool, terminateSimulation::Bool, 
-    nominalsOfContinuousStatesChanged::Bool, valuesOfContinuousStatesChanged::Bool,
-    nextEventTimeDefined::Bool, nextEventTime::Real)
-    fmi3UpdateDiscreteStates(c, fmi3Boolean(discreteStatesNeedUpdate), fmi3Boolean(terminateSimulation), fmi3Boolean(nominalsOfContinuousStatesChanged), 
-    fmi3Boolean(valuesOfContinuousStatesChanged), fmi3Boolean(nextEventTimeDefined), fmi3Float64(nextEventTime))
-end
+# function fmi3UpdateDiscreteStates(c::fmi3Component, discreteStatesNeedUpdate::fmi3Boolean, terminateSimulation::fmi3Boolean, 
+#     nominalsOfContinuousStatesChanged::fmi3Boolean, valuesOfContinuousStatesChanged::fmi3Boolean,
+#     nextEventTimeDefined::fmi3Boolean, nextEventTime::fmi3Float64)
+#     fmi3UpdateDiscreteStates(c, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, 
+#     valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
+# end
 
 """
 TODO: FMI specification reference.

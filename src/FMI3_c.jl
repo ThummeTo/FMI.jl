@@ -1371,6 +1371,7 @@ function fmi3EvaluateDiscreteStates(c::fmi3Component)
             c.compAddr)
 end
 
+# TODO funktion mit !
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.3.5. State: Event Mode
 
@@ -1384,6 +1385,12 @@ function fmi3UpdateDiscreteStates(c::fmi3Component, discreteStatesNeedUpdate::fm
             Cuint,
             (Ptr{Nothing}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Float64}),
             c.compAddr, Ref(discreteStatesNeedUpdate), Ref(terminateSimulation), Ref(nominalsOfContinuousStatesChanged), Ref(valuesOfContinuousStatesChanged), Ref(nextEventTimeDefined), Ref(nextEventTime))
+        println("---------------------")
+        println(discreteStatesNeedUpdate)
+        println(terminateSimulation)
+        println(nominalsOfContinuousStatesChanged)
+        println(valuesOfContinuousStatesChanged)
+        println(nextEventTimeDefined)
 end
 
 """

@@ -2,15 +2,19 @@
 
 
 Seminar:
-directionalDerivative von Bouncing Ball. Jakobi- Zustände über Zustandsmatrix 2 x 2, [[1, 0], [0, 1]] 
-fmi3: restliche FUnktionen testen und checken - DONE
-fmi3GetBinary -funktioniert, bin mir aber bei den Adressen net ganz sicher
-getNumberOfVariableDependencies, getVariableDependencies, evaluteDiscreteStates, kein Test möglich
-getDirectional, getAdjoint Werte stimmen nicht. nochmal checken
-simulate model exchange fertig machen - Funktioniert soweit bis auf Event handling
-enums fmi3exact, ... juliaspezifisch, in der Doku anders - DONE
+
 Testing
-clocks funktionen rein, leerer Rumpf assertions -DONE
+Docstrings und Kommentare
+fmi3SimulateME nach besten gewissen implementieren
+simulate model exchange fertig machen - Funktioniert soweit bis auf Event handling
+Daumen drücken
+fmi3GetBinary -funktioniert, bin mir aber bei den Adressen net ganz sicher
+
+fmi3: restliche Funktionen testen und checken - DONE
+getNumberOfVariableDependencies, getVariableDependencies, evaluteDiscreteStates, kein Test möglich - DONE
+getDirectional, getAdjoint Werte stimmen nicht. nochmal checken - DONE
+directionalDerivative von Bouncing Ball. Jakobi- Zustände über Zustandsmatrix [1] - DONE
+
 
 
 

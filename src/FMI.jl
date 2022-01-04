@@ -120,7 +120,7 @@ end
 function prepareValueReference(comp::fmi2Component, vr::fmi2ValueReferenceFormat)
     prepareValueReference(comp.fmu.modelDescription, vr)
 end
-# TODO just copied the functions might be joined in a new union datatype
+
 function prepareValueReference(md::fmi3ModelDescription, vr::fmi3ValueReferenceFormat)
     tvr = typeof(vr)
     if tvr == Array{fmi3ValueReference,1}
