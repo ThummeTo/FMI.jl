@@ -69,15 +69,15 @@ An exported model container that fulfils the FMI requirements is referred to as 
 ## Library FMI.jl
 Models within closed simulation tools complicate hybrid modelling, because for training purposes of data-driven model parts the loss gradient must be determined by neural networks (NN) and the model itself is required. Nevertheless, the structural integration of models in NNs is a sought-after field of research in which some approaches have already been made. For example, progress by integrating algorithmic numerical solvers for ordinary differential equations (ODEs) in NNs. Another approach was to integrate physical models into machine learning processes, where physical models are evaluated during training as part of the loss function. Besides, the focus here is not only on cost function but above all on the structural integration of FMUs. For this purpose, the combination of physical and data-driven models is suitable as an overall industrial tool, which so far cannot be implemented in reality. By exporting the models to a more suitable environment, a alternative can be created, which serves as an approach to this freely usable library.As [prior knowledge](@ref prior_knowledge) points out, the common standard in both business and research is the usage of FMI, in our application this serves as an excellent candidate. With the extension fmiflix.jl and the provision of providing fmi.jl, it should now be possible to make the subject area of neuronalODEs more attractive for industrial applications and bring the state of the art of machine learning techniques closer to production.
 
-- <ins>FMI.jl</ins>: load, instantiate, parameterize and simutale FMUs seamlessly inside the Julia prgramming langurage
+- **FMI.jl**: load, instantiate, parameterize and simutale FMUs seamlessly inside the Julia prgramming langurage
 
-- <ins>FMIFlux.jl</ins>: place FMUs simply inside any feedforward NN topology and still keep the resulting hybrid model trainable with a standard automatic Differentiation (AD) training process
+- **FMIFlux.jl**: place FMUs simply inside any feedforward NN topology and still keep the resulting hybrid model trainable with a standard automatic Differentiation (AD) training process
 
 ```@eval
 import Markdown
 Markdown.parse("""
 !!! note
-    f you want to know more about the extension fmiflix.jl of this library, visit the[documentation](https://github.com/ThummeTo/FMIFlux.jl) 
+    For further information about the FMIFlux extension, please visit our [documentation](https://github.com/ThummeTo/FMIFlux.jl).
 """)
 ```  
 
