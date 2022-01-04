@@ -23,11 +23,11 @@
 - 🖥️ tested on: Windows, Ubuntu, macOS
 
 ## Documentation Overview
-1. [Documentation](@ref Doc)
-2. [Tutorials](@ref Overview)
-3. [Examples](@ref Examples)
-4. [Libary_Funktions](@ref Lib)
-5. [Relted Publications](@ref related)
+1. [Documentation](@ref)
+2. [Tutorials](@ref )
+3. [Examples](@ref )
+4. [Libary Funktions](@ref )
+5. [Relted Publications](@ref )
 
 ## Get Started
 1. open a Julia-Command-Window, activate your preferred environment
