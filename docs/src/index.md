@@ -49,9 +49,9 @@ The Functional Mock-up Interface (FMI) is an open standard for the tool-independ
 
 An exported model container that fulfils the FMI requirements is referred to as a Functional Mock-up Unit (FMU). They can be applied in diverse simulation environments and sometimes even in entire co-simulations. So, FMUs can be divided into two main application classes: model-exchange(ME) and co-simulation(CS).
 
-- <ins>model-exchange(ME)</ins>:  ME-FMUs provide an interface to the system dynamics, allowing a system state derivative of a system state to be calculated. Then, outside the FMU, the next system state can be derived by numerical integration. In most applications, ME-FMUs should be the first choice, as this offers a wide range of possibilities when it comes to learning a dynamic system.
+- **model-exchange(ME)**:  ME-FMUs provide an interface to the system dynamics, allowing a system state derivative of a system state to be calculated. Then, outside the FMU, the next system state can be derived by numerical integration. In most applications, ME-FMUs should be the first choice, as this offers a wide range of possibilities when it comes to learning a dynamic system.
 
-- <ins>co-simulation(CS)</ins>:  The inclusion of a numerical solver for ordinary differential equations (ODEs) simplifies the simulation considerably and also prevents further manipulation before numerical integration.
+- **co-simulation(CS)**:  The inclusion of a numerical solver for ordinary differential equations (ODEs) simplifies the simulation considerably and also prevents further manipulation before numerical integration.
 
 ```@eval
 file = "FMI-Specification-2.0.3.pdf"
