@@ -81,14 +81,6 @@ Markdown.parse("""
 """)
 ```  
 
-<!---Modelling physical systems is often based on a simplification that excludes the parameterization of all physical aspects. For example, friction is neglected in many modelling of mechanical, electrical or hydraulic systems. Even when friction models are used, the parameterization is very fragile. This is where the hybrid modelling technique comes in, where a general representation of the parameterization of the friction model is to be learned over time, through measurements on the example system.
-```@eval
-import Markdown
-Markdown.parse("""
-!!! note
-    In chapter 4 of this paper, the advantages are described in more detail using a simple example. [NeuralFMU: Towards Structural Integration of FMUs into Neural Networks](https://arxiv.org/abs/2109.04351)
-""")
-```--->
 
 The Julia library provides a number of useful commands for use. Among the main applications is the unpacking, assigning, parameterizing and simulating of entire FMUs with additional display of the results.
 Because FMI is under development, a version-independent FMU simulation with the same user interface must be ensured. In addition, the aim is to ensure a pleasant user experience for any user, which is why small but high-level Julia command sets are provided as well as low-level commands defined by the FMI standard. 
@@ -104,13 +96,3 @@ Markdown.parse("""
 """)
 ```  
 
-<!---## What is currently supported in FMI.jl?
-- simulation / plotting of CS- and ME-FMUs
-- event-handling for discontinuous ME-FMUs
-- the full FMI command set
-
-## What is under development in FMI.jl?
-- FMI 3.0 and SSP 1.0 support
-- FMI Cross Checks
-- more examples
-- ... --->
