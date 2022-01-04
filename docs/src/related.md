@@ -1,4 +1,4 @@
-# Related Publications
+# [Related Publications](@id related)
 
 
 
