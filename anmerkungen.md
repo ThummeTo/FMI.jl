@@ -6,7 +6,7 @@ Seminar:
 Testing
 Docstrings und Kommentare
 fmi3SimulateME nach besten gewissen implementieren
-simulate model exchange fertig machen - Funktioniert soweit bis auf Event handling
+simulate model exchange fertig machen - Funktioniert soweit bis auf Event handling - DONE
 Daumen drücken
 fmi3GetBinary -funktioniert, bin mir aber bei den Adressen net ganz sicher
 

@@ -765,7 +765,7 @@ function fmi3GetBinary(c::fmi3Component, vr::fmi3ValueReferenceFormat)
     nvr = Csize_t(length(vr))
     values = Array{fmi3Binary}(undef, nvr)
     valueSizes = Array{Csize_t}(undef, nvr)
-    fill!(valueSizes, Csize_t(1))
+    fill!(valueSizes, Csize_t(8 * length(vr)))
     fmi3GetBinary!(c, vr, nvr, valueSizes, values, nvr)
 
     if length(values) == 1
@@ -790,7 +790,7 @@ function fmi3GetBinary!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::
 
     nvr = Csize_t(length(vr))
     valueSizes = Array{Csize_t}(undef, nvr)
-    fill!(valueSizes, Csize_t(1))
+    fill!(valueSizes, Csize_t(64))
     fmi3GetBinary!(c, vr, nvr, valueSizes, values, nvr)
     nothing
 end
@@ -813,7 +813,7 @@ function fmi3SetBinary(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::U
 
     nvr = Csize_t(length(vr))
     valueSizes = Array{Csize_t}(undef, nvr)
-    fill!(valueSizes, Csize_t(1))
+    fill!(valueSizes, Csize_t(64))
     fmi3SetBinary(c, vr, nvr, valueSizes, values, nvr)
 end
 
