@@ -1,4 +1,4 @@
-## [Get Sarted](@id Get Started)
+## [Get Sarted](@id Get_started)
 
 ## How can I install FMI.jl?
 1. open a Julia-Command-Window, activate your preferred environment

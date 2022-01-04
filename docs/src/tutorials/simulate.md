@@ -1,4 +1,4 @@
-# Simulate a FMU
+# [Simulate a FMU](@id Simulate)
 
 ## Instantiation
 

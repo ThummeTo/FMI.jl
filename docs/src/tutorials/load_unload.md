@@ -1,3 +1,4 @@
+# [Load and Upload] (@id Load_upload)
 ## [Load a FMU](@id loading)
 
 Loading a FMU in FMI.jl is fairly easy, you only have to call the [`fmiLoad`](@ref) function with the path to your FMU.
