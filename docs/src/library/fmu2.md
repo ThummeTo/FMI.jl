@@ -1,4 +1,4 @@
-# FMU Standard 2 functions
+# [FMU Standard 2 functions](@id Lib)
 
 ## [Simulation results](@id fmu2)
 
