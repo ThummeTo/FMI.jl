@@ -219,6 +219,7 @@ function fmi3SimulateME(c::fmi3Component, t_start::Real = 0.0, t_stop::Real = 1.
 
     if setup
         fmi3EnterInitializationMode(c, t_start, t_stop)
+        c.fmu.previous_z = fmi3GetEventIndicators(c)
         fmi3ExitInitializationMode(c)
     end
 
