@@ -105,7 +105,7 @@ Markdown.parse("""
 """)
 ```  
 
-## What is currently supported in FMI.jl?
+<!---## What is currently supported in FMI.jl?
 - simulation / plotting of CS- and ME-FMUs
 - event-handling for discontinuous ME-FMUs
 - the full FMI command set
@@ -114,4 +114,4 @@ Markdown.parse("""
 - FMI 3.0 and SSP 1.0 support
 - FMI Cross Checks
 - more examples
-- ...
+- ... --->
