@@ -3,11 +3,12 @@
 
 Seminar:
 
-Testing
+Testing - DONE
+Printlns raus
 Docstrings und Kommentare
-fmi3SimulateME nach besten gewissen implementieren
+fmi3SimulateME nach besten gewissen implementieren - DONE
 simulate model exchange fertig machen - Funktioniert soweit bis auf Event handling - DONE
-Daumen drücken
+Daumen drücken - DONE
 fmi3GetBinary -funktioniert, bin mir aber bei den Adressen net ganz sicher
 
 fmi3: restliche Funktionen testen und checken - DONE

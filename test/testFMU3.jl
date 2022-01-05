@@ -57,11 +57,12 @@ using FMI
     # success, data = FMI.fmi3SimulateCS(fmu, t_start, t_stop; recordValues=["h", "v"], saveat = saveat)
     success, data = FMI.fmi3SimulateME(fmu, t_start, t_stop; recordValues=["h", "v"])
     FMI.fmiPlot(fmu,["h", "v"], data)
-    # FMI.fmi3EnterInitializationMode(fmu, 0.0, 3.0)
+    FMI.fmi3EnterInitializationMode(fmu, 0.0, 3.0)
+    indicators = FMI.fmi3GetEventIndicators(instance1)
     # FMI.fmi3GetFloat64(fmu, "g")
     # FMI.fmi3SetFloat64(fmu, ["g"], [0.5])
     # FMI.fmi3GetFloat64(fmu, "g")
-    # FMI.fmi3ExitInitializationMode(fmu)
+    FMI.fmi3ExitInitializationMode(fmu)
     # dt = FMI.fmi3Float64(0.1)
     # ts = 0.0:dt:3.0
     # t = FMI.fmi3Float64(0.0)
@@ -127,6 +128,7 @@ using FMI
     fmu = FMI.fmi3Load("model/fmi3/Dahlquist.fmu")
     instance1 = FMI.fmi3InstantiateModelExchange!(fmu)
     FMI.fmi3EnterInitializationMode(fmu, 0.0, 10.0)
+    indicators = FMI.fmi3GetEventIndicators(instance1)
     FMI.fmi3ExitInitializationMode(fmu)
     # success, data = FMI.fmi3SimulateME(fmu, 0.0, 3.0; recordValues=["x"])
     # FMI.fmiPlot(fmu,["x"], data)
@@ -208,7 +210,7 @@ using FMI
     FMI.fmi3GetString(fmu, "string_param")
     FMI.fmi3SetString(fmu, ["string_param"], ["Test!"])
     FMI.fmi3GetString(fmu, ["string_param"])
-    binary = FMI.fmi3GetBinary(fmu, ["binary_in", "binary_out", "binary_in", "binary_out"])
+    FMI.fmi3GetBinary(fmu, ["binary_in"])
     FMI.fmi3SetBinary(fmu, ["binary_in"], FMI.fmi3Binary(0x000000005e7ce5f0))
     FMI.fmi3GetBinary(fmu, ["binary_in"])
     # FMI.fmi3SetBinary(fmu, ["binary_out"], FMI.fmi3Binary(0x000000005e7fc390))
@@ -265,7 +267,7 @@ end
     dt = 0.001
     saveat = t_start:dt:t_stop
     success, data = FMI.fmi3SimulateCS(fmu, t_start, t_stop; recordValues=["x0", "x1"], saveat=saveat)
-    success, data = FMI.fmi3SimulateME(fmu, t_start, t_stop; recordValues=["x0", "x1"])
+    success, data = FMI.fmi3SimulateME(fmu, t_start, t_stop; recordValues=["x0", "x1"], dtmax=0.01)
     FMI.fmiPlot(fmu,["x0", "x1"], data)
 
     FMI.fmi3GetFMUState(fmu)
