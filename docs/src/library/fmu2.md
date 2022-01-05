@@ -1,4 +1,4 @@
-# [FMU Standard 2 functions](@id FMU_std2)
+# [FMU Standard 2 functions](@id FMU_f)
 
 ## [Simulation results](@id fmu2)
 
