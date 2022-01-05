@@ -26,6 +26,7 @@ makedocs(sitename="FMI.jl",
                 "examples/multipleInstance.md"
             ]
             "Library Functions" => Any[
+                "Overview" => "library/overview_library"
                 "FMI 2 library functions" => "library/library.md",
                 "FMI version independent functions" => "library/library_ind.md",
                 "FMU 2 functions" => "library/fmu2.md",

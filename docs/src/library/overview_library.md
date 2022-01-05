@@ -1,0 +1,1 @@
+# [Librar Functions](@id Lib)

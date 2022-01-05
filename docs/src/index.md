@@ -19,7 +19,7 @@ By using [Examples](@ref Examples), the use of the library can be shown best. He
 
 
 ### 4. Libary Funktions
-The [Library Functions](@ref Lib) sections contains all the documentation to the functions provided by this library.  
+The [Library Functions](@ref Lib) sections contains all the documentation to the functions provided by this library. A distinction is made between the functions already defined by the FMI standard and the functions developed internally. The individual functions are available in version-specific as well as version-independent form.    
 
 
 
