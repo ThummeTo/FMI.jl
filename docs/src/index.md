@@ -47,7 +47,6 @@ Markdown.parse("""
 !!! info
     More detailed information about the Mock-up Interface (FMI) can be found on the following website [fmi-standard.org](http://fmi-standard.org/)  
     The documentation is also available in PDF format: [$file]($url).
-    
 """)
 ``` 
 
