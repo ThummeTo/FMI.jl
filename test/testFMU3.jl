@@ -27,18 +27,18 @@ using FMI
         end
     end
     FMI.fmi3ExitInitializationMode(fmu)
-    FMI.fmi3GetOutputDerivatives(fmu,)
+    #FMI.fmi3GetOutputDerivatives(fmu,)
     FMI.fmi3EnterEventMode(fmu, true, false, [FMI.fmi3Int32(2)], 0, false)
     # test1 = FMI.fmi3GetNumberOfContinuousStates(fmu)
     # test2 = FMI.fmi3GetNumberOfEventIndicators(fmu)
     FMI.fmi3GetDirectionalDerivative(fmu, fmu.modelDescription.derivativeValueReferences[1], fmu.modelDescription.stateValueReferences[1])
-    FMI.fmi3GetAdjointDerivative(fmu, fmu.modelDescription.derivativeValueReferences, fmu.modelDescription.stateValueReferences[1])
+    FMI.fmi3GetAdjointDerivative(fmu, fmu.modelDescription.derivativeValueReferences[1], fmu.modelDescription.stateValueReferences[1])
     FMI.fmi3EnterStepMode(fmu)
     FMI.fmi3GetDirectionalDerivative(fmu, fmu.modelDescription.derivativeValueReferences[1], fmu.modelDescription.stateValueReferences[2])
     FMI.fmi3GetAdjointDerivative(fmu, fmu.modelDescription.derivativeValueReferences, fmu.modelDescription.stateValueReferences[1])
     FMI.fmi3Terminate(fmu)
     test = 0.0
-    FMI.fmi3GetOutputDerivatives(fmu, Int32(1), Int32(1), 1, test, Int32(1))
+    FMI.fmi3GetOutputDerivatives(fmu, UInt32(1), Int32(1))
     FMI.fmi3Unload(fmu)
 #
 

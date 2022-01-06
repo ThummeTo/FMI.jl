@@ -11,7 +11,8 @@ include("FMI3_comp.jl")
 include("FMI3_md.jl")
 
 """
-IN PROGRESS:
+Source: FMISpec3.0, Version D5ef1c1: 2.2.1. Header Files and Naming of Functions
+
 The mutable struct representing an FMU in the FMI 3.0 Standard.
 Also contains the paths to the FMU and ZIP folder as well als all the FMI 3.0 function pointers
 """
@@ -38,6 +39,7 @@ mutable struct FMU3 <: FMU
     # c-functions
     cInstantiateModelExchange::Ptr{Cvoid}
     cInstantiateCoSimulation::Ptr{Cvoid}
+    cInstantiateScheduledExecution::Ptr{Cvoid}
 
     cGetVersion::Ptr{Cvoid}
     cFreeInstance::Ptr{Cvoid}
@@ -214,17 +216,17 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
 
     cd(lastDirectory)
 
-    if fmi3IsCoSimulation(fmu) # TODO
+    if fmi3IsCoSimulation(fmu) 
         fmu.type = fmi3CoSimulation::fmi3Type
-    elseif fmi3IsModelExchange(fmu) #TODO
+    elseif fmi3IsModelExchange(fmu) 
         fmu.type = fmi3ModelExchange::fmi3Type
-    elseif fmi3IsScheduledExecution(fmu) # TODO
+    elseif fmi3IsScheduledExecution(fmu) 
         fmu.type = fmi3ScheduledExecution::fmi3Type
     else
         error(unknownFMUType)
     end
 
-    if fmi3IsCoSimulation(fmu) && fmi3IsModelExchange(fmu) # TODO
+    if fmi3IsCoSimulation(fmu) && fmi3IsModelExchange(fmu) 
         @info "fmi3Load(...): FMU supports both CS and ME, using CS as default if nothing specified." # TODO ScheduledExecution
     end
 
@@ -235,9 +237,10 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
 
     @info "fmi3Load(...): FMU resources location is `$(fmu.fmuResourceLocation)`"
 
-    # # retrieve functions TODO check new Names and availability in FMI3
+    # # retrieve functions 
     fmu.cInstantiateModelExchange                  = dlsym(fmu.libHandle, :fmi3InstantiateModelExchange)
     fmu.cInstantiateCoSimulation                   = dlsym(fmu.libHandle, :fmi3InstantiateCoSimulation)
+    fmu.cInstantiateScheduledExecution             = dlsym(fmu.libHandle, :fmi3InstantiateScheduledExecution)
     fmu.cGetVersion                                = dlsym(fmu.libHandle, :fmi3GetVersion)
     fmu.cFreeInstance                              = dlsym(fmu.libHandle, :fmi3FreeInstance)
     fmu.cSetDebugLogging                           = dlsym(fmu.libHandle, :fmi3SetDebugLogging)
@@ -384,6 +387,7 @@ end
 function fmi3IsScheduledExecution(fmu::FMU3)
     fmi3IsScheduledExecution(fmu.modelDescription)
 end
+# TODO unused
 """
 Struct to handle FMU simulation data / results.
 """
@@ -548,15 +552,6 @@ function fmi3Unzip(pathToFMU::String; unpackPath=nothing)
 
     (unzippedAbsPath, zipAbsPath)
 end
-""" 
-Returns how a variable depends on another variable based on the model description.
-"""
-function fmi3VariableDependsOnVariable(fmu::FMU3, vr1::fmi3ValueReference, vr2::fmi3ValueReference) # TODO check what it does
-    i1 = fmu.modelDescription.valueReferenceIndicies[vr1]
-    i2 = fmu.modelDescription.valueReferenceIndicies[vr2]
-    return fmi3GetDependencies(fmu)[i1, i2]
-end
-
 
 """
 Unload a FMU.
@@ -596,15 +591,11 @@ For more information call ?fmi3InstantiateModelExchange
 function fmi3InstantiateModelExchange!(fmu::FMU3; visible::Bool = false, loggingOn::Bool = false)
 
     ptrLogger = @cfunction(fmi3CallbackLogMessage, Cvoid, (Ptr{Cvoid}, Ptr{Cchar}, Cuint, Ptr{Cchar}))
-    # ptrAllocateMemory = @cfunction(cbAllocateMemory, Ptr{Cvoid}, (Csize_t, Csize_t))
-    # ptrFreeMemory = @cfunction(cbFreeMemory, Cvoid, (Ptr{Cvoid},))
-    # ptrStepFinished = C_NULL
-    # fmu.fmi3CallbackLoggerFunction = fmi3CallbackLoggerFunction(ptrLogger) #, ptrAllocateMemory, ptrFreeMemory, ptrStepFinished, C_NULL)
 
     compAddr = fmi3InstantiateModelExchange(fmu.cInstantiateModelExchange, fmu.instanceName, fmu.modelDescription.instantiationToken, fmu.fmuResourceLocation, fmi3Boolean(visible), fmi3Boolean(loggingOn), fmu.instanceEnvironment, ptrLogger)
 
     if compAddr == Ptr{Cvoid}(C_NULL)
-        @error "fmi3Instantiate!(...): Instantiation failed!"
+        @error "fmi3InstantiateModelExchange!(...): Instantiation failed!"
         return nothing
     end
 
@@ -622,10 +613,12 @@ Returns the instance of a new FMU component.
 
 For more information call ?fmi3InstantiateCoSimulation
 """
-function fmi3InstantiateCoSimulation!(fmu::FMU3; visible::Bool = false, loggingOn::Bool = false, eventModeUsed::Bool = false)
+function fmi3InstantiateCoSimulation!(fmu::FMU3; visible::Bool = false, loggingOn::Bool = false, eventModeUsed::Bool = false, ptrIntermediateUpdate=nothing)
 
     ptrLogger = @cfunction(fmi3CallbackLogMessage, Cvoid, (Ptr{Cvoid}, Ptr{Cchar}, Cuint, Ptr{Cchar}))
-    ptrIntermediateUpdate = @cfunction(fmi3CallbackIntermediateUpdate, Cvoid, (Ptr{Cvoid}, fmi3Float64, fmi3Boolean, fmi3Boolean, fmi3Boolean, fmi3Boolean, fmi3Boolean, Ptr{fmi3Boolean}, Ptr{fmi3Float64}))
+    if ptrIntermediateUpdate === nothing
+        ptrIntermediateUpdate = @cfunction(fmi3CallbackIntermediateUpdate, Cvoid, (Ptr{Cvoid}, fmi3Float64, fmi3Boolean, fmi3Boolean, fmi3Boolean, fmi3Boolean, Ptr{fmi3Boolean}, Ptr{fmi3Float64}))
+    end
     if fmu.modelDescription.CShasEventMode 
         mode = eventModeUsed
     else
@@ -637,7 +630,7 @@ function fmi3InstantiateCoSimulation!(fmu::FMU3; visible::Bool = false, loggingO
                                             fmi3Boolean(mode), fmi3Boolean(fmu.modelDescription.CScanReturnEarlyAfterIntermediateUpdate), fmu.modelDescription.intermediateUpdateValueReferences, Csize_t(length(fmu.modelDescription.intermediateUpdateValueReferences)), fmu.instanceEnvironment, ptrLogger, ptrIntermediateUpdate)
 
     if compAddr == Ptr{Cvoid}(C_NULL)
-        @error "fmi3Instantiate!(...): Instantiation failed!"
+        @error "fmi3InstantiateCoSimulation!(...): Instantiation failed!"
         return nothing
     end
 
@@ -645,6 +638,34 @@ function fmi3InstantiateCoSimulation!(fmu::FMU3; visible::Bool = false, loggingO
     push!(fmu.components, component)
     component
 end
+
+# TODO not tested
+"""
+TODO: FMI specification reference.
+
+Create a new instance of the given fmu, adds a logger if logginOn == true.
+
+Returns the instance of a new FMU component.
+
+For more information call ?fmi3InstantiateScheduledExecution
+"""
+function fmi3InstantiateScheduledExecution!(fmu::FMU3, ptrlockPreemption::Ptr{Cvoid}, ptrunlockPreemption::Ptr{Cvoid}; visible::Bool = false, loggingOn::Bool = false)
+
+    ptrLogger = @cfunction(fmi3CallbackLogMessage, Cvoid, (Ptr{Cvoid}, Ptr{Cchar}, Cuint, Ptr{Cchar}))
+    ptrClockUpdate = @cfunction(fmi3CallbackClockUpdate, Cvoid, (Ptr{Cvoid}, ))
+
+    compAddr = fmi3InstantiateScheduledExecution(fmu.cInstantiateScheduledExecution, fmu.instanceName, fmu.modelDescription.instantiationToken, fmu.fmuResourceLocation, fmi3Boolean(visible), fmi3Boolean(loggingOn), fmu.instanceEnvironment, ptrLogger, ptrClockUpdate, ptrlockPreemption, ptrunlockPreemption)
+
+    if compAddr == Ptr{Cvoid}(C_NULL)
+        @error "fmi3InstantiateScheduledExecution!(...): Instantiation failed!"
+        return nothing
+    end
+
+    component = fmi3Component(compAddr, fmu)
+    push!(fmu.components, component)
+    component
+end
+
 
 """
 TODO: FMI specification reference.
@@ -1357,8 +1378,22 @@ the array order specifies the corresponding order of derivation of the variables
 
 For more information call ?fmi3GetOutputDerivatives
 """
-function fmi3GetOutputDerivatives(fmu::FMU3, vr::fmi3ValueReference, nValueReferences::Cint, order::Integer, values::Real, nValues::Cint)
-    fmi3GetOutputDerivatives(fmu.components[end], vr, Csize_t(nValueReferences), fmi3Int32(order), fmi3Float64(values), Csize_t(nValues))
+function fmi3GetOutputDerivatives(fmu::FMU3, vr::fmi3ValueReferenceFormat, order::Array{Integer})
+    fmi3GetOutputDerivatives(fmu.components[end], vr, order)
+end
+
+"""
+TODO: FMI specification reference.
+
+Retrieves the n-th derivative of output values.
+
+vr defines the value references of the variables
+the array order specifies the corresponding order of derivation of the variables
+
+For more information call ?fmi3GetOutputDerivatives
+"""
+function fmi3GetOutputDerivatives(fmu::FMU3, vr::fmi3ValueReference, order::Integer)
+    fmi3GetOutputDerivatives(fmu.components[end], vr, order)
 end
 
 """
@@ -1419,7 +1454,7 @@ end
 """
 TODO: FMI specification reference.
 
-The actual dependencies (of type dependenciesKind) can be retrieved by calling the function fmi3GetVariableDependencies:
+The dependencies (of type dependenciesKind) can be retrieved by calling the function fmi3GetVariableDependencies.
 For more information call ?fmi3GetVariableDependencies
 """
 function fmi3GetVariableDependencies(fmu::FMU3, vr::Union{fmi3ValueReference, String})
@@ -1457,12 +1492,12 @@ TODO: FMI specification reference.
 
 This function is called to signal a converged solution at the current super-dense time instant. fmi3UpdateDiscreteStates must be called at least once per super-dense time instant.
 
-For more information call ?fmi3UpdateDiscreteStates
+For more information call ?fmi3UpdateDiscreteStates!
 """
-function fmi3UpdateDiscreteStates(fmu::FMU3, discreteStatesNeedUpdate::fmi3Boolean, terminateSimulation::fmi3Boolean, 
+function fmi3UpdateDiscreteStates!(fmu::FMU3, discreteStatesNeedUpdate::fmi3Boolean, terminateSimulation::fmi3Boolean, 
     nominalsOfContinuousStatesChanged::fmi3Boolean, valuesOfContinuousStatesChanged::fmi3Boolean,
     nextEventTimeDefined::fmi3Boolean, nextEventTime::fmi3Float64)
-    fmi3UpdateDiscreteStates(fmu.components[end], discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, 
+    fmi3UpdateDiscreteStates!(fmu.components[end], discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, 
     valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
 end
 

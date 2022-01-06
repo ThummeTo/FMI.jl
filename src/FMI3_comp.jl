@@ -4,7 +4,13 @@
 #
 
 # Comfort functions for fmi3 functions using fmi3Components
+"""
+TODO: FMI specification reference.
 
+FMU enters Initialization mode.
+
+For more information call ?fmi3EnterInitializationMode
+"""
 function fmi3EnterInitializationMode(c::fmi3Component, startTime::Real = 0.0, stopTime::Real = startTime; tolerance::Real = 0.0)
     # c.fmu.t = startTime
 
@@ -244,7 +250,7 @@ function fmi3GetUInt8!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::A
     nothing
 end
 function fmi3GetUInt8!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::fmi3UInt8)
-    @assert false "fmi3GetInt8! is only possible for arrays of values, please use an array instead of a scalar."
+    @assert false "fmi3GetUInt8! is only possible for arrays of values, please use an array instead of a scalar."
 end
 
 """
@@ -364,7 +370,7 @@ function fmi3GetUInt16!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::
     nothing
 end
 function fmi3GetUInt16!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::fmi3UInt16)
-    @assert false "fmi3GetInt16! is only possible for arrays of values, please use an array instead of a scalar."
+    @assert false "fmi3GetUInt16! is only possible for arrays of values, please use an array instead of a scalar."
 end
 
 """
@@ -484,7 +490,7 @@ function fmi3GetUInt32!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::
     nothing
 end
 function fmi3GetUInt32!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::fmi3UInt32)
-    @assert false "fmi3GetInt32! is only possible for arrays of values, please use an array instead of a scalar."
+    @assert false "fmi3GetUInt32! is only possible for arrays of values, please use an array instead of a scalar."
 end
 
 """
@@ -604,7 +610,7 @@ function fmi3GetUInt64!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::
     nothing
 end
 function fmi3GetUInt64!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::fmi3UInt64)
-    @assert false "fmi3GetInt64! is only possible for arrays of values, please use an array instead of a scalar."
+    @assert false "fmi3GetUInt64! is only possible for arrays of values, please use an array instead of a scalar."
 end
 
 """
@@ -786,7 +792,7 @@ function fmi3GetBinary!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::
 
     vr = prepareValueReference(c, vr)
     # values = prepareValue(values)
-    @assert length(vr) == length(values) "fmi3GetString!(...): `vr` and `values` need to be the same length."
+    @assert length(vr) == length(values) "fmi3GetBinary!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(vr))
     valueSizes = Array{Csize_t}(undef, nvr)
@@ -872,7 +878,7 @@ function fmi3SetClock(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Un
 
     vr = prepareValueReference(c, vr)
     values = prepareValue(values)
-    @assert length(vr) == length(values) "fmi3SetBinary(...): `vr` and `values` need to be the same length."
+    @assert length(vr) == length(values) "fmi3SetClock(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(vr))
     fmi3SetClock(c, vr, nvr, values)
@@ -1069,6 +1075,41 @@ function fmi3GetAdjointDerivative!(c::fmi3Component,
     fmi3GetAdjointDerivative!(c, unknowns, nUnknowns, knowns, nKnowns, seed, nSeed, sensitivity, nSensitivity)
 
     nothing
+end
+
+"""
+TODO: FMI specification reference.
+
+Retrieves the n-th derivative of output values.
+
+vr defines the value references of the variables
+the array order specifies the corresponding order of derivation of the variables
+
+For more information call ?fmi3GetOutputDerivatives
+"""
+function fmi3GetOutputDerivatives(c::fmi3Component, vr::fmi3ValueReferenceFormat, order::Array{Integer})
+    vr = prepareValueReference(c, vr)
+    nvr = Csize_t(length(vr))
+    values = Array{fmi3Float64}(undef, nvr)
+    fmi3GetOutputDerivatives(c, vr, nvr, order, values, nvr)
+    values
+end
+
+"""
+TODO: FMI specification reference.
+
+Retrieves the n-th derivative of output values.
+
+vr defines the value references of the variables
+the array order specifies the corresponding order of derivation of the variables
+
+For more information call ?fmi3GetOutputDerivatives
+"""
+function fmi3GetOutputDerivatives(c::fmi3Component, vr::fmi3ValueReference, order::Integer)
+    nvr = Csize_t(1)
+    values = Array{fmi3Float64}(undef, nvr)
+    fmi3GetOutputDerivatives(c, [vr], nvr, [order], values, nvr)
+    values
 end
 
 """

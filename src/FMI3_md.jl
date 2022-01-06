@@ -84,17 +84,25 @@ function fmi3ReadModelDescription(pathToModellDescription::String)
             md.CSprovidesEvaluateDiscreteStates         = parseNodeBoolean(node, "providesEvaluateDiscreteStates"           ; onfail=false)
 
         elseif node.name == "ModelExchange"
-            # TODO check if all are included
             md.isModelExchange = true
             md.MEmodelIdentifier                        = node["modelIdentifier"]
+            md.MEneedsExecutionTool                     = parseNodeBoolean(node, "needsExecutionTool"                       ; onfail=false)
+            md.MEcanBeInstantiatedOnlyOncePerProcess    = parseNodeBoolean(node, "canBeInstantiatedOnlyOncePerProcess"      ; onfail=false)
             md.MEcanGetAndSetFMUstate                   = parseNodeBoolean(node, "canGetAndSetFMUstate"                     ; onfail=false)
             md.MEcanSerializeFMUstate                   = parseNodeBoolean(node, "canSerializeFMUstate"                     ; onfail=false)
             md.MEprovidesDirectionalDerivatives         = parseNodeBoolean(node, "providesDirectionalDerivatives"           ; onfail=false)
             md.MEprovidesAdjointDerivatives             = parseNodeBoolean(node, "providesAdjointDerivatives"               ; onfail=false)
+            md.MEprovidesPerElementDependencies         = parseNodeBoolean(node, "providesPerElementDependencies"           ; onfail=false)
         elseif node.name == "ScheduledExecution"
             md.isScheduledExecution = true
             md.SEmodelIdentifier                        = node["modelIdentifier"]
-            # TODO
+            md.SEneedsExecutionTool                     = parseNodeBoolean(node, "needsExecutionTool"                       ; onfail=false)
+            md.SEcanBeInstantiatedOnlyOncePerProcess    = parseNodeBoolean(node, "canBeInstantiatedOnlyOncePerProcess"      ; onfail=false)
+            md.SEcanGetAndSetFMUstate                   = parseNodeBoolean(node, "canGetAndSetFMUstate"                     ; onfail=false)
+            md.SEcanSerializeFMUstate                   = parseNodeBoolean(node, "canSerializeFMUstate"                     ; onfail=false)
+            md.SEprovidesDirectionalDerivatives         = parseNodeBoolean(node, "providesDirectionalDerivatives"           ; onfail=false)
+            md.SEprovidesAdjointDerivatives             = parseNodeBoolean(node, "providesAdjointDerivatives"               ; onfail=false)
+            md.SEprovidesPerElementDependencies         = parseNodeBoolean(node, "providesPerElementDependencies"           ; onfail=false)
         elseif node.name == "TypeDefinitions"
             typedefinitions = node
 
@@ -188,19 +196,6 @@ function fmi3GetEventIndicators(md::fmi3ModelDescription)
     md.numberOfEventIndicators
 end
 
-# """
-# Returns if the FMU model description contains `dependency` information.
-# """
-# function fmi2DependenciesSupported(md::fmi2ModelDescription)
-#     for mv in md.modelVariables
-#         if mv.dependencies != nothing && length(mv.dependencies) > 0
-#             return true
-#         end
-#     end 
-
-#     return false
-# end
-
 """
 Returns the tag 'modelIdentifier' from CS or ME section.
 """
@@ -271,7 +266,9 @@ Returns true, if the FMU supports model exchange
 function fmi3IsModelExchange(md::fmi3ModelDescription)
     md.isModelExchange
 end
-
+"""
+Returns true, if the FMU supports scheduled execution
+"""
 function fmi3IsScheduledExecution(md::fmi3ModelDescription)
     md.isScheduledExecution
 end

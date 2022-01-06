@@ -2,14 +2,16 @@
 
 
 Seminar:
-
-Testing - DONE
+fmi3GetBinary -funktioniert, bin mir aber bei den Adressen net ganz sicher
 Printlns raus
 Docstrings und Kommentare
+Matrizen
+
+Testing - DONE
 fmi3SimulateME nach besten gewissen implementieren - DONE
 simulate model exchange fertig machen - Funktioniert soweit bis auf Event handling - DONE
 Daumen drücken - DONE
-fmi3GetBinary -funktioniert, bin mir aber bei den Adressen net ganz sicher
+
 
 fmi3: restliche Funktionen testen und checken - DONE
 getNumberOfVariableDependencies, getVariableDependencies, evaluteDiscreteStates, kein Test möglich - DONE

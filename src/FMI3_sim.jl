@@ -16,7 +16,7 @@ function time_choice(c::fmi3Component, integrator, timeEvent::Ref{fmi3Boolean})
     nextEventTimeDefined = fmi3False
     nextEventTime = fmi3Float64(0.0)
 
-    fmi3UpdateDiscreteStates(c, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
+    fmi3UpdateDiscreteStates!(c, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
     # eventInfo = fmi2NewDiscreteStates(c)
     fmi3EnterContinuousTimeMode(c)
     if Bool(nextEventTimeDefined)
@@ -44,7 +44,7 @@ function handleEvents(c::fmi3Component, enterEventMode::Bool, exitInContinuousMo
     nextEventTimeDefined = fmi3False
     nextEventTime = fmi3Float64(0.0)
 
-    fmi3UpdateDiscreteStates(c, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
+    fmi3UpdateDiscreteStates!(c, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
     # eventInfo = fmi2NewDiscreteStates(c)
     println("---------------------")
     println(discreteStatesNeedUpdate)
@@ -70,13 +70,13 @@ function handleEvents(c::fmi3Component, enterEventMode::Bool, exitInContinuousMo
         # nextEventTimeDefined = fmi3False
         # nextEventTime = fmi3Float64(0.0)
 
-        fmi3UpdateDiscreteStates(c, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
+        fmi3UpdateDiscreteStates!(c, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
         # eventInfo = fmi2NewDiscreteStates(c)
         # valuesOfContinuousStatesChanged = eventInfo.valuesOfContinuousStatesChanged
         # nominalsOfContinuousStatesChanged = eventInfo.nominalsOfContinuousStatesChanged
 
         if terminateSimulation == fmi3True
-            @error "fmi3UpdateDiscreteStates returned error!"
+            @error "fmi3UpdateDiscreteStates! returned error!"
         end
         nominalsChanged |=nominalsOfContinuousStatesChanged
         valuesChanged |= valuesOfContinuousStatesChanged
@@ -96,12 +96,10 @@ function condition(c::fmi3Component, out, x, t, integrator, inputFunction, input
     if inputFunction !== nothing
         fmi3SetFloat64(c, inputValues, inputFunction(integrator.t))
     end
-    # TODO check Zeit für Event und Eventindicatorwerte
     stateEvent[] = false
     fmi3SetTime(c, t)
     fmi3SetContinuousStates(c, x)
     indicators = fmi3GetEventIndicators(c)
-    # TODO rootsFound
     if length(indicators) > 0
         for i in 1:length(indicators)
             if c.fmu.previous_z[i] < 0 && indicators[i] >= 0
@@ -236,7 +234,7 @@ function fmi3SimulateME(c::fmi3Component, t_start::Real = 0.0, t_stop::Real = 1.
 
     if eventHandling
         println("test EventHandling")
-        fmi3UpdateDiscreteStates(c, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
+        fmi3UpdateDiscreteStates!(c, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
         timeEventHandling = (nextEventTimeDefined == fmi3True)
     end
     
@@ -440,6 +438,17 @@ function fmi3SimulateCS(c::fmi3Component, t_start::Real, t_stop::Real;
         success = true
         return success
     end
+end
+
+# TODO simulate ScheduledExecution
+function fmi3SimulateSE(c::fmi3Component, t_start::Real, t_stop::Real;
+    recordValues::fmi3ValueReferenceFormat = nothing,
+    saveat = [],
+    setup::Bool = true,
+    reset = nothing,
+    inputValues::fmi3ValueReferenceFormat = nothing,
+    inputFunction = nothing)
+    @assert false "Not implemented"
 end
 
 """
