@@ -19,7 +19,7 @@ makedocs(sitename="FMI.jl",
                 "Simulate a FMU" => "tutorials/simulate.md"
             ]
             "Examples" => [
-                "examples/examples.md"
+                "examples/overview_examples.md"
                 "examples/CS_simulation.md"
                 "examples/simulateME.md"
                 "examples/parameterize.md"
