@@ -4,7 +4,7 @@
 Seminar:
 fmi3GetBinary -funktioniert, bin mir aber bei den Adressen net ganz sicher
 Printlns raus
-Docstrings und Kommentare
+Docstrings und Kommentare, TOdos in fmi3 und fmi3comp noch machen
 Matrizen
 
 Testing - DONE

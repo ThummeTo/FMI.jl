@@ -580,7 +580,7 @@ function fmi3Unload(fmu::FMU3, cleanUp::Bool = true)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1:: 2.3.1. Super State: FMU State Setable
 
 Create a new instance of the given fmu, adds a logger if logginOn == true.
 
@@ -605,7 +605,7 @@ function fmi3InstantiateModelExchange!(fmu::FMU3; visible::Bool = false, logging
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1:: 2.3.1. Super State: FMU State Setable
 
 Create a new instance of the given fmu, adds a logger if logginOn == true.
 
@@ -641,7 +641,7 @@ end
 
 # TODO not tested
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1:: 2.3.1. Super State: FMU State Setable
 
 Create a new instance of the given fmu, adds a logger if logginOn == true.
 
@@ -668,7 +668,7 @@ end
 
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.4. Inquire Version Number of Header Files
 
 Returns the version of the FMI Standard used in this FMU.
 
@@ -679,7 +679,7 @@ function fmi3GetVersion(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.3.1. Super State: FMU State Setable
 
 Sets debug logging for the FMU.
 
@@ -690,7 +690,7 @@ function fmi3SetDebugLogging(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.3.2. State: Instantiated
 
 FMU enters Initialization mode.
 
@@ -701,7 +701,7 @@ function fmi3EnterInitializationMode(fmu::FMU3, startTime::Real = 0.0, stopTime:
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.3.3. State: Initialization Mode
 
 FMU exits Initialization mode.
 
@@ -712,7 +712,7 @@ function fmi3ExitInitializationMode(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.3.4. Super State: Initialized
 
 Informs FMU that simulation run is terminated.
 
@@ -723,7 +723,7 @@ function fmi3Terminate(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.3.1. Super State: FMU State Setable
 
 Resets FMU.
 
@@ -734,7 +734,7 @@ function fmi3Reset(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Float32 variables.
 
@@ -745,7 +745,7 @@ function fmi3GetFloat32(fmu::FMU3, vr::fmi3ValueReferenceFormat)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Float32 variables.
 
@@ -756,7 +756,7 @@ function fmi3GetFloat32!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Set the values of an array of fmi3Float32 variables.
 
@@ -767,7 +767,7 @@ function fmi3SetFloat32(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{A
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Float64 variables.
 
@@ -778,7 +778,7 @@ function fmi3GetFloat64(fmu::FMU3, vr::fmi3ValueReferenceFormat)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Float64 variables.
 
@@ -789,7 +789,7 @@ function fmi3GetFloat64!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Set the values of an array of fmi3Float64 variables.
 
@@ -800,7 +800,7 @@ function fmi3SetFloat64(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{A
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Int8 variables.
 
@@ -811,7 +811,7 @@ function fmi3GetInt8(fmu::FMU3, vr::fmi3ValueReferenceFormat)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Int8 variables.
 
@@ -822,7 +822,7 @@ function fmi3GetInt8!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Arr
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Set the values of an array of fmi3Int8 variables.
 
@@ -833,7 +833,7 @@ function fmi3SetInt8(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Arra
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3UInt8 variables.
 
@@ -844,7 +844,7 @@ function fmi3GetUInt8(fmu::FMU3, vr::fmi3ValueReferenceFormat)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3UInt8 variables.
 
@@ -855,7 +855,7 @@ function fmi3GetUInt8!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Ar
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Set the values of an array of fmi3UInt8 variables.
 
@@ -866,7 +866,7 @@ function fmi3SetUInt8(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Arr
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Int16 variables.
 
@@ -877,7 +877,7 @@ function fmi3GetInt16(fmu::FMU3, vr::fmi3ValueReferenceFormat)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Int16 variables.
 
@@ -888,7 +888,7 @@ function fmi3GetInt16!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Ar
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Set the values of an array of fmi3Int16 variables.
 
@@ -899,7 +899,7 @@ function fmi3SetInt16(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Arr
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3UInt16 variables.
 
@@ -910,7 +910,7 @@ function fmi3GetUInt16(fmu::FMU3, vr::fmi3ValueReferenceFormat)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3UInt16 variables.
 
@@ -921,7 +921,7 @@ function fmi3GetUInt16!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{A
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Set the values of an array of fmi3UInt16 variables.
 
@@ -932,7 +932,7 @@ function fmi3SetUInt16(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Ar
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Int32 variables.
 
@@ -943,7 +943,7 @@ function fmi3GetInt32(fmu::FMU3, vr::fmi3ValueReferenceFormat)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Int32 variables.
 
@@ -954,7 +954,7 @@ function fmi3GetInt32!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Ar
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Set the values of an array of fmi3Int32 variables.
 
@@ -965,7 +965,7 @@ function fmi3SetInt32(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Arr
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3UInt32 variables.
 
@@ -976,7 +976,7 @@ function fmi3GetUInt32(fmu::FMU3, vr::fmi3ValueReferenceFormat)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3UInt32 variables.
 
@@ -987,7 +987,7 @@ function fmi3GetUInt32!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{A
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Set the values of an array of fmi3UInt32 variables.
 
@@ -998,7 +998,7 @@ function fmi3SetUInt32(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Ar
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Int64 variables.
 
@@ -1009,7 +1009,7 @@ function fmi3GetInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Int64 variables.
 
@@ -1020,7 +1020,7 @@ function fmi3GetInt64!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Ar
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Set the values of an array of fmi3Int64 variables.
 
@@ -1031,7 +1031,7 @@ function fmi3SetInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Arr
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3UInt64 variables.
 
@@ -1042,7 +1042,7 @@ function fmi3GetUInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3UInt64 variables.
 
@@ -1053,7 +1053,7 @@ function fmi3GetUInt64!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{A
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Set the values of an array of fmi3UInt64 variables.
 
@@ -1064,7 +1064,7 @@ function fmi3SetUInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Ar
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Boolean variables.
 
@@ -1075,7 +1075,7 @@ function fmi3GetBoolean(fmu::FMU3, vr::fmi3ValueReferenceFormat)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Boolean variables.
 
@@ -1086,7 +1086,7 @@ function fmi3GetBoolean!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Set the values of an array of fmi3Boolean variables.
 
@@ -1097,7 +1097,7 @@ function fmi3SetBoolean(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{A
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3String variables.
 
@@ -1108,7 +1108,7 @@ function fmi3GetString(fmu::FMU3, vr::fmi3ValueReferenceFormat)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3String variables.
 
@@ -1119,7 +1119,7 @@ function fmi3GetString!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{A
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Set the values of an array of fmi3String variables.
 
@@ -1130,7 +1130,7 @@ function fmi3SetString(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Ar
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Binary variables.
 
@@ -1141,7 +1141,7 @@ function fmi3GetBinary(fmu::FMU3, vr::fmi3ValueReferenceFormat)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Binary variables.
 
@@ -1152,7 +1152,7 @@ function fmi3GetBinary!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{A
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Set the values of an array of fmi3Binary variables.
 
@@ -1163,7 +1163,7 @@ function fmi3SetBinary(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Ar
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Clock variables.
 
@@ -1174,7 +1174,7 @@ function fmi3GetClock(fmu::FMU3, vr::fmi3ValueReferenceFormat)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Get the values of an array of fmi3Clock variables.
 
@@ -1185,7 +1185,7 @@ function fmi3GetClock!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Ar
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
 Set the values of an array of fmi3Clock variables.
 
@@ -1196,7 +1196,7 @@ function fmi3SetClock(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Arr
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.4. Getting and Setting the Complete FMU State
 
 Get the pointer to the current FMU state.
 
@@ -1211,7 +1211,7 @@ function fmi3GetFMUState(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.4. Getting and Setting the Complete FMU State
 
 Set the FMU to the given fmi3FMUstate.
 
@@ -1222,7 +1222,7 @@ function fmi3SetFMUState(fmu::FMU3, state::fmi3FMUState)
 end
 
 """
-TODO: FMI specification reference.
+function fmi3FreeFMUState(c::fmi3Component, FMUstate::Ref{fmi3FMUState})
 
 Free the allocated memory for the FMU state.
 
@@ -1235,7 +1235,7 @@ function fmi3FreeFMUState(fmu::FMU3, state::fmi3FMUState)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.4. Getting and Setting the Complete FMU State
 
 Returns the size of a byte vector the FMU can be stored in.
 
@@ -1249,7 +1249,7 @@ function fmi3SerializedFMUStateSize(fmu::FMU3, state::fmi3FMUState)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.4. Getting and Setting the Complete FMU State
 
 Serialize the data in the FMU state pointer.
 
@@ -1263,7 +1263,7 @@ function fmi3SerializeFMUState(fmu::FMU3, state::fmi3FMUState)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.6.4. Getting and Setting the Complete FMU State
 
 Deserialize the data in the serializedState fmi3Byte field.
 
@@ -1278,7 +1278,7 @@ function fmi3DeSerializeFMUState(fmu::FMU3, serializedState::Array{fmi3Byte})
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.11. Getting Partial Derivatives
 
 Retrieves directional derivatives.
 
@@ -1293,7 +1293,7 @@ function fmi3GetDirectionalDerivative(fmu::FMU3,
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.11. Getting Partial Derivatives
 
 Retrieves directional derivatives.
 
@@ -1308,7 +1308,7 @@ function fmi3GetDirectionalDerivative(fmu::FMU3,
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.11. Getting Partial Derivatives
 
 Retrieves directional derivatives in-place.
 
@@ -1324,7 +1324,7 @@ function fmi3GetDirectionalDerivative!(fmu::FMU3,
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.11. Getting Partial Derivatives
 
 Retrieves adjoint derivatives.
 
@@ -1339,7 +1339,7 @@ function fmi3GetAdjointDerivative(fmu::FMU3,
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.11. Getting Partial Derivatives
 
 Retrieves adjoint derivatives.
 
@@ -1354,7 +1354,7 @@ function fmi3GetAdjointDerivative(fmu::FMU3,
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.11. Getting Partial Derivatives
 
 Retrieves adjoint derivatives.
 
@@ -1369,7 +1369,7 @@ function fmi3GetAdjointDerivative!(fmu::FMU3,
     fmi3GetAdjointDerivative!(fmu.components[end], unknowns, knowns, sensitivity, seed)
 end
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.12. Getting Derivatives of Continuous Outputs
 
 Retrieves the n-th derivative of output values.
 
@@ -1383,7 +1383,7 @@ function fmi3GetOutputDerivatives(fmu::FMU3, vr::fmi3ValueReferenceFormat, order
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.12. Getting Derivatives of Continuous Outputs
 
 Retrieves the n-th derivative of output values.
 
@@ -1397,7 +1397,7 @@ function fmi3GetOutputDerivatives(fmu::FMU3, vr::fmi3ValueReference, order::Inte
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.3.2. State: Instantiated
 
 If the importer needs to change structural parameters, it must move the FMU into Configuration Mode using fmi3EnterConfigurationMode.
 For more information call ?fmi3EnterConfigurationMode
@@ -1407,7 +1407,7 @@ function fmi3EnterConfigurationMode(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.3.2. State: Instantiated
 
 This function returns the number of continuous states.
 This function can only be called in Model Exchange. 
@@ -1418,7 +1418,7 @@ function fmi3GetNumberOfContinuousStates(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.3.2. State: Instantiated
 
 This function returns the number of event indicators.
 This function can only be called in Model Exchange.
@@ -1429,7 +1429,7 @@ function fmi3GetNumberOfEventIndicators(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.10. Dependencies of Variables
 
 The number of dependencies of a given variable, which may change if structural parameters are changed, can be retrieved by calling the following function:
 For more information call ?fmi3GetNumberOfVariableDependencies
@@ -1439,7 +1439,7 @@ function fmi3GetNumberOfVariableDependencies(fmu::FMU3, vr::Union{fmi3ValueRefer
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.3.3. State: Initialization Mode
 
 Return the states at the current time instant.
 For more information call ?fmi3GetContinuousStates
@@ -1452,7 +1452,7 @@ function fmi3GetContinuousStates(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.2.10. Dependencies of Variables
 
 The dependencies (of type dependenciesKind) can be retrieved by calling the function fmi3GetVariableDependencies.
 For more information call ?fmi3GetVariableDependencies
@@ -1462,7 +1462,7 @@ function fmi3GetVariableDependencies(fmu::FMU3, vr::Union{fmi3ValueReference, St
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.3.3. State: Initialization Mode
 
 Return the nominal values of the continuous states.
 
@@ -1476,7 +1476,7 @@ function fmi3GetNominalsOfContinuousStates(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.3.3. State: Initialization Mode
 
 This function is called to trigger the evaluation of fdisc to compute the current values of discrete states from previous values. 
 The FMU signals the support of fmi3EvaluateDiscreteStates via the capability flag providesEvaluateDiscreteStates.
@@ -1488,7 +1488,7 @@ function fmi3EvaluateDiscreteStates(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.3.5. State: Event Mode
 
 This function is called to signal a converged solution at the current super-dense time instant. fmi3UpdateDiscreteStates must be called at least once per super-dense time instant.
 
@@ -1502,7 +1502,7 @@ function fmi3UpdateDiscreteStates!(fmu::FMU3, discreteStatesNeedUpdate::fmi3Bool
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.3.5. State: Event Mode
 
 The model enters Continuous-Time Mode.
 
@@ -1513,7 +1513,7 @@ function fmi3EnterContinuousTimeMode(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.3.5. State: Event Mode
 
 This function must be called to change from Event Mode into Step Mode in Co-Simulation.
 
@@ -1524,7 +1524,7 @@ function fmi3EnterStepMode(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 2.3.6. State: Configuration Mode
 
 Exits the Configuration Mode and returns to state Instantiated.
 
@@ -1535,7 +1535,7 @@ function fmi3ExitConfigurationMode(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 
 Set independent variable time and reinitialize chaching of variables that depend on time.
 
@@ -1547,7 +1547,7 @@ function fmi3SetTime(fmu::FMU3, time::Real)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 
 Set a new (continuous) state vector and reinitialize chaching of variables that depend on states.
 
@@ -1560,7 +1560,7 @@ function fmi3SetContinuousStates(fmu::FMU3, x::Union{Array{Float32}, Array{Float
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 
 Compute state derivatives at the current time instant and for the current states.
 
@@ -1574,7 +1574,7 @@ function  fmi3GetContinuousStateDerivatives(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 
 Returns the event indicators of the FMU.
 
@@ -1588,7 +1588,7 @@ function fmi3GetEventIndicators(fmu::FMU3)
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 
 This function must be called by the environment after every completed step
 If enterEventMode == fmi3True, the event mode must be entered
@@ -1608,7 +1608,7 @@ function fmi3CompletedIntegratorStep(fmu::FMU3,
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 
 The model enters Event Mode.
 
@@ -1619,7 +1619,7 @@ function fmi3EnterEventMode(fmu::FMU3, stepEvent::Bool, stateEvent::Bool, rootsF
 end
 
 """
-TODO: FMI specification reference.
+Source: FMISpec3.0, Version D5ef1c1: 4.2.1. State: Step Mode
 
 The computation of a time step is started.
 
