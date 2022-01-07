@@ -51,7 +51,7 @@ Markdown.parse("""
 ``` 
 
 ## Library FMI.jl
-__*Motivation*__: Models within closed simulation tools complicate hybrid modelling, because for training purposes of data-driven model parts the loss gradient must be determined by neural networks (NN) and the model itself is required. Nevertheless, the structural integration of models in NNs is a sought-after field of research in which some approaches have already been made. For example, progress by integrating algorithmic numerical solvers for ordinary differential equations (ODEs) in NNs. Another approach was to integrate physical models into machine learning processes, where physical models are evaluated during training as part of the loss function. Besides, the focus here is not only on cost function but above all on the structural integration of FMUs. For this purpose, the combination of physical and data-driven models is suitable as an overall industrial tool, which so far cannot be implemented in reality.  
+__*Motivation*__: Models within closed simulation tools complicate hybrid modelling, because for training purposes of data-driven model parts the loss gradient must be determined by neural networks (NN) and the model itself is required. Nevertheless, the structural integration of models in NNs is a sought-after field of research in which some approaches have already been made. For example, progress by integrating algorithmic numerical solvers for ordinary differential equations (ODEs) in NNs. Another approach was to integrate physical models into machine learning processes, where physical models are evaluated during training as part of the loss function. Besides, the focus here is not only on cost function but above all on the structural integration of FMUs. For this purpose, the combination of physical and data-driven models is suitable as an overall industrial tool, which so far cannot be implemented in reality[[1]](#Source).  
 
 __*Approach*__: By exporting the models to a more suitable environment, a alternative can be created, which serves as an approach to this freely usable library.As prior knowledge points out, the common standard in both business and research is the usage of [FMI](@ref FMI), in our application this serves as an excellent candidate. With the extension fmiflix.jl and the provision of providing fmi.jl, it should now be possible to make the subject area of neuronalODEs more attractive for industrial applications and bring the state of the art of machine learning techniques closer to production.
 
@@ -66,10 +66,10 @@ Markdown.parse("""
     For further information about the FMIFlux extension, please visit our [documentation](https://github.com/ThummeTo/FMIFlux.jl).
 """)
 ```  
-
+*NeuralFMU (ME) from* [[1]](#Source).
 
 The Julia library provides a number of useful commands for use. Among the main applications is the unpacking, assigning, parameterizing and simulating of entire FMUs with additional display of the results.
-Because FMI is under development, a version-independent FMU simulation with the same user interface must be ensured. In addition, the aim is to ensure a pleasant user experience for any user, which is why small but high-level Julia command sets are provided as well as low-level commands defined by the FMI standard. 
+Because FMI is under development, a version-independent FMU simulation with the same user interface must be ensured. In addition, the aim is to ensure a pleasant user experience for any user, which is why small but high-level Julia command sets are provided as well as low-level commands defined by the FMI standard [[1]](#Source). 
 
 ```@eval
 file = "NeuralFMU.pdf"
