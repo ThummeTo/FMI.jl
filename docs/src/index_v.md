@@ -6,27 +6,31 @@ This section is intended to familiarise users with the documentation environment
 ### 1. Introduction
 The Introduction is intended to provide an initial overview of the structure of the documentation. Thereby the most important terms are briefly explained for a better understanding of the functionalities of the library. In addition, the characteristic features and functions of our FMI.jl library are specifically described to answer users initial questions before using the library for the first time.  
 
-### 2. Usage
-In order to make the usage of the library understandable, two helpful methods are used. Combined, they should provide a good overview of how to use the Julia Library.  
+### 2. Tutorials
+Guidance on how to use the library correctly is provided in the [Tutorial](@ref Tutorials) sections. Various topics are explained step by step and illustrated with the help of code snippets.  
 
-__*Tutorials*__:Guidance on how to use the library correctly is provided in the [Tutorial](@ref Tutorials) sections. This includes a step-by-step guide containing snippets of code for various applications. 
- 
-__*Examples*__:By using [Examples](@ref Examples), the use of the library can be shown best. Here, short and easy to understand code blocks are explained which should make the use of the functions a little easier. 
+Until now, tutorials have been organized on the following topics:
+- [Get Started](@ref Get_started)
+- [load and upload](@ref Load_upload)
+- [simulate a FMU](@ref Simulate)
+
+### 3. Examples
+By using [Examples](@ref Examples), the use of the library can be shown best. Here, short and easy to understand code blocks are explained which should make the use of the functions a little easier.
 
 
-### 3. Libary Funktions
+### 4. Libary Funktions
 The [Library Functions](@ref Lib) sections contains all the documentation to the functions provided by this library. A distinction is made between the functions already defined by the FMI standard and the functions developed internally. The individual functions are available in version-specific as well as version-independent form.    
 
 
 
-### 4. Related Publications
+### 5. Related Publications
 If you are interested in [related publications](@ref related), you can browse through the list of references and gather more information. 
 
 ## [Prior knowledge](@id prior_knowledge)
 ### Julia Programming Language
 Julia is a dynamic typing language developed for fast numerical computation. The aim is to ensure platform-independent numerical computation with high-level programming. Many universities and research institutions have already joined the development of this programming language and publish library extensions. Due to its increasing popularity and essential features, our library will also support Java.
 
-### [Functional Mock-up Interface](@id FMI2) 
+### [Functional Mock-up Interface](@id FMI) 
 The *Functional Mock-up Interface (FMI)* is an open standard for the tool-independent exchange and integration of track models from different manufactures. FMI simplifies the use of the best tools for specific modeling tasks and the consistent reuse of models in different development phases and across departmental boundaries.  
 
 An exported model container that fulfils the FMI requirements is referred to as a *Functional Mock-up Unit (FMU)*. They can be applied in diverse simulation environments and sometimes even in entire co-simulations. So, FMUs can be divided into two main application classes: model-exchange(ME) and co-simulation(CS).
@@ -49,7 +53,7 @@ Markdown.parse("""
 ## Library FMI.jl
 __*Motivation*__: Models within closed simulation tools complicate hybrid modelling, because for training purposes of data-driven model parts the loss gradient must be determined by neural networks (NN) and the model itself is required. Nevertheless, the structural integration of models in NNs is a sought-after field of research in which some approaches have already been made. For example, progress by integrating algorithmic numerical solvers for ordinary differential equations (ODEs) in NNs. Another approach was to integrate physical models into machine learning processes, where physical models are evaluated during training as part of the loss function. Besides, the focus here is not only on cost function but above all on the structural integration of FMUs. For this purpose, the combination of physical and data-driven models is suitable as an overall industrial tool, which so far cannot be implemented in reality[[1]](#Source).  
 
-__*Approach*__: By exporting the models to a more suitable environment, a alternative can be created, which serves as an approach to this freely usable library.As prior knowledge points out, the common standard in both business and research is the usage of [FMI](@ref FMI2), in our application this serves as an excellent candidate. With the extension fmiflix.jl and the provision of providing fmi.jl, it should now be possible to make the subject area of neuronalODEs more attractive for industrial applications and bring the state of the art of machine learning techniques closer to production.
+__*Approach*__: By exporting the models to a more suitable environment, a alternative can be created, which serves as an approach to this freely usable library.As prior knowledge points out, the common standard in both business and research is the usage of [FMI](@ref FMI), in our application this serves as an excellent candidate. With the extension fmiflix.jl and the provision of providing fmi.jl, it should now be possible to make the subject area of neuronalODEs more attractive for industrial applications and bring the state of the art of machine learning techniques closer to production.
 
 - *FMI.jl*: load, instantiate, parameterize and simutale FMUs seamlessly inside the Julia prgramming langurage
 

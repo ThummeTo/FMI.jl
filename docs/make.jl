@@ -11,8 +11,7 @@ makedocs(sitename="FMI.jl",
             sidebar_sitename = false
          ),
          pages= Any[
-            
-            "Introduction" => "index_v2.md"
+            "Introduction" => "index.md"
             "Usage" =>[
                 "Overview" => "usage/usage_overview.md"
                 "Tutorials" => [
