@@ -11,12 +11,12 @@ makedocs(sitename="FMI.jl",
             sidebar_sitename = false
          ),
          pages= Any[
-            "Introduction" => "index.md"
-
-            "Leraning" =>[
-                "Overview" => "learing/learning_overview.md"
+            
+            "Introduction" => "index_v2.md"
+            "Usage" =>[
+                "Overview" => "usage/usage_overview.md"
                 "Tutorials" => [
-                    "tutorials/overview.md"
+                    "Overview" => "tutorials/tutorial_overview.md"
                     "Get Started" => "tutorials/get_started.md"
                     "Load/Unload a FMU" => "tutorials/load_unload.md"
                     "Simulate a FMU" => "tutorials/simulate.md"
