@@ -771,7 +771,7 @@ function fmi3GetBinary(c::fmi3Component, vr::fmi3ValueReferenceFormat)
     nvr = Csize_t(length(vr))
     values = Array{fmi3Binary}(undef, nvr)
     valueSizes = Array{Csize_t}(undef, nvr)
-    fill!(valueSizes, Csize_t(1))
+    # fill!(valueSizes, Csize_t(8))
     fmi3GetBinary!(c, vr, nvr, valueSizes, values, nvr)
     println(values)
     if length(values) == 1
@@ -796,7 +796,7 @@ function fmi3GetBinary!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::
 
     nvr = Csize_t(length(vr))
     valueSizes = Array{Csize_t}(undef, nvr)
-    fill!(valueSizes, Csize_t(1))
+    # fill!(valueSizes, Csize_t(8))
     fmi3GetBinary!(c, vr, nvr, valueSizes, values, nvr)
     println(values)
 end
@@ -819,7 +819,9 @@ function fmi3SetBinary(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::U
 
     nvr = Csize_t(length(vr))
     valueSizes = Array{Csize_t}(undef, nvr)
-    fill!(valueSizes, Csize_t(1))
+    for i in 1:length(values)
+        valueSizes[i] = length(values[i])
+    end
     fmi3SetBinary(c, vr, nvr, valueSizes, values, nvr)
     println(values)
 end
@@ -1250,12 +1252,18 @@ This function is called to signal a converged solution at the current super-dens
 
 For more information call ?fmi3UpdateDiscreteStates
 """
-# function fmi3UpdateDiscreteStates(c::fmi3Component, discreteStatesNeedUpdate::fmi3Boolean, terminateSimulation::fmi3Boolean, 
-#     nominalsOfContinuousStatesChanged::fmi3Boolean, valuesOfContinuousStatesChanged::fmi3Boolean,
-#     nextEventTimeDefined::fmi3Boolean, nextEventTime::fmi3Float64)
-#     fmi3UpdateDiscreteStates(c, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, 
-#     valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
-# end
+function fmi3UpdateDiscreteStates!(c::fmi3Component)
+    discreteStatesNeedUpdate = fmi3False
+    terminateSimulation = fmi3False
+    nominalsOfContinuousStatesChanged = fmi3False
+    valuesOfContinuousStatesChanged = fmi3False
+    nextEventTimeDefined = fmi3False
+    nextEventTime = fmi3Float64(0.0)
+
+    fmi3UpdateDiscreteStates!(c, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, 
+    valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
+    discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime
+end
 
 """
 Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode

@@ -2,9 +2,9 @@
 
 
 Seminar:
-fmi3GetBinary -funktioniert, bin mir aber bei den Adressen net ganz sicher
+fmi3GetBinary -funktioniert, bin mir aber bei den Adressen net ganz sicher - QUASI DONE
 Printlns raus
-Docstrings und Kommentare, TOdos in fmi3 und fmi3comp noch machen
+Docstrings und Kommentare, TOdos in fmi3 und fmi3comp noch machen - DONE
 Matrizen
 
 Testing - DONE

@@ -29,8 +29,11 @@ mutable struct FMU3 <: FMU
     instanceEnvironment::fmi3InstanceEnvironment
     components::Array{fmi3Component}
 
+    # TODO in component struct
     previous_z::Array{fmi3Float64}
     rootsFound::Array{fmi3Int32}
+    stateEvent::fmi3Boolean
+    timeEvent::fmi3Boolean
 
     # paths of ziped and unziped FMU folders
     path::String
@@ -326,6 +329,8 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
 
         fmu.previous_z  = zeros(fmi3Float64, fmi3GetEventIndicators(fmu.modelDescription))
         fmu.rootsFound  = zeros(fmi3Int32, fmi3GetEventIndicators(fmu.modelDescription))
+        fmu.stateEvent  = fmi3False
+        fmu.timeEvent   = fmi3False
     end
 
     if fmi3IsScheduledExecution(fmu)
@@ -1494,11 +1499,8 @@ This function is called to signal a converged solution at the current super-dens
 
 For more information call ?fmi3UpdateDiscreteStates!
 """
-function fmi3UpdateDiscreteStates!(fmu::FMU3, discreteStatesNeedUpdate::fmi3Boolean, terminateSimulation::fmi3Boolean, 
-    nominalsOfContinuousStatesChanged::fmi3Boolean, valuesOfContinuousStatesChanged::fmi3Boolean,
-    nextEventTimeDefined::fmi3Boolean, nextEventTime::fmi3Float64)
-    fmi3UpdateDiscreteStates!(fmu.components[end], discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, 
-    valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
+function fmi3UpdateDiscreteStates!(fmu::FMU3)
+    fmi3UpdateDiscreteStates!(fmu.components[end])
 end
 
 """

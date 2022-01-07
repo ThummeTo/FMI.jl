@@ -63,53 +63,54 @@ using FMI
     # FMI.fmi3SetFloat64(fmu, ["g"], [0.5])
     # FMI.fmi3GetFloat64(fmu, "g")
     FMI.fmi3ExitInitializationMode(fmu)
-    # dt = FMI.fmi3Float64(0.1)
-    # ts = 0.0:dt:3.0
-    # t = FMI.fmi3Float64(0.0)
-    # noSetFMUStatePriorToCurrentPoint = FMI.fmi3False
-    # eventEncountered = FMI.fmi3False
-    # terminateSimulation = FMI.fmi3False
-    # earlyReturn = FMI.fmi3False
-    # lastSuccessfulTime = FMI.fmi3Float64(0.0)
-    # result = []
-    # ccall(fmu.cDoStep, Cuint,
-    #         (Ptr{Nothing}, FMI.fmi3Float64, FMI.fmi3Float64, FMI.fmi3Boolean, Ptr{FMI.fmi3Boolean}, Ptr{FMI.fmi3Boolean}, Ptr{FMI.fmi3Boolean}, Ptr{FMI.fmi3Float64}),
-    #         fmu.components[end].compAddr, t, dt, noSetFMUStatePriorToCurrentPoint, Ref(eventEncountered), Ref(terminateSimulation), Ref(earlyReturn), Ref(lastSuccessfulTime))
-    # FMI.fmi3EnterStepMode(fmu.components[end])
-    # FMI.fmi3DoStep(fmu, 0.0, dt, false, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
-    # for t in ts
-    #     FMI.fmi3DoStep(fmu, t, dt, false, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
-    #     value = FMI.fmi3GetFloat64(fmu, "h")
-    #     println(result, value)
-    #     push!(result, value)
-    # end
-    # state = FMI.fmi3GetFMUState(fmu)
-    # FMI.fmi3SetFloat64(fmu, ["g"], [2.0])
-    # FMI.fmi3GetFloat64(fmu, ["g"])
-    # FMI.fmi3SetFMUState(fmu, state)
-    # FMI.fmi3GetFloat64(fmu, ["g"])
-    # FMI.fmi3FreeFMUState(fmu, state)
-    # # TODO not working for ME
-    # test = FMI.fmi3GetNumberOfContinuousStates(fmu)
-    # test = FMI.fmi3GetNumberOfEventIndicators(fmu)
-    # FMI.fmi3GetContinuousStates(fmu)
-    # FMI.fmi3GetNominalsOfContinuousStates(fmu)
-    # FMI.fmi3EvaluateDiscreteStates(fmu)
-    # FMI.fmi3EnterContinuousTimeMode(fmu)
-    # dir_ders_buffer = zeros(FMI.fmi3Float64, 2)
-    # fmu.modelDescription.derivativeValueReferences
-    # dir_ders = FMI.fmi3GetDirectionalDerivative(fmu, fmu.modelDescription.derivativeValueReferences, [fmu.modelDescription.stateValueReferences[1]])
-    # FMI.fmi3GetDirectionalDerivative!(fmu, fmu.modelDescription.derivativeValueReferences, [fmu.modelDescription.stateValueReferences[1]], dir_ders_buffer)
-    # size = FMI.fmi3SerializedFMUStateSize(fmu, state)
-    # size
-    # serialState = FMI.fmi3SerializeFMUState(fmu, state)
-    # state2 = FMI.fmi3DeSerializeFMUState(fmu, serialState)
-    # FMI.fmi3SetFMUState(fmu, state2)
-    # FMI.fmi3EnterConfigurationMode(fmu)
-    # FMI.fmi3ExitConfigurationMode(fmu)
-    # FMI.fmi3EnterStepMode(instance2)
-    # FMI.fmi3Terminate(fmu)
-    # FMI.fmi3Reset(fmu)
+    dt = FMI.fmi3Float64(0.1)
+    ts = 0.0:dt:3.0
+    t = FMI.fmi3Float64(0.0)
+    noSetFMUStatePriorToCurrentPoint = FMI.fmi3False
+    eventEncountered = FMI.fmi3False
+    terminateSimulation = FMI.fmi3False
+    earlyReturn = FMI.fmi3False
+    lastSuccessfulTime = FMI.fmi3Float64(0.0)
+    result = []
+    ccall(fmu.cDoStep, Cuint,
+            (Ptr{Nothing}, FMI.fmi3Float64, FMI.fmi3Float64, FMI.fmi3Boolean, Ptr{FMI.fmi3Boolean}, Ptr{FMI.fmi3Boolean}, Ptr{FMI.fmi3Boolean}, Ptr{FMI.fmi3Float64}),
+            fmu.components[end].compAddr, t, dt, noSetFMUStatePriorToCurrentPoint, Ref(eventEncountered), Ref(terminateSimulation), Ref(earlyReturn), Ref(lastSuccessfulTime))
+    FMI.fmi3EnterStepMode(fmu.components[end])
+    FMI.fmi3DoStep(fmu, 0.0, dt, false, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
+    for t in ts
+        FMI.fmi3DoStep(fmu, t, dt, false, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
+        value = FMI.fmi3GetFloat64(fmu, "h")
+        println(result, value)
+        push!(result, value)
+    end
+    state = FMI.fmi3GetFMUState(fmu)
+    FMI.fmi3SetFloat64(fmu, ["g"], [2.0])
+    FMI.fmi3GetFloat64(fmu, ["g"])
+    FMI.fmi3SetFMUState(fmu, state)
+    FMI.fmi3GetFloat64(fmu, ["g"])
+    FMI.fmi3FreeFMUState(fmu, state)
+    # TODO not working for ME
+    test = FMI.fmi3GetNumberOfContinuousStates(fmu)
+    test = FMI.fmi3GetNumberOfEventIndicators(fmu)
+    FMI.fmi3GetContinuousStates(fmu)
+    FMI.fmi3GetNominalsOfContinuousStates(fmu)
+    FMI.fmi3EvaluateDiscreteStates(fmu)
+    FMI.fmi3EnterContinuousTimeMode(fmu)
+    FMI.fmi3EnterEventMode(fmu, true, false, [FMI.fmi3Int32(2)], 0, false)
+    dir_ders_buffer = zeros(FMI.fmi3Float64, 2)
+    fmu.modelDescription.derivativeValueReferences
+    dir_ders = FMI.fmi3GetDirectionalDerivative(fmu, fmu.modelDescription.derivativeValueReferences, [fmu.modelDescription.stateValueReferences[1]])
+    FMI.fmi3GetDirectionalDerivative!(fmu, fmu.modelDescription.derivativeValueReferences, [fmu.modelDescription.stateValueReferences[1]], dir_ders_buffer)
+    size = FMI.fmi3SerializedFMUStateSize(fmu, state)
+    size
+    serialState = FMI.fmi3SerializeFMUState(fmu, state)
+    state2 = FMI.fmi3DeSerializeFMUState(fmu, serialState)
+    FMI.fmi3SetFMUState(fmu, state2)
+    FMI.fmi3EnterConfigurationMode(fmu)
+    FMI.fmi3ExitConfigurationMode(fmu)
+    FMI.fmi3EnterStepMode(instance2)
+    FMI.fmi3Terminate(fmu)
+    FMI.fmi3Reset(fmu)
     FMI.fmi3Unload(fmu)
 
 
@@ -210,8 +211,9 @@ using FMI
     FMI.fmi3GetString(fmu, "string_param")
     FMI.fmi3SetString(fmu, ["string_param"], ["Test!"])
     FMI.fmi3GetString(fmu, ["string_param"])
-    FMI.fmi3GetBinary(fmu, ["binary_in"])
-    FMI.fmi3SetBinary(fmu, ["binary_in"], FMI.fmi3Binary(0x000000005e7ce5f0))
+    binary = FMI.fmi3GetBinary(fmu, ["binary_in"])
+    unsafe_string(binary)
+    FMI.fmi3SetBinary(fmu, ["binary_in"], pointer("Hello, World!"))
     FMI.fmi3GetBinary(fmu, ["binary_in"])
     # FMI.fmi3SetBinary(fmu, ["binary_out"], FMI.fmi3Binary(0x000000005e7fc390))
     FMI.fmi3GetBinary(fmu, ["binary_out"])
