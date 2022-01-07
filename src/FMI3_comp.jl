@@ -773,7 +773,6 @@ function fmi3GetBinary(c::fmi3Component, vr::fmi3ValueReferenceFormat)
     valueSizes = Array{Csize_t}(undef, nvr)
     # fill!(valueSizes, Csize_t(8))
     fmi3GetBinary!(c, vr, nvr, valueSizes, values, nvr)
-    println(values)
     if length(values) == 1
         return values[1]
     else
@@ -798,7 +797,6 @@ function fmi3GetBinary!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::
     valueSizes = Array{Csize_t}(undef, nvr)
     # fill!(valueSizes, Csize_t(8))
     fmi3GetBinary!(c, vr, nvr, valueSizes, values, nvr)
-    println(values)
 end
 function fmi3GetBinary!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::fmi3Binary)
     @assert false "fmi3GetBinary! is only possible for arrays of values, please use an array instead of a scalar."
@@ -811,19 +809,15 @@ Set the values of an array of fmi3Binary variables.
 
 For more information call ?fmi3SetBinary
 """
-function fmi3SetBinary(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Binary}, fmi3Binary})
+function fmi3SetBinary(c::fmi3Component, vr::fmi3ValueReferenceFormat, valueSizes::Union{Array{Csize_t}, Csize_t}, values::Union{Array{fmi3Binary}, fmi3Binary})
 
     vr = prepareValueReference(c, vr)
     values = prepareValue(values)
+    valueSizes = prepareValue(valueSizes)
     @assert length(vr) == length(values) "fmi3SetBinary(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(vr))
-    valueSizes = Array{Csize_t}(undef, nvr)
-    for i in 1:length(values)
-        valueSizes[i] = length(values[i])
-    end
     fmi3SetBinary(c, vr, nvr, valueSizes, values, nvr)
-    println(values)
 end
 
 """

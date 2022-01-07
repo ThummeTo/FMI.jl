@@ -281,7 +281,6 @@ function fmi3CallbackLogMessage(instanceEnvironment::Ptr{Cvoid},
         _category = "No category"
     end
     _status = fmi3StatusString(status)
-    # println("Info: LogMessage")
     if status == Integer(fmi3OK)
         @info "[$_status][$_category]: $_message"
         # @info "[$_status][]: $_message"

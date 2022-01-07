@@ -2,7 +2,7 @@
 
 
 Seminar:
-fmi3GetBinary -funktioniert, bin mir aber bei den Adressen net ganz sicher - QUASI DONE
+fmi3GetBinary -funktioniert, bin mir aber bei den Adressen net ganz sicher - DONE
 Printlns raus
 Docstrings und Kommentare, TOdos in fmi3 und fmi3comp noch machen - DONE
 Matrizen

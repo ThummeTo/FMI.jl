@@ -1163,8 +1163,8 @@ Set the values of an array of fmi3Binary variables.
 
 For more information call ?fmi3SetBinary
 """
-function fmi3SetBinary(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Binary}, fmi3Binary})
-    fmi3SetBinary(fmu.components[end], vr, values)
+function fmi3SetBinary(fmu::FMU3, vr::fmi3ValueReferenceFormat, valueSizes::Union{Array{Csize_t}, Csize_t}, values::Union{Array{fmi3Binary}, fmi3Binary})
+    fmi3SetBinary(fmu.components[end], vr, valueSizes, values)
 end
 
 """
