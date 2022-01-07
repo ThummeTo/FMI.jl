@@ -4,5 +4,6 @@ This section gives an overview and short examples on how to work with the FMI.jl
 
 The tutorials are grouped as followed:
 
-- __Load/Unload an FMU__: A short introductory example on how to load/unload a FMU and what happens in the background.
-- __Simulate a FMU__: Guides you through all the nessacery steps to instatiate, initialize and simulate a FMU.
+- [Get Started](@ref Get_started): The first stups to install the library FMI.jl
+- [Load/Unload an FMU](@ref Load_upload): A short introductory example on how to load/unload a FMU and what happens in the background.
+- [Simulate a FMU](@ref Simulate): Guides you through all the nessacery steps to instatiate, initialize and simulate a FMU.
