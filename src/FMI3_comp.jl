@@ -1247,15 +1247,32 @@ This function is called to signal a converged solution at the current super-dens
 For more information call ?fmi3UpdateDiscreteStates
 """
 function fmi3UpdateDiscreteStates!(c::fmi3Component)
-    discreteStatesNeedUpdate = fmi3False
-    terminateSimulation = fmi3False
-    nominalsOfContinuousStatesChanged = fmi3False
-    valuesOfContinuousStatesChanged = fmi3False
-    nextEventTimeDefined = fmi3False
-    nextEventTime = fmi3Float64(0.0)
-
-    fmi3UpdateDiscreteStates!(c, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, 
-    valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
+    discreteStatesNeedUpdate = fmi3True
+    terminateSimulation = fmi3True
+    nominalsOfContinuousStatesChanged = fmi3True
+    valuesOfContinuousStatesChanged = fmi3True
+    nextEventTimeDefined = fmi3True
+    nextEventTime = fmi3Float64(1.0)
+    refdS = Ref(discreteStatesNeedUpdate)
+    reftS = Ref(terminateSimulation)
+    refnOCS = Ref(nominalsOfContinuousStatesChanged)
+    refvOCS = Ref(valuesOfContinuousStatesChanged)
+    refnETD = Ref(nextEventTimeDefined)
+    refnET = Ref(nextEventTime)
+    fmi3UpdateDiscreteStates!(c, refdS, reftS, refnOCS, refvOCS, refnETD, refnET)
+    discreteStatesNeedUpdate = refdS[]
+    terminateSimulation = reftS[]
+    nominalsOfContinuousStatesChanged =refnOCS[]
+    valuesOfContinuousStatesChanged = refvOCS[]
+    nextEventTimeDefined = refnETD[]
+    nextEventTime = refnET[]
+    println("---------------------")
+    println(discreteStatesNeedUpdate)
+    println(terminateSimulation)
+    println(nominalsOfContinuousStatesChanged)
+    println(valuesOfContinuousStatesChanged)
+    println(nextEventTimeDefined)
+    println(nextEventTime)
     discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime
 end
 
@@ -1283,13 +1300,17 @@ If terminateSimulation == fmi3True, the simulation shall be terminated
 For more information call ?fmi3CompletedIntegratorStep
 """
 function fmi3CompletedIntegratorStep(c::fmi3Component,
-                                     noSetFMUStatePriorToCurrentPoint::fmi3Boolean)
-    enterEventMode = fmi3Boolean(false)
-    terminateSimulation = fmi3Boolean(false)
+    noSetFMUStatePriorToCurrentPoint::fmi3Boolean)
+    enterEventMode = fmi3Boolean(true)
+    terminateSimulation = fmi3Boolean(true)
+    refEventMode = Ref(enterEventMode)
+    refterminateSimulation = Ref(terminateSimulation)
     status = fmi3CompletedIntegratorStep!(c,
-                                         noSetFMUStatePriorToCurrentPoint,
-                                         enterEventMode,
-                                         terminateSimulation)
+                                        noSetFMUStatePriorToCurrentPoint,
+                                        refEventMode,
+                                        refterminateSimulation)
+    enterEventMode = refEventMode[]
+    terminateSimulation = refterminateSimulation[]
     (status, enterEventMode, terminateSimulation)
 end
 
@@ -1300,6 +1321,6 @@ The model enters Event Mode.
 
 For more information call ?fmi3EnterEventMode
 """
-function fmi3EnterEventMode(c::fmi3Component, stepEvent::Bool, stateEvent::Bool, rootsFound::Array{fmi3Int32}, nEventIndicators::Integer, timeEvent::Bool)
-    fmi3EnterEventMode(c, fmi3Boolean(stepEvent), fmi3Boolean(stateEvent), rootsFound, Csize_t(nEventIndicators), fmi3Boolean(timeEvent))
+function fmi3EnterEventMode(c::fmi3Component, stepEvent::Bool, stateEvent::Bool, rootsFound::Array{fmi3Int32}, nEventIndicators::Csize_t, timeEvent::Bool)
+    fmi3EnterEventMode(c, fmi3Boolean(stepEvent), fmi3Boolean(stateEvent), rootsFound, nEventIndicators, fmi3Boolean(timeEvent))
 end

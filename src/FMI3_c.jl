@@ -1535,19 +1535,19 @@ Source: FMISpec3.0, Version D5ef1c1: 2.3.5. State: Event Mode
 
 This function is called to signal a converged solution at the current super-dense time instant. fmi3UpdateDiscreteStates must be called at least once per super-dense time instant.
 """
-function fmi3UpdateDiscreteStates!(c::fmi3Component, discreteStatesNeedUpdate::fmi3Boolean, terminateSimulation::fmi3Boolean, 
-                                    nominalsOfContinuousStatesChanged::fmi3Boolean, valuesOfContinuousStatesChanged::fmi3Boolean,
-                                    nextEventTimeDefined::fmi3Boolean, nextEventTime::fmi3Float64)
+function fmi3UpdateDiscreteStates!(c::fmi3Component, discreteStatesNeedUpdate::Ref{fmi3Boolean}, terminateSimulation::Ref{fmi3Boolean}, 
+                                    nominalsOfContinuousStatesChanged::Ref{fmi3Boolean}, valuesOfContinuousStatesChanged::Ref{fmi3Boolean},
+                                    nextEventTimeDefined::Ref{fmi3Boolean}, nextEventTime::Ref{fmi3Float64})
     ccall(c.fmu.cUpdateDiscreteStates,
             Cuint,
             (Ptr{Nothing}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Float64}),
-            c.compAddr, Ref(discreteStatesNeedUpdate), Ref(terminateSimulation), Ref(nominalsOfContinuousStatesChanged), Ref(valuesOfContinuousStatesChanged), Ref(nextEventTimeDefined), Ref(nextEventTime))
-        println("---------------------")
-        println(discreteStatesNeedUpdate)
-        println(terminateSimulation)
-        println(nominalsOfContinuousStatesChanged)
-        println(valuesOfContinuousStatesChanged)
-        println(nextEventTimeDefined)
+            c.compAddr, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
+        # println("---------------------")
+        # println(discreteStatesNeedUpdate)
+        # println(terminateSimulation)
+        # println(nominalsOfContinuousStatesChanged)
+        # println(valuesOfContinuousStatesChanged)
+        # println(nextEventTimeDefined)
 end
 
 """
@@ -1557,6 +1557,7 @@ The model enters Continuous-Time Mode and all discrete-time equations become ina
 This function has to be called when changing from Event Mode (after the global event iteration in Event Mode over all involved FMUs and other models has converged) into Continuous-Time Mode.
 """
 function fmi3EnterContinuousTimeMode(c::fmi3Component)
+    println("enterContinuousTimeMode")
     ccall(c.fmu.cEnterContinuousTimeMode,
           Cuint,
           (Ptr{Nothing},),
@@ -1637,12 +1638,12 @@ If terminateSimulation == fmi3True, the simulation shall be terminated
 """
 function fmi3CompletedIntegratorStep!(c::fmi3Component,
                                       noSetFMUStatePriorToCurrentPoint::fmi3Boolean,
-                                      enterEventMode::fmi3Boolean,
-                                      terminateSimulation::fmi3Boolean)
+                                      enterEventMode::Ref{fmi3Boolean},
+                                      terminateSimulation::Ref{fmi3Boolean})
     ccall(c.fmu.cCompletedIntegratorStep,
           Cuint,
           (Ptr{Nothing}, fmi3Boolean, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}),
-          c.compAddr, noSetFMUStatePriorToCurrentPoint, Ref(enterEventMode), Ref(terminateSimulation))
+          c.compAddr, noSetFMUStatePriorToCurrentPoint, enterEventMode, terminateSimulation)
 end
 
 """
@@ -1651,6 +1652,7 @@ Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 The model enters Event Mode from the Continuous-Time Mode in ModelExchange oder Step Mode in CoSimulation and discrete-time equations may become active (and relations are not “frozen”).
 """
 function fmi3EnterEventMode(c::fmi3Component, stepEvent::fmi3Boolean, stateEvent::fmi3Boolean, rootsFound::Array{fmi3Int32}, nEventIndicators::Csize_t, timeEvent::fmi3Boolean)
+    println("EnterEventMode!")
     ccall(c.fmu.cEnterEventMode,
           Cuint,
           (Ptr{Nothing},fmi3Boolean, fmi3Boolean, Ptr{fmi3Int32}, Csize_t, fmi3Boolean),
@@ -1663,10 +1665,10 @@ Source: FMISpec3.0, Version D5ef1c1: 4.2.1. State: Step Mode
 The computation of a time step is started.
 """
 function fmi3DoStep(c::fmi3Component, currentCommunicationPoint::fmi3Float64, communicationStepSize::fmi3Float64, noSetFMUStatePriorToCurrentPoint::fmi3Boolean,
-                    eventEncountered::fmi3Boolean, terminateSimulation::fmi3Boolean, earlyReturn::fmi3Boolean, lastSuccessfulTime::fmi3Float64)
+                    eventEncountered::Ref{fmi3Boolean}, terminateSimulation::Ref{fmi3Boolean}, earlyReturn::Ref{fmi3Boolean}, lastSuccessfulTime::Ref{fmi3Float64})
     @assert c.fmu.cDoStep != C_NULL ["fmi3DoStep(...): This FMU does not support fmi3DoStep, probably it's a ME-FMU with no CS-support?"]
 
     ccall(c.fmu.cDoStep, Cuint,
           (Ptr{Nothing}, fmi3Float64, fmi3Float64, fmi3Boolean, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Float64}),
-          c.compAddr, currentCommunicationPoint, communicationStepSize, noSetFMUStatePriorToCurrentPoint, Ref(eventEncountered), Ref(terminateSimulation), Ref(earlyReturn), Ref(lastSuccessfulTime))
+          c.compAddr, currentCommunicationPoint, communicationStepSize, noSetFMUStatePriorToCurrentPoint, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
 end

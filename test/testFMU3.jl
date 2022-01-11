@@ -63,6 +63,9 @@ using FMI
     # FMI.fmi3SetFloat64(fmu, ["g"], [0.5])
     # FMI.fmi3GetFloat64(fmu, "g")
     FMI.fmi3ExitInitializationMode(fmu)
+    FMI.fmi3EnterContinuousTimeMode(fmu)
+    FMI.fmi3GetNumberOfEventIndicators(fmu)
+    FMI.fmi3EnterEventMode(fmu.components[end], FMI.fmi3False, FMI.fmi3True, [FMI.fmi3Int32(-1)], Csize_t(FMI.fmi3GetNumberOfEventIndicators(fmu)), FMI.fmi3False)
     dt = FMI.fmi3Float64(0.1)
     ts = 0.0:dt:3.0
     t = FMI.fmi3Float64(0.0)
@@ -72,17 +75,17 @@ using FMI
     earlyReturn = FMI.fmi3False
     lastSuccessfulTime = FMI.fmi3Float64(0.0)
     result = []
-    ccall(fmu.cDoStep, Cuint,
-            (Ptr{Nothing}, FMI.fmi3Float64, FMI.fmi3Float64, FMI.fmi3Boolean, Ptr{FMI.fmi3Boolean}, Ptr{FMI.fmi3Boolean}, Ptr{FMI.fmi3Boolean}, Ptr{FMI.fmi3Float64}),
-            fmu.components[end].compAddr, t, dt, noSetFMUStatePriorToCurrentPoint, Ref(eventEncountered), Ref(terminateSimulation), Ref(earlyReturn), Ref(lastSuccessfulTime))
-    FMI.fmi3EnterStepMode(fmu.components[end])
-    FMI.fmi3DoStep(fmu, 0.0, dt, false, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
-    for t in ts
-        FMI.fmi3DoStep(fmu, t, dt, false, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
-        value = FMI.fmi3GetFloat64(fmu, "h")
-        println(result, value)
-        push!(result, value)
-    end
+    # ccall(fmu.cDoStep, Cuint,
+    #         (Ptr{Nothing}, FMI.fmi3Float64, FMI.fmi3Float64, FMI.fmi3Boolean, Ptr{FMI.fmi3Boolean}, Ptr{FMI.fmi3Boolean}, Ptr{FMI.fmi3Boolean}, Ptr{FMI.fmi3Float64}),
+    #         fmu.components[end].compAddr, t, dt, noSetFMUStatePriorToCurrentPoint, Ref(eventEncountered), Ref(terminateSimulation), Ref(earlyReturn), Ref(lastSuccessfulTime))
+    # FMI.fmi3EnterStepMode(fmu.components[end])
+    # FMI.fmi3DoStep(fmu, 0.0, dt, false, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
+    # for t in ts
+    #     FMI.fmi3DoStep(fmu, t, dt, false, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
+    #     value = FMI.fmi3GetFloat64(fmu, "h")
+    #     println(result, value)
+    #     push!(result, value)
+    # end
     state = FMI.fmi3GetFMUState(fmu)
     FMI.fmi3SetFloat64(fmu, ["g"], [2.0])
     FMI.fmi3GetFloat64(fmu, ["g"])
@@ -213,7 +216,7 @@ using FMI
     FMI.fmi3GetString(fmu, ["string_param"])
     binary = FMI.fmi3GetBinary(fmu, ["binary_in"])
     unsafe_string(binary)
-    FMI.fmi3SetBinary(fmu, ["binary_in"], Csize_t(length("Hello, World!")), pointer("Hello, World!"))
+    FMI.fmi3SetBinary(fmu, ["binary_in"], Csize_t(length("Hello, World1111!")), pointer("Hello, World111!"))
     two = FMI.fmi3GetBinary(fmu, ["binary_in"])
     unsafe_string(two)
     # FMI.fmi3SetBinary(fmu, ["binary_out"], FMI.fmi3Binary(0x000000005e7fc390))

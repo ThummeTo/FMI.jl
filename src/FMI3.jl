@@ -1600,13 +1600,7 @@ For more information call ?fmi3CompletedIntegratorStep
 """
 function fmi3CompletedIntegratorStep(fmu::FMU3,
                                      noSetFMUStatePriorToCurrentPoint::fmi3Boolean)
-    enterEventMode = fmi3Boolean(false)
-    terminateSimulation = fmi3Boolean(false)
-    status = fmi3CompletedIntegratorStep!(fmu.components[end],
-                                         noSetFMUStatePriorToCurrentPoint,
-                                         enterEventMode,
-                                         terminateSimulation)
-    (status, enterEventMode, terminateSimulation)
+    fmi3CompletedIntegratorStep(fmu.components[end], noSetFMUStatePriorToCurrentPoint)
 end
 
 """
@@ -1628,7 +1622,15 @@ The computation of a time step is started.
 For more information call ?fmi3DoStep
 """
 function fmi3DoStep(fmu::FMU3, currentCommunicationPoint::Real, communicationStepSize::Real, noSetFMUStatePriorToCurrentPoint::Bool, eventEncountered::fmi3Boolean, terminateSimulation::fmi3Boolean, earlyReturn::fmi3Boolean, lastSuccessfulTime::fmi3Float64)
-    fmi3DoStep(fmu.components[end], fmi3Float64(currentCommunicationPoint), fmi3Float64(communicationStepSize), fmi3Boolean(noSetFMUStatePriorToCurrentPoint), eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
+    refeventEncountered = Ref(eventEncountered)
+    refterminateSimulation = Ref(terminateSimulation)
+    refearlyReturn = Ref(earlyReturn)
+    reflastSuccessfulTime = Ref(lastSuccessfulTime)
+    fmi3DoStep(fmu.components[end], fmi3Float64(currentCommunicationPoint), fmi3Float64(communicationStepSize), fmi3Boolean(noSetFMUStatePriorToCurrentPoint), refeventEncountered, refterminateSimulation, refearlyReturn, reflastSuccessfulTime)
+    eventEncountered = refeventEncountered[]
+    terminateSimulation = refterminateSimulation[]
+    earlyReturn = refearlyReturn[]
+    lastSuccessfulTime = reflastSuccessfulTime[]
 end
 # function fmi3DoStep(fmu::FMU3, communicationStepSize::Real)
 #     fmi3DoStep(fmu.components[end], fmi3Float64(fmu.t), fmi3Float64(communicationStepSize), fmi2True)
