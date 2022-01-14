@@ -34,6 +34,7 @@ mutable struct FMU3 <: FMU
     rootsFound::Array{fmi3Int32}
     stateEvent::fmi3Boolean
     timeEvent::fmi3Boolean
+    stepEvent::fmi3Boolean
 
     # paths of ziped and unziped FMU folders
     path::String
@@ -331,6 +332,7 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
         fmu.rootsFound  = zeros(fmi3Int32, fmi3GetEventIndicators(fmu.modelDescription))
         fmu.stateEvent  = fmi3False
         fmu.timeEvent   = fmi3False
+        fmu.stepEvent   = fmi3False
     end
 
     if fmi3IsScheduledExecution(fmu)

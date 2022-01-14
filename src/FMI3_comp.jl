@@ -1266,13 +1266,13 @@ function fmi3UpdateDiscreteStates!(c::fmi3Component)
     valuesOfContinuousStatesChanged = refvOCS[]
     nextEventTimeDefined = refnETD[]
     nextEventTime = refnET[]
-    println("---------------------")
-    println(discreteStatesNeedUpdate)
-    println(terminateSimulation)
-    println(nominalsOfContinuousStatesChanged)
-    println(valuesOfContinuousStatesChanged)
-    println(nextEventTimeDefined)
-    println(nextEventTime)
+    # println("---------------------xx")
+    # println(discreteStatesNeedUpdate)
+    # println(terminateSimulation)
+    # println(nominalsOfContinuousStatesChanged)
+    # println(valuesOfContinuousStatesChanged)
+    # println(nextEventTimeDefined)
+    # println(nextEventTime)
     discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime
 end
 

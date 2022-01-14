@@ -44,18 +44,18 @@ using FMI
 
 # BouncingBall ME
     fmu = FMI.fmi3Load("model/fmi3/BouncingBall.fmu")
-    instance1 = FMI.fmi3InstantiateModelExchange!(fmu; loggingOn=true)
+    instance1 = FMI.fmi3InstantiateModelExchange!(fmu; visible=true, loggingOn=true)
     # instance2 = FMI.fmi3InstantiateCoSimulation!(fmu; loggingOn=true)
     # fmu.components
     # FMI.fmi3CanSerializeFMUstate(fmu)
     # FMI.fmi3GetVersion(fmu)
     # FMI.fmi3SetDebugLogging(fmu)
     t_start = 0.0
-    t_stop = 1.0
-    dt = 0.01
+    t_stop = 3.0
+    dt = 0.001
     saveat = t_start:dt:t_stop
     # success, data = FMI.fmi3SimulateCS(fmu, t_start, t_stop; recordValues=["h", "v"], saveat = saveat)
-    success, data = FMI.fmi3SimulateME(fmu, t_start, t_stop; recordValues=["h", "v"])
+    success, data = FMI.fmi3SimulateME(fmu, t_start, t_stop; recordValues=["h", "v"], dtmax=0.1)
     FMI.fmiPlot(fmu,["h", "v"], data)
     FMI.fmi3EnterInitializationMode(fmu, 0.0, 3.0)
     indicators = FMI.fmi3GetEventIndicators(instance1)

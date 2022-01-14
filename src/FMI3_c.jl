@@ -1542,12 +1542,13 @@ function fmi3UpdateDiscreteStates!(c::fmi3Component, discreteStatesNeedUpdate::R
             Cuint,
             (Ptr{Nothing}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Float64}),
             c.compAddr, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
-        # println("---------------------")
-        # println(discreteStatesNeedUpdate)
-        # println(terminateSimulation)
-        # println(nominalsOfContinuousStatesChanged)
-        # println(valuesOfContinuousStatesChanged)
-        # println(nextEventTimeDefined)
+            println("---------------------x")
+            println(discreteStatesNeedUpdate[])
+            println(terminateSimulation[])
+            println(nominalsOfContinuousStatesChanged[])
+            println(valuesOfContinuousStatesChanged[])
+            println(nextEventTimeDefined[])
+            println(nextEventTime[])
 end
 
 """
