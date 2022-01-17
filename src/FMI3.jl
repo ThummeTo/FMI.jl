@@ -24,17 +24,8 @@ mutable struct FMU3 <: FMU
     modelDescription::fmi3ModelDescription
 
     type::fmi3Type
-    # fmi3CallbackLoggerFunction::fmi3CallbackLoggerFunction
-    # fmi3CallbackIntermediateUpdateFunction::fmi3CallbackIntermediateUpdateFunction
     instanceEnvironment::fmi3InstanceEnvironment
-    components::Array{fmi3Component}
-
-    # TODO in component struct
-    previous_z::Array{fmi3Float64}
-    rootsFound::Array{fmi3Int32}
-    stateEvent::fmi3Boolean
-    timeEvent::fmi3Boolean
-    stepEvent::fmi3Boolean
+    components::Array{fmi3Component}   
 
     # paths of ziped and unziped FMU folders
     path::String
@@ -123,23 +114,23 @@ mutable struct FMU3 <: FMU
     # c-libraries
     libHandle::Ptr{Nothing}
 
-    # # START: experimental section (to FMIFlux.jl)
-    # dependencies::Matrix{fmi2Dependency}
+    # START: experimental section (to FMIFlux.jl)
+    dependencies::Matrix{fmi2Dependency}
 
-    # t::Real         # current time
-    # next_t::Real    # next time
+    t::Real         # current time
+    next_t::Real    # next time
 
-    # x       # current state
-    # next_x  # next state
+    x       # current state
+    next_x  # next state
 
-    # dx      # current state derivative
-    # simulationResult
+    dx      # current state derivative
+    simulationResult
 
-    # jac_dxy_x::Matrix{fmi2Real}
-    # jac_dxy_u::Matrix{fmi2Real}
-    # jac_x::Array{fmi2Real}
-    # jac_t::fmi2Real
-    # # END: experimental section
+    jac_dxy_x::Matrix{fmi2Real}
+    jac_dxy_u::Matrix{fmi2Real}
+    jac_x::Array{fmi2Real}
+    jac_t::fmi2Real
+    # END: experimental section
 
     # Constructor
     FMU3() = new()
@@ -327,12 +318,6 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
         fmu.cCompletedIntegratorStep               = dlsym(fmu.libHandle, :fmi3CompletedIntegratorStep)
         fmu.cEnterEventMode                        = dlsym(fmu.libHandle, :fmi3EnterEventMode)        
         fmu.cUpdateDiscreteStates                  = dlsym(fmu.libHandle, :fmi3UpdateDiscreteStates)
-
-        fmu.previous_z  = zeros(fmi3Float64, fmi3GetEventIndicators(fmu.modelDescription))
-        fmu.rootsFound  = zeros(fmi3Int32, fmi3GetEventIndicators(fmu.modelDescription))
-        fmu.stateEvent  = fmi3False
-        fmu.timeEvent   = fmi3False
-        fmu.stepEvent   = fmi3False
     end
 
     if fmi3IsScheduledExecution(fmu)
@@ -344,11 +329,11 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
         fmu.cGetShiftFraction                      = dlsym(fmu.libHandle, :fmi3GetShiftFraction)
         fmu.cActivateModelPartition                = dlsym(fmu.libHandle, :fmi3ActivateModelPartition)
     end
-    # # initialize further variables TODO check if needed
-    # fmu.jac_x = zeros(Float64, fmu.modelDescription.numberOfContinuousStates)
-    # fmu.jac_t = -1.0
-    # fmu.jac_dxy_x = zeros(fmi2Real,0,0)
-    # fmu.jac_dxy_u = zeros(fmi2Real,0,0)
+    # initialize further variables TODO check if needed
+    fmu.jac_x = zeros(Float64, fmu.modelDescription.numberOfContinuousStates)
+    fmu.jac_t = -1.0
+    fmu.jac_dxy_x = zeros(fmi2Real,0,0)
+    fmu.jac_dxy_u = zeros(fmi2Real,0,0)
    
     # dependency matrix 
     # fmu.dependencies
@@ -605,8 +590,12 @@ function fmi3InstantiateModelExchange!(fmu::FMU3; visible::Bool = false, logging
         @error "fmi3InstantiateModelExchange!(...): Instantiation failed!"
         return nothing
     end
-
-    component = fmi3Component(compAddr, fmu)
+    previous_z  = zeros(fmi3Float64, fmi3GetEventIndicators(fmu.modelDescription))
+    rootsFound  = zeros(fmi3Int32, fmi3GetEventIndicators(fmu.modelDescription))
+    stateEvent  = fmi3False
+    timeEvent   = fmi3False
+    stepEvent   = fmi3False
+    component = fmi3Component(compAddr, fmu, previous_z, rootsFound, stateEvent, timeEvent, stepEvent)
     push!(fmu.components, component)
     component
 end
@@ -631,8 +620,7 @@ function fmi3InstantiateCoSimulation!(fmu::FMU3; visible::Bool = false, loggingO
     else
         mode = false
     end
-    # fmu.fmi3CallbackLoggerFunction = fmi3CallbackLoggerFunction(ptrLogger) #, ptrAllocateMemory, ptrFreeMemory, ptrStepFinished, C_NULL)
-    # fmu.fmi3CallbackIntermediateUpdateFunction = fmi3CallbackIntermediateUpdateFunction(ptrIntermediateUpdate)
+
     compAddr = fmi3InstantiateCoSimulation(fmu.cInstantiateCoSimulation, fmu.instanceName, fmu.modelDescription.instantiationToken, fmu.fmuResourceLocation, fmi3Boolean(visible), fmi3Boolean(loggingOn), 
                                             fmi3Boolean(mode), fmi3Boolean(fmu.modelDescription.CScanReturnEarlyAfterIntermediateUpdate), fmu.modelDescription.intermediateUpdateValueReferences, Csize_t(length(fmu.modelDescription.intermediateUpdateValueReferences)), fmu.instanceEnvironment, ptrLogger, ptrIntermediateUpdate)
 
@@ -1499,10 +1487,10 @@ Source: FMISpec3.0, Version D5ef1c1: 2.3.5. State: Event Mode
 
 This function is called to signal a converged solution at the current super-dense time instant. fmi3UpdateDiscreteStates must be called at least once per super-dense time instant.
 
-For more information call ?fmi3UpdateDiscreteStates!
+For more information call ?fmi3UpdateDiscreteStates
 """
-function fmi3UpdateDiscreteStates!(fmu::FMU3)
-    fmi3UpdateDiscreteStates!(fmu.components[end])
+function fmi3UpdateDiscreteStates(fmu::FMU3)
+    fmi3UpdateDiscreteStates(fmu.components[end])
 end
 
 """
@@ -1634,10 +1622,7 @@ function fmi3DoStep(fmu::FMU3, currentCommunicationPoint::Real, communicationSte
     earlyReturn = refearlyReturn[]
     lastSuccessfulTime = reflastSuccessfulTime[]
 end
-# function fmi3DoStep(fmu::FMU3, communicationStepSize::Real)
-#     fmi3DoStep(fmu.components[end], fmi3Float64(fmu.t), fmi3Float64(communicationStepSize), fmi2True)
-#     fmu.t += communicationStepSize
-# end
+
 """
 Starts a simulation of the fmu instance for the matching fmu type. If both types are available, CS is preferred over ME.
 """

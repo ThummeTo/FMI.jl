@@ -62,7 +62,6 @@ For more information call ?fmi3GetFloat32!
 function fmi3GetFloat32!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Array{fmi3Float32})
 
     vr = prepareValueReference(c, vr)
-    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi3GetFloat32!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
@@ -122,7 +121,7 @@ For more information call ?fmi3GetFloat64!
 function fmi3GetFloat64!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Array{fmi3Float64})
 
     vr = prepareValueReference(c, vr)
-    # values = prepareValue(values)
+
     @assert length(vr) == length(values) "fmi3GetFloat64!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
@@ -182,7 +181,6 @@ For more information call ?fmi3GetInt8!
 function fmi3GetInt8!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Array{fmi3Int8})
 
     vr = prepareValueReference(c, vr)
-    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi3GetInt8!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
@@ -242,7 +240,6 @@ For more information call ?fmi3GetUInt8!
 function fmi3GetUInt8!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Array{fmi3UInt8})
 
     vr = prepareValueReference(c, vr)
-    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi3GetUInt8!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
@@ -302,7 +299,6 @@ For more information call ?fmi3GetInt16!
 function fmi3GetInt16!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Array{fmi3Int16})
 
     vr = prepareValueReference(c, vr)
-    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi3GetInt16!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
@@ -362,7 +358,6 @@ For more information call ?fmi3GetUInt16!
 function fmi3GetUInt16!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Array{fmi3UInt16})
 
     vr = prepareValueReference(c, vr)
-    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi3GetUInt16!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
@@ -422,7 +417,6 @@ For more information call ?fmi3GetInt32!
 function fmi3GetInt32!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Array{fmi3Int32})
 
     vr = prepareValueReference(c, vr)
-    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi3GetInt32!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
@@ -482,7 +476,6 @@ For more information call ?fmi3GetUInt32!
 function fmi3GetUInt32!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Array{fmi3UInt32})
 
     vr = prepareValueReference(c, vr)
-    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi3GetUInt32!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
@@ -542,7 +535,6 @@ For more information call ?fmi3GetInt64!
 function fmi3GetInt64!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Array{fmi3Int64})
 
     vr = prepareValueReference(c, vr)
-    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi3GetInt64!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
@@ -602,7 +594,6 @@ For more information call ?fmi3GetUInt64!
 function fmi3GetUInt64!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Array{fmi3UInt64})
 
     vr = prepareValueReference(c, vr)
-    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi3GetUInt64!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
@@ -662,7 +653,6 @@ For more information call ?fmi3GetBoolean!
 function fmi3GetBoolean!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Array{fmi3Boolean})
 
     vr = prepareValueReference(c, vr)
-    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi3GetBoolean!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(values))
@@ -725,7 +715,6 @@ For more information call ?fmi3GetString!
 function fmi3GetString!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Array{fmi3String})
 
     vr = prepareValueReference(c, vr)
-    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi3GetString!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(vr))
@@ -771,7 +760,6 @@ function fmi3GetBinary(c::fmi3Component, vr::fmi3ValueReferenceFormat)
     nvr = Csize_t(length(vr))
     values = Array{fmi3Binary}(undef, nvr)
     valueSizes = Array{Csize_t}(undef, nvr)
-    # fill!(valueSizes, Csize_t(8))
     fmi3GetBinary!(c, vr, nvr, valueSizes, values, nvr)
     if length(values) == 1
         return values[1]
@@ -790,12 +778,10 @@ For more information call ?fmi3GetBinary!
 function fmi3GetBinary!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Array{fmi3Binary})
 
     vr = prepareValueReference(c, vr)
-    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi3GetBinary!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(vr))
     valueSizes = Array{Csize_t}(undef, nvr)
-    # fill!(valueSizes, Csize_t(8))
     fmi3GetBinary!(c, vr, nvr, valueSizes, values, nvr)
 end
 function fmi3GetBinary!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::fmi3Binary)
@@ -852,7 +838,6 @@ For more information call ?fmi3GetClock!
 function fmi3GetClock!(c::fmi3Component, vr::fmi3ValueReferenceFormat, values::Array{fmi3Clock})
 
     vr = prepareValueReference(c, vr)
-    # values = prepareValue(values)
     @assert length(vr) == length(values) "fmi3GetClock!(...): `vr` and `values` need to be the same length."
 
     nvr = Csize_t(length(vr))
@@ -1246,7 +1231,7 @@ This function is called to signal a converged solution at the current super-dens
 
 For more information call ?fmi3UpdateDiscreteStates
 """
-function fmi3UpdateDiscreteStates!(c::fmi3Component)
+function fmi3UpdateDiscreteStates(c::fmi3Component)
     discreteStatesNeedUpdate = fmi3True
     terminateSimulation = fmi3True
     nominalsOfContinuousStatesChanged = fmi3True
@@ -1259,20 +1244,13 @@ function fmi3UpdateDiscreteStates!(c::fmi3Component)
     refvOCS = Ref(valuesOfContinuousStatesChanged)
     refnETD = Ref(nextEventTimeDefined)
     refnET = Ref(nextEventTime)
-    fmi3UpdateDiscreteStates!(c, refdS, reftS, refnOCS, refvOCS, refnETD, refnET)
+    fmi3UpdateDiscreteStates(c, refdS, reftS, refnOCS, refvOCS, refnETD, refnET)
     discreteStatesNeedUpdate = refdS[]
     terminateSimulation = reftS[]
     nominalsOfContinuousStatesChanged =refnOCS[]
     valuesOfContinuousStatesChanged = refvOCS[]
     nextEventTimeDefined = refnETD[]
     nextEventTime = refnET[]
-    # println("---------------------xx")
-    # println(discreteStatesNeedUpdate)
-    # println(terminateSimulation)
-    # println(nominalsOfContinuousStatesChanged)
-    # println(valuesOfContinuousStatesChanged)
-    # println(nextEventTimeDefined)
-    # println(nextEventTime)
     discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime
 end
 

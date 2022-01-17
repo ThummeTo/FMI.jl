@@ -449,16 +449,6 @@ mutable struct fmi3ModelVariable
                 end
             end
         end
-
-        # if !occursin(initialString, string(instances(fmi3initial)))
-        #     display("Error: initial not known")
-        # else
-        #     for i in 0:(length(instances(fmi3initial))-1)
-        #         if initialString == string(fmi3initial(i))
-        #             init = fmi3initial(i)
-        #         end
-        #     end
-        # end
         new(name, valueReference, type, description, cau, var, dependencies, dependenciesKind)
     end
 end
@@ -551,6 +541,11 @@ The mutable struct represents a pointer to an FMU specific data structure that c
 mutable struct fmi3Component
     compAddr::Ptr{Nothing}
     fmu
+    previous_z::Array{fmi3Float64}
+    rootsFound::Array{fmi3Int32}
+    stateEvent::fmi3Boolean
+    timeEvent::fmi3Boolean
+    stepEvent::fmi3Boolean
 end
 
 """
@@ -729,7 +724,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3GetFloat32!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Float32}, nvalue::Csize_t)
     ccall(c.fmu.cGetFloat32,
@@ -742,7 +739,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3SetFloat32(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Float32}, nvalue::Csize_t)
     status = ccall(c.fmu.cSetFloat32,
@@ -755,7 +754,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3GetFloat64!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Float64}, nvalue::Csize_t)
     ccall(c.fmu.cGetFloat64,
@@ -768,7 +769,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3SetFloat64(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Float64}, nvalue::Csize_t)
     status = ccall(c.fmu.cSetFloat64,
@@ -782,7 +785,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3GetInt8!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int8}, nvalue::Csize_t)
     ccall(c.fmu.cGetInt8,
@@ -795,7 +800,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3SetInt8(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int8}, nvalue::Csize_t)
     status = ccall(c.fmu.cSetInt8,
@@ -809,7 +816,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3GetUInt8!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3UInt8}, nvalue::Csize_t)
     ccall(c.fmu.cGetUInt8,
@@ -822,7 +831,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3SetUInt8(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3UInt8}, nvalue::Csize_t)
     status = ccall(c.fmu.cSetUInt8,
@@ -835,7 +846,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3GetInt16!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int16}, nvalue::Csize_t)
     ccall(c.fmu.cGetInt16,
@@ -848,7 +861,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3SetInt16(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int16}, nvalue::Csize_t)
     status = ccall(c.fmu.cSetInt16,
@@ -861,7 +876,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3GetUInt16!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3UInt16}, nvalue::Csize_t)
     ccall(c.fmu.cGetUInt16,
@@ -873,7 +890,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3SetUInt16(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3UInt16}, nvalue::Csize_t)
     status = ccall(c.fmu.cSetUInt16,
@@ -886,7 +905,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3GetInt32!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int32}, nvalue::Csize_t)
     ccall(c.fmu.cGetInt32,
@@ -899,7 +920,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3SetInt32(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int32}, nvalue::Csize_t)
     status = ccall(c.fmu.cSetInt32,
@@ -912,7 +935,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3GetUInt32!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3UInt32}, nvalue::Csize_t)
     ccall(c.fmu.cGetUInt32,
@@ -925,7 +950,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3SetUInt32(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3UInt32}, nvalue::Csize_t)
     status = ccall(c.fmu.cSetUInt32,
@@ -938,7 +965,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3GetInt64!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int64}, nvalue::Csize_t)
     ccall(c.fmu.cGetInt64,
@@ -951,7 +980,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3SetInt64(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Int64}, nvalue::Csize_t)
     status = ccall(c.fmu.cSetInt64,
@@ -964,7 +995,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3GetUInt64!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3UInt64}, nvalue::Csize_t)
     ccall(c.fmu.cGetUInt64,
@@ -977,7 +1010,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3SetUInt64(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3UInt64}, nvalue::Csize_t)
     status = ccall(c.fmu.cSetUInt64,
@@ -990,7 +1025,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3GetBoolean!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Boolean}, nvalue::Csize_t)
     status = ccall(c.fmu.cGetBoolean,
@@ -1003,7 +1040,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3SetBoolean(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Boolean}, nvalue::Csize_t)
     status = ccall(c.fmu.cSetBoolean,
@@ -1016,7 +1055,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3GetString!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Vector{Ptr{Cchar}}, nvalue::Csize_t)
     status = ccall(c.fmu.cGetString,
@@ -1029,7 +1070,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """     
 function fmi3SetString(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Union{Array{Ptr{Cchar}}, Array{Ptr{UInt8}}}, nvalue::Csize_t)
     status = ccall(c.fmu.cSetString,
@@ -1038,14 +1081,13 @@ function fmi3SetString(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csi
                 c.compAddr, vr, nvr, value, nvalue)
     status
 end
-# TODO nvalues erklären
-# TODO working might check result
-# The strings returned by fmi3GetString, as well as the binary values returned by fmi3GetBinary, must be copied by the importer 
-# because the allocated memory for these strings might be deallocated or overwritten by the next call of an FMU function.
+
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValues - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3GetBinary!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, valueSizes::Array{Csize_t}, value::Array{fmi3Binary}, nvalue::Csize_t)
     ccall(c.fmu.cGetBinary,
@@ -1057,7 +1099,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3SetBinary(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, valueSizes::Array{Csize_t}, value::Array{fmi3Binary}, nvalue::Csize_t)
     status = ccall(c.fmu.cSetBinary,
@@ -1070,7 +1114,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3GetClock!(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Clock})
     status = ccall(c.fmu.cGetClock,
@@ -1083,7 +1129,9 @@ end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.2.6.2. Getting and Setting Variable Values
 
-Functions to get and set values of variables idetified by their valueReference
+Functions to get and set values of variables idetified by their valueReference.
+
+nValue - is different from nvr if the value reference represents an array and therefore are more values tied to a single value reference.
 """
 function fmi3SetClock(c::fmi3Component, vr::Array{fmi3ValueReference}, nvr::Csize_t, value::Array{fmi3Clock})
     status = ccall(c.fmu.cSetClock,
@@ -1535,7 +1583,7 @@ Source: FMISpec3.0, Version D5ef1c1: 2.3.5. State: Event Mode
 
 This function is called to signal a converged solution at the current super-dense time instant. fmi3UpdateDiscreteStates must be called at least once per super-dense time instant.
 """
-function fmi3UpdateDiscreteStates!(c::fmi3Component, discreteStatesNeedUpdate::Ref{fmi3Boolean}, terminateSimulation::Ref{fmi3Boolean}, 
+function fmi3UpdateDiscreteStates(c::fmi3Component, discreteStatesNeedUpdate::Ref{fmi3Boolean}, terminateSimulation::Ref{fmi3Boolean}, 
                                     nominalsOfContinuousStatesChanged::Ref{fmi3Boolean}, valuesOfContinuousStatesChanged::Ref{fmi3Boolean},
                                     nextEventTimeDefined::Ref{fmi3Boolean}, nextEventTime::Ref{fmi3Float64})
     ccall(c.fmu.cUpdateDiscreteStates,
