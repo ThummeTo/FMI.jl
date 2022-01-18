@@ -64,6 +64,7 @@ function condition(c::fmi2Component, out, x, t, integrator, inputFunction, input
 end
 
 # Handles the upcoming events.
+# Sets a new state for the solver from the FMU (if needed).
 function affectFMU!(c::fmi2Component, integrator, idx, inputFunction, inputValues::Array{fmi2ValueReference})
     # Event found - handle it
     continuousStatesChanged, nominalsChanged = handleEvents(c, true, Bool(sign(idx)))
@@ -103,6 +104,10 @@ end
 
 # save FMU values 
 function saveValues(c::fmi2Component, recordValues, u, t, integrator)
+    fmi2SetTime(c, t) 
+    x = integrator.sol(t)
+    fmi2SetContinuousStates(c, x)
+    
     (fmiGetReal(c, recordValues)...,)
 end
 
