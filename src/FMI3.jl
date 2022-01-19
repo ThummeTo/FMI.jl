@@ -1187,7 +1187,7 @@ Set the values of an array of fmi3Clock variables.
 For more information call ?fmi3SetClock
 """
 function fmi3SetClock(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Clock}, fmi3Clock})
-    fmi3SetBinary(fmu.components[end], vr, values)
+    fmi3SetClock(fmu.components[end], vr, values)
 end
 
 """
@@ -1198,11 +1198,7 @@ Get the pointer to the current FMU state.
 For more information call ?fmi3GetFMUState
 """
 function fmi3GetFMUState(fmu::FMU3)
-    state = fmi3FMUState()
-    stateRef = Ref(state)
-    fmi3GetFMUState(fmu.components[end], stateRef)
-    state = stateRef[]
-    state
+    fmi3GetFMUState(fmu.components[end])
 end
 
 """
@@ -1237,10 +1233,7 @@ Returns the size of a byte vector the FMU can be stored in.
 For more information call ?fmi3SerzializedFMUStateSize
 """
 function fmi3SerializedFMUStateSize(fmu::FMU3, state::fmi3FMUState)
-    size = 0
-    sizeRef = Ref(Csize_t(size))
-    fmi3SerializedFMUStateSize(fmu.components[end], state, sizeRef)
-    size = sizeRef[]
+    fmi3SerializedFMUStateSize(fmu.components[end], state)
 end
 
 """
@@ -1251,10 +1244,7 @@ Serialize the data in the FMU state pointer.
 For more information call ?fmi3SerializeFMUState
 """
 function fmi3SerializeFMUState(fmu::FMU3, state::fmi3FMUState)
-    size = fmi3SerializedFMUStateSize(fmu, state)
-    serializedState = Array{fmi3Byte}(undef, size)
-    fmi3SerializeFMUState(fmu.components[end], state, serializedState, size)
-    serializedState
+    fmi3SerializeFMUState(fmu.components[end], state)
 end
 
 """
@@ -1265,11 +1255,7 @@ Deserialize the data in the serializedState fmi3Byte field.
 For more information call ?fmi3DeSerializeFMUState
 """
 function fmi3DeSerializeFMUState(fmu::FMU3, serializedState::Array{fmi3Byte})
-    size = length(serializedState)
-    state = fmi3FMUState()
-    stateRef = Ref(state)
-    fmi3DeSerializeFMUState(fmu.components[end], serializedState, Csize_t(size), stateRef)
-    state = stateRef[]
+    fmi3DeSerializeFMUState(fmu.components[end], serializedState)
 end
 
 """
@@ -1440,10 +1426,7 @@ Return the states at the current time instant.
 For more information call ?fmi3GetContinuousStates
 """
 function fmi3GetContinuousStates(fmu::FMU3)
-    nx = Csize_t(fmu.modelDescription.numberOfContinuousStates)
-    x = zeros(fmi3Float64, nx)
-    fmi3GetContinuousStates(fmu.components[end], x, nx)
-    x
+    fmi3GetContinuousStates(fmu.components[end])
 end
 
 """
@@ -1464,10 +1447,7 @@ Return the nominal values of the continuous states.
 For more information call ?fmi3GetNominalsOfContinuousStates
 """
 function fmi3GetNominalsOfContinuousStates(fmu::FMU3)
-    nx = Csize_t(fmu.modelDescription.numberOfContinuousStates)
-    x = zeros(fmi3Float64, nx)
-    fmi3GetNominalsOfContinuousStates(fmu.components[end], x, nx)
-    x
+    fmi3GetNominalsOfContinuousStates(fmu.components[end])
 end
 
 """
@@ -1547,7 +1527,7 @@ For more information call ?fmi3SetContinuousStates
 """
 function fmi3SetContinuousStates(fmu::FMU3, x::Union{Array{Float32}, Array{Float64}})
     nx = Csize_t(length(x))
-    # fmu.x = x
+    fmu.x = x
     fmi3SetContinuousStates(fmu.components[end], Array{fmi3Float64}(x), nx)
 end
 
@@ -1559,10 +1539,7 @@ Compute state derivatives at the current time instant and for the current states
 For more information call ?fmi3GetContinuousStateDerivatives
 """
 function  fmi3GetContinuousStateDerivatives(fmu::FMU3)
-    nx = Csize_t(fmu.modelDescription.numberOfContinuousStates)
-    derivatives = zeros(fmi3Float64, nx)
-    fmi3GetContinuousStateDerivatives(fmu.components[end], derivatives, nx)
-    derivatives
+    fmi3GetContinuousStateDerivatives(fmu.components[end])
 end
 
 """
@@ -1573,10 +1550,7 @@ Returns the event indicators of the FMU.
 For more information call ?fmi3GetEventIndicators
 """
 function fmi3GetEventIndicators(fmu::FMU3)
-    ni = Csize_t(fmu.modelDescription.numberOfEventIndicators)
-    eventIndicators = zeros(fmi3Float64, ni)
-    fmi3GetEventIndicators(fmu.components[end], eventIndicators, ni)
-    eventIndicators
+    fmi3GetEventIndicators(fmu.components[end])
 end
 
 """

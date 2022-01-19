@@ -330,7 +330,7 @@ function fmi3CallbackIntermediateUpdate(instanceEnvironment::Ptr{Cvoid},
     canReturnEarly::fmi3Boolean,
     earlyReturnRequested::Ptr{fmi3Boolean},
     earlyReturnTime::Ptr{fmi3Float64})
-    @warn "To be implemented!"
+    @debug "To be implemented!"
 end
 
 """
@@ -342,7 +342,7 @@ fmi3CallbackClockUpdate switches the FMU itself then into the Clock Update Mode 
 instanceEnvironment - is the instance name of the model that calls this function. 
 """
 function fmi3CallbackClockUpdate(instanceEnvironment::Ptr{Cvoid})
-    @warn "to be implemented!"
+    @debug "to be implemented!"
 end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.4.7. Definition of Model Variables
@@ -602,6 +602,7 @@ function fmi3InstantiateCoSimulation(cfunc::Ptr{Nothing},
     compAddr
 end
 
+# TODO not tested
 """
 Source: FMISpec3.0, Version D5ef1c1:: 2.3.1. Super State: FMU State Setable
 
@@ -1590,13 +1591,6 @@ function fmi3UpdateDiscreteStates(c::fmi3Component, discreteStatesNeedUpdate::Re
             Cuint,
             (Ptr{Nothing}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Boolean}, Ptr{fmi3Float64}),
             c.compAddr, discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime)
-            println("---------------------x")
-            println(discreteStatesNeedUpdate[])
-            println(terminateSimulation[])
-            println(nominalsOfContinuousStatesChanged[])
-            println(valuesOfContinuousStatesChanged[])
-            println(nextEventTimeDefined[])
-            println(nextEventTime[])
 end
 
 """
@@ -1606,7 +1600,6 @@ The model enters Continuous-Time Mode and all discrete-time equations become ina
 This function has to be called when changing from Event Mode (after the global event iteration in Event Mode over all involved FMUs and other models has converged) into Continuous-Time Mode.
 """
 function fmi3EnterContinuousTimeMode(c::fmi3Component)
-    println("enterContinuousTimeMode")
     ccall(c.fmu.cEnterContinuousTimeMode,
           Cuint,
           (Ptr{Nothing},),
@@ -1701,7 +1694,6 @@ Source: FMISpec3.0, Version D5ef1c1: 3.2.1. State: Continuous-Time Mode
 The model enters Event Mode from the Continuous-Time Mode in ModelExchange oder Step Mode in CoSimulation and discrete-time equations may become active (and relations are not “frozen”).
 """
 function fmi3EnterEventMode(c::fmi3Component, stepEvent::fmi3Boolean, stateEvent::fmi3Boolean, rootsFound::Array{fmi3Int32}, nEventIndicators::Csize_t, timeEvent::fmi3Boolean)
-    println("EnterEventMode!")
     ccall(c.fmu.cEnterEventMode,
           Cuint,
           (Ptr{Nothing},fmi3Boolean, fmi3Boolean, Ptr{fmi3Int32}, Csize_t, fmi3Boolean),

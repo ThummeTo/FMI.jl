@@ -12,7 +12,7 @@ FMU enters Initialization mode.
 For more information call ?fmi3EnterInitializationMode
 """
 function fmi3EnterInitializationMode(c::fmi3Component, startTime::Real = 0.0, stopTime::Real = startTime; tolerance::Real = 0.0)
-    # c.fmu.t = startTime
+    c.fmu.t = startTime
 
     toleranceDefined = (tolerance > 0.0)
     stopTimeDefined = (stopTime > startTime)
