@@ -149,3 +149,38 @@ if ENV["EXPORTINGTOOL"] == "Dymola/2020x"
     @test sum(abs.(solution.u[end] - [0.613371, 0.188633])) < 0.01
     fmiUnload(myFMU)
 end
+
+# case 4: ME-FMU without events, but saving value interpolation
+
+if ENV["EXPORTINGTOOL"] == "Dymola/2020x"
+    pathToFMU = joinpath(dirname(@__FILE__), "..", "model", ENV["EXPORTINGTOOL"], "SpringFrictionPendulum1D.fmu")
+
+    myFMU = fmiLoad(pathToFMU)
+
+    comp = fmiInstantiate!(myFMU; loggingOn=false)
+    @test comp != 0
+
+    # choose FMU or FMUComponent
+    fmuStruct = nothing
+    envFMUSTRUCT = ENV["FMUSTRUCT"]
+    if envFMUSTRUCT == "FMU"
+        fmuStruct = myFMU
+    elseif envFMUSTRUCT == "FMUCOMPONENT"
+        fmuStruct = comp
+    end
+    @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+
+    solution, savedValues = fmiSimulateME(fmuStruct, t_start, t_stop; saveat=tData, recordValues=myFMU.modelDescription.stateValueReferences)
+    @test length(solution.u) == length(tData)
+    @test length(solution.t) == length(tData)
+    @test length(savedValues.saveval) == length(tData)
+    @test length(savedValues.t) == length(tData)
+
+    for i in 1:length(tData)
+        @test sum(abs(solution.t[i] - solution.t[i])) < 1e-6
+        @test sum(abs(solution.u[i][1] - savedValues.saveval[i][1])) < 1e-6
+        @test sum(abs(solution.u[i][2] - savedValues.saveval[i][2])) < 1e-6
+    end
+
+    fmiUnload(myFMU)
+end
