@@ -49,7 +49,6 @@ export fmiGetStartValue
 # FMI2.jl
 export fmi2Dependency, fmi2DependencyDependent, fmi2DependencyIndependent, fmi2DependencyUnknown, fmi2DependencyFixed, fmi2GetDependencies
 export FMU2, fmi2True, fmi2False
-export fmi2SimulationResult, fmi2SimulationResultGetValuesAtIndex, fmi2SimulationResultGetTime, fmi2SimulationResultGetValues
 export fmi2ValueReference, fmi2String2ValueReference, fmi2ValueReference2String
 export fmi2Unzip, fmi2Load, fmi2Unload
 export fmi2GetTypesPlatform, fmi2GetVersion

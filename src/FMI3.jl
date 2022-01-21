@@ -379,56 +379,6 @@ end
 function fmi3IsScheduledExecution(fmu::FMU3)
     fmi3IsScheduledExecution(fmu.modelDescription)
 end
-# TODO unused
-"""
-Struct to handle FMU simulation data / results.
-"""
-mutable struct fmi3SimulationResult
-    valueReferences::Array{fmi3ValueReference}
-    dataPoints::Array
-    fmu::FMU3
-
-    fmi3SimulationResult() = new()
-end
-
-"""
-Collects all data points for variable save index ´i´ inside a fmi3SimulationResult ´sd´.
-"""
-function fmi3SimulationResultGetValuesAtIndex(sd::fmi3SimulationResult, i)
-    collect(dataPoint[i] for dataPoint in sd.dataPoints)
-end
-
-"""
-Collects all time data points inside a fmi3SimulationResult ´sd´.
-"""
-function fmi3SimulationResultGetTime(sd::fmi3SimulationResult)
-    fmi3SimulationResultGetValuesAtIndex(sd, 1)
-end
-
-"""
-Collects all data points for variable with value reference ´tvr´ inside a fmi3SimulationResult ´sd´.
-"""
-function fmi3SimulationResultGetValues(sd::fmi3SimulationResult, tvr::fmi3ValueReference)
-    @assert tvr !== nothing ["fmi3SimulationResultGetValues(...): value reference is nothing!"]
-    @assert length(sd.dataPoints) > 0 ["fmi3SimulationResultGetValues(...): simulation results are empty!"]
-
-    numVars = length(sd.dataPoints[1])-1
-    for i in 1:numVars
-        vr = sd.valueReferences[i]
-        if vr == tvr
-            return fmi3SimulationResultGetValuesAtIndex(sd, i+1)
-        end
-    end
-
-    nothing
-end
-
-"""
-Collects all data points for variable with value name ´s´ inside a fmi3SimulationResult ´sd´.
-"""
-function fmi3SimulationResultGetValues(sd::fmi3SimulationResult, s::String)
-    fmi3SimulationResultGetValues(sd, fmi3String2ValueReference(sd.fmu, s))
-end
 
 """
 Returns an array of ValueReferences coresponding to the variable names.
