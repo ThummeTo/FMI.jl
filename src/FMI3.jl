@@ -631,6 +631,8 @@ Sets debug logging for the FMU.
 For more information call ?fmi3SetDebugLogging
 """
 function fmi3SetDebugLogging(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SetDebugLogging(fmu.components[end])
 end
 
@@ -642,6 +644,8 @@ FMU enters Initialization mode.
 For more information call ?fmi3EnterInitializationMode
 """
 function fmi3EnterInitializationMode(fmu::FMU3, startTime::Real = 0.0, stopTime::Real = startTime; tolerance::Real = 0.0)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3EnterInitializationMode(fmu.components[end], startTime, stopTime; tolerance = tolerance)
 end
 
@@ -653,6 +657,8 @@ FMU exits Initialization mode.
 For more information call ?fmi3ExitInitializationMode
 """
 function fmi3ExitInitializationMode(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3ExitInitializationMode(fmu.components[end])
 end
 
@@ -664,6 +670,8 @@ Informs FMU that simulation run is terminated.
 For more information call ?fmi3Terminate
 """
 function fmi3Terminate(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3Terminate(fmu.components[end])
 end
 
@@ -675,6 +683,8 @@ Resets FMU.
 For more information call ?fmi3Reset
 """
 function fmi3Reset(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3Reset(fmu.components[end])
 end
 
@@ -686,6 +696,8 @@ Get the values of an array of fmi3Float32 variables.
 For more information call ?fmi3GetFloat32
 """
 function fmi3GetFloat32(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetFloat32(fmu.components[end], vr)
 end
 
@@ -697,6 +709,8 @@ Get the values of an array of fmi3Float32 variables.
 For more information call ?fmi3GetFloat32!
 """
 function fmi3GetFloat32!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Float32}, fmi3Float32})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetFloat32!(fmu.components[end], vr, values)
 end
 
@@ -708,6 +722,8 @@ Set the values of an array of fmi3Float32 variables.
 For more information call ?fmi3SetFloat32
 """
 function fmi3SetFloat32(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Float32}, fmi3Float32})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SetFloat32(fmu.components[end], vr, values)
 end
 
@@ -719,6 +735,8 @@ Get the values of an array of fmi3Float64 variables.
 For more information call ?fmi3GetFloat64
 """
 function fmi3GetFloat64(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetFloat64(fmu.components[end], vr)
 end
 
@@ -730,6 +748,8 @@ Get the values of an array of fmi3Float64 variables.
 For more information call ?fmi3GetFloat64!
 """
 function fmi3GetFloat64!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Float64}, fmi3Float64})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetFloat64!(fmu.components[end], vr, values)
 end
 
@@ -741,6 +761,8 @@ Set the values of an array of fmi3Float64 variables.
 For more information call ?fmi3SetFloat64
 """
 function fmi3SetFloat64(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Float64}, fmi3Float64})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SetFloat64(fmu.components[end], vr, values)
 end
 
@@ -752,6 +774,8 @@ Get the values of an array of fmi3Int8 variables.
 For more information call ?fmi3GetInt8
 """
 function fmi3GetInt8(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetInt8(fmu.components[end], vr)
 end
 
@@ -763,6 +787,8 @@ Get the values of an array of fmi3Int8 variables.
 For more information call ?fmi3GetInt8!
 """
 function fmi3GetInt8!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int8}, fmi3Int8})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetInt8!(fmu.components[end], vr, values)
 end
 
@@ -774,6 +800,8 @@ Set the values of an array of fmi3Int8 variables.
 For more information call ?fmi3SetInt8
 """
 function fmi3SetInt8(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int8}, fmi3Int8})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SetInt8(fmu.components[end], vr, values)
 end
 
@@ -785,6 +813,8 @@ Get the values of an array of fmi3UInt8 variables.
 For more information call ?fmi3GetUInt8
 """
 function fmi3GetUInt8(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetUInt8(fmu.components[end], vr)
 end
 
@@ -796,6 +826,8 @@ Get the values of an array of fmi3UInt8 variables.
 For more information call ?fmi3GetUInt8!
 """
 function fmi3GetUInt8!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt8}, fmi3UInt8})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetUInt8!(fmu.components[end], vr, values)
 end
 
@@ -807,6 +839,8 @@ Set the values of an array of fmi3UInt8 variables.
 For more information call ?fmi3SetUInt8
 """
 function fmi3SetUInt8(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt8}, fmi3UInt8})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SetUInt8(fmu.components[end], vr, values)
 end
 
@@ -818,6 +852,8 @@ Get the values of an array of fmi3Int16 variables.
 For more information call ?fmi3GetInt16
 """
 function fmi3GetInt16(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetInt16(fmu.components[end], vr)
 end
 
@@ -829,6 +865,8 @@ Get the values of an array of fmi3Int16 variables.
 For more information call ?fmi3GetInt16!
 """
 function fmi3GetInt16!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int16}, fmi3Int16})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetInt16!(fmu.components[end], vr, values)
 end
 
@@ -840,6 +878,8 @@ Set the values of an array of fmi3Int16 variables.
 For more information call ?fmi3SetInt16
 """
 function fmi3SetInt16(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int16}, fmi3Int16})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SetInt16(fmu.components[end], vr, values)
 end
 
@@ -851,6 +891,8 @@ Get the values of an array of fmi3UInt16 variables.
 For more information call ?fmi3GetUInt16
 """
 function fmi3GetUInt16(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetUInt16(fmu.components[end], vr)
 end
 
@@ -862,6 +904,8 @@ Get the values of an array of fmi3UInt16 variables.
 For more information call ?fmi3GetUInt16!
 """
 function fmi3GetUInt16!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt16}, fmi3UInt16})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetUInt16!(fmu.components[end], vr, values)
 end
 
@@ -873,6 +917,8 @@ Set the values of an array of fmi3UInt16 variables.
 For more information call ?fmi3SetUInt16
 """
 function fmi3SetUInt16(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt16}, fmi3UInt16})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SetUInt16(fmu.components[end], vr, values)
 end
 
@@ -884,6 +930,8 @@ Get the values of an array of fmi3Int32 variables.
 For more information call ?fmi3GetInt32
 """
 function fmi3GetInt32(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetInt32(fmu.components[end], vr)
 end
 
@@ -895,6 +943,8 @@ Get the values of an array of fmi3Int32 variables.
 For more information call ?fmi3GetInt32!
 """
 function fmi3GetInt32!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int32}, fmi3Int32})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetInt32!(fmu.components[end], vr, values)
 end
 
@@ -906,6 +956,8 @@ Set the values of an array of fmi3Int32 variables.
 For more information call ?fmi3SetInt32
 """
 function fmi3SetInt32(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int32}, fmi3Int32})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SetInt32(fmu.components[end], vr, values)
 end
 
@@ -917,6 +969,8 @@ Get the values of an array of fmi3UInt32 variables.
 For more information call ?fmi3GetUInt32
 """
 function fmi3GetUInt32(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetUInt32(fmu.components[end], vr)
 end
 
@@ -928,6 +982,8 @@ Get the values of an array of fmi3UInt32 variables.
 For more information call ?fmi3GetUInt32!
 """
 function fmi3GetUInt32!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt32}, fmi3UInt32})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetUInt32!(fmu.components[end], vr, values)
 end
 
@@ -939,6 +995,8 @@ Set the values of an array of fmi3UInt32 variables.
 For more information call ?fmi3SetUInt32
 """
 function fmi3SetUInt32(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt32}, fmi3UInt32})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SetUInt32(fmu.components[end], vr, values)
 end
 
@@ -950,6 +1008,8 @@ Get the values of an array of fmi3Int64 variables.
 For more information call ?fmi3GetInt64
 """
 function fmi3GetInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetInt64(fmu.components[end], vr)
 end
 
@@ -961,6 +1021,8 @@ Get the values of an array of fmi3Int64 variables.
 For more information call ?fmi3GetInt64!
 """
 function fmi3GetInt64!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int64}, fmi3Int64})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetInt64!(fmu.components[end], vr, values)
 end
 
@@ -972,6 +1034,8 @@ Set the values of an array of fmi3Int64 variables.
 For more information call ?fmi3SetInt64
 """
 function fmi3SetInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Int64}, fmi3Int64})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SetInt64(fmu.components[end], vr, values)
 end
 
@@ -983,6 +1047,8 @@ Get the values of an array of fmi3UInt64 variables.
 For more information call ?fmi3GetUInt64
 """
 function fmi3GetUInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetUInt64(fmu.components[end], vr)
 end
 
@@ -994,6 +1060,8 @@ Get the values of an array of fmi3UInt64 variables.
 For more information call ?fmi3GetUInt64!
 """
 function fmi3GetUInt64!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt64}, fmi3UInt64})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetUInt64!(fmu.components[end], vr, values)
 end
 
@@ -1005,6 +1073,8 @@ Set the values of an array of fmi3UInt64 variables.
 For more information call ?fmi3SetUInt64
 """
 function fmi3SetUInt64(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3UInt64}, fmi3UInt64})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SetUInt64(fmu.components[end], vr, values)
 end
 
@@ -1016,6 +1086,8 @@ Get the values of an array of fmi3Boolean variables.
 For more information call ?fmi3GetBoolean
 """
 function fmi3GetBoolean(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetBoolean(fmu.components[end], vr)
 end
 
@@ -1027,6 +1099,8 @@ Get the values of an array of fmi3Boolean variables.
 For more information call ?fmi3GetBoolean!
 """
 function fmi3GetBoolean!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{Bool}, Bool, Array{fmi3Boolean}})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetBoolean!(fmu.components[end], vr, values)
 end
 
@@ -1038,6 +1112,8 @@ Set the values of an array of fmi3Boolean variables.
 For more information call ?fmi3SetBoolean
 """
 function fmi3SetBoolean(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{Bool}, Bool})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SetBoolean(fmu.components[end], vr, values)
 end
 
@@ -1049,6 +1125,8 @@ Get the values of an array of fmi3String variables.
 For more information call ?fmi3GetString
 """
 function fmi3GetString(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetString(fmu.components[end], vr)
 end
 
@@ -1060,6 +1138,8 @@ Get the values of an array of fmi3String variables.
 For more information call ?fmi3GetString!
 """
 function fmi3GetString!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{String}, String})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetString!(fmu.components[end], vr, values)
 end
 
@@ -1071,6 +1151,8 @@ Set the values of an array of fmi3String variables.
 For more information call ?fmi3SetString
 """
 function fmi3SetString(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{String}, String})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SetString(fmu.components[end], vr, values)
 end
 
@@ -1082,6 +1164,8 @@ Get the values of an array of fmi3Binary variables.
 For more information call ?fmi3GetBinary
 """
 function fmi3GetBinary(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetBinary(fmu.components[end], vr)
 end
 
@@ -1093,6 +1177,8 @@ Get the values of an array of fmi3Binary variables.
 For more information call ?fmi3GetBinary!
 """
 function fmi3GetBinary!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Binary}, fmi3Binary})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetBinary!(fmu.components[end], vr, values)
 end
 
@@ -1104,6 +1190,8 @@ Set the values of an array of fmi3Binary variables.
 For more information call ?fmi3SetBinary
 """
 function fmi3SetBinary(fmu::FMU3, vr::fmi3ValueReferenceFormat, valueSizes::Union{Array{Csize_t}, Csize_t}, values::Union{Array{fmi3Binary}, fmi3Binary})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SetBinary(fmu.components[end], vr, valueSizes, values)
 end
 
@@ -1115,6 +1203,8 @@ Get the values of an array of fmi3Clock variables.
 For more information call ?fmi3GetClock
 """
 function fmi3GetClock(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetClock(fmu.components[end], vr)
 end
 
@@ -1126,6 +1216,8 @@ Get the values of an array of fmi3Clock variables.
 For more information call ?fmi3GetClock!
 """
 function fmi3GetClock!(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Clock}, fmi3Clock})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetClock!(fmu.components[end], vr, values)
 end
 
@@ -1137,6 +1229,8 @@ Set the values of an array of fmi3Clock variables.
 For more information call ?fmi3SetClock
 """
 function fmi3SetClock(fmu::FMU3, vr::fmi3ValueReferenceFormat, values::Union{Array{fmi3Clock}, fmi3Clock})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SetClock(fmu.components[end], vr, values)
 end
 
@@ -1148,6 +1242,8 @@ Get the pointer to the current FMU state.
 For more information call ?fmi3GetFMUState
 """
 function fmi3GetFMUState(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetFMUState(fmu.components[end])
 end
 
@@ -1159,6 +1255,8 @@ Set the FMU to the given fmi3FMUstate.
 For more information call ?fmi3SetFMUState
 """
 function fmi3SetFMUState(fmu::FMU3, state::fmi3FMUState)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SetFMUState(fmu.components[end], state)
 end
 
@@ -1170,6 +1268,8 @@ Free the allocated memory for the FMU state.
 For more information call ?fmi3FreeFMUState
 """
 function fmi3FreeFMUState(fmu::FMU3, state::fmi3FMUState)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     stateRef = Ref(state)
     fmi3FreeFMUState(fmu.components[end], stateRef)
     state = stateRef[]
@@ -1183,6 +1283,8 @@ Returns the size of a byte vector the FMU can be stored in.
 For more information call ?fmi3SerzializedFMUStateSize
 """
 function fmi3SerializedFMUStateSize(fmu::FMU3, state::fmi3FMUState)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SerializedFMUStateSize(fmu.components[end], state)
 end
 
@@ -1194,6 +1296,8 @@ Serialize the data in the FMU state pointer.
 For more information call ?fmi3SerializeFMUState
 """
 function fmi3SerializeFMUState(fmu::FMU3, state::fmi3FMUState)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SerializeFMUState(fmu.components[end], state)
 end
 
@@ -1205,6 +1309,8 @@ Deserialize the data in the serializedState fmi3Byte field.
 For more information call ?fmi3DeSerializeFMUState
 """
 function fmi3DeSerializeFMUState(fmu::FMU3, serializedState::Array{fmi3Byte})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3DeSerializeFMUState(fmu.components[end], serializedState)
 end
 
@@ -1219,6 +1325,7 @@ function fmi3GetDirectionalDerivative(fmu::FMU3,
                                       unknowns::fmi3ValueReference,
                                       knowns::fmi3ValueReference,
                                       seed::fmi3Float64 = 1.0)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
 
     fmi3GetDirectionalDerivative(fmu.components[end], unknowns, knowns, seed)
 end
@@ -1234,6 +1341,7 @@ function fmi3GetDirectionalDerivative(fmu::FMU3,
                                       unknowns::Array{fmi3ValueReference},
                                       knowns::Array{fmi3ValueReference},
                                       seed::Array{fmi3Float64} = Array{fmi3Float64}([]))
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
 
     fmi3GetDirectionalDerivative(fmu.components[end], unknowns, knowns, seed)
 end
@@ -1250,6 +1358,7 @@ function fmi3GetDirectionalDerivative!(fmu::FMU3,
     knowns::Array{fmi3ValueReference},
     sensitivity::Array{fmi3Float64},
     seed::Array{fmi3Float64} = Array{fmi3Float64}([])) 
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
 
     fmi3GetDirectionalDerivative!(fmu.components[end], unknowns, knowns, sensitivity, seed)
 end
@@ -1266,6 +1375,8 @@ function fmi3GetAdjointDerivative(fmu::FMU3,
                                       knowns::fmi3ValueReference,
                                       seed::fmi3Float64 = 1.0)
 
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetAdjointDerivative(fmu.components[end], unknowns, knowns, seed)
 end
 
@@ -1280,6 +1391,8 @@ function fmi3GetAdjointDerivative(fmu::FMU3,
                                       unknowns::Array{fmi3ValueReference},
                                       knowns::Array{fmi3ValueReference},
                                       seed::Array{fmi3Float64} = Array{fmi3Float64}([]))
+
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
 
     fmi3GetAdjointDerivative(fmu.components[end], unknowns, knowns, seed)
 end
@@ -1297,6 +1410,8 @@ function fmi3GetAdjointDerivative!(fmu::FMU3,
     sensitivity::Array{fmi3Float64},
     seed::Array{fmi3Float64} = Array{fmi3Float64}([])) 
 
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetAdjointDerivative!(fmu.components[end], unknowns, knowns, sensitivity, seed)
 end
 """
@@ -1310,6 +1425,8 @@ the array order specifies the corresponding order of derivation of the variables
 For more information call ?fmi3GetOutputDerivatives
 """
 function fmi3GetOutputDerivatives(fmu::FMU3, vr::fmi3ValueReferenceFormat, order::Array{Integer})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetOutputDerivatives(fmu.components[end], vr, order)
 end
 
@@ -1324,6 +1441,8 @@ the array order specifies the corresponding order of derivation of the variables
 For more information call ?fmi3GetOutputDerivatives
 """
 function fmi3GetOutputDerivatives(fmu::FMU3, vr::fmi3ValueReference, order::Integer)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetOutputDerivatives(fmu.components[end], vr, order)
 end
 
@@ -1334,6 +1453,8 @@ If the importer needs to change structural parameters, it must move the FMU into
 For more information call ?fmi3EnterConfigurationMode
 """
 function fmi3EnterConfigurationMode(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3EnterConfigurationMode(fmu.components[end])
 end
 
@@ -1345,6 +1466,8 @@ This function can only be called in Model Exchange.
 For more information call ?fmi3GetNumberOfContinuousStates
 """
 function fmi3GetNumberOfContinuousStates(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetNumberOfContinuousStates(fmu.components[end])
 end
 
@@ -1356,6 +1479,8 @@ This function can only be called in Model Exchange.
 For more information call ?fmi3GetNumberOfEventIndicators
 """
 function fmi3GetNumberOfEventIndicators(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetNumberOfEventIndicators(fmu.components[end])
 end
 
@@ -1366,6 +1491,8 @@ The number of dependencies of a given variable, which may change if structural p
 For more information call ?fmi3GetNumberOfVariableDependencies
 """
 function fmi3GetNumberOfVariableDependencies(fmu::FMU3, vr::Union{fmi3ValueReference, String})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetNumberOfVariableDependencies(fmu.components[end], vr)
 end
 
@@ -1376,6 +1503,8 @@ Return the states at the current time instant.
 For more information call ?fmi3GetContinuousStates
 """
 function fmi3GetContinuousStates(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetContinuousStates(fmu.components[end])
 end
 
@@ -1386,6 +1515,8 @@ The dependencies (of type dependenciesKind) can be retrieved by calling the func
 For more information call ?fmi3GetVariableDependencies
 """
 function fmi3GetVariableDependencies(fmu::FMU3, vr::Union{fmi3ValueReference, String})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetVariableDependencies(fmu.components[end], vr)
 end
 
@@ -1397,6 +1528,8 @@ Return the nominal values of the continuous states.
 For more information call ?fmi3GetNominalsOfContinuousStates
 """
 function fmi3GetNominalsOfContinuousStates(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetNominalsOfContinuousStates(fmu.components[end])
 end
 
@@ -1409,6 +1542,8 @@ The FMU signals the support of fmi3EvaluateDiscreteStates via the capability fla
 For more information call ?fmi3EvaluateDiscreteStates
 """
 function fmi3EvaluateDiscreteStates(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3EvaluateDiscreteStates(fmu.components[end])
 end
 
@@ -1420,6 +1555,8 @@ This function is called to signal a converged solution at the current super-dens
 For more information call ?fmi3UpdateDiscreteStates
 """
 function fmi3UpdateDiscreteStates(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3UpdateDiscreteStates(fmu.components[end])
 end
 
@@ -1431,6 +1568,8 @@ The model enters Continuous-Time Mode.
 For more information call ?fmi3EnterContinuousTimeMode
 """
 function fmi3EnterContinuousTimeMode(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3EnterContinuousTimeMode(fmu.components[end])
 end
 
@@ -1442,6 +1581,8 @@ This function must be called to change from Event Mode into Step Mode in Co-Simu
 For more information call ?fmi3EnterStepMode
 """
 function fmi3EnterStepMode(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3EnterStepMode(fmu.components[end])
 end
 
@@ -1453,6 +1594,8 @@ Exits the Configuration Mode and returns to state Instantiated.
 For more information call ?fmi3ExitConfigurationMode
 """
 function fmi3ExitConfigurationMode(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3ExitConfigurationMode(fmu.components[end])
 end
 
@@ -1464,6 +1607,8 @@ Set independent variable time and reinitialize chaching of variables that depend
 For more information call ?fmi3SetTime
 """
 function fmi3SetTime(fmu::FMU3, time::Real)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmu.t = time
     fmi3SetTime(fmu.components[end], fmi3Float64(time))
 end
@@ -1476,6 +1621,8 @@ Set a new (continuous) state vector and reinitialize chaching of variables that 
 For more information call ?fmi3SetContinuousStates
 """
 function fmi3SetContinuousStates(fmu::FMU3, x::Union{Array{Float32}, Array{Float64}})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     nx = Csize_t(length(x))
     fmu.x = x
     fmi3SetContinuousStates(fmu.components[end], Array{fmi3Float64}(x), nx)
@@ -1489,6 +1636,8 @@ Compute state derivatives at the current time instant and for the current states
 For more information call ?fmi3GetContinuousStateDerivatives
 """
 function  fmi3GetContinuousStateDerivatives(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetContinuousStateDerivatives(fmu.components[end])
 end
 
@@ -1500,6 +1649,8 @@ Returns the event indicators of the FMU.
 For more information call ?fmi3GetEventIndicators
 """
 function fmi3GetEventIndicators(fmu::FMU3)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3GetEventIndicators(fmu.components[end])
 end
 
@@ -1514,6 +1665,8 @@ For more information call ?fmi3CompletedIntegratorStep
 """
 function fmi3CompletedIntegratorStep(fmu::FMU3,
                                      noSetFMUStatePriorToCurrentPoint::fmi3Boolean)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3CompletedIntegratorStep(fmu.components[end], noSetFMUStatePriorToCurrentPoint)
 end
 
@@ -1525,6 +1678,8 @@ The model enters Event Mode.
 For more information call ?fmi3EnterEventMode
 """
 function fmi3EnterEventMode(fmu::FMU3, stepEvent::Bool, stateEvent::Bool, rootsFound::Array{fmi3Int32}, nEventIndicators::Integer, timeEvent::Bool)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3EnterEventMode(fmu.components[end], stepEvent, stateEvent, rootsFound, nEventIndicators, timeEvent)
 end
 
@@ -1536,6 +1691,8 @@ The computation of a time step is started.
 For more information call ?fmi3DoStep
 """
 function fmi3DoStep(fmu::FMU3, currentCommunicationPoint::Real, communicationStepSize::Real, noSetFMUStatePriorToCurrentPoint::Bool, eventEncountered::fmi3Boolean, terminateSimulation::fmi3Boolean, earlyReturn::fmi3Boolean, lastSuccessfulTime::fmi3Float64)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     refeventEncountered = Ref(eventEncountered)
     refterminateSimulation = Ref(terminateSimulation)
     refearlyReturn = Ref(earlyReturn)
@@ -1552,6 +1709,8 @@ Starts a simulation of the fmu instance for the matching fmu type. If both types
 """
 function fmi3Simulate(fmu::FMU3, t_start::Real = 0.0, t_stop::Real = 1.0;
                       recordValues::fmi3ValueReferenceFormat = nothing, saveat=[], setup=true)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3Simulate(fmu.components[end], t_start, t_stop;
                  recordValues=recordValues, saveat=saveat, setup=setup)
 end
@@ -1560,6 +1719,8 @@ Starts a simulation of a FMU in CS-mode.
 """
 function fmi3SimulateCS(fmu::FMU3, t_start::Real, t_stop::Real;
                         recordValues::fmi3ValueReferenceFormat = nothing, saveat=[], setup=true)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SimulateCS(fmu.components[end], t_start, t_stop;
                    recordValues=recordValues, saveat=saveat, setup=setup)
 end
@@ -1568,5 +1729,18 @@ end
 Starts a simulation of a FMU in ME-mode.
 """
 function fmi3SimulateME(fmu::FMU3, t_start::Real, t_stop::Real; kwargs...)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi3SimulateME(fmu.components[end], t_start, t_stop; kwargs...)
+end
+
+"""
+Returns the start/default value for a given value reference.
+
+TODO: Add this command in the documentation.
+"""
+function fmi3GetStartValue(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+    
+    fmi3GetStartValue(fmu.components[end], vr)
 end

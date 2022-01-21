@@ -1302,3 +1302,31 @@ For more information call ?fmi3EnterEventMode
 function fmi3EnterEventMode(c::fmi3Component, stepEvent::Bool, stateEvent::Bool, rootsFound::Array{fmi3Int32}, nEventIndicators::Csize_t, timeEvent::Bool)
     fmi3EnterEventMode(c, fmi3Boolean(stepEvent), fmi3Boolean(stateEvent), rootsFound, nEventIndicators, fmi3Boolean(timeEvent))
 end
+
+"""
+Returns the start/default value for a given value reference.
+
+TODO: Add this command in the documentation.
+"""
+function fmi3GetStartValue(c::fmi3Component, vrs::fmi3ValueReferenceFormat)
+
+    vrs = prepareValueReference(c, vrs)
+
+    starts = []
+
+    for vr in vrs
+        mvs = fmi3ModelVariablesForValueReference(c.fmu.modelDescription, vr) 
+
+        if length(mvs) == 0
+            @warn "fmi3GetStartValue(...) found no model variable with value reference $(vr)."
+        end
+    
+        push!(starts, mvs[1].datatype.start)
+    end
+
+    if length(vrs) == 1
+        return starts[1]
+    else
+        return starts 
+    end
+end 

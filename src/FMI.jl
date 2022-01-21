@@ -88,6 +88,49 @@ export fmi2ProvidesDirectionalDerivative
 export fmi2IsCoSimulation, fmi2IsModelExchange
 export fmi2ModelVariablesForValueReference
 
+
+# FMI3.jl
+export FMU3, fmi3True, fmi3False
+export fmi3ValueReference, fmi3String2ValueReference, fmi3ValueReference2String
+export fmi3Unzip, fmi3Load, fmi3Unload
+export fmi3GetVersion
+export fmi3InstantiateModelExchange!, fmi3InstantiateCoSimulation!, fmi3InstantiateScheduledExecution!, fmi3FreeInstance!, fmi3SetDebugLogging
+export fmi3EnterInitializationMode, fmi3ExitInitializationMode, fmi3Terminate, fmi3Reset
+export fmi3GetFloat32, fmi3SetFloat32, fmi3GetFloat64, fmi3SetFloat64
+export fmi3GetInt8, fmi3SetInt8,  fmi3GetUInt8, fmi3SetUInt8,  fmi3GetInt16, fmi3SetInt16,  fmi3GetUInt16, fmi3SetUInt16,  fmi3GetInt32, fmi3SetInt32, fmi3GetUInt32, fmi3SetUInt32,  fmi3GetInt64, fmi3SetInt64,  fmi3GetUInt64, fmi3SetUInt64
+export fmi3GetBoolean, fmi3SetBoolean, fmi3GetString, fmi3SetString, fmi3GetBinary, fmi3SetBinary
+export fmi3GetFMUState, fmi3SetFMUState, fmi3FreeFMUState, fmi3SerializedFMUStateSize, fmi3SerializeFMUState, fmi3DeSerializeFMUState
+export fmi3GetDirectionalDerivative, fmi3GetAdjointDerivative, fmi3GetDirectionalDerivative!, fmi3GetAdjointDerivative!
+export fmi3GetOutputDerivatives
+export fmi3EnterConfigurationMode, fmi3ExitConfigurationMode
+export fmi3DoStep, fmi3EnterStepMode
+export fmi3SetTime, fmi3SetContinuousStates, fmi3EvaluateDiscreteStates
+export fmi3EnterEventMode, fmi3UpdateDiscreteStates, fmi3EnterContinuousTimeMode, fmi3CompletedIntegratorStep, fmi3GetContinuousStateDerivatives, fmi3GetEventIndicators, fmi3GetContinuousStates, fmi3GetNominalsOfContinuousStates
+export fmi3GetStartValue
+
+# TODO export clock functions when they are tested
+
+# FMI3_comp.jl
+# already exported above
+
+# FMI3_c.jl
+export fmi3Component
+export fmi3Char, fmi3String, fmi3Boolean, fmi3Binary, fmi3Float32, fmi3Float64, fmi3Int8, fmi3UInt8, fmi3Int16, fmi3UInt16, fmi3Int32, fmi3UInt32, fmi3Int64, fmi3UInt64, fmi3Byte, fmi3FMUState, fmi3InstanceEnvironment, fmi3Enum
+export fmi3DependencyKind, fmi3Dependent, fmi3Independent, fmi3Constant, fmi3Tunable, fmi3Discrete, fmi3Fixed, fmi3GetVariableDependencies
+# FMI3_sim.jl
+export fmi3Simulate, fmi3SimulateCS, fmi3SimulateME
+# export stepCompleted, affect!, condition, handleEvents
+
+# FMI3_md.jl
+export fmi3GetModelName, fmi3GetInstantiationToken, fmi3GetModelIdentifier
+export fmi3GetGenerationTool, fmi3GetGenerationDateAndTime
+export fmi3GetVariableNamingConvention, fmi3GetNumberOfEventIndicators, fmi3GetNumberOfContinuousStates, fmi3GetNumberOfVariableDependencies
+export fmi3CanGetSetState, fmi3CanSerializeFMUstate
+export fmi3ProvidesDirectionalDerivative
+export fmi3ProvidesAdjointDerivative
+export fmi3IsCoSimulation, fmi3IsModelExchange, fmi3IsScheduledExecution
+export fmi3ModelVariablesForValueReference
+
 ### EXPORTING LISTS END ###
 
 fmi2Struct = Union{FMU2, fmi2Component}
