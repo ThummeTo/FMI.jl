@@ -1,5 +1,7 @@
 ~FMUOutput/
 Resources/
+Distribution/
+platforms/
 IO/
 Distribution/
 platforms/
@@ -9,6 +11,7 @@ dsfinal.txt
 dsin.txt
 dslog.txt
 modelDescription.xml
+stop
 *.exe
 *.c
 *.h
@@ -21,4 +24,3 @@ modelDescription.xml
 fmi3/
 
 *.dll
-stop
