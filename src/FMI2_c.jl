@@ -257,6 +257,12 @@ CoSimulation specific Enum representing state of fmu after fmi2DoStep returned f
     fmi2Terminated
 end
 
+# this is a custom type to catch the internal state of the component 
+@enum fmi2ComponentState begin
+    fmi2ModelSetableFMUstate
+    fmi2ModelUnderEvaluation
+    fmi2ModelInitialized
+end
 """
 Source: FMISpec2.0.2[p.19]: 2.1.5 Creation, Destruction and Logging of FMU Instances
 
@@ -265,6 +271,7 @@ The mutable struct represents an instantiated instance of an FMU in the FMI 2.0.
 mutable struct fmi2Component
     compAddr::Ptr{Nothing}
     fmu
+    state::fmi2ComponentState
 end
 
 """
@@ -392,7 +399,7 @@ Source: FMISpec2.0.2[p.34]: 2.2.1 Definition of an FMU (fmiModelDescription)
 
 The “ModelVariables” element of fmiModelDescription is the central part of the model description. It provides the static information of all exposed variables.
 """
-mutable struct fmi2ModelDescription
+mutable struct fmi2ModelDescription # ToDo: Move, this shouls not be part of FMI2_c.jl-file
     # FMI model description
     fmiVersion::String
     modelName::String
@@ -442,6 +449,11 @@ mutable struct fmi2ModelDescription
 
     # additional fields (non-FMI-specific)
     valueReferenceIndicies::Dict{Integer,Integer}
+
+    # default experiment 
+    defaultStartTime::Real
+    defaultStopTime::Real
+    defaultTolerance::Real
 end
 
 # Common function for ModelExchange & CoSimulation
@@ -570,6 +582,7 @@ Source: FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an 
 Informs the FMU to exit Initialization Mode.
 """
 function fmi2ExitInitializationMode(c::fmi2Component)
+    c.state = fmi2ModelInitialized
     ccall(c.fmu.cExitInitializationMode,
           Cuint,
           (Ptr{Nothing},),
@@ -582,6 +595,10 @@ Source: FMISpec2.0.2[p.24]: 2.1.6 Initialization, Termination, and Resetting an 
 Informs the FMU that the simulation run is terminated.
 """
 function fmi2Terminate(c::fmi2Component)
+    if c.state != fmi2ModelInitialized
+        @warn "fmi2Terminate(_): Should be only called in FMU state `modelInitialized`."
+    end
+    c.state = fmi2ModelSetableFMUstate
     ccall(c.fmu.cTerminate, Cuint, (Ptr{Nothing},), c.compAddr)
 end
 
@@ -591,6 +608,10 @@ Source: FMISpec2.0.2[p.24]: 2.1.6 Initialization, Termination, and Resetting an 
 Is called by the environment to reset the FMU after a simulation run. The FMU goes into the same state as if fmi2Instantiate would have been called.
 """
 function fmi2Reset(c::fmi2Component)
+    if c.state != fmi2ModelSetableFMUstate
+        @warn "fmi2Reset(_): Should be only called in FMU state `modelSetableFMUstate`."
+    end
+    c.state = fmi2ModelUnderEvaluation
     ccall(c.fmu.cReset, Cuint, (Ptr{Nothing},), c.compAddr)
 end
 
@@ -847,12 +868,42 @@ Source: FMISpec2.0.2[p.106]: 4.2.3 Retrieving Status Information from the Slave
 
 Informs the master about the actual status of the simulation run. Which status information is to be returned is specified by the argument fmi2StatusKind.
 """
-function fmi2GetStatus(c::fmi2Component, s::fmi2StatusKind, value::fmi2Status)
-    status = ccall(c.fmu.cGetStatus,
-                Cuint,
-                (Ptr{Nothing}, Ptr{Nothing}, Ptr{Nothing}),
-                c.compAddr, s, Ref(value))
+function fmi2GetStatus!(c::fmi2Component, s::fmi2StatusKind, value)
+    rtype = nothing
+    if s == fmi2Terminated
+        rtype = fmi2Boolean
+    else 
+        @assert false "fmi2GetStatus!(_, $(s), $(value)): StatusKind $(s) not implemented yet, please open an issue."
+    end
+    @assert typeof(value) == rtype "fmi2GetStatus!(_, $(s), $(value)): Type of value ($(typeof(value))) doesn't fit type of return type $(rtype). Change type of value to $(rtype) or change status kind."
+    
+    status = fmi2Error
+    if rtype == fmi2Boolean
+        status = ccall(c.fmu.cGetRealStatus,
+                    Cuint,
+                    (Ptr{Nothing}, Ptr{Nothing}, Ptr{fmi2Boolean}),
+                    c.compAddr, s, Ref(value))
+    end 
     status
+end
+function fmi2GetStatus(c::fmi2Component, s::fmi2StatusKind)
+    rtype = nothing
+    if s == fmi2Terminated
+        rtype = fmi2Boolean
+    else 
+        @assert false "fmi2GetStatus(_, $(s)): StatusKind $(s) not implemented yet, please open an issue."
+    end
+    value = zeros(rtype, 1)
+
+    status = fmi2Error
+    if rtype == fmi2Boolean
+        status = ccall(c.fmu.cGetStatus,
+                    Cuint,
+                    (Ptr{Nothing}, fmi2StatusKind, Ptr{fmi2Boolean}),
+                    c.compAddr, s, value)
+    end 
+
+    status, value[1]
 end
 
 """
@@ -860,6 +911,7 @@ Source: FMISpec2.0.2[p.106]: 4.2.3 Retrieving Status Information from the Slave
 
 Informs the master about the actual status of the simulation run. Which status information is to be returned is specified by the argument fmi2StatusKind.
 """
+# ToDo: Missing "!", test implementation!
 function fmi2GetRealStatus(c::fmi2Component, s::fmi2StatusKind, value::fmi2Real)
     status = ccall(c.fmu.cGetRealStatus,
                 Cuint,
@@ -873,6 +925,7 @@ Source: FMISpec2.0.2[p.106]: 4.2.3 Retrieving Status Information from the Slave
 
 Informs the master about the actual status of the simulation run. Which status information is to be returned is specified by the argument fmi2StatusKind.
 """
+# ToDo: Missing "!", test implementation!
 function fmi2GetIntegerStatus(c::fmi2Component, s::fmi2StatusKind, value::fmi2Integer)
     status = ccall(c.fmu.cGetIntegerStatus,
                 Cuint,
@@ -886,6 +939,7 @@ Source: FMISpec2.0.2[p.106]: 4.2.3 Retrieving Status Information from the Slave
 
 Informs the master about the actual status of the simulation run. Which status information is to be returned is specified by the argument fmi2StatusKind.
 """
+# ToDo: Missing "!", test implementation!
 function fmi2GetBooleanStatus(c::fmi2Component, s::fmi2StatusKind, value::fmi2Boolean)
     status = ccall(c.fmu.cGetBooleanStatus,
                 Cuint,
@@ -899,6 +953,7 @@ Source: FMISpec2.0.2[p.106]: 4.2.3 Retrieving Status Information from the Slave
 
 Informs the master about the actual status of the simulation run. Which status information is to be returned is specified by the argument fmi2StatusKind.
 """
+# ToDo: Missing "!", test implementation!
 function fmi2GetStringStatus(c::fmi2Component, s::fmi2StatusKind, value::fmi2String)
     status = ccall(c.fmu.cGetStringStatus,
                 Cuint,

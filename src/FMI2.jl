@@ -581,7 +581,7 @@ end
 """
 Starts a simulation of the fmu instance for the matching fmu type. If both types are available, CS is preferred over ME.
 """
-function fmi2Simulate(fmu::FMU2, t_start::Real = 0.0, t_stop::Real = 1.0; kwargs...)
+function fmi2Simulate(fmu::FMU2, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
     @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2Simulate(fmu.components[end], t_start, t_stop; kwargs...)
 end
@@ -589,7 +589,7 @@ end
 """
 Starts a simulation of a FMU in CS-mode.
 """
-function fmi2SimulateCS(fmu::FMU2, t_start::Real, t_stop::Real; kwargs...)
+function fmi2SimulateCS(fmu::FMU2, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
     @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SimulateCS(fmu.components[end], t_start, t_stop; kwargs...)
 end
@@ -597,7 +597,7 @@ end
 """
 Starts a simulation of a FMU in ME-mode.
 """
-function fmi2SimulateME(fmu::FMU2, t_start::Real, t_stop::Real; kwargs...)
+function fmi2SimulateME(fmu::FMU2, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
     @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SimulateME(fmu.components[end], t_start, t_stop; kwargs...)
 end
@@ -683,7 +683,7 @@ function fmi2Instantiate!(fmu::FMU2; visible::Bool = false, loggingOn::Bool = fa
         return nothing
     end
 
-    component = fmi2Component(compAddr, fmu)
+    component = fmi2Component(compAddr, fmu, fmi2ModelUnderEvaluation)
     push!(fmu.components, component)
     component
 end
