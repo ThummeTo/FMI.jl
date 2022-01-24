@@ -70,6 +70,8 @@ export fmi2GetStartValue
 # FMI2_c.jl
 export fmi2Component
 export fmi2Char, fmi2String, fmi2Boolean, fmi2Real, fmi2Integer, fmi2Byte, fmi2FMUstate, fmi2ComponentEnvironment, fmi2Enum
+export fmi2StatusKind, fmi2DoStepStatus, fmi2PendingStatus, fmi2LastSuccessfulTime, fmi2Terminated
+export fmi2ComponentState, fmi2ModelSetableFMUstate, fmi2ModelUnderEvaluation, fmi2ModelInitialized
 
 # FMI2_sim.jl
 export fmi2Simulate, fmi2SimulateCS, fmi2SimulateME
@@ -245,21 +247,21 @@ end
 """
 Simulate an fmu according to its standard from 0.0 to t_stop.
 """
-function fmiSimulate(str::fmi2Struct, t_start::Real = 0.0, t_stop::Real = 1.0; kwargs...)
+function fmiSimulate(str::fmi2Struct, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
     fmi2Simulate(str, t_start, t_stop; kwargs...)
 end
 
 """
 Simulate an CoSimulation fmu according to its standard from 0.0 to t_stop.
 """
-function fmiSimulateCS(str::fmi2Struct, t_start::Real = 0.0, t_stop::Real = 1.0; kwargs...)
+function fmiSimulateCS(str::fmi2Struct, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
     fmi2SimulateCS(str, t_start, t_stop; kwargs...)
 end
 
 """
 Simulate an ModelExchange fmu according to its standard from 0.0 to t_stop.
 """
-function fmiSimulateME(str::fmi2Struct, t_start::Real = 0.0, t_stop::Real = 1.0; kwargs...)
+function fmiSimulateME(str::fmi2Struct, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
     fmi2SimulateME(str, t_start, t_stop; kwargs...)
 end
 

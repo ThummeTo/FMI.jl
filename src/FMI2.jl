@@ -581,21 +581,24 @@ end
 """
 Starts a simulation of the fmu instance for the matching fmu type. If both types are available, CS is preferred over ME.
 """
-function fmi2Simulate(fmu::FMU2, t_start::Real = 0.0, t_stop::Real = 1.0; kwargs...)
+function fmi2Simulate(fmu::FMU2, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2Simulate(fmu.components[end], t_start, t_stop; kwargs...)
 end
 
 """
 Starts a simulation of a FMU in CS-mode.
 """
-function fmi2SimulateCS(fmu::FMU2, t_start::Real, t_stop::Real; kwargs...)
+function fmi2SimulateCS(fmu::FMU2, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SimulateCS(fmu.components[end], t_start, t_stop; kwargs...)
 end
 
 """
 Starts a simulation of a FMU in ME-mode.
 """
-function fmi2SimulateME(fmu::FMU2, t_start::Real, t_stop::Real; kwargs...)
+function fmi2SimulateME(fmu::FMU2, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SimulateME(fmu.components[end], t_start, t_stop; kwargs...)
 end
 
@@ -680,7 +683,7 @@ function fmi2Instantiate!(fmu::FMU2; visible::Bool = false, loggingOn::Bool = fa
         return nothing
     end
 
-    component = fmi2Component(compAddr, fmu)
+    component = fmi2Component(compAddr, fmu, fmi2ModelUnderEvaluation)
     push!(fmu.components, component)
     component
 end
@@ -693,6 +696,7 @@ Free the allocated memory used for the logger and fmu2 instance and destroy the 
 For more information call ?fmi2FreeInstance
 """
 function fmi2FreeInstance!(fmu::FMU2)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2FreeInstance!(fmu.components[end])
     pop!(fmu.components)
     nothing
@@ -706,6 +710,7 @@ Sets debug logging for the FMU.
 For more information call ?fmi2SetDebugLogging
 """
 function fmi2SetDebugLogging(fmu::FMU2)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SetDebugLogging(fmu.components[end])
 end
 
@@ -717,6 +722,7 @@ Setup the simulation.
 For more information call ?fmi2SetupExperiment
 """
 function fmi2SetupExperiment(fmu::FMU2, startTime::Real = 0.0, stopTime::Real = startTime; tolerance::Real = 0.0)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SetupExperiment(fmu.components[end], startTime, stopTime; tolerance=tolerance)
 end
 
@@ -728,6 +734,7 @@ FMU enters Initialization mode.
 For more information call ?fmi2EnterInitializationMode
 """
 function fmi2EnterInitializationMode(fmu::FMU2)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2EnterInitializationMode(fmu.components[end])
 end
 
@@ -739,6 +746,7 @@ FMU exits Initialization mode.
 For more information call ?fmi2ExitInitializationMode
 """
 function fmi2ExitInitializationMode(fmu::FMU2)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2ExitInitializationMode(fmu.components[end])
 end
 
@@ -750,6 +758,7 @@ Informs FMU that simulation run is terminated.
 For more information call ?fmi2Terminate
 """
 function fmi2Terminate(fmu::FMU2)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2Terminate(fmu.components[end])
 end
 
@@ -761,6 +770,7 @@ Resets FMU.
 For more information call ?fmi2Reset
 """
 function fmi2Reset(fmu::FMU2)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2Reset(fmu.components[end])
 end
 
@@ -772,6 +782,7 @@ Get the values of an array of fmi2Real variables.
 For more information call ?fmi2GetReal!
 """
 function fmi2GetReal(fmu::FMU2, vr::fmi2ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2GetReal(fmu.components[end], vr)
 end
 
@@ -783,6 +794,7 @@ Get the values of an array of fmi2Real variables.
 For more information call ?fmi2GetReal!
 """
 function fmi2GetReal!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{<:Real}, <:Real})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2GetReal!(fmu.components[end], vr, values)
 end
 
@@ -790,6 +802,7 @@ end
 TODO
 """
 function fmi2GetRealOutputDerivatives(fmu::FMU2, vr::fmi2ValueReferenceFormat, order)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2GetRealOutputDerivatives(fmu.components[end], vr, order)
 end
 
@@ -801,6 +814,7 @@ Set the values of an array of fmi2Real variables.
 For more information call ?fmi2SetReal
 """
 function fmi2SetReal(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{<:Real}, <:Real})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SetReal(fmu.components[end], vr, values)
 end
 
@@ -808,6 +822,7 @@ end
 ToDO 
 """
 function fmi2SetRealInputDerivatives(fmu::FMU2, vr::fmi2ValueReferenceFormat, order, values)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SetRealInputDerivatives(fmu.components[end], vr, order, values)
 end
 
@@ -819,6 +834,7 @@ Get the values of an array of fmi2Integer variables.
 For more information call ?fmi2GetInteger!
 """
 function fmi2GetInteger(fmu::FMU2, vr::fmi2ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2GetInteger(fmu.components[end], vr)
 end
 
@@ -830,6 +846,7 @@ Get the values of an array of fmi2Integer variables.
 For more information call ?fmi2GetInteger!
 """
 function fmi2GetInteger!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{<:Integer}, <:Integer})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2GetInteger!(fmu.components[end], vr, values)
 end
 
@@ -841,6 +858,7 @@ Set the values of an array of fmi2Integer variables.
 For more information call ?fmi2SetInteger
 """
 function fmi2SetInteger(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{<:Integer}, <:Integer})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SetInteger(fmu.components[end], vr, values)
 end
 
@@ -852,6 +870,7 @@ Get the values of an array of fmi2Boolean variables.
 For more information call ?fmi2GetBoolean!
 """
 function fmi2GetBoolean(fmu::FMU2, vr::fmi2ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2GetBoolean(fmu.components[end], vr)
 end
 
@@ -863,6 +882,7 @@ Get the values of an array of fmi2Boolean variables.
 For more information call ?fmi2GetBoolean!
 """
 function fmi2GetBoolean!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{Bool}, Bool, Array{fmi2Boolean}})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2GetBoolean!(fmu.components[end], vr, values)
 end
 
@@ -874,6 +894,7 @@ Set the values of an array of fmi2Boolean variables.
 For more information call ?fmi2SetBoolean
 """
 function fmi2SetBoolean(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{Bool}, Bool})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SetBoolean(fmu.components[end], vr, values)
 end
 
@@ -885,6 +906,7 @@ Get the values of an array of fmi2String variables.
 For more information call ?fmi2GetString!
 """
 function fmi2GetString(fmu::FMU2, vr::fmi2ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2GetString(fmu.components[end], vr)
 end
 
@@ -896,6 +918,7 @@ Get the values of an array of fmi2String variables.
 For more information call ?fmi2GetString!
 """
 function fmi2GetString!(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{String}, String})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2GetString!(fmu.components[end], vr, values)
 end
 
@@ -907,6 +930,7 @@ Set the values of an array of fmi2String variables.
 For more information call ?fmi2SetString
 """
 function fmi2SetString(fmu::FMU2, vr::fmi2ValueReferenceFormat, values::Union{Array{String}, String})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SetString(fmu.components[end], vr, values)
 end
 
@@ -918,6 +942,8 @@ Get the pointer to the current FMU state.
 For more information call ?fmi2GetFMUstate
 """
 function fmi2GetFMUstate(fmu::FMU2)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     state = fmi2FMUstate()
     stateRef = Ref(state)
     fmi2GetFMUstate(fmu.components[end], stateRef)
@@ -933,6 +959,7 @@ Set the FMU to the given fmi2FMUstate.
 For more information call ?fmi2SetFMUstate
 """
 function fmi2SetFMUstate(fmu::FMU2, state::fmi2FMUstate)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SetFMUstate(fmu.components[end], state)
 end
 
@@ -944,6 +971,7 @@ Free the allocated memory for the FMU state.
 For more information call ?fmi2FreeFMUstate
 """
 function fmi2FreeFMUstate(fmu::FMU2, state::fmi2FMUstate)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     stateRef = Ref(state)
     fmi2FreeFMUstate(fmu.components[end], stateRef)
     state = stateRef[]
@@ -957,6 +985,8 @@ Returns the size of a byte vector the FMU can be stored in.
 For more information call ?fmi2SerzializedFMUstateSize
 """
 function fmi2SerializedFMUstateSize(fmu::FMU2, state::fmi2FMUstate)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     size = 0
     sizeRef = Ref(Csize_t(size))
     fmi2SerializedFMUstateSize(fmu.components[end], state, sizeRef)
@@ -971,6 +1001,8 @@ Serialize the data in the FMU state pointer.
 For more information call ?fmi2SerzializeFMUstate
 """
 function fmi2SerializeFMUstate(fmu::FMU2, state::fmi2FMUstate)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     size = fmi2SerializedFMUstateSize(fmu, state)
     serializedState = Array{fmi2Byte}(undef, size)
     fmi2SerializeFMUstate(fmu.components[end], state, serializedState, size)
@@ -985,6 +1017,8 @@ Deserialize the data in the serializedState fmi2Byte field.
 For more information call ?fmi2DeSerzializeFMUstate
 """
 function fmi2DeSerializeFMUstate(fmu::FMU2, serializedState::Array{fmi2Byte})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     size = length(serializedState)
     state = fmi2FMUstate()
     stateRef = Ref(state)
@@ -1003,6 +1037,7 @@ function fmi2GetDirectionalDerivative(fmu::FMU2,
                                       vUnknown_ref::fmi2ValueReference,
                                       vKnown_ref::fmi2ValueReference,
                                       dvKnown::fmi2Real = 1.0)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
 
     fmi2GetDirectionalDerivative(fmu.components[end], vUnknown_ref, vKnown_ref, dvKnown)
 end
@@ -1019,6 +1054,8 @@ function fmi2GetDirectionalDerivative(fmu::FMU2,
                                       vKnown_ref::Array{fmi2ValueReference},
                                       dvKnown::Array{fmi2Real} = Array{fmi2Real}([]))
 
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi2GetDirectionalDerivative(fmu.components[end], vUnknown_ref, vKnown_ref, dvKnown)
 end
 
@@ -1033,7 +1070,9 @@ function fmi2GetDirectionalDerivative!(fmu::FMU2,
     vUnknown_ref::Array{fmi2ValueReference},
     vKnown_ref::Array{fmi2ValueReference},
     dvUnknown::AbstractArray,
-    dvKnown::Array{fmi2Real} = Array{fmi2Real}([])) 
+    dvKnown::Array{fmi2Real} = Array{fmi2Real}([]))
+    
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
 
     fmi2GetDirectionalDerivative!(fmu.components[end], vUnknown_ref, vKnown_ref, dvUnknown, dvKnown)
 end
@@ -1045,6 +1084,8 @@ function fmi2SampleDirectionalDerivative(fmu::FMU2,
                                        vUnknown_ref::Array{fmi2ValueReference},
                                        vKnown_ref::Array{fmi2ValueReference},
                                        steps::Array{fmi2Real} = ones(fmi2Real, length(vKnown_ref)).*1e-5)
+
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SampleDirectionalDerivative(fmu.components[end], vUnknown_ref, vKnown_ref, steps)
 end
 function fmi2SampleDirectionalDerivative!(fmu::FMU2,
@@ -1052,12 +1093,14 @@ function fmi2SampleDirectionalDerivative!(fmu::FMU2,
                                           vKnown_ref::Array{fmi2ValueReference},
                                           dvUnknown::AbstractArray,
                                           steps::Array{fmi2Real} = ones(fmi2Real, length(vKnown_ref)).*1e-5)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SampleDirectionalDerivative!(fmu.components[end], vUnknown_ref, vKnown_ref, dvUnknown, steps)
 end
 function fmi2SampleDirectionalDerivative(fmu::FMU2,
                                        vUnknown_ref::fmi2ValueReference,
                                        vKnown_ref::fmi2ValueReference,
                                        steps::fmi2Real = 1e-5)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SampleDirectionalDerivative(fmu.components[end], [vUnknown_ref], [vKnown_ref], [steps])[1]
 end
 
@@ -1072,6 +1115,7 @@ the array order specifies the corresponding order of derivation of the variables
 For more information call ?fmi2SetRealInputDerivatives
 """
 function fmi2SetRealInputDerivatives(fmu::FMU2, vr::fmi2ValueReferenceFormat, order::Union{Array{<:Integer}, <:Integer}, value::Union{Array{<:Real}, <:Real})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SetRealInputDerivatives(fmu.components[end], vr, order, value)
 end
 
@@ -1086,6 +1130,7 @@ the array order specifies the corresponding order of derivation of the variables
 For more information call ?fmi2GetRealOutputDerivatives
 """
 function fmi2GetRealOutputDerivatives(fmu::FMU2, vr::fmi2ValueReferenceFormat, order::Union{Array{<:Integer}, <:Integer})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2GetRealOutputDerivatives(fmu.components[end], vr, order)
 end
 
@@ -1097,9 +1142,11 @@ The computation of a time step is started.
 For more information call ?fmi2DoStep
 """
 function fmi2DoStep(fmu::FMU2, currentCommunicationPoint::Real, communicationStepSize::Real, noSetFMUStatePriorToCurrentPoint::Bool = true)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2DoStep(fmu.components[end], fmi2Real(currentCommunicationPoint), fmi2Real(communicationStepSize), fmi2Boolean(noSetFMUStatePriorToCurrentPoint))
 end
 function fmi2DoStep(fmu::FMU2, communicationStepSize::Real)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2DoStep(fmu.components[end], fmi2Real(fmu.t), fmi2Real(communicationStepSize), fmi2True)
     fmu.t += communicationStepSize
 end
@@ -1112,6 +1159,7 @@ Cancels a DoStep operation.
 For more information call ?fmi2CancelStep
 """
 function fmi2CancelStep(fmu::FMU2)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2CancelStep(fmu.components[end])
 end
 
@@ -1123,6 +1171,7 @@ Informs Master of fmi2Status.
 For more information call ?fmi2GetStatus
 """
 function fmi2GetStatus(fmu::FMU2, s::fmi2StatusKind, value::fmi2Status)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2GetStatus(fmu.components[end], s, value)
 end
 
@@ -1134,6 +1183,7 @@ Informs Master of fmi2Status of fmi2Real.
 For more information call ?fmi2GetRealStatus
 """
 function fmi2GetRealStatus(fmu::FMU2, s::fmi2StatusKind, value::Real)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2GetRealStatus(fmu.components[end], s, fmi2Real(value))
 end
 
@@ -1145,6 +1195,7 @@ Informs Master of fmi2Status of fmi2Integer.
 For more information call ?fmi2GetIntegerStatus
 """
 function fmi2GetIntegerStatus(fmu::FMU2, s::fmi2StatusKind, value::Integer)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2GetIntegerStatus(fmu.components[end], s, fmi2Integer(value))
 end
 
@@ -1156,6 +1207,7 @@ Informs Master of fmi2Status of fmi2Boolean.
 For more information call ?fmi2GetBooleanStatus
 """
 function fmi2GetBooleanStatus(fmu::FMU2, s::fmi2StatusKind, value::Bool)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2GetBooleanStatus(fmu.components[end], s, fmiBoolean(value))
 end
 
@@ -1167,6 +1219,7 @@ Informs Master of fmi2Status of fmi2String.
 For more information call ?fmi2GetStringStatus
 """
 function fmi2GetStringStatus(fmu::FMU2, s::fmi2StatusKind, value::String)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2GetStringStatus(fmu.components[end], s, fmiString(value))
 end
 
@@ -1178,6 +1231,7 @@ Set independent variable time and reinitialize chaching of variables that depend
 For more information call ?fmi2SetTime
 """
 function fmi2SetTime(fmu::FMU2, time::Real)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmu.t = time
     fmi2SetTime(fmu.components[end], fmi2Real(time))
 end
@@ -1190,6 +1244,8 @@ Set a new (continuous) state vector and reinitialize chaching of variables that 
 For more information call ?fmi2SetContinuousStates
 """
 function fmi2SetContinuousStates(fmu::FMU2, x::Union{Array{Float32}, Array{Float64}})
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     nx = Csize_t(length(x))
     fmu.x = x
     fmi2SetContinuousStates(fmu.components[end], Array{fmi2Real}(x), nx)
@@ -1203,6 +1259,7 @@ The model enters Event Mode.
 For more information call ?fmi2EnterEventMode
 """
 function fmi2EnterEventMode(fmu::FMU2)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2EnterEventMode(fmu.components[end])
 end
 
@@ -1214,6 +1271,8 @@ Increment the super dense time in event mode.
 For more information call ?fmi2NewDiscreteStates
 """
 function fmi2NewDiscreteStates(fmu::FMU2)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     eventInfo = fmi2EventInfo()
     fmi2NewDiscreteStates(fmu.components[end], eventInfo)
     eventInfo
@@ -1227,6 +1286,8 @@ The model enters Continuous-Time Mode.
 For more information call ?fmi2EnterContinuousTimeMode
 """
 function fmi2EnterContinuousTimeMode(fmu::FMU2)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     fmi2EnterContinuousTimeMode(fmu.components[end])
 end
 
@@ -1241,6 +1302,8 @@ For more information call ?fmi2CompletedIntegratorStep
 """
 function fmi2CompletedIntegratorStep(fmu::FMU2,
                                      noSetFMUStatePriorToCurrentPoint::fmi2Boolean)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     enterEventMode = fmi2Boolean(false)
     terminateSimulation = fmi2Boolean(false)
     status = fmi2CompletedIntegratorStep!(fmu.components[end],
@@ -1258,6 +1321,8 @@ Compute state derivatives at the current time instant and for the current states
 For more information call ?fmi2GetDerivatives
 """
 function  fmi2GetDerivatives(fmu::FMU2)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     nx = Csize_t(fmu.modelDescription.numberOfContinuousStates)
     derivatives = zeros(fmi2Real, nx)
     fmi2GetDerivatives(fmu.components[end], derivatives, nx)
@@ -1272,6 +1337,8 @@ Returns the event indicators of the FMU.
 For more information call ?fmi2GetEventIndicators
 """
 function fmi2GetEventIndicators(fmu::FMU2)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     ni = Csize_t(fmu.modelDescription.numberOfEventIndicators)
     eventIndicators = zeros(fmi2Real, ni)
     fmi2GetEventIndicators(fmu.components[end], eventIndicators, ni)
@@ -1286,6 +1353,8 @@ Return the new (continuous) state vector x.
 For more information call ?fmi2GetContinuousStates
 """
 function fmi2GetContinuousStates(fmu::FMU2)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     nx = Csize_t(fmu.modelDescription.numberOfContinuousStates)
     x = zeros(fmi2Real, nx)
     fmi2GetContinuousStates(fmu.components[end], x, nx)
@@ -1300,6 +1369,8 @@ Return the nominal values of the continuous states.
 For more information call ?fmi2GetNominalsOfContinuousStates
 """
 function fmi2GetNominalsOfContinuousStates(fmu::FMU2)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
     nx = Csize_t(fmu.modelDescription.numberOfContinuousStates)
     x = zeros(fmi2Real, nx)
     fmi2GetNominalsOfContinuousStates(fmu.components[end], x, nx)
@@ -1312,5 +1383,7 @@ Returns the start/default value for a given value reference.
 TODO: Add this command in the documentation.
 """
 function fmi2GetStartValue(fmu::FMU2, vr::fmi2ValueReferenceFormat)
+    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+    
     fmi2GetStartValue(fmu.components[end], vr)
 end

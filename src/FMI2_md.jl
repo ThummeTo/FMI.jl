@@ -52,6 +52,10 @@ function fmi2ReadModelDescription(pathToModellDescription::String)
     md.numberOfEventIndicators = parseNodeInteger(root, "numberOfEventIndicators"; onfail=0)
     md.description = parseNodeString(root, "description"; onfail="[Unknown Description]")
 
+    md.defaultStartTime = 0.0
+    md.defaultStopTime = 1.0
+    md.defaultTolerance = 0.0001
+
     for node in eachelement(root)
 
         if node.name == "CoSimulation" || node.name == "ModelExchange"
@@ -81,6 +85,11 @@ function fmi2ReadModelDescription(pathToModellDescription::String)
 
         elseif node.name == "ModelStructure"
             modelstructure = node
+
+        elseif node.name == "DefaultExperiment" 
+            md.defaultStartTime                             = parseNodeReal(node, "startTime"                                   ; onfail=0.0)
+            md.defaultStopTime                              = parseNodeReal(node, "stopTime"                                    ; onfail=1.0)
+            md.defaultTolerance                             = parseNodeReal(node, "tolerance"                                   ; onfail=0.0001)
         end
     end
 
@@ -348,10 +357,18 @@ function parseDependencies(nodes::EzXML.Node, md::fmi2ModelDescription)
             dependencies = nothing
             dependenciesKind = nothing
 
-            if haskey(node, "index") && haskey(node, "dependencies") && haskey(node, "dependenciesKind")
+            if haskey(node, "index")
                 index = parseInteger(node["index"])
-                dependencies = node["dependencies"]
-                dependenciesKind = node["dependenciesKind"]
+                dependencies = "" 
+                dependenciesKind = ""
+
+                if haskey(node, "dependencies")
+                    dependencies = node["dependencies"]
+                end 
+
+                if haskey(node, "dependenciesKind")
+                    dependenciesKind = node["dependenciesKind"]
+                end
 
                 if length(dependencies) > 0 && length(dependenciesKind) > 0
                     dependenciesSplit = split(dependencies, " ")
@@ -368,7 +385,7 @@ function parseDependencies(nodes::EzXML.Node, md::fmi2ModelDescription)
                     md.modelVariables[index].dependenciesKind = []
                 end
             else 
-                @warn "Invalid entry for node `Unknown` in `ModelStructure`."
+                @warn "Invalid entry for node `Unknown` in `ModelStructure`, missing entry `index`."
             end
         else 
             @warn "Unknown entry in `ModelStructure` named `$(node.name)`."
@@ -425,6 +442,27 @@ end
 function parseNodeInteger(node, key; onfail=nothing)
     if haskey(node, key)
         return parseInteger(node[key]; onfail=onfail)
+    else
+        return onfail
+    end
+end
+
+# Parses a real value represented by a string.
+function parseReal(s::Union{String, SubString{String}}; onfail=nothing)
+    if onfail == nothing
+        return parse(Real, s)
+    else
+        try
+            return parse(Real, s)
+        catch
+            return onfail
+        end
+    end
+end
+
+function parseNodeReal(node, key; onfail=nothing)
+    if haskey(node, key)
+        return parseReal(node[key]; onfail=onfail)
     else
         return onfail
     end

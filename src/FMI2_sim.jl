@@ -64,6 +64,7 @@ function condition(c::fmi2Component, out, x, t, integrator, inputFunction, input
 end
 
 # Handles the upcoming events.
+# Sets a new state for the solver from the FMU (if needed).
 function affectFMU!(c::fmi2Component, integrator, idx, inputFunction, inputValues::Array{fmi2ValueReference})
     # Event found - handle it
     continuousStatesChanged, nominalsChanged = handleEvents(c, true, Bool(sign(idx)))
@@ -103,6 +104,10 @@ end
 
 # save FMU values 
 function saveValues(c::fmi2Component, recordValues, u, t, integrator)
+    fmi2SetTime(c, t) 
+    x = integrator.sol(t)
+    fmi2SetContinuousStates(c, x)
+    
     (fmiGetReal(c, recordValues)...,)
 end
 
@@ -118,7 +123,7 @@ Keywords:
     - recordValues: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
     - saveat: Time points to save values at (interpolated)
     - setup: Boolean, if FMU should be setup (default=true)
-    - reset: Boolean, if FMU should be reset before simulation (default reset=setup)
+    - reset: Union{Bool, :auto}, if FMU should be reset before simulation (default reset=:auto)
     - inputValues: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
     - inputFunction: Function to retrieve the values to set the inputs to 
 
@@ -126,13 +131,13 @@ Returns:
     - If keyword `recordValues` is not set, a struct of type `ODESolution`.
     - If keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues).
 """
-function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.0;
+function fmi2SimulateME(c::fmi2Component, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default;
     solver = nothing,
     customFx = nothing,
     recordValues::fmi2ValueReferenceFormat = nothing,
     saveat = [],
     setup::Bool = true,
-    reset = nothing, # nothing = auto
+    reset::Bool = true, # nothing = auto
     inputValues::fmi2ValueReferenceFormat = nothing,
     inputFunction = nothing,
     kwargs...)
@@ -145,6 +150,14 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
 
     savingValues = (length(recordValues) > 0)
     hasInputs = (length(inputValues) > 0)
+
+    if t_start == :default
+        t_start = c.fmu.modelDescription.defaultStartTime
+    end
+
+    if t_stop == :default
+        t_stop = c.fmu.modelDescription.defaultStopTime
+    end
 
     if savingValues
         savedValues = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...})
@@ -159,14 +172,15 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
         solver = Tsit5()
     end
 
-    # auto correct reset if only setup is given
-    if reset == nothing 
-        reset = setup
-    end
     @assert !(setup==false && reset==true) "fmi2SimulateME(...): keyword argument `setup=false`, but `reset=true`. This may cause a FMU crash."
 
     if reset 
-        fmi2Reset(c)
+        if c.state == fmi2ModelInitialized
+            fmi2Terminate(c)
+        end
+        if c.state == fmi2ModelSetableFMUstate
+            fmi2Reset(c)
+        end
     end 
 
     if setup
@@ -226,7 +240,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.
         if timeEventHandling
             timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator),
                                             (integrator) -> affectFMU!(c, integrator, 0, inputFunction, inputValues), Float64; 
-                                            initial_affect = true,
+                                            initial_affect = true, # ToDo: or better 'false'?
                                             save_positions=(false,false))
             push!(callbacks, timeEventCb)
         end
@@ -260,7 +274,7 @@ Returns:
     - If keyword `recordValues` is not set, a boolean `success` is returned (simulation success).
     - If keyword `recordValues` is set, a tuple of type (true, DiffEqCallbacks.SavedValues) or (false, nothing).
 """
-function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
+function fmi2SimulateCS(c::fmi2Component, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default;
                         recordValues::fmi2ValueReferenceFormat = nothing,
                         saveat = [],
                         setup::Bool = true,
@@ -271,6 +285,14 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
     recordValues = prepareValueReference(c, recordValues)
     inputValues = prepareValueReference(c, inputValues)
     variableSteps = c.fmu.modelDescription.CScanHandleVariableCommunicationStepSize 
+
+    if t_start == :default
+        t_start = c.fmu.modelDescription.defaultStartTime
+    end
+
+    if t_stop == :default
+        t_stop = c.fmu.modelDescription.defaultStopTime
+    end
 
     success = false
     savedValues = nothing
@@ -295,7 +317,12 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Real, t_stop::Real;
     @assert !(setup==false && reset==true) "fmi2SimulateME(...): keyword argument `setup=false`, but `reset=true`. This may cause a FMU crash."
 
     if reset 
-        fmi2Reset(c)
+        if c.state == fmi2ModelInitialized
+            fmi2Terminate(c)
+        end
+        if c.state == fmi2ModelSetableFMUstate
+            fmi2Reset(c)
+        end
     end 
 
     if setup
@@ -389,7 +416,7 @@ Returns:
     - if keyword `recordValues` is set, a tuple of type (success::Bool, DiffEqCallbacks.SavedValues) for CS-FMUs
     - if keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues) for ME-FMUs
 """
-function fmi2Simulate(c::fmi2Component, t_start::Real = 0.0, t_stop::Real = 1.0; kwargs...)
+function fmi2Simulate(c::fmi2Component, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
 
     if c.fmu.type == fmi2CoSimulation
         return fmi2SimulateCS(c, t_start, t_stop; kwargs...)
