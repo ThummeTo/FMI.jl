@@ -66,6 +66,10 @@ end
 # Handles the upcoming events.
 # Sets a new state for the solver from the FMU (if needed).
 function affectFMU!(c::fmi2Component, integrator, idx, inputFunction, inputValues::Array{fmi2ValueReference})
+
+    # there are fx-evaluations before the event is handled, reset the FMU state to the current integrator step
+    fmi2SetContinuousStates(c, integrator.u)
+
     # Event found - handle it
     continuousStatesChanged, nominalsChanged = handleEvents(c, true, Bool(sign(idx)))
 

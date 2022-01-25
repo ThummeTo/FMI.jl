@@ -5,6 +5,8 @@
 
 module FMI
 
+@debug "Debugging messages enabled for FMI.jl ..."
+
 """
 The mutable struct representing an abstract (version unknown) FMU.
 """
@@ -18,6 +20,8 @@ include("assertions.jl")
 # ToDo: Submodules
 include("FMI2_sim.jl")
 include("FMI_plot.jl")
+include("FMI3_sim.jl")
+include("FMI3_plot.jl")
 
 ### EXPORTING LISTS START ###
 
@@ -47,7 +51,6 @@ export fmiGetStartValue
 # FMI2.jl
 export fmi2Dependency, fmi2DependencyDependent, fmi2DependencyIndependent, fmi2DependencyUnknown, fmi2DependencyFixed, fmi2GetDependencies
 export FMU2, fmi2True, fmi2False
-export fmi2SimulationResult, fmi2SimulationResultGetValuesAtIndex, fmi2SimulationResultGetTime, fmi2SimulationResultGetValues
 export fmi2ValueReference, fmi2String2ValueReference, fmi2ValueReference2String
 export fmi2Unzip, fmi2Load, fmi2Unload
 export fmi2GetTypesPlatform, fmi2GetVersion
@@ -90,6 +93,49 @@ export fmi2IsCoSimulation, fmi2IsModelExchange
 export fmi2ModelVariablesForValueReference
 export fmi2GetDefaultStartTime, fmi2GetDefaultStopTime, fmi2GetDefaultTolerance, fmi2GetDefaultStepSize
 
+
+# FMI3.jl
+export FMU3, fmi3True, fmi3False
+export fmi3ValueReference, fmi3String2ValueReference, fmi3ValueReference2String
+export fmi3Unzip, fmi3Load, fmi3Unload
+export fmi3GetVersion
+export fmi3InstantiateModelExchange!, fmi3InstantiateCoSimulation!, fmi3InstantiateScheduledExecution!, fmi3FreeInstance!, fmi3SetDebugLogging
+export fmi3EnterInitializationMode, fmi3ExitInitializationMode, fmi3Terminate, fmi3Reset
+export fmi3GetFloat32, fmi3SetFloat32, fmi3GetFloat64, fmi3SetFloat64
+export fmi3GetInt8, fmi3SetInt8,  fmi3GetUInt8, fmi3SetUInt8,  fmi3GetInt16, fmi3SetInt16,  fmi3GetUInt16, fmi3SetUInt16,  fmi3GetInt32, fmi3SetInt32, fmi3GetUInt32, fmi3SetUInt32,  fmi3GetInt64, fmi3SetInt64,  fmi3GetUInt64, fmi3SetUInt64
+export fmi3GetBoolean, fmi3SetBoolean, fmi3GetString, fmi3SetString, fmi3GetBinary, fmi3SetBinary
+export fmi3GetFMUState, fmi3SetFMUState, fmi3FreeFMUState, fmi3SerializedFMUStateSize, fmi3SerializeFMUState, fmi3DeSerializeFMUState
+export fmi3GetDirectionalDerivative, fmi3GetAdjointDerivative, fmi3GetDirectionalDerivative!, fmi3GetAdjointDerivative!
+export fmi3GetOutputDerivatives
+export fmi3EnterConfigurationMode, fmi3ExitConfigurationMode
+export fmi3DoStep, fmi3EnterStepMode
+export fmi3SetTime, fmi3SetContinuousStates, fmi3EvaluateDiscreteStates
+export fmi3EnterEventMode, fmi3UpdateDiscreteStates, fmi3EnterContinuousTimeMode, fmi3CompletedIntegratorStep, fmi3GetContinuousStateDerivatives, fmi3GetEventIndicators, fmi3GetContinuousStates, fmi3GetNominalsOfContinuousStates
+export fmi3GetStartValue
+
+# TODO export clock functions when they are tested
+
+# FMI3_comp.jl
+# already exported above
+
+# FMI3_c.jl
+export fmi3Component
+export fmi3Char, fmi3String, fmi3Boolean, fmi3Binary, fmi3Float32, fmi3Float64, fmi3Int8, fmi3UInt8, fmi3Int16, fmi3UInt16, fmi3Int32, fmi3UInt32, fmi3Int64, fmi3UInt64, fmi3Byte, fmi3FMUState, fmi3InstanceEnvironment, fmi3Enum
+export fmi3DependencyKind, fmi3Dependent, fmi3Independent, fmi3Constant, fmi3Tunable, fmi3Discrete, fmi3Fixed, fmi3GetVariableDependencies
+# FMI3_sim.jl
+export fmi3Simulate, fmi3SimulateCS, fmi3SimulateME
+# export stepCompleted, affect!, condition, handleEvents
+
+# FMI3_md.jl
+export fmi3GetModelName, fmi3GetInstantiationToken, fmi3GetModelIdentifier
+export fmi3GetGenerationTool, fmi3GetGenerationDateAndTime
+export fmi3GetVariableNamingConvention, fmi3GetNumberOfEventIndicators, fmi3GetNumberOfContinuousStates, fmi3GetNumberOfVariableDependencies
+export fmi3CanGetSetState, fmi3CanSerializeFMUstate
+export fmi3ProvidesDirectionalDerivative
+export fmi3ProvidesAdjointDerivative
+export fmi3IsCoSimulation, fmi3IsModelExchange, fmi3IsScheduledExecution
+export fmi3ModelVariablesForValueReference
+
 ### EXPORTING LISTS END ###
 
 fmi2Struct = Union{FMU2, fmi2Component}
@@ -122,6 +168,33 @@ function prepareValueReference(comp::fmi2Component, vr::fmi2ValueReferenceFormat
     prepareValueReference(comp.fmu.modelDescription, vr)
 end
 
+function prepareValueReference(md::fmi3ModelDescription, vr::fmi3ValueReferenceFormat)
+    tvr = typeof(vr)
+    if tvr == Array{fmi3ValueReference,1}
+        return vr
+    elseif tvr == fmi3ValueReference
+        return [vr]
+    elseif tvr == String
+        return [fmi3String2ValueReference(md, vr)]
+    elseif tvr == Array{String,1}
+        return fmi3String2ValueReference(md, vr)
+    elseif tvr == Int64
+        return [fmi3ValueReference(vr)]
+    elseif tvr == Array{Int64,1}
+        return fmi3ValueReference.(vr)
+    elseif tvr == Nothing
+        return Array{fmi3ValueReference,1}()
+    end
+
+    @assert false "prepareValueReference(...): Unknown value reference structure `$tvr`."
+end
+function prepareValueReference(fmu::FMU3, vr::fmi3ValueReferenceFormat)
+    prepareValueReference(fmu.modelDescription, vr)
+end
+function prepareValueReference(comp::fmi3Component, vr::fmi3ValueReferenceFormat)
+    prepareValueReference(comp.fmu.modelDescription, vr)
+end
+
 # Receives one or an array of values and converts it into an Array{typeof(value)} (if not already).
 function prepareValue(value)
     if isa(value, Array) && length(size(value)) == 1
@@ -149,6 +222,17 @@ Enter ```fmi2String2ValueReference``` for more information.
 """
 function fmiString2ValueReference(dataStruct::Union{FMU2, fmi2ModelDescription}, identifier::Union{String, Array{String}})
     fmi2String2ValueReference(dataStruct, identifier)
+end
+
+# TODO join in with function above
+
+"""
+Returns the ValueReference coresponding to the variable name.
+
+Enter ```fmi2String2ValueReference``` for more information.
+"""
+function fmiString2ValueReference(dataStruct::Union{FMU3, fmi3ModelDescription}, identifier::Union{String, Array{String}})
+    fmi3String2ValueReference(dataStruct, identifier)
 end
 
 # Wrapping modelDescription Functions
