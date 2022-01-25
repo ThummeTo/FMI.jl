@@ -86,7 +86,7 @@ if ENV["EXPORTINGTOOL"] == "Dymola/2020x"
 
     # reference values from Simulation in Dymola2020x (Dassl)
     @test [solution.saveval[1]...] == [0.5, 0.0]
-    @test sum(abs.([solution.saveval[end]...] - [0.613371, 0.188633])) < 0.05
+    @test sum(abs.([solution.saveval[end]...] - [0.613371, 0.188633])) < 0.2
     fmiUnload(myFMU)
 end
 
