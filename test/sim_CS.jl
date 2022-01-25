@@ -22,29 +22,32 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
+t_start = 0.0
+t_stop = 8.0
+
 # test without recording values (but why?)
-success = fmiSimulateCS(fmuStruct; dt=1e-5)
+success = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-3)
 @test success
 
 # test with recording values
-success, savedValues = fmiSimulateCS(fmuStruct; dt=1e-5, recordValues=["mass.s", "mass.v"])
+success, savedValues = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-3, recordValues=["mass.s", "mass.v"])
 @test success
-@test length(savedValues.saveval) == fmi2GetDefaultStartTime(myFMU.modelDescription):1e-5:fmi2GetDefaultStopTime(myFMU.modelDescription) |> length
+@test length(savedValues.saveval) == t_start:1e-3:t_stop |> length
 @test length(savedValues.saveval[1]) == 2
 
 t = savedValues.t
 s = collect(d[1] for d in savedValues.saveval)
 v = collect(d[2] for d in savedValues.saveval)
-@test t[1] == fmi2GetDefaultStartTime(myFMU.modelDescription) 
-@test t[end] == fmi2GetDefaultStopTime(myFMU.modelDescription) 
+@test t[1] == t_start
+@test t[end] == t_stop
 
 # reference values from Simulation in Dymola2020x (Dassl)
 @test s[1] == 0.5
 @test v[1] == 0.0
 
 if ENV["EXPORTINGTOOL"] == "Dymola/2020x" # ToDo: Linux FMU was corrupted
-    @test s[end] ≈ 1.700334 atol=0.01
-    @test v[end] ≈ -0.04006 atol=0.01
+    @test s[end] ≈ 0.509219 atol=1e-3
+    @test v[end] ≈ 0.314074 atol=1e-3
 end
 
 fmiUnload(myFMU)
@@ -73,7 +76,7 @@ if ENV["EXPORTINGTOOL"] == "Dymola/2020x"
     end
     @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-    success, solution = fmiSimulateCS(fmuStruct; dt=1e-2, recordValues=["mass.s", "mass.v"], inputValues=["extForce"], inputFunction=extForce)
+    success, solution = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-3, recordValues=["mass.s", "mass.v"], inputValues=["extForce"], inputFunction=extForce)
     @test success
     @test length(solution.saveval) > 0
     @test length(solution.t) > 0
