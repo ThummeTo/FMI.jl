@@ -52,7 +52,7 @@ end
 # Returns the event indicators for an FMU.
 function condition(c::fmi2Component, out, x, t, integrator, inputFunction, inputValues::Array{fmi2ValueReference}) 
 
-    if inputFunction != nothing
+    if inputFunction !== nothing
         fmi2SetReal(c, inputValues, inputFunction(integrator.t))
     end
 
@@ -69,7 +69,7 @@ function affectFMU!(c::fmi2Component, integrator, idx, inputFunction, inputValue
     # Event found - handle it
     continuousStatesChanged, nominalsChanged = handleEvents(c, true, Bool(sign(idx)))
 
-    if inputFunction != nothing
+    if inputFunction !== nothing
         fmi2SetReal(c, inputValues, inputFunction(integrator.t))
     end
 
@@ -132,6 +132,8 @@ Returns:
     - If keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues).
 """
 function fmi2SimulateME(c::fmi2Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
+    tolerance::Union{Real, Nothing} = nothing,
+    dt::Union{Real, Nothing} = nothing,
     solver = nothing,
     customFx = nothing,
     recordValues::fmi2ValueReferenceFormat = nothing,
@@ -151,13 +153,13 @@ function fmi2SimulateME(c::fmi2Component, t_start::Union{Real, Nothing} = nothin
     savingValues = (length(recordValues) > 0)
     hasInputs = (length(inputValues) > 0)
 
-    t_start = t_start === nothing ? fmi2GetDefaultStartTime(c.fmu.md) : t_start
+    t_start = t_start === nothing ? fmi2GetDefaultStartTime(c.fmu.modelDescription) : t_start
     t_start = t_start === nothing ? 0.0 : t_start
-    t_stop = t_stop === nothing ? fmi2GetDefaultStopTime(c.fmu.md) : t_stop
+    t_stop = t_stop === nothing ? fmi2GetDefaultStopTime(c.fmu.modelDescription) : t_stop
     t_stop = t_stop === nothing ? 1.0 : t_stop
-    tolerance = tolerance === nothing ? fmi2GetDefaultTolerance(c.fmu.md) : tolerance
-    tolerance = tolerance === nothing ? 1e-4 : tolerance
-    dt = dt === nothing ? fmi2GetDefaultStepSize(c.fmu.md) : dt
+    tolerance = tolerance === nothing ? fmi2GetDefaultTolerance(c.fmu.modelDescription) : tolerance
+    tolerance = tolerance === nothing ? 1e-6 : tolerance
+    dt = dt === nothing ? fmi2GetDefaultStepSize(c.fmu.modelDescription) : dt
     dt = dt === nothing ? 1e-3 : dt 
 
     if savingValues
@@ -276,6 +278,8 @@ Returns:
     - If keyword `recordValues` is set, a tuple of type (true, DiffEqCallbacks.SavedValues) or (false, nothing).
 """
 function fmi2SimulateCS(c::fmi2Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
+                        tolerance::Union{Real, Nothing} = nothing,
+                        dt::Union{Real, Nothing} = nothing,
                         recordValues::fmi2ValueReferenceFormat = nothing,
                         saveat = [],
                         setup::Bool = true,
@@ -287,23 +291,22 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Union{Real, Nothing} = nothin
     inputValues = prepareValueReference(c, inputValues)
     variableSteps = c.fmu.modelDescription.CScanHandleVariableCommunicationStepSize 
 
-    t_start = t_start === nothing ? fmi2GetDefaultStartTime(c.fmu.md) : t_start
+    t_start = t_start === nothing ? fmi2GetDefaultStartTime(c.fmu.modelDescription) : t_start
     t_start = t_start === nothing ? 0.0 : t_start
-    t_stop = t_stop === nothing ? fmi2GetDefaultStopTime(c.fmu.md) : t_stop
+    t_stop = t_stop === nothing ? fmi2GetDefaultStopTime(c.fmu.modelDescription) : t_stop
     t_stop = t_stop === nothing ? 1.0 : t_stop
-    tolerance = tolerance === nothing ? fmi2GetDefaultTolerance(c.fmu.md) : tolerance
-    tolerance = tolerance === nothing ? 1e-4 : tolerance
-    dt = dt === nothing ? fmi2GetDefaultStepSize(c.fmu.md) : dt
-    dt = dt === nothing ? 1e-3 : dt 
+    tolerance = tolerance === nothing ? fmi2GetDefaultTolerance(c.fmu.modelDescription) : tolerance
+    tolerance = tolerance === nothing ? 0.0 : tolerance
+    dt = dt === nothing ? fmi2GetDefaultStepSize(c.fmu.modelDescription) : dt
+    dt = dt === nothing ? 1e-3 : dt
 
     success = false
     savedValues = nothing
 
     # default setup
     if length(saveat) == 0
-        saveat = LinRange(t_start, t_stop, 100)
+        saveat = t_start:dt:t_stop
     end
-    dt = (t_stop - t_start) / length(saveat)
 
     # setup if no variable steps
     if variableSteps == false 
@@ -328,7 +331,7 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Union{Real, Nothing} = nothin
     end 
 
     if setup
-        fmi2SetupExperiment(c, t_start, t_stop)
+        fmi2SetupExperiment(c, t_start, t_stop; tolerance=tolerance)
         fmi2EnterInitializationMode(c)
         fmi2ExitInitializationMode(c)
     end
@@ -418,7 +421,7 @@ Returns:
     - if keyword `recordValues` is set, a tuple of type (success::Bool, DiffEqCallbacks.SavedValues) for CS-FMUs
     - if keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues) for ME-FMUs
 """
-function fmi2Simulate(c::fmi2Component, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
+function fmi2Simulate(c::fmi2Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
 
     if c.fmu.type == fmi2CoSimulation
         return fmi2SimulateCS(c, t_start, t_stop; kwargs...)

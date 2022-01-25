@@ -30,24 +30,21 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-t_start = 0.0
-t_stop = 8.0
-
 # test without recording values (but why?)
-success = fmiSimulate(fmuStruct, t_start, t_stop)
+success = fmiSimulate(fmuStruct; dt=1e-2)
 @test success
 
 # test with recording values
-success, savedValues = fmiSimulate(fmuStruct, t_start, t_stop; recordValues=["mass.s", "mass.v"], setup=true)
+success, savedValues = fmiSimulate(fmuStruct; dt=1e-2, recordValues=["mass.s", "mass.v"], setup=true)
 @test success
-@test length(savedValues.saveval) == 100
+@test length(savedValues.saveval) == fmi2GetDefaultStartTime(myFMU.modelDescription):1e-2:fmi2GetDefaultStopTime(myFMU.modelDescription) |> length
 @test length(savedValues.saveval[1]) == 2
 
 t = savedValues.t
 s = collect(d[1] for d in savedValues.saveval)
 v = collect(d[2] for d in savedValues.saveval)
-@test t[1] == t_start 
-@test t[end] == t_stop 
+@test t[1] == fmi2GetDefaultStartTime(myFMU.modelDescription)
+@test t[end] == fmi2GetDefaultStopTime(myFMU.modelDescription) 
 
 # reference values from Simulation in Dymola2020x (Dassl)
 @test s[1] == 0.5

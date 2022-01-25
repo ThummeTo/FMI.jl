@@ -22,24 +22,21 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-t_start = 0.0
-t_stop = 8.0
-
 # test without recording values (but why?)
-success = fmiSimulateCS(fmuStruct, t_start, t_stop)
+success = fmiSimulateCS(fmuStruct; dt=1e-2)
 @test success
 
 # test with recording values
-success, savedValues = fmiSimulateCS(fmuStruct, t_start, t_stop; recordValues=["mass.s", "mass.v"])
+success, savedValues = fmiSimulateCS(fmuStruct; dt=1e-2, recordValues=["mass.s", "mass.v"])
 @test success
-@test length(savedValues.saveval) == 100
+@test length(savedValues.saveval) == fmi2GetDefaultStartTime(myFMU.modelDescription):1e-2:fmi2GetDefaultStopTime(myFMU.modelDescription) |> length
 @test length(savedValues.saveval[1]) == 2
 
 t = savedValues.t
 s = collect(d[1] for d in savedValues.saveval)
 v = collect(d[2] for d in savedValues.saveval)
-@test t[1] == t_start 
-@test t[end] == t_stop 
+@test t[1] == fmi2GetDefaultStartTime(myFMU.modelDescription) 
+@test t[end] == fmi2GetDefaultStopTime(myFMU.modelDescription) 
 
 # reference values from Simulation in Dymola2020x (Dassl)
 @test s[1] == 0.5
@@ -76,14 +73,14 @@ if ENV["EXPORTINGTOOL"] == "Dymola/2020x"
     end
     @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-    success, solution = fmiSimulateCS(fmuStruct, t_start, t_stop; saveat=t_start:0.001:t_stop, recordValues=["mass.s", "mass.v"], inputValues=["extForce"], inputFunction=extForce)
+    success, solution = fmiSimulateCS(fmuStruct; dt=1e-2, recordValues=["mass.s", "mass.v"], inputValues=["extForce"], inputFunction=extForce)
     @test success
     @test length(solution.saveval) > 0
     @test length(solution.t) > 0
 
-    @test solution.t[1] == t_start 
-    @test solution.t[end] == t_stop 
-
+    @test t[1] == fmi2GetDefaultStartTime(myFMU.modelDescription) 
+    @test t[end] == fmi2GetDefaultStopTime(myFMU.modelDescription) 
+    
     # reference values from Simulation in Dymola2020x (Dassl)
     @test [solution.saveval[1]...] == [0.5, 0.0]
     @test sum(abs.([solution.saveval[end]...] - [0.613371, 0.188633])) < 0.05

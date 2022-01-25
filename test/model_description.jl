@@ -29,10 +29,10 @@ if tool == "Dymola/2020x"
     @test fmi2DependencyFixed::fmi2Dependency in depMtx
     @test fmi2DependencyDependent::fmi2Dependency in depMtx
 
-    @test fmi2GetDefaultStartTime(myFMU.md) ≈ 0.0
-    @test fmi2GetDefaultStopTime(myFMU.md) ≈ 1.0
-    @test fmi2GetDefaultTolerance(myFMU.md) ≈ 1e-4
-    @test fmi2GetDefaultStepSize(myFMU.md) === nothing
+    @test fmi2GetDefaultStartTime(myFMU.modelDescription) ≈ 0.0
+    @test fmi2GetDefaultStopTime(myFMU.modelDescription) ≈ 1.0
+    @test fmi2GetDefaultTolerance(myFMU.modelDescription) ≈ 1e-4
+    @test fmi2GetDefaultStepSize(myFMU.modelDescription) === nothing
 
 elseif tool == "OpenModelica/v1.17.0"
     @test fmiGetGUID(myFMU) == "{8584aa5b-179e-44ed-9ba6-d557ed34541e}"
@@ -46,10 +46,10 @@ elseif tool == "OpenModelica/v1.17.0"
     depMtx = fmi2GetDependencies(myFMU)
     @test fmi2DependencyDependent::fmi2Dependency in depMtx
     
-    @test fmi2GetDefaultStartTime(myFMU.md) ≈ 0.0
-    @test fmi2GetDefaultStopTime(myFMU.md) ≈ 1.0
-    @test fmi2GetDefaultTolerance(myFMU.md) ≈ 1e-6
-    @test fmi2GetDefaultStepSize(myFMU.md) === nothing
+    @test fmi2GetDefaultStartTime(myFMU.modelDescription) ≈ 0.0
+    @test fmi2GetDefaultStopTime(myFMU.modelDescription) ≈ 1.0
+    @test fmi2GetDefaultTolerance(myFMU.modelDescription) ≈ 1e-6
+    @test fmi2GetDefaultStepSize(myFMU.modelDescription) === nothing
 else
     @warn "Unknown exporting tool `$tool`. Skipping model description tests."
 end
