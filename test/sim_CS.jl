@@ -23,13 +23,13 @@ end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
 # test without recording values (but why?)
-success = fmiSimulateCS(fmuStruct; dt=1e-2)
+success = fmiSimulateCS(fmuStruct; dt=1e-5)
 @test success
 
 # test with recording values
-success, savedValues = fmiSimulateCS(fmuStruct; dt=1e-2, recordValues=["mass.s", "mass.v"])
+success, savedValues = fmiSimulateCS(fmuStruct; dt=1e-5, recordValues=["mass.s", "mass.v"])
 @test success
-@test length(savedValues.saveval) == fmi2GetDefaultStartTime(myFMU.modelDescription):1e-2:fmi2GetDefaultStopTime(myFMU.modelDescription) |> length
+@test length(savedValues.saveval) == fmi2GetDefaultStartTime(myFMU.modelDescription):1e-5:fmi2GetDefaultStopTime(myFMU.modelDescription) |> length
 @test length(savedValues.saveval[1]) == 2
 
 t = savedValues.t
@@ -80,7 +80,7 @@ if ENV["EXPORTINGTOOL"] == "Dymola/2020x"
 
     @test t[1] == fmi2GetDefaultStartTime(myFMU.modelDescription) 
     @test t[end] == fmi2GetDefaultStopTime(myFMU.modelDescription) 
-    
+
     # reference values from Simulation in Dymola2020x (Dassl)
     @test [solution.saveval[1]...] == [0.5, 0.0]
     @test sum(abs.([solution.saveval[end]...] - [0.613371, 0.188633])) < 0.05

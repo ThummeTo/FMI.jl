@@ -31,13 +31,13 @@ end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
 # test without recording values (but why?)
-success = fmiSimulate(fmuStruct; dt=1e-2)
+success = fmiSimulate(fmuStruct; dt=1e-5)
 @test success
 
 # test with recording values
-success, savedValues = fmiSimulate(fmuStruct; dt=1e-2, recordValues=["mass.s", "mass.v"], setup=true)
+success, savedValues = fmiSimulate(fmuStruct; dt=1e-5, recordValues=["mass.s", "mass.v"], setup=true)
 @test success
-@test length(savedValues.saveval) == fmi2GetDefaultStartTime(myFMU.modelDescription):1e-2:fmi2GetDefaultStopTime(myFMU.modelDescription) |> length
+@test length(savedValues.saveval) == fmi2GetDefaultStartTime(myFMU.modelDescription):1e-5:fmi2GetDefaultStopTime(myFMU.modelDescription) |> length
 @test length(savedValues.saveval[1]) == 2
 
 t = savedValues.t
