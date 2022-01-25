@@ -20,34 +20,34 @@ if envFMUSTRUCT == "FMU"
 elseif envFMUSTRUCT == "FMUCOMPONENT"
     fmuStruct = comp
 end
-@assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+@assert fmuStruct !== nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
 t_start = 0.0
 t_stop = 8.0
 
 # test without recording values (but why?)
-success = fmiSimulateCS(fmuStruct, t_start, t_stop)
+success = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2)
 @test success
 
 # test with recording values
-success, savedValues = fmiSimulateCS(fmuStruct, t_start, t_stop; recordValues=["mass.s", "mass.v"])
+success, savedValues = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2, recordValues=["mass.s", "mass.v"])
 @test success
-@test length(savedValues.saveval) == 100
+@test length(savedValues.saveval) == t_start:1e-2:t_stop |> length
 @test length(savedValues.saveval[1]) == 2
 
 t = savedValues.t
 s = collect(d[1] for d in savedValues.saveval)
 v = collect(d[2] for d in savedValues.saveval)
-@test t[1] == t_start 
-@test t[end] == t_stop 
+@test t[1] == t_start
+@test t[end] == t_stop
 
 # reference values from Simulation in Dymola2020x (Dassl)
 @test s[1] == 0.5
 @test v[1] == 0.0
 
 if ENV["EXPORTINGTOOL"] == "Dymola/2020x" # ToDo: Linux FMU was corrupted
-    @test abs(s[end] - 0.509219) < 0.01
-    @test abs(v[end] - 0.314074) < 0.01
+    @test s[end] ≈ 0.509219 atol=1e-1
+    @test v[end] ≈ 0.314074 atol=1e-1
 end
 
 fmiUnload(myFMU)
@@ -74,19 +74,19 @@ if ENV["EXPORTINGTOOL"] == "Dymola/2020x"
     elseif envFMUSTRUCT == "FMUCOMPONENT"
         fmuStruct = comp
     end
-    @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+    @assert fmuStruct !== nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-    success, solution = fmiSimulateCS(fmuStruct, t_start, t_stop; saveat=t_start:0.001:t_stop, recordValues=["mass.s", "mass.v"], inputValues=["extForce"], inputFunction=extForce)
+    success, solution = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2, recordValues=["mass.s", "mass.v"], inputValues=["extForce"], inputFunction=extForce)
     @test success
     @test length(solution.saveval) > 0
     @test length(solution.t) > 0
 
-    @test solution.t[1] == t_start 
-    @test solution.t[end] == t_stop 
+    @test t[1] == t_start
+    @test t[end] == t_stop
 
     # reference values from Simulation in Dymola2020x (Dassl)
     @test [solution.saveval[1]...] == [0.5, 0.0]
-    @test sum(abs.([solution.saveval[end]...] - [0.613371, 0.188633])) < 0.05
+    @test sum(abs.([solution.saveval[end]...] - [0.613371, 0.188633])) < 0.2
     fmiUnload(myFMU)
 end
 
