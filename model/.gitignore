@@ -6,6 +6,7 @@ IO/
 Distribution/
 platforms/
 tmp/
+fmi3/
 buildlog.txt
 dsfinal.txt
 dsin.txt
@@ -21,6 +22,4 @@ stop
 *.pdf
 *.obj
 *.fmu
-fmi3/
-
 *.dll
