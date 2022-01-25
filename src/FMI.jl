@@ -88,6 +88,7 @@ export fmi2CanGetSetState, fmi2CanSerializeFMUstate
 export fmi2ProvidesDirectionalDerivative
 export fmi2IsCoSimulation, fmi2IsModelExchange
 export fmi2ModelVariablesForValueReference
+export fmi2GetDefaultStartTime, fmi2GetDefaultStopTime, fmi2GetDefaultTolerance, fmi2GetDefaultStepSize
 
 ### EXPORTING LISTS END ###
 

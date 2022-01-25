@@ -131,7 +131,7 @@ Returns:
     - If keyword `recordValues` is not set, a struct of type `ODESolution`.
     - If keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues).
 """
-function fmi2SimulateME(c::fmi2Component, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default;
+function fmi2SimulateME(c::fmi2Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
     solver = nothing,
     customFx = nothing,
     recordValues::fmi2ValueReferenceFormat = nothing,
@@ -151,13 +151,14 @@ function fmi2SimulateME(c::fmi2Component, t_start::Union{Real, Symbol} = :defaul
     savingValues = (length(recordValues) > 0)
     hasInputs = (length(inputValues) > 0)
 
-    if t_start == :default
-        t_start = c.fmu.modelDescription.defaultStartTime
-    end
-
-    if t_stop == :default
-        t_stop = c.fmu.modelDescription.defaultStopTime
-    end
+    t_start = t_start === nothing ? fmi2GetDefaultStartTime(c.fmu.md) : t_start
+    t_start = t_start === nothing ? 0.0 : t_start
+    t_stop = t_stop === nothing ? fmi2GetDefaultStopTime(c.fmu.md) : t_stop
+    t_stop = t_stop === nothing ? 1.0 : t_stop
+    tolerance = tolerance === nothing ? fmi2GetDefaultTolerance(c.fmu.md) : tolerance
+    tolerance = tolerance === nothing ? 1e-4 : tolerance
+    dt = dt === nothing ? fmi2GetDefaultStepSize(c.fmu.md) : dt
+    dt = dt === nothing ? 1e-3 : dt 
 
     if savingValues
         savedValues = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...})
@@ -168,7 +169,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Union{Real, Symbol} = :defaul
         push!(callbacks, savingCB)
     end
 
-    if solver == nothing
+    if solver === nothing
         solver = Tsit5()
     end
 
@@ -246,7 +247,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Union{Real, Symbol} = :defaul
         end
     end
 
-    solution = solve(problem, solver; callback = CallbackSet(callbacks...), saveat = saveat, kwargs...)
+    solution = solve(problem, solver; callback = CallbackSet(callbacks...), saveat = saveat, tol=tolerance, dt=dt, kwargs...)
 
     if savingValues
         return solution, savedValues
