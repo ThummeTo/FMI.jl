@@ -581,7 +581,7 @@ end
 """
 Starts a simulation of the fmu instance for the matching fmu type. If both types are available, CS is preferred over ME.
 """
-function fmi2Simulate(fmu::FMU2, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
+function fmi2Simulate(fmu::FMU2, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
     @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2Simulate(fmu.components[end], t_start, t_stop; kwargs...)
 end
@@ -589,7 +589,7 @@ end
 """
 Starts a simulation of a FMU in CS-mode.
 """
-function fmi2SimulateCS(fmu::FMU2, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
+function fmi2SimulateCS(fmu::FMU2, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
     @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SimulateCS(fmu.components[end], t_start, t_stop; kwargs...)
 end
@@ -597,7 +597,7 @@ end
 """
 Starts a simulation of a FMU in ME-mode.
 """
-function fmi2SimulateME(fmu::FMU2, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
+function fmi2SimulateME(fmu::FMU2, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
     @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi2SimulateME(fmu.components[end], t_start, t_stop; kwargs...)
 end
