@@ -275,7 +275,7 @@ Returns:
     - If keyword `recordValues` is not set, a boolean `success` is returned (simulation success).
     - If keyword `recordValues` is set, a tuple of type (true, DiffEqCallbacks.SavedValues) or (false, nothing).
 """
-function fmi2SimulateCS(c::fmi2Component, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default;
+function fmi2SimulateCS(c::fmi2Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
                         recordValues::fmi2ValueReferenceFormat = nothing,
                         saveat = [],
                         setup::Bool = true,
@@ -287,13 +287,14 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Union{Real, Symbol} = :defaul
     inputValues = prepareValueReference(c, inputValues)
     variableSteps = c.fmu.modelDescription.CScanHandleVariableCommunicationStepSize 
 
-    if t_start == :default
-        t_start = c.fmu.modelDescription.defaultStartTime
-    end
-
-    if t_stop == :default
-        t_stop = c.fmu.modelDescription.defaultStopTime
-    end
+    t_start = t_start === nothing ? fmi2GetDefaultStartTime(c.fmu.md) : t_start
+    t_start = t_start === nothing ? 0.0 : t_start
+    t_stop = t_stop === nothing ? fmi2GetDefaultStopTime(c.fmu.md) : t_stop
+    t_stop = t_stop === nothing ? 1.0 : t_stop
+    tolerance = tolerance === nothing ? fmi2GetDefaultTolerance(c.fmu.md) : tolerance
+    tolerance = tolerance === nothing ? 1e-4 : tolerance
+    dt = dt === nothing ? fmi2GetDefaultStepSize(c.fmu.md) : dt
+    dt = dt === nothing ? 1e-3 : dt 
 
     success = false
     savedValues = nothing
