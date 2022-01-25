@@ -54,8 +54,8 @@ v = collect(d[2] for d in savedValues.saveval)
 @test v[1] == 0.0
 
 if ENV["EXPORTINGTOOL"] == "Dymola/2020x" # ToDo: Linux FMU was corrupted
-    @test s[end] ≈ 0.509219 atol=1e-3
-    @test v[end] ≈ 0.314074 atol=1e-3
+    @test s[end] ≈ 0.509219 atol=1e-2
+    @test v[end] ≈ 0.314074 atol=1e-2
 end
 
 fmiUnload(myFMU)
