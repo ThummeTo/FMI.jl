@@ -26,26 +26,6 @@ function handleEvents(c::fmi3Component, enterEventMode::Bool, exitInContinuousMo
     nominalsChanged = fmi3False
     valuesChanged = fmi3False
     if enterEventMode
-        
-        # correct_step = false
-        # indicators = fmi3GetEventIndicators(c)
-        # for i in 1:length(c.rootsFound)
-        #     if c.rootsFound[i] != 0
-        #         if c.rootsFound[i] != sign(indicators[i])
-        #             # we are at left roots
-        #             correct_step = true
-        #         end
-        #     end
-        # end
-        # if correct_step
-        #     x = fmi3GetContinuousStates(c)
-        #     dx = fmi3GetContinuousStateDerivatives(c)
-        #     newx = x + dx * 1e-12
-        #     fmi3SetContinuousStates(c, newx)
-        #     # integrator.u = newx
-        #     # integrator.t += 1e-12
-        #     @debug "set x from $x to $newx"
-        # end
 
         fmi3EnterEventMode(c, c.stepEvent, c.stateEvent, c.rootsFound, Csize_t(c.fmu.modelDescription.numberOfEventIndicators), c.timeEvent)
         # TODO inputEvent handling
@@ -158,13 +138,7 @@ function stepCompleted(c::fmi3Component, x, t, integrator, inputFunction, inputV
     (status, c.stepEvent, terminateSimulation) = fmi3CompletedIntegratorStep(c, fmi3True)
     @debug "stepCompleted(_, $(x), $(t), _, _, _): stepEvent $(c.stepEvent)"
     @assert terminateSimulation == fmi3False "completed Integratorstep failed!"
-    # if stepEvent == fmi3True
-    #     affectFMU!(c, integrator, 0, inputFunction, inputValues)
-    # else
-    #     if inputFunction !== nothing
-    #         fmi3SetFloat64(c, inputValues, inputFunction(integrator.t))
-    #     end
-    # end
+    
 end
 
 # Returns the state derivatives of the FMU.
