@@ -63,6 +63,10 @@ function fmi3ReadModelDescription(pathToModellDescription::String)
     md.variableNamingConvention = parseNodeString(root, "variableNamingConvention"; onfail="[Unknown variable naming convention]")
     md.description = parseNodeString(root, "description"; onfail="[Unknown Description]")
 
+    md.defaultStartTime = 0.0
+    md.defaultStopTime = 1.0
+    md.defaultTolerance = 0.0001
+
     for node in eachelement(root)
 
         if node.name == "CoSimulation"
@@ -112,6 +116,8 @@ function fmi3ReadModelDescription(pathToModellDescription::String)
         elseif node.name == "ModelStructure"
             modelstructure = node
         end
+
+        # ToDo: Parse default experiment
     end
 
     if typedefinitions === nothing
@@ -316,7 +322,7 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi3ModelDescription, deriva
     modelVariables = Array{fmi3ModelVariable}(undef, numberOfVariables)
     index = 1
     for node in eachelement(nodes)
-        name = node["name"]
+        name = ""
         ValueReference = parse(fmi3ValueReference, (node["valueReference"]))
         description = ""
         causality = ""
@@ -324,6 +330,10 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi3ModelDescription, deriva
 
         if !(ValueReference in md.valueReferences)
             push!(md.valueReferences, ValueReference)
+        end
+
+        if haskey(node, "name")
+            name = node["name"]
         end
 
         if haskey(node, "description")

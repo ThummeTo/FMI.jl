@@ -5,6 +5,8 @@
 
 module FMI
 
+@debug "Debugging messages enabled for FMI.jl ..."
+
 """
 The mutable struct representing an abstract (version unknown) FMU.
 """

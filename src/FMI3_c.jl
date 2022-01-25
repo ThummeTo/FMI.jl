@@ -526,6 +526,10 @@ mutable struct fmi3ModelDescription
 
     stringValueReferences
 
+    defaultStartTime::fmi3Float64
+    defaultStopTime::fmi3Float64
+    defaultTolerance::fmi3Float64
+
     # Constructor for uninitialized struct
     fmi3ModelDescription() = new()
 
