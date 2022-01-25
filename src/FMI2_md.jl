@@ -52,9 +52,10 @@ function fmi2ReadModelDescription(pathToModellDescription::String)
     md.numberOfEventIndicators = parseNodeInteger(root, "numberOfEventIndicators"; onfail=0)
     md.description = parseNodeString(root, "description"; onfail="[Unknown Description]")
 
-    md.defaultStartTime = 0.0
-    md.defaultStopTime = 1.0
-    md.defaultTolerance = 0.0001
+    md.defaultStartTime = nothing
+    md.defaultStopTime = nothing
+    md.defaultTolerance = nothing
+    md.defaultStepSize = nothing
 
     for node in eachelement(root)
 
@@ -86,10 +87,11 @@ function fmi2ReadModelDescription(pathToModellDescription::String)
         elseif node.name == "ModelStructure"
             modelstructure = node
 
-        elseif node.name == "DefaultExperiment" 
-            md.defaultStartTime                             = parseNodeReal(node, "startTime"                                   ; onfail=0.0)
-            md.defaultStopTime                              = parseNodeReal(node, "stopTime"                                    ; onfail=1.0)
-            md.defaultTolerance                             = parseNodeReal(node, "tolerance"                                   ; onfail=0.0001)
+        elseif node.name == "DefaultExperiment"
+            md.defaultStartTime                             = parseNodeReal(node, "startTime")
+            md.defaultStopTime                              = parseNodeReal(node, "stopTime")
+            md.defaultTolerance                             = parseNodeReal(node, "tolerance")
+            md.defaultStepSize                              = parseNodeReal(node, "stepSize")
         end
     end
 
@@ -122,6 +124,34 @@ function fmi2ReadModelDescription(pathToModellDescription::String)
     end 
 
     md
+end
+
+"""
+Returns startTime from DefaultExperiment if defined else defaults to nothing.
+"""
+function fmi2GetDefaultStartTime(md::fmi2ModelDescription)
+    md.defaultStartTime
+end
+
+"""
+Returns stopTime from DefaultExperiment if defined else defaults to nothing.
+"""
+function fmi2GetDefaultStopTime(md::fmi2ModelDescription)
+    md.defaultStopTime
+end
+
+"""
+Returns tolerance from DefaultExperiment if defined else defaults to nothing.
+"""
+function fmi2GetDefaultTolerance(md::fmi2ModelDescription)
+    md.defaultTolerance
+end
+
+"""
+Returns stepSize from DefaultExperiment if defined else defaults to nothing.
+"""
+function fmi2GetDefaultStepSize(md::fmi2ModelDescription)
+    md.defaultStepSize
 end
 
 """
@@ -429,10 +459,10 @@ end
 # Parses an Integer value represented by a string.
 function parseInteger(s::Union{String, SubString{String}}; onfail=nothing)
     if onfail == nothing
-        return parse(Int, s)
+        return parse(fmi2Integer, s)
     else
         try
-            return parse(Int, s)
+            return parse(fmi2Integer, s)
         catch
             return onfail
         end
@@ -450,10 +480,10 @@ end
 # Parses a real value represented by a string.
 function parseReal(s::Union{String, SubString{String}}; onfail=nothing)
     if onfail == nothing
-        return parse(Real, s)
+        return parse(fmi2Real, s)
     else
         try
-            return parse(Real, s)
+            return parse(fmi2Real, s)
         catch
             return onfail
         end
@@ -529,7 +559,7 @@ function setDatatypeVariables(node::EzXML.Node, md::fmi2ModelDescription)
         elseif typename == "Enumeration"
             for i in 1:length(md.enumerations)
                 if type.declaredType == md.enumerations[i][1] # identify the enum by the name
-                    type.start = md.enumerations[i][1 + parse(Int, typenode["start"])] # find the enum value and set it
+                    type.start = md.enumerations[i][1 + parse(fmi2Integer, typenode["start"])] # find the enum value and set it
                 end
             end
         elseif typename == "String"

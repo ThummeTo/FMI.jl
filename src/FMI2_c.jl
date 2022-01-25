@@ -448,9 +448,10 @@ mutable struct fmi2ModelDescription # ToDo: Move, this shouls not be part of FMI
     valueReferenceIndicies::Dict{Integer,Integer}
 
     # default experiment 
-    defaultStartTime::Real
-    defaultStopTime::Real
-    defaultTolerance::Real
+    defaultStartTime::Union{Real,Nothing}
+    defaultStopTime::Union{Real,Nothing}
+    defaultTolerance::Union{Real,Nothing}
+    defaultStepSize::Union{Real,Nothing}
 end
 
 # Common function for ModelExchange & CoSimulation

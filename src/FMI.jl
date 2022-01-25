@@ -88,6 +88,7 @@ export fmi2CanGetSetState, fmi2CanSerializeFMUstate
 export fmi2ProvidesDirectionalDerivative
 export fmi2IsCoSimulation, fmi2IsModelExchange
 export fmi2ModelVariablesForValueReference
+export fmi2GetDefaultStartTime, fmi2GetDefaultStopTime, fmi2GetDefaultTolerance, fmi2GetDefaultStepSize
 
 ### EXPORTING LISTS END ###
 
@@ -247,21 +248,21 @@ end
 """
 Simulate an fmu according to its standard from 0.0 to t_stop.
 """
-function fmiSimulate(str::fmi2Struct, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
+function fmiSimulate(str::fmi2Struct, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
     fmi2Simulate(str, t_start, t_stop; kwargs...)
 end
 
 """
 Simulate an CoSimulation fmu according to its standard from 0.0 to t_stop.
 """
-function fmiSimulateCS(str::fmi2Struct, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
+function fmiSimulateCS(str::fmi2Struct, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
     fmi2SimulateCS(str, t_start, t_stop; kwargs...)
 end
 
 """
 Simulate an ModelExchange fmu according to its standard from 0.0 to t_stop.
 """
-function fmiSimulateME(str::fmi2Struct, t_start::Union{Real, Symbol} = :default, t_stop::Union{Real, Symbol} = :default; kwargs...)
+function fmiSimulateME(str::fmi2Struct, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
     fmi2SimulateME(str, t_start, t_stop; kwargs...)
 end
 
