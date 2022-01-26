@@ -170,7 +170,7 @@ function fmi3Load(pathToFMU::String; unpackPath=nothing)
     pathToBinary = ""
 
     if Sys.iswindows()
-        directories = [joinpath("binaries", "win64"), joinpath("binaries","x86_64-windows")]
+        directories = [joinpath("binaries", "win64"), joinpath("binaries", "x86_64-windows")]
         for directory in directories
             directoryBinary = joinpath(fmu.path, directory)
             if isdir(directoryBinary)

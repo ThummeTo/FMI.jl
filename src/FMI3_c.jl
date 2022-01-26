@@ -349,12 +349,11 @@ Source: FMISpec3.0, Version D5ef1c1: 2.4.7. Definition of Model Variables
                                      2.4.4. Definition of Types
 
 """
-mutable struct fmi3datatypeVariable
+mutable struct fmi3DatatypeVariable
     # mandatory 
     # TODO clock
-    datatype::Union{Type{fmi3String}, Type{fmi3Float64}, Type{fmi3Float32}, Type{fmi3Int8}, Type{fmi3UInt8}, Type{fmi3Int16}, Type{fmi3UInt16}, Type{fmi3Int32}, Type{fmi3UInt32}, Type{fmi3Int64}, Type{fmi3UInt64}, Type{fmi3Boolean}, Type{fmi3Binary}, Type{fmi3Char}, Type{fmi3Byte}, Type{fmi3Enum}}
+    datatype::Union{Nothing, Type{fmi3String}, Type{fmi3Float64}, Type{fmi3Float32}, Type{fmi3Int8}, Type{fmi3UInt8}, Type{fmi3Int16}, Type{fmi3UInt16}, Type{fmi3Int32}, Type{fmi3UInt32}, Type{fmi3Int64}, Type{fmi3UInt64}, Type{fmi3Boolean}, Type{fmi3Binary}, Type{fmi3Char}, Type{fmi3Byte}, Type{fmi3Enum}}
     
-
     # Optional
     canHandleMultipleSet::Union{fmi3Boolean, Nothing}
     intermediateUpdate::fmi3Boolean
@@ -393,7 +392,7 @@ mutable struct fmi3datatypeVariable
     dependenciesValueReferences::Array{fmi3ValueReference}
 
     # Constructor
-    fmi3datatypeVariable() = new()
+    fmi3DatatypeVariable() = new()
 end
 """
 Source: FMISpec3.0, Version D5ef1c1: 2.4.7. Definition of Model Variables
@@ -404,7 +403,7 @@ mutable struct fmi3ModelVariable
     #mandatory
     name::fmi3String
     valueReference::fmi3ValueReference
-    datatype::fmi3datatypeVariable
+    datatype::fmi3DatatypeVariable
 
     # Optional
     description::fmi3String
@@ -419,7 +418,7 @@ mutable struct fmi3ModelVariable
 
     # Constructor for not further specified Model variable
     function fmi3ModelVariable(name, valueReference)
-        new(name, Cuint(valueReference), fmi3datatypeVariable(), "", fmi3local::fmi3causality, fmi3continuous::fmi3variability)
+        new(name, Cuint(valueReference), fmi3DatatypeVariable(), "", fmi3local::fmi3causality, fmi3continuous::fmi3variability)
     end
 
     # Constructor for fully specified Model Variable

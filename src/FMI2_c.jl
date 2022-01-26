@@ -301,9 +301,9 @@ end
 Source: FMISpec2.0.2[p.40]: 2.2.3 Definition of Types (TypeDefinitions)
         FMISpec2.0.2[p.56]: 2.2.7 Definition of Model Variables (ModelVariables)
 """
-mutable struct datatypeVariable
+mutable struct fmi2DatatypeVariable
     # mandatory
-    datatype::Union{Type{fmi2String}, Type{fmi2Real}, Type{fmi2Integer}, Type{fmi2Boolean}, Type{fmi2Enum}}
+    datatype::Union{Nothing, Type{fmi2String}, Type{fmi2Real}, Type{fmi2Integer}, Type{fmi2Boolean}, Type{fmi2Enum}}
     declaredType::fmi2String
 
     # Optional
@@ -325,7 +325,7 @@ mutable struct datatypeVariable
     #dependenciesValueReferences::Array{fmi2ValueReference}
 
     # Constructor
-    datatypeVariable() = new()
+    fmi2DatatypeVariable() = new()
 end
 
 """
@@ -337,7 +337,7 @@ mutable struct fmi2ScalarVariable
     #mandatory
     name::fmi2String
     valueReference::fmi2ValueReference
-    datatype::datatypeVariable
+    datatype::fmi2DatatypeVariable
 
     # Optional
     description::fmi2String
@@ -351,7 +351,7 @@ mutable struct fmi2ScalarVariable
 
     # Constructor for not further specified ScalarVariables
     function fmi2ScalarVariable(name, valueReference)
-        new(name, Cint(valueReference), datatypeVariable(), "", fmi2local::fmi2causality, fmi2continuous::fmi2variability, fmi2calculated::fmi2initial)
+        new(name, Cint(valueReference), fmi2DatatypeVariable(), "", fmi2local::fmi2causality, fmi2continuous::fmi2variability, fmi2calculated::fmi2initial)
     end
 
     # Constructor for fully specified ScalarVariable
