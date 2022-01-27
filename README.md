@@ -1,4 +1,4 @@
-![FMI.jl Logo](https://github.com/ThummeTo/FMI.jl/blob/main/logo/dark/fmijl_logo_640_320.png =100x )
+![FMI.jl Logo](https://github.com/ThummeTo/FMI.jl/blob/main/logo/dark/fmijl_logo_640_320.png =100x100 )
 # FMI.jl
 
 [![][docs-img]](docs-url) [![][test-img]]() 
