@@ -1,9 +1,9 @@
-![FMI.jl Logo](https://github.com/ThummeTo/FMI.jl/blob/main/logo/dark/fmijl_logo_640_320.png "FMI.jl Logo")
+![FMI.jl Logo](https://github.com/ThummeTo/FMI.jl/blob/main/logo/dark/fmijl_logo_640_320.png )
 # FMI.jl
 
 [![][docs-img]](docs-url) [![][test-img]]() 
 
-<!---Dokumentation Variablen--->
+<!---Dokumentation Variablen    "FMI.jl Logo"--->
 
 [docs-img]: https://img.shields.io/badge/docs-dev-blue.svg
 [docs-url]: https://github.com/adribrune.io/FMI.jl/dev
