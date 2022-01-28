@@ -29,7 +29,7 @@ export FMU
 
 # FMI.jl
 export prepareValueReference
-export fmiLoad, fmiSimulate, fmiSimulateCS, fmiSimulateME, fmiUnload
+export fmiLoad, fmiReload, fmiSimulate, fmiSimulateCS, fmiSimulateME, fmiUnload
 export fmiGetNumberOfStates, fmiGetTypesPlatform, fmiGetVersion, fmiInstantiate!, fmiFreeInstance!
 export fmiSetDebugLogging, fmiSetupExperiment, fmiEnterInitializationMode, fmiExitInitializationMode, fmiTerminate , fmiReset
 export fmiGetReal, fmiSetReal, fmiGetInteger, fmiSetInteger, fmiGetBoolean, fmiSetBoolean, fmiGetString, fmiSetString, fmiGetReal!, fmiGetInteger!, fmiGetBoolean!, fmiGetString!
@@ -52,7 +52,7 @@ export fmiGetStartValue
 export fmi2Dependency, fmi2DependencyDependent, fmi2DependencyIndependent, fmi2DependencyUnknown, fmi2DependencyFixed, fmi2GetDependencies
 export FMU2, fmi2True, fmi2False
 export fmi2ValueReference, fmi2String2ValueReference, fmi2ValueReference2String
-export fmi2Unzip, fmi2Load, fmi2Unload
+export fmi2Unzip, fmi2Load, fmi2Unload, fmi2Reload
 export fmi2GetTypesPlatform, fmi2GetVersion
 export fmi2Instantiate!, fmi2FreeInstance!, fmi2SetDebugLogging
 export fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2Terminate, fmi2Reset
@@ -327,6 +327,13 @@ Load FMUs independent of the FMI version, currently supporting version 2.0.X.
 """
 function fmiLoad(pathToFMU::String; unpackPath=nothing, type=nothing)
     fmi2Load(pathToFMU; unpackPath=unpackPath, type=type)
+end
+
+"""
+Reloads the FMU-binary. This is useful, if the FMU does not support a clean reset implementation.
+"""
+function fmiReload(pathToFMU::String)
+    fmi2Reload(pathToFMU)
 end
 
 """

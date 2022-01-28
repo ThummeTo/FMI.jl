@@ -42,7 +42,7 @@ fmiUnload(myFMU)
 - ...
 
 ## What Platforms are supported?
-FMI.jl is tested (and testing) under Julia Versions 1.6 and *nightly* on Windows (latest) and Ubuntu (latest). Mac should work, but untested.
+FMI.jl is tested (and testing) under Julia Versions 1.6 (64-bit) and *nightly* (64-bit) on Windows *latest* (64-bit) and Ubuntu *latest* (64-bit). Mac and Julia (32-bit) should work, but untested.
 
 ## How to cite? Related publications?
 Tobias Thummerer, Lars Mikelsons and Josef Kircher. 2021. **NeuralFMU: towards structural integration of FMUs into neural networks.** Martin Sjölund, Lena Buffoni, Adrian Pop and Lennart Ochel (Ed.). Proceedings of 14th Modelica Conference 2021, Linköping, Sweden, September 20-24, 2021. Linköping University Electronic Press, Linköping (Linköping Electronic Conference Proceedings ; 181), 297-306. [DOI: 10.3384/ecp21181297](https://doi.org/10.3384/ecp21181297)

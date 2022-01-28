@@ -183,17 +183,24 @@ function fmi2SimulateME(c::fmi2Component, t_start::Union{Real, Nothing} = nothin
 
     if reset 
         if c.state == fmi2ModelInitialized
-            fmi2Terminate(c)
+            retcode = fmi2Terminate(c)
+            @assert retcode == Integer(fmi2OK) "fmi2SimulateME(...): Termination failed with return code $(retcode)."
         end
         if c.state == fmi2ModelSetableFMUstate
-            fmi2Reset(c)
+            retcode = fmi2Reset(c)
+            @assert retcode == Integer(fmi2OK) "fmi2SimulateME(...): Reset failed with return code $(retcode)."
         end
     end 
 
     if setup
-        fmi2SetupExperiment(c, t_start, t_stop)
-        fmi2EnterInitializationMode(c)
-        fmi2ExitInitializationMode(c)
+        retcode = fmi2SetupExperiment(c, t_start, t_stop)
+        @assert retcode == Integer(fmi2OK) "fmi2SimulateME(...): Setting up experiment failed with return code $(retcode)."
+
+        retcode = fmi2EnterInitializationMode(c)
+        @assert retcode == Integer(fmi2OK) "fmi2SimulateME(...): Entering initialization mode failed with return code $(retcode)."
+
+        retcode = fmi2ExitInitializationMode(c)
+        @assert retcode == Integer(fmi2OK) "fmi2SimulateME(...): Exiting initialization mode failed with return code $(retcode)."
     end
 
     eventHandling = c.fmu.modelDescription.numberOfEventIndicators > 0
