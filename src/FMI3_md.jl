@@ -345,7 +345,7 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi3ModelDescription, deriva
         if haskey(node, "variability")
             variability = node["variability"]
         end
-        datatype = fmi3setDatatypeVariables(node, md)
+        datatype = fmi3SetDatatypeVariables(node, md)
 
         dependencies = []
         dependenciesKind = []
@@ -487,8 +487,8 @@ function parseFMI3Boolean(s::Union{String, SubString{String}})
 end
 
 # set the datatype and attributes of an model variable
-function fmi3setDatatypeVariables(node::EzXML.Node, md::fmi3ModelDescription)
-    type = fmi3datatypeVariable()
+function fmi3SetDatatypeVariables(node::EzXML.Node, md::fmi3ModelDescription)
+    type = fmi3DatatypeVariable()
     typename = node.name
     type.canHandleMultipleSet = nothing
     type.intermediateUpdate = false
@@ -509,6 +509,7 @@ function fmi3setDatatypeVariables(node::EzXML.Node, md::fmi3ModelDescription)
     type.reinit = nothing
     type.mimeType = nothing
     type.maxSize = nothing
+    type.datatype = nothing
 
     if typename == "Float32"
         type.datatype = fmi3Float32

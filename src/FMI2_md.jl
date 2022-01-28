@@ -345,7 +345,7 @@ function parseModelVariables(nodes::EzXML.Node, md::fmi2ModelDescription, deriva
         if haskey(node, "initial")
             initial = node["initial"]
         end
-        datatype = setDatatypeVariables(node, md)
+        datatype = fmi2SetDatatypeVariables(node, md)
 
         dependencies = []
         dependenciesKind = []
@@ -516,8 +516,8 @@ function parseFMI2Boolean(s::Union{String, SubString{String}})
 end
 
 # set the datatype and attributes of an model variable
-function setDatatypeVariables(node::EzXML.Node, md::fmi2ModelDescription)
-    type = datatypeVariable()
+function fmi2SetDatatypeVariables(node::EzXML.Node, md::fmi2ModelDescription)
+    type = fmi2DatatypeVariable()
     typenode = node.firstelement
     typename = typenode.name
     type.start = nothing
@@ -531,6 +531,8 @@ function setDatatypeVariables(node::EzXML.Node, md::fmi2ModelDescription)
     type.unbounded = nothing
     type.derivative = nothing
     type.reinit = nothing
+    type.datatype = nothing
+
     if typename == "Real"
         type.datatype = fmi2Real
     elseif typename == "String"

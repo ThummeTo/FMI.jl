@@ -41,6 +41,7 @@ mutable struct FMU2 <: FMU
 
     # paths of ziped and unziped FMU folders
     path::String
+    binaryPath::String
     zipPath::String
 
     # c-functions
@@ -330,51 +331,51 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing, type=nothing)
     directoryBinary = ""
     pathToBinary = ""
 
+    directories = []
+    
+    fmuExt = ""
+    osStr = ""
+
+    juliaArch = Sys.WORD_SIZE
+    @assert (juliaArch == 64 || juliaArch == 32) "fmi2Load(...): Unknown Julia Architecture with $(juliaArch)-bit, must be 64- or 32-bit."
+        
     if Sys.iswindows()
-        directories = [joinpath("binaries", "win64"), joinpath("binaries","x86_64-windows")]
-        for directory in directories
-            directoryBinary = joinpath(fmu.path, directory)
-            if isdir(directoryBinary)
-                pathToBinary = joinpath(directoryBinary, "$(fmuName).dll")
-                break
-            end
+        if juliaArch == 64
+            directories = [joinpath("binaries", "win64"), joinpath("binaries","x86_64-windows")]
+        else 
+            directories = [joinpath("binaries", "win32"), joinpath("binaries","i686-windows")]
         end
-        @assert isfile(pathToBinary) "Target platform is Windows, but can't find valid FMU binary at `$(pathToBinary)` for path `$(fmu.path)`."
+        osStr = "Windows"
+        fmuExt = "dll"
     elseif Sys.islinux()
-        directories = [joinpath("binaries", "linux64"), joinpath("binaries", "x86_64-linux")]
-        for directory in directories
-            directoryBinary = joinpath(fmu.path, directory)
-            if isdir(directoryBinary)
-                pathToBinary = joinpath(directoryBinary, "$(fmuName).so")
-                break
-            end
+        if juliaArch == 64
+            directories = [joinpath("binaries", "linux64"), joinpath("binaries", "x86_64-linux")]
+        else 
+            directories = []
         end
-        @assert isfile(pathToBinary) "Target platform is Linux, but can't find valid FMU binary at `$(pathToBinary)` for path `$(fmu.path)`."
+        osStr = "Linux"
+        fmuExt = "so"
     elseif Sys.isapple()
-        directories = [joinpath("binaries", "darwin64"), joinpath("binaries", "x86_64-darwin")]
-        for directory in directories
-            directoryBinary = joinpath(fmu.path, directory)
-            if isdir(directoryBinary)
-                pathToBinary = joinpath(directoryBinary, "$(fmuName).dylib")
-                break
-            end
+        if juliaArch == 64
+            directories = [joinpath("binaries", "darwin64"), joinpath("binaries", "x86_64-darwin")]
+        else 
+            directories = []
         end
-        @assert isfile(pathToBinary) "Target platform is macOS, but can't find valid FMU binary at `$(pathToBinary)` for path `$(fmu.path)`."
+        osStr = "Mac"
+        fmuExt = "dylib"
     else
-        @assert false "Unsupported target platform. Supporting Windows64, Linux64 and Mac64."
+        @assert false "fmi2Load(...): Unsupported target platform. Supporting Windows, Linux and Mac. Please open an issue if you want to use another OS."
     end
 
-    lastDirectory = pwd()
-    cd(directoryBinary)
-
-    # set FMU binary handler
-    fmu.libHandle = dlopen(pathToBinary)
-
-    cd(lastDirectory)
-
-    if fmi2IsCoSimulation(fmu) && fmi2IsModelExchange(fmu)
-        @info "fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified."
+    @assert (length(directories) > 0) "fmi2Load(...): Unsupported architecture. Supporting Julia for Windows (64- and 32-bit), Linux (64-bit) and Mac (64-bit). Please open an issue if you want to use another architecture."
+    for directory in directories
+        directoryBinary = joinpath(fmu.path, directory)
+        if isdir(directoryBinary)
+            pathToBinary = joinpath(directoryBinary, "$(fmuName).$(fmuExt)")
+            break
+        end
     end
+    @assert isfile(pathToBinary) "fmi2Load(...): Target platform is $(osStr), but can't find valid FMU binary at `$(pathToBinary)` for path `$(fmu.path)`."
 
     # make URI ressource location
     tmpResourceLocation = string("file:///", fmu.path)
@@ -382,6 +383,34 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing, type=nothing)
     fmu.fmuResourceLocation = replace(tmpResourceLocation, "\\" => "/") # URIs.escapeuri(tmpResourceLocation)
 
     @info "fmi2Load(...): FMU resources location is `$(fmu.fmuResourceLocation)`"
+
+    if fmi2IsCoSimulation(fmu) && fmi2IsModelExchange(fmu)
+        @info "fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified."
+    end
+
+    fmu.binaryPath = pathToBinary
+    loadBinary(fmu)
+
+    # initialize further variables 
+    fmu.jac_x = zeros(Float64, fmu.modelDescription.numberOfContinuousStates)
+    fmu.jac_t = -1.0
+    fmu.jac_dxy_x = zeros(fmi2Real,0,0)
+    fmu.jac_dxy_u = zeros(fmi2Real,0,0)
+   
+    # dependency matrix 
+    # fmu.dependencies
+
+    fmu
+end
+
+function loadBinary(fmu::FMU2)
+    lastDirectory = pwd()
+    cd(dirname(fmu.binaryPath))
+
+    # set FMU binary handler
+    fmu.libHandle = dlopen(fmu.binaryPath)
+
+    cd(lastDirectory)
 
     # retrieve functions
     fmu.cInstantiate                  = dlsym(fmu.libHandle, :fmi2Instantiate)
@@ -446,17 +475,14 @@ function fmi2Load(pathToFMU::String; unpackPath=nothing, type=nothing)
         fmu.cGetEventIndicators           = dlsym(fmu.libHandle, :fmi2GetEventIndicators)
         fmu.cGetNominalsOfContinuousStates= dlsym(fmu.libHandle, :fmi2GetNominalsOfContinuousStates)
     end
+end
 
-    # initialize further variables 
-    fmu.jac_x = zeros(Float64, fmu.modelDescription.numberOfContinuousStates)
-    fmu.jac_t = -1.0
-    fmu.jac_dxy_x = zeros(fmi2Real,0,0)
-    fmu.jac_dxy_u = zeros(fmi2Real,0,0)
-   
-    # dependency matrix 
-    # fmu.dependencies
-
-    fmu
+"""
+Reloads the FMU-binary. This is useful, if the FMU does not support a clean reset implementation.
+"""
+function fmi2Reload(fmu::FMU2)
+    dlclose(fmu.libHandle)
+    loadBinary(fmu)
 end
 
 """ 
@@ -697,8 +723,7 @@ For more information call ?fmi2FreeInstance
 """
 function fmi2FreeInstance!(fmu::FMU2)
     @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2FreeInstance!(fmu.components[end])
-    pop!(fmu.components)
+    fmi2FreeInstance!(fmu.components[end]) # this command removes the component from the array
     nothing
 end
 
