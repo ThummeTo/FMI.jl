@@ -353,7 +353,7 @@ mutable struct fmi3DatatypeVariable
     # mandatory 
     # TODO clock
     datatype::Union{Nothing, Type{fmi3String}, Type{fmi3Float64}, Type{fmi3Float32}, Type{fmi3Int8}, Type{fmi3UInt8}, Type{fmi3Int16}, Type{fmi3UInt16}, Type{fmi3Int32}, Type{fmi3UInt32}, Type{fmi3Int64}, Type{fmi3UInt64}, Type{fmi3Boolean}, Type{fmi3Binary}, Type{fmi3Char}, Type{fmi3Byte}, Type{fmi3Enum}}
-    
+
     # Optional
     canHandleMultipleSet::Union{fmi3Boolean, Nothing}
     intermediateUpdate::fmi3Boolean
