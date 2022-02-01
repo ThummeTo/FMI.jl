@@ -26,5 +26,5 @@ FMI.fmiCOMMAND NAME
 ```
 For further clarification of the architecture, a graphical summary is shown below.  
 
-![ ](https://github.com/adribrune/FMI.jl/blob/main/docs/src/assets/logo.png)
+![ ](https://raw.githubusercontent.com/adribrune/FMI.jl/main/docs/src/assets/architecture.png)
 
