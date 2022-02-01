@@ -3,7 +3,7 @@
 # FMI.jl
 
 
-[![][docs-img]](docs-url) [![][test-img]]() [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md)
+[![][docs-img]](docs-url) [![][test-img]]() [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
  
 <!---Dokumentation Variablen    "FMI.jl Logo"--->
 
