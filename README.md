@@ -3,14 +3,15 @@
 # FMI.jl
 
 
-[![][docs-img]](docs-url) [![][test-img]]() [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md)
+[![][docs-img]](docs-url) [![][test-img]]()  
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md)
  
 <!---Dokumentation Variablen    "FMI.jl Logo"--->
 
 [docs-img]: https://img.shields.io/badge/docs-dev-blue.svg
-[docs-url]: https://github.com/adribrune.io/FMI.jl/dev
+[docs-url]: https://ThummeTo.github.io/FMI.jl/dev
 
-<!---https://ThummeTo.github.io/FMI.jl/dev--->
+<!---https://github.com/adribrune.io/FMI.jl/dev--->
 <!--- Run FMI.jl Tests Variablen--->
 
 [test-img]: https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg
@@ -26,7 +27,7 @@
 - 🖥️ tested on: Windows, Ubuntu, macOS
 
 ## Documentation Overview
-1. [Documentation](@ref)
+1. [Documentation]()
 2. [Tutorials](@ref )
 3. [Examples](@ref )
 4. [Libary Funktions](@ref )
