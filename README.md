@@ -51,10 +51,15 @@ fmiUnload(myFMU)
 | getAjointDerivatives      | -            | -      | ~~              | ~      |
 
 ✓✓ supported & tested
+
 ✓  supported (beta)
+
 ~~ work in progress
+
 ~  planned
--  not supported by the corresponding FMI standard
+
+\-  not supported by the corresponding FMI standard
+
 x  not planned
 
 ## What FMI.jl-Library to use?
