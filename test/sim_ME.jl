@@ -3,6 +3,8 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
+using DifferentialEquations: Tsit5, Rosenbrock23
+
 t_start = 0.0
 t_stop = 8.0
 
@@ -113,7 +115,7 @@ if ENV["EXPORTINGTOOL"] == "Dymola/2020x"
     fmiUnload(myFMU)
 end
 
-# case 3: ME-FMU without events, but with input signal
+# case 3a: ME-FMU without events, but with input signal (explicit solver: Tsit5)
 
 function extForce(t)
     [sin(t)]
@@ -137,7 +139,44 @@ if ENV["EXPORTINGTOOL"] == "Dymola/2020x"
     end
     @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-    solution = fmiSimulateME(fmuStruct, t_start, t_stop; inputValues=["extForce"], inputFunction=extForce, dtmax=0.001)
+    solution = fmiSimulateME(fmuStruct, t_start, t_stop; inputValueReferences=["extForce"], inputFunction=extForce, solver=Tsit5())
+    @test length(solution.u) > 0
+    @test length(solution.t) > 0
+
+    @test solution.t[1] == t_start 
+    @test solution.t[end] == t_stop 
+
+    # reference values from Simulation in Dymola2020x (Dassl)
+    @test solution.u[1] == [0.5, 0.0]
+    @test sum(abs.(solution.u[end] - [0.613371, 0.188633])) < 0.012
+    fmiUnload(myFMU)
+end
+
+# case 3b: ME-FMU without events, but with input signal (implicit solver: Rosenbrock23)
+
+function extForce(t)
+    [sin(t)]
+end 
+
+if ENV["EXPORTINGTOOL"] == "Dymola/2020x"
+    pathToFMU = joinpath(dirname(@__FILE__), "..", "model", ENV["EXPORTINGTOOL"], "SpringPendulumExtForce1D.fmu")
+
+    myFMU = fmiLoad(pathToFMU)
+
+    comp = fmiInstantiate!(myFMU; loggingOn=false)
+    @test comp != 0
+
+    # choose FMU or FMUComponent
+    fmuStruct = nothing
+    envFMUSTRUCT = ENV["FMUSTRUCT"]
+    if envFMUSTRUCT == "FMU"
+        fmuStruct = myFMU
+    elseif envFMUSTRUCT == "FMUCOMPONENT"
+        fmuStruct = comp
+    end
+    @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+
+    solution = fmiSimulateME(fmuStruct, t_start, t_stop; inputValueReferences=["extForce"], inputFunction=extForce, dtmax=0.001, solver=Rosenbrock23())
     @test length(solution.u) > 0
     @test length(solution.t) > 0
 

@@ -3,6 +3,8 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
+using FMI.FMIImport.FMICore: fmi2Real
+
 pathToFMU = joinpath(dirname(@__FILE__), "..", "model", ENV["EXPORTINGTOOL"], "SpringPendulum1D.fmu")
 
 myFMU = fmiLoad(pathToFMU)
@@ -37,11 +39,11 @@ for i in 1:fmiGetNumberOfStates(myFMU)
         @test sum(abs.(sample_ders_buffer[:,1] - targetValues[i])) < 1e-3
 
         dir_ders = fmiGetDirectionalDerivative(fmuStruct, myFMU.modelDescription.derivativeValueReferences, [myFMU.modelDescription.stateValueReferences[i]])
-        fmiGetDirectionalDerivative!(fmuStruct, myFMU.modelDescription.derivativeValueReferences, [myFMU.modelDescription.stateValueReferences[i]], dir_ders_buffer)
+        @test fmiGetDirectionalDerivative!(fmuStruct, myFMU.modelDescription.derivativeValueReferences, [myFMU.modelDescription.stateValueReferences[i]], dir_ders_buffer) == 0
     
         @test sum(abs.(dir_ders - targetValues[i])) < 1e-3
         @test sum(abs.(dir_ders_buffer - targetValues[i])) < 1e-3
-
+        
         # single derivative call 
         dir_der = fmiGetDirectionalDerivative(fmuStruct, myFMU.modelDescription.derivativeValueReferences[1], myFMU.modelDescription.stateValueReferences[1])
         @test dir_der == targetValues[1][1]

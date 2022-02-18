@@ -5,9 +5,11 @@
 
 using DifferentialEquations, DiffEqCallbacks
 
+using FMIImport: fmi3Component
+
 ############ Model-Exchange ############
 
-# Read next time event from fmu and provide it to the integrator 
+# Read next time event from FMU and provide it to the integrator 
 function time_choice(c::fmi3Component, integrator) 
     @debug "time_choice(_, _): Time event @ t=$(integrator.t)"
 
@@ -71,15 +73,15 @@ function condition(c::fmi3Component, out, x, t, integrator, inputFunction, input
     indicators = fmi3GetEventIndicators(c)
     if length(indicators) > 0
         for i in 1:length(indicators)
-            if c.previous_z[i] < 0 && indicators[i] >= 0
+            if c.z_prev[i] < 0 && indicators[i] >= 0
                 c.rootsFound[i] = 1
-            elseif c.previous_z[i] > 0 && indicators[i] <= 0
+            elseif c.z_prev[i] > 0 && indicators[i] <= 0
                 c.rootsFound[i] = -1
             else
                 c.rootsFound[i] = 0
             end
             c.stateEvent |= (c.rootsFound[i] != 0)
-            # c.previous_z[i] = indicators[i]
+            # c.z_prev[i] = indicators[i]
         end
     end
     @debug "condition(_, _, $(x), $(t), _, _, _): eventIndicators $indicators   rootsFound $(c.rootsFound)   stateEvent $(c.stateEvent)"
@@ -123,15 +125,15 @@ function stepCompleted(c::fmi3Component, x, t, integrator, inputFunction, inputV
         c.stateEvent = fmi3False
     
         for i in 1:length(indicators)
-            if c.previous_z[i] < 0 && indicators[i] >= 0
+            if c.z_prev[i] < 0 && indicators[i] >= 0
                 c.rootsFound[i] = 1
-            elseif c.previous_z[i] > 0 && indicators[i] <= 0
+            elseif c.z_prev[i] > 0 && indicators[i] <= 0
                 c.rootsFound[i] = -1
             else
                 c.rootsFound[i] = 0
             end
             c.stateEvent |= (c.rootsFound[i] != 0)
-            c.previous_z[i] = indicators[i]
+            c.z_prev[i] = indicators[i]
         end
     end
 
@@ -245,7 +247,7 @@ function fmi3SimulateME(c::fmi3Component, t_start::Union{Real, Nothing} = nothin
     fmi3EnterContinuousTimeMode(c)
 
     if eventHandling
-        c.previous_z = fmi3GetEventIndicators(c)
+        c.z_prev = fmi3GetEventIndicators(c)
     end
 
     # First evaluation of the FMU

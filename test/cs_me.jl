@@ -8,9 +8,8 @@ t_start = 0.0
 t_stop = 1.0
 
 myFMU = fmiLoad(pathToFMU)
-@test myFMU.type == FMI.fmi2CoSimulation
-@test fmi2IsCoSimulation(myFMU)
-@test fmi2IsModelExchange(myFMU)
+@test fmiIsCoSimulation(myFMU)
+@test fmiIsModelExchange(myFMU)
 comp = fmiInstantiate!(myFMU; loggingOn=false)
 @test comp != 0
 # choose FMU or FMUComponent
@@ -30,7 +29,7 @@ fmiUnload(myFMU)
 
 
 myFMU = fmiLoad(pathToFMU; type=:ME)
-@test myFMU.type == FMI.fmi2ModelExchange
+@test myFMU.type == FMI.fmi2TypeModelExchange
 comp = fmiInstantiate!(myFMU; loggingOn=false)
 fmuStruct = nothing
 envFMUSTRUCT = ENV["FMUSTRUCT"]
@@ -46,7 +45,7 @@ fmiUnload(myFMU)
 
 
 myFMU = fmiLoad(pathToFMU; type=:CS)
-@test myFMU.type == FMI.fmi2CoSimulation
+@test myFMU.type == FMI.fmi2TypeCoSimulation
 comp = fmiInstantiate!(myFMU; loggingOn=false)
 fmuStruct = nothing
 envFMUSTRUCT = ENV["FMUSTRUCT"]

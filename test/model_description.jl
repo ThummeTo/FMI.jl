@@ -3,6 +3,8 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
+using FMI: fmi2VariableNamingConventionStructured, fmi2DependencyKindDependent, fmi2DependencyKindFixed
+
 tool = ENV["EXPORTINGTOOL"]
 pathToFMU = joinpath(dirname(@__FILE__), "..", "model", tool, "SpringFrictionPendulum1D.fmu")
 
@@ -12,7 +14,7 @@ myFMU = fmiLoad(pathToFMU)
 @test fmiGetTypesPlatform(myFMU) == "default"
 
 @test fmiGetModelName(myFMU) == "SpringFrictionPendulum1D"
-@test fmiGetVariableNamingConvention(myFMU) == "structured"
+@test fmiGetVariableNamingConvention(myFMU) == fmi2VariableNamingConventionStructured
 @test fmiIsCoSimulation(myFMU) == true
 @test fmiIsModelExchange(myFMU) == true
 
@@ -26,8 +28,8 @@ if tool == "Dymola/2020x"
     @test fmiProvidesDirectionalDerivative(myFMU) == true
 
     depMtx = fmi2GetDependencies(myFMU)
-    @test fmi2DependencyFixed::fmi2Dependency in depMtx
-    @test fmi2DependencyDependent::fmi2Dependency in depMtx
+    @test fmi2DependencyKindFixed in depMtx
+    @test fmi2DependencyKindDependent in depMtx
 
     @test fmi2GetDefaultStartTime(myFMU.modelDescription) ≈ 0.0
     @test fmi2GetDefaultStopTime(myFMU.modelDescription) ≈ 1.0
@@ -44,8 +46,8 @@ elseif tool == "OpenModelica/v1.17.0"
     @test fmiProvidesDirectionalDerivative(myFMU) == false
 
     depMtx = fmi2GetDependencies(myFMU)
-    @test fmi2DependencyDependent::fmi2Dependency in depMtx
-    
+    @test fmi2DependencyKindDependent in depMtx
+
     @test fmi2GetDefaultStartTime(myFMU.modelDescription) ≈ 0.0
     @test fmi2GetDefaultStopTime(myFMU.modelDescription) ≈ 1.0
     @test fmi2GetDefaultTolerance(myFMU.modelDescription) ≈ 1e-6
