@@ -39,8 +39,8 @@ fmiUnload(myFMU)
 - event-handling for imported discontinuous ME-FMUs
 
 |                           | **FMI2.0.3** |        | **FMI3.0 beta** |        |
-|                           | Import       | Export | Import          | Export |
 |---------------------------|--------------|--------|-----------------|--------|
+|                           | Import       | Export | Import          | Export |
 | CS                        | ✓✓           | ~~     | ~~              | ~      |
 | ME (continuous)           | ✓✓           | ✓✓     | ~~              | ~      |
 | ME (discontinuous)        | ✓✓           | ✓✓     | ~~              | ~      |
