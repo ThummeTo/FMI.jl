@@ -1,24 +1,25 @@
 name = "FMI"
 uuid = "14a09403-18e3-468f-ad8a-74f8dda2d9ac"
 authors = ["TT <tobias.thummerer@informatik.uni-augsburg.de>", "LM <lars.mikelsons@informatik.uni-augsburg.de>", "JK <josef.kircher@student.uni-augsburg.de>"]
-version = "0.3.11"
+version = "0.5.0"
 
 [deps]
+ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
 DiffEqCallbacks = "459566f4-90b8-5000-8ac3-15dfb0a30def"
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
-EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
-Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+FMIExport = "31b88311-cab6-44ed-ba9c-fe5a9abbd67a"
+FMIImport = "9fcbc62e-52a0-44e9-a616-1359a0008194"
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
-Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
+Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 SciMLBase = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
-ZipFile = "a5390f91-8eb1-5f08-bee0-b1d1ffed6cea"
 
 [compat]
 DiffEqCallbacks = "^2.16.1"
 DifferentialEquations = "^6.16, 7"
-EzXML = "^1.1"
+FMIExport = "0.1.1"
+FMIImport = "0.6.0"
 OrdinaryDiffEq = "^5.53.1, 6"
-Plots = "^1.14"
 SciMLBase = "^1.23.1"
-ZipFile = "^0.9.3"
 julia = "1.6"

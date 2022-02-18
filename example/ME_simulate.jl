@@ -26,15 +26,8 @@ fmiInfo(myFMU)
 # make an instance from the FMU
 fmiInstantiate!(myFMU; loggingOn=true)
 
-# setup the experiment, start time = 0.0 (optional for setup=true)
-#fmiSetupExperiment(myFMU, t_start)
-
-# enter and exit initialization (optional for setup=true)
-#fmiEnterInitializationMode(myFMU)
-#fmiExitInitializationMode(myFMU)
-
 # run the FMU in mode Model-Exchange (ME) with adaptive step sizes, result values are stored in `solution`
-solution, _ = fmiSimulateME(myFMU, t_start, t_stop; setup=true)
+solution, _ = fmiSimulateME(myFMU, t_start, t_stop)
 
 # plot the results
 fmiPlot(myFMU, solution)

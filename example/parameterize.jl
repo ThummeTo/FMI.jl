@@ -4,7 +4,6 @@
 #
 
 using FMI
-# using Plots TODO: can be deleted
 
 pathToFMU = joinpath(dirname(@__FILE__), "../model/Dymola/2020x/IO.fmu")
 

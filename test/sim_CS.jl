@@ -76,7 +76,7 @@ if ENV["EXPORTINGTOOL"] == "Dymola/2020x"
     end
     @assert fmuStruct !== nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-    success, solution = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2, recordValues=["mass.s", "mass.v"], inputValues=["extForce"], inputFunction=extForce)
+    success, solution = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2, recordValues=["mass.s", "mass.v"], inputValueReferences=["extForce"], inputFunction=extForce)
     @test success
     @test length(solution.saveval) > 0
     @test length(solution.t) > 0

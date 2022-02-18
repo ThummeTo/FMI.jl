@@ -4,6 +4,8 @@
 ## What is FMI.jl?
 FMI.jl is a free-to-use software library for the Julia programming language which integrates FMI ([fmi-standard.org](http://fmi-standard.org/)): load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
 
+**A detailed documentation and well formatted doc-strings are under construction and well be published soon.**
+
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) [![](https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg)]() 
 <!--- [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://ThummeTo.github.io/FMI.jl/stable) --->
 
@@ -30,14 +32,40 @@ fmiUnload(myFMU)
 ```
 
 ## What is currently supported in FMI.jl?
-- the full FMI 2.0.3 command set, including optional specials like getState, setState and getDirectionalDerivative
+- importing the full FMI 2.0.3 command set, including optional specials like getState, setState and getDirectionalDerivative
 - parameterization, simulation & plotting of CS- and ME-FMUs
-- event-handling for discontinuous ME-FMUs
-- ...
+- event-handling for imported discontinuous ME-FMUs
 
-## What is under development in FMI.jl?
-- the full FMI 3.0 beta command set (already checked-in)
-- export for FMUs (FMI 2.0.3)
+|                           | **FMI2.0.3** |        | **FMI3.0 beta** |        |
+|                           | Import       | Export | Import          | Export |
+|---------------------------|--------------|--------|-----------------|--------|
+| CS                        | ✓✓           | ~~     | ~~              | ~      |
+| ME (continuous)           | ✓✓           | ✓✓     | ~~              | ~      |
+| ME (discontinuous)        | ✓✓           | ✓✓     | ~~              | ~      |
+| Explicit solvers          | ✓✓           | ~~     | ~~              | ~      |
+| Implicit solvers (AD)     | ✓✓           | ~~     | ~~              | ~      |
+| get/setState              | ✓✓           | ~      | ~~              | ~      |
+| getDirectionalDerivatives | ✓✓           | ~      | ~~              | ~      |
+| getAjointDerivatives      | -            | -      | ~~              | ~      |
+
+✓✓ supported & tested
+✓  supported (beta)
+~~ work in progress
+~  planned
+-  not supported by the corresponding FMI standard
+x  not planned
+
+## What FMI.jl-Library to use?
+![FMI.jl Logo](https://github.com/ThummeTo/FMI.jl/blob/main/docs/src/assets/FMI_JL_family.png "FMI.jl Family")
+To keep dependencies nice and clean, the old FMI.jl had been split into new packages:
+- **FMI.jl:** High level loading, manipulationg, saving or building entire FMUs from scratch
+- **FMIImport.jl:** Importing FMUs into Julia
+- **FMIExport.jl:** Exporting FMUs from Julia Code
+- **FMICore.jl:** C-code wrapper for the FMI-standard
+- **FMIBuild.jl:** Compiler dependencies for FMIExport.jl, holds dependencies not suitable for exported FMUs
+- **FMIFlux.jl:** Machine Learning with FMUs (differentiation over FMUs)
+
+## What is further under development in FMI.jl?
 - FMI Cross Checks
 - more examples
 - ...

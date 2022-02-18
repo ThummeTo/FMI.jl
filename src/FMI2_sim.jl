@@ -6,10 +6,16 @@
 using DifferentialEquations, DiffEqCallbacks
 import SciMLBase: RightRootFind
 
+using FMIImport: fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2NewDiscreteStates, fmi2GetContinuousStates, fmi2GetNominalsOfContinuousStates, fmi2SetContinuousStates
+using FMIImport.FMICore: fmi2StatusOK, fmi2TypeCoSimulation, fmi2TypeModelExchange
+
+using ChainRulesCore
+import ForwardDiff
+
 ############ Model-Exchange ############
 
 # Read next time event from fmu and provide it to the integrator 
-function time_choice(c::fmi2Component, integrator)
+function time_choice(c::FMU2Component, integrator)
     eventInfo = fmi2NewDiscreteStates(c)
     fmi2EnterContinuousTimeMode(c)
     if Bool(eventInfo.nextEventTimeDefined)
@@ -20,7 +26,7 @@ function time_choice(c::fmi2Component, integrator)
 end
 
 # Handles events and returns the values and nominals of the changed continuous states.
-function handleEvents(c::fmi2Component, enterEventMode::Bool, exitInContinuousMode::Bool)
+function handleEvents(c::FMU2Component, enterEventMode::Bool, exitInContinuousMode::Bool)
 
     if enterEventMode
         fmi2EnterEventMode(c)
@@ -50,7 +56,7 @@ function handleEvents(c::fmi2Component, enterEventMode::Bool, exitInContinuousMo
 end
 
 # Returns the event indicators for an FMU.
-function condition(c::fmi2Component, out, x, t, integrator, inputFunction, inputValues::Array{fmi2ValueReference}) 
+function condition(c::FMU2Component, out, x, t, integrator, inputFunction, inputValues::Array{fmi2ValueReference}) 
 
     if inputFunction !== nothing
         fmi2SetReal(c, inputValues, inputFunction(integrator.t))
@@ -65,7 +71,7 @@ end
 
 # Handles the upcoming events.
 # Sets a new state for the solver from the FMU (if needed).
-function affectFMU!(c::fmi2Component, integrator, idx, inputFunction, inputValues::Array{fmi2ValueReference})
+function affectFMU!(c::FMU2Component, integrator, idx, inputFunction, inputValues::Array{fmi2ValueReference})
 
     # there are fx-evaluations before the event is handled, reset the FMU state to the current integrator step
     fmi2SetContinuousStates(c, integrator.u)
@@ -78,7 +84,9 @@ function affectFMU!(c::fmi2Component, integrator, idx, inputFunction, inputValue
     end
 
     if continuousStatesChanged == fmi2True
-        integrator.u = fmi2GetContinuousStates(c)
+        new_u = fmi2GetContinuousStates(c)
+        @debug "affectFMU!(...): Handled event, new state is $(new_u)"
+        integrator.u = new_u
     end
 
     if nominalsChanged == fmi2True
@@ -87,7 +95,7 @@ function affectFMU!(c::fmi2Component, integrator, idx, inputFunction, inputValue
 end
 
 # Does one step in the simulation.
-function stepCompleted(c::fmi2Component, x, t, integrator, inputFunction, inputValues::Array{fmi2ValueReference})
+function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, inputValues::Array{fmi2ValueReference})
 
     (status, enterEventMode, terminateSimulation) = fmi2CompletedIntegratorStep(c, fmi2True)
     if enterEventMode == fmi2True
@@ -100,14 +108,119 @@ function stepCompleted(c::fmi2Component, x, t, integrator, inputFunction, inputV
 end
 
 # Returns the state derivatives of the FMU.
-function fx(c::fmi2Component, x, p, t)
+function fx(c::FMU2Component, 
+            x::Array{<:Real}, 
+            p::Array, 
+            t::Real)
+
+    if isa(t, ForwardDiff.Dual) 
+        t = ForwardDiff.value(t)
+    end 
+
     fmi2SetTime(c, t) 
     fmi2SetContinuousStates(c, x)
     dx = fmi2GetDerivatives(c)
 end
 
+# ForwardDiff-Dispatch for fx
+function fx(comp::FMU2Component,
+            x::Array{<:ForwardDiff.Dual{Tx, Vx, Nx}},
+            p::Array,
+            t::Real) where {Tx, Vx, Nx}
+
+    _fx_fd((Tx, Vx, Nx), comp, x, p, t)
+end
+
+# ForwardDiff-Dispatch implementation for fx
+function _fx_fd(TVNx, comp, x, p, t) 
+  
+    Tx, Vx, Nx = TVNx
+    
+    ȧrgs = [NoTangent(), NoTangent(), collect(ForwardDiff.partials(e) for e in x), collect(ForwardDiff.partials(e) for e in p), ForwardDiff.partials(t)]
+    args = [fx,          comp,        collect(ForwardDiff.value(e) for e in x),    collect(ForwardDiff.value(e) for e in p),    ForwardDiff.value(t),  ]
+
+    ȧrgs = (ȧrgs...,)
+    args = (args...,)
+     
+    y, _, dx, _, _ = ChainRulesCore.frule(ȧrgs, args...)
+
+    if Vx != Float64
+        Vx = Float64
+    end
+
+    [collect( ForwardDiff.Dual{Tx, Vx, Nx}(y[i], dx[i]) for i in 1:length(dx) )...]
+end
+
+# rrule for fx
+function ChainRulesCore.rrule(::typeof(fx), 
+                              comp::FMU2Component,
+                              x,
+                              p,
+                              t)
+
+    y = fx(comp, x, p, t)
+    function fx_pullback(ȳ)
+
+        if t >= 0.0
+            fmi2SetTime(comp, t)
+        end
+
+        fmi2SetContinuousStates(comp, x)
+
+        jac = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
+        comp.jacobianFct(jac, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
+
+        n_dx_x = @thunk(jac' * ȳ)
+
+        f̄ = NoTangent()
+        c̄omp = ZeroTangent()
+        x̄ = n_dx_x
+        p̄ = ZeroTangent()
+        t̄ = ZeroTangent()
+        
+        return f̄, c̄omp, x̄, p̄, t̄
+    end
+    return y, fx_pullback
+end
+
+# frule for fx
+function ChainRulesCore.frule((Δself, Δcomp, Δx, Δp, Δt), 
+                              ::typeof(fx), 
+                              comp, #::FMU2Component,
+                              x,#::Array{<:Real},
+                              p,
+                              t)
+
+    y = fx(comp, x, p, t)
+    function fx_pullforward(Δx)
+       
+        if t >= 0.0 
+            fmi2SetTime(comp, t)
+        end
+        
+        if all(isa.(x, ForwardDiff.Dual))
+            xf = collect(ForwardDiff.value(e) for e in x)
+            fmi2SetContinuousStates(comp, xf)
+        else
+            fmi2SetContinuousStates(comp, x)
+        end
+       
+        jac = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
+        comp.jacobianFct(jac, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
+        n_dx_x = jac * Δx
+
+        c̄omp = ZeroTangent()
+        x̄ = n_dx_x 
+        p̄ = ZeroTangent()
+        t̄ = ZeroTangent()
+       
+        return (c̄omp, x̄, p̄, t̄)
+    end
+    return (y, fx_pullforward(Δx)...)
+end
+
 # save FMU values 
-function saveValues(c::fmi2Component, recordValues, u, t, integrator)
+function saveValues(c::FMU2Component, recordValues, u, t, integrator)
     fmi2SetTime(c, t) 
     x = integrator.sol(t)
     fmi2SetContinuousStates(c, x)
@@ -128,14 +241,15 @@ Keywords:
     - saveat: Time points to save values at (interpolated)
     - setup: Boolean, if FMU should be setup (default=true)
     - reset: Union{Bool, :auto}, if FMU should be reset before simulation (default reset=:auto)
-    - inputValues: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
+    - inputValueReferences: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
     - inputFunction: Function to retrieve the values to set the inputs to 
+    - parameters: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization 
 
 Returns:
     - If keyword `recordValues` is not set, a struct of type `ODESolution`.
     - If keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues).
 """
-function fmi2SimulateME(c::fmi2Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
+function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
     tolerance::Union{Real, Nothing} = nothing,
     dt::Union{Real, Nothing} = nothing,
     solver = nothing,
@@ -143,28 +257,35 @@ function fmi2SimulateME(c::fmi2Component, t_start::Union{Real, Nothing} = nothin
     recordValues::fmi2ValueReferenceFormat = nothing,
     saveat = [],
     setup::Bool = true,
-    reset::Bool = true, # nothing = auto
-    inputValues::fmi2ValueReferenceFormat = nothing,
+    reset::Union{Bool, Nothing} = nothing, # nothing = auto
+    inputValueReferences::fmi2ValueReferenceFormat = nothing,
     inputFunction = nothing,
+    parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
+    dtmax::Union{Real, Nothing} = nothing,
     kwargs...)
 
     recordValues = prepareValueReference(c, recordValues)
-    inputValues = prepareValueReference(c, inputValues)
+    inputValueReferences = prepareValueReference(c, inputValueReferences)
     solution = nothing
     callbacks = []
     savedValues = nothing
 
     savingValues = (length(recordValues) > 0)
-    hasInputs = (length(inputValues) > 0)
+    hasInputs = (length(inputValueReferences) > 0)
+    hasParameters = (parameters != nothing)
 
     t_start = t_start === nothing ? fmi2GetDefaultStartTime(c.fmu.modelDescription) : t_start
     t_start = t_start === nothing ? 0.0 : t_start
     t_stop = t_stop === nothing ? fmi2GetDefaultStopTime(c.fmu.modelDescription) : t_stop
     t_stop = t_stop === nothing ? 1.0 : t_stop
     tolerance = tolerance === nothing ? fmi2GetDefaultTolerance(c.fmu.modelDescription) : tolerance
-    tolerance = tolerance === nothing ? 1e-6 : tolerance
+    tolerance = tolerance === nothing ? 1e-4 : tolerance
     dt = dt === nothing ? fmi2GetDefaultStepSize(c.fmu.modelDescription) : dt
-    dt = dt === nothing ? 1e-3 : dt 
+    dt = dt === nothing ? 1e-5 : dt 
+
+    if dtmax == nothing
+        dtmax = (t_stop-t_start)/100.0
+    end
 
     if savingValues
         savedValues = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...})
@@ -179,28 +300,36 @@ function fmi2SimulateME(c::fmi2Component, t_start::Union{Real, Nothing} = nothin
         solver = Tsit5()
     end
 
+    if reset == nothing 
+        reset = setup 
+    end
+
     @assert !(setup==false && reset==true) "fmi2SimulateME(...): keyword argument `setup=false`, but `reset=true`. This may cause a FMU crash."
 
     if reset 
-        if c.state == fmi2ModelInitialized
+        if c.state == fmi2ComponentStateModelInitialized
             retcode = fmi2Terminate(c)
-            @assert retcode == Integer(fmi2OK) "fmi2SimulateME(...): Termination failed with return code $(retcode)."
+            @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Termination failed with return code $(retcode)."
         end
-        if c.state == fmi2ModelSetableFMUstate
+        if c.state == fmi2ComponentStateModelSetableFMUstate
             retcode = fmi2Reset(c)
-            @assert retcode == Integer(fmi2OK) "fmi2SimulateME(...): Reset failed with return code $(retcode)."
+            @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Reset failed with return code $(retcode)."
         end
     end 
 
     if setup
         retcode = fmi2SetupExperiment(c, t_start, t_stop)
-        @assert retcode == Integer(fmi2OK) "fmi2SimulateME(...): Setting up experiment failed with return code $(retcode)."
+        @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Setting up experiment failed with return code $(retcode)."
 
         retcode = fmi2EnterInitializationMode(c)
-        @assert retcode == Integer(fmi2OK) "fmi2SimulateME(...): Entering initialization mode failed with return code $(retcode)."
+        @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Entering initialization mode failed with return code $(retcode)."
+
+        if hasParameters
+            fmi2Set(c, collect(keys(parameters)), collect(values(parameters)) )
+        end
 
         retcode = fmi2ExitInitializationMode(c)
-        @assert retcode == Integer(fmi2OK) "fmi2SimulateME(...): Exiting initialization mode failed with return code $(retcode)."
+        @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Exiting initialization mode failed with return code $(retcode)."
     end
 
     eventHandling = c.fmu.modelDescription.numberOfEventIndicators > 0
@@ -236,7 +365,7 @@ function fmi2SimulateME(c::fmi2Component, t_start::Union{Real, Nothing} = nothin
     
     # use step callback always if we have inputs or need evenet handling
     if hasInputs || eventHandling
-        stepCb = FunctionCallingCallback((x, t, integrator) -> stepCompleted(c, x, t, integrator, inputFunction, inputValues);
+        stepCb = FunctionCallingCallback((x, t, integrator) -> stepCompleted(c, x, t, integrator, inputFunction, inputValueReferences);
                                             func_everystep = true,
                                             func_start = true)
         push!(callbacks, stepCb)
@@ -244,8 +373,8 @@ function fmi2SimulateME(c::fmi2Component, t_start::Union{Real, Nothing} = nothin
 
     if eventHandling
 
-        eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator, inputFunction, inputValues),
-                                           (integrator, idx) -> affectFMU!(c, integrator, idx, inputFunction, inputValues),
+        eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator, inputFunction, inputValueReferences),
+                                           (integrator, idx) -> affectFMU!(c, integrator, idx, inputFunction, inputValueReferences),
                                            Int64(c.fmu.modelDescription.numberOfEventIndicators);
                                            rootfind = RightRootFind,
                                            save_positions=(false,false))
@@ -253,14 +382,14 @@ function fmi2SimulateME(c::fmi2Component, t_start::Union{Real, Nothing} = nothin
 
         if timeEventHandling
             timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator),
-                                            (integrator) -> affectFMU!(c, integrator, 0, inputFunction, inputValues), Float64; 
+                                            (integrator) -> affectFMU!(c, integrator, 0, inputFunction, inputValueReferences), Float64; 
                                             initial_affect = true, # ToDo: or better 'false'?
                                             save_positions=(false,false))
             push!(callbacks, timeEventCb)
         end
     end
 
-    solution = solve(problem, solver; callback = CallbackSet(callbacks...), saveat = saveat, tol=tolerance, dt=dt, kwargs...)
+    solution = solve(problem, solver; callback = CallbackSet(callbacks...), saveat = saveat, tol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
 
     if savingValues
         return solution, savedValues
@@ -281,26 +410,30 @@ Keywords:
     - saveat: Time points to save values at (interpolated)
     - setup: Boolean, if FMU should be setup (default=true)
     - reset: Boolean, if FMU should be reset before simulation (default reset=setup)
-    - inputValues: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
+    - inputValueReferences: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
     - inputFunction: Function to retrieve the values to set the inputs to 
+    - parameters: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization 
 
 Returns:
     - If keyword `recordValues` is not set, a boolean `success` is returned (simulation success).
     - If keyword `recordValues` is set, a tuple of type (true, DiffEqCallbacks.SavedValues) or (false, nothing).
 """
-function fmi2SimulateCS(c::fmi2Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
+function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
                         tolerance::Union{Real, Nothing} = nothing,
                         dt::Union{Real, Nothing} = nothing,
                         recordValues::fmi2ValueReferenceFormat = nothing,
                         saveat = [],
                         setup::Bool = true,
                         reset = nothing,
-                        inputValues::fmi2ValueReferenceFormat = nothing,
-                        inputFunction = nothing)
+                        inputValueReferences::fmi2ValueReferenceFormat = nothing,
+                        inputFunction = nothing,
+                        parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing)
 
     recordValues = prepareValueReference(c, recordValues)
-    inputValues = prepareValueReference(c, inputValues)
-    variableSteps = c.fmu.modelDescription.CScanHandleVariableCommunicationStepSize 
+    inputValueReferences = prepareValueReference(c, inputValueReferences)
+    
+    variableSteps = c.fmu.modelDescription.coSimulation.canHandleVariableCommunicationStepSize 
+    hasParameters = (parameters != nothing)
 
     t_start = t_start === nothing ? fmi2GetDefaultStartTime(c.fmu.modelDescription) : t_start
     t_start = t_start === nothing ? 0.0 : t_start
@@ -333,10 +466,10 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Union{Real, Nothing} = nothin
     @assert !(setup==false && reset==true) "fmi2SimulateME(...): keyword argument `setup=false`, but `reset=true`. This may cause a FMU crash."
 
     if reset 
-        if c.state == fmi2ModelInitialized
+        if c.state == fmi2ComponentStateModelInitialized
             fmi2Terminate(c)
         end
-        if c.state == fmi2ModelSetableFMUstate
+        if c.state == fmi2ComponentStateModelSetableFMUstate
             fmi2Reset(c)
         end
     end 
@@ -344,6 +477,11 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Union{Real, Nothing} = nothin
     if setup
         fmi2SetupExperiment(c, t_start, t_stop; tolerance=tolerance)
         fmi2EnterInitializationMode(c)
+
+        if hasParameters
+            fmi2Set(c, collect(keys(parameters)), collect(values(parameters)) )
+        end
+
         fmi2ExitInitializationMode(c)
     end
 
@@ -356,9 +494,9 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Union{Real, Nothing} = nothin
 
         i = 1
 
-        values = (fmi2GetReal(c, recordValues)...,)
+        svalues = (fmi2GetReal(c, recordValues)...,)
         DiffEqCallbacks.copyat_or_push!(savedValues.t, i, t)
-        DiffEqCallbacks.copyat_or_push!(savedValues.saveval, i, values, Val{false})
+        DiffEqCallbacks.copyat_or_push!(savedValues.saveval, i, svalues, Val{false})
 
         while t < t_stop
             if variableSteps
@@ -370,16 +508,16 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Union{Real, Nothing} = nothin
             end
 
             if inputFunction != nothing
-                fmi2SetReal(c, inputValues, inputFunction(t))
+                fmi2SetReal(c, inputValueReferences, inputFunction(t))
             end
 
-            fmi2DoStep(c, t, dt)
+            fmi2DoStep(c, dt; currentCommunicationPoint=t)
             t = t + dt 
             i += 1
 
-            values = (fmi2GetReal(c, recordValues)...,)
+            svalues = (fmi2GetReal(c, recordValues)...,)
             DiffEqCallbacks.copyat_or_push!(savedValues.t, i, t)
-            DiffEqCallbacks.copyat_or_push!(savedValues.saveval, i, values, Val{false})
+            DiffEqCallbacks.copyat_or_push!(savedValues.saveval, i, svalues, Val{false})
         end
 
         success = true
@@ -397,10 +535,10 @@ function fmi2SimulateCS(c::fmi2Component, t_start::Union{Real, Nothing} = nothin
             end
 
             if inputFunction != nothing
-                fmi2SetReal(c, inputValues, inputFunction(t))
+                fmi2SetReal(c, inputValueReferences, inputFunction(t))
             end
 
-            fmi2DoStep(c, t, dt)
+            fmi2DoStep(c, dt; currentCommunicationPoint=t)
             t = t + dt 
             i += 1
         end
@@ -432,11 +570,11 @@ Returns:
     - if keyword `recordValues` is set, a tuple of type (success::Bool, DiffEqCallbacks.SavedValues) for CS-FMUs
     - if keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues) for ME-FMUs
 """
-function fmi2Simulate(c::fmi2Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
+function fmi2Simulate(c::FMU2Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
 
-    if c.fmu.type == fmi2CoSimulation
+    if c.fmu.type == fmi2TypeCoSimulation
         return fmi2SimulateCS(c, t_start, t_stop; kwargs...)
-    elseif c.fmu.type == fmi2ModelExchange
+    elseif c.fmu.type == fmi2TypeModelExchange
         return fmi2SimulateME(c, t_start, t_stop; kwargs...)
     else
         error(unknownFMUType)

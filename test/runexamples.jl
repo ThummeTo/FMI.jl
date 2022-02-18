@@ -4,14 +4,15 @@
 #
 
 using Test
+using Plots
 
-examples = ["ME_simulate", "CS_simulate", "multiple_instances", "parameterize", "modelica_conference_2021"]
+examples = ["ME_simulate", "CS_simulate", "multiple_instances", "parameterize", "modelica_conference_2021", "manipulation"]
 
 @testset "FMI.jl Examples" begin
     for example in examples
         @testset "$(example).jl" begin
             path = joinpath(dirname(@__FILE__), "..", "example", example * ".jl")
-            @test include(path) == nothing
+            include(path)
         end
     end
 end

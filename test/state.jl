@@ -33,7 +33,7 @@ end
 # Testing state functions #
 ###########################
 
-if fmi2CanGetSetState(myFMU) && fmi2CanSerializeFMUstate(myFMU)
+if fmiCanGetSetState(myFMU) && fmiCanSerializeFMUstate(myFMU)
     @test fmiGetReal(fmuStruct, "mass.s") == 0.5
     FMUstate = fmiGetFMUstate(fmuStruct)
     @test typeof(FMUstate) == FMI.fmi2FMUstate
@@ -53,8 +53,8 @@ if fmi2CanGetSetState(myFMU) && fmi2CanSerializeFMUstate(myFMU)
     @test fmiGetReal(fmuStruct, "mass.s") == 0.5
     fmiSetFMUstate(fmuStruct, FMUstate)
     @test fmiGetReal(fmuStruct, "mass.s") == 10.0
-    fmiFreeFMUstate(fmuStruct, FMUstate)
-    fmiFreeFMUstate(fmuStruct, FMUstate2)
+    fmiFreeFMUstate!(fmuStruct, FMUstate)
+    fmiFreeFMUstate!(fmuStruct, FMUstate2)
 else
     @info "The FMU provided from the tool `$(ENV["EXPORTINGTOOL"])` does not support state get, set, serialization and deserialization. Skipping related tests."
 end

@@ -66,6 +66,13 @@ cacheString = ""
 
 # this is not supported by OMEdit-FMUs in the repository
 if ENV["EXPORTINGTOOL"] != "OpenModelica/v1.17.0"
+    fmiSet(fmuStruct, 
+           [realValueReferences[1], integerValueReferences[1], booleanValueReferences[1], stringValueReferences[1]], 
+           [rndReal,                rndInteger,                rndBoolean,                rndString])
+    @test fmiGet(fmuStruct, 
+                 [realValueReferences[1], integerValueReferences[1], booleanValueReferences[1], stringValueReferences[1]]) == 
+                 [rndReal,                rndInteger,                rndBoolean,                rndString]
+
     @test fmiGetStartValue(fmuStruct, "p_enumeration") == "myEnumeration1"
     @test fmiGetStartValue(fmuStruct, "p_string") == "Hello World!"
     @test fmiGetStartValue(fmuStruct, "p_real") == 0.0
@@ -84,7 +91,7 @@ rndString = [tmp, tmp]
 cacheReal = [0.0, 0.0]
 cacheInteger =  [FMI.fmi2Integer(0), FMI.fmi2Integer(0)]
 cacheBoolean = [FMI.fmi2Boolean(false), FMI.fmi2Boolean(false)]
-cacheString = [FMI.fmi2String(""), FMI.fmi2String("")]
+cacheString = [pointer(""), pointer("")]
 
 @test fmiSetReal(fmuStruct, realValueReferences, rndReal) == 0
 @test fmiGetReal(fmuStruct, realValueReferences) == rndReal
@@ -117,7 +124,7 @@ fmiGetBoolean!(fmuStruct, booleanValueReferences, cacheBoolean)
 @test fmiSetString(fmuStruct, stringValueReferences, rndString) == 0
 @test fmiGetString(fmuStruct, stringValueReferences) == rndString
 fmiGetString!(fmuStruct, stringValueReferences, cacheString)
-@test cacheString == rndString
+@test unsafe_string.(cacheString) == rndString
 
 # this is not suppoerted by OMEdit-FMUs in the repository
 if ENV["EXPORTINGTOOL"] != "OpenModelica/v1.17.0"
@@ -129,13 +136,13 @@ if ENV["EXPORTINGTOOL"] != "OpenModelica/v1.17.0"
     @test fmiSetRealInputDerivatives(fmuStruct, ["u_real"], ones(Int, 1), zeros(1)) == 0
 
     @test fmiExitInitializationMode(fmuStruct) == 0
-    @test fmiDoStep(fmuStruct, 0.1) == 0.1
+    @test fmiDoStep(fmuStruct, 0.1) == 0
 
     dirs = fmiGetRealOutputDerivatives(fmuStruct, ["y_real"], ones(Int, 1))
     @test dirs == 0.0
 else 
     @test fmiExitInitializationMode(fmuStruct) == 0
-    @test fmiDoStep(fmuStruct, 0.1) == 0.1
+    @test fmiDoStep(fmuStruct, 0.1) == 0
 end
 
 ############
