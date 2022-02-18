@@ -18,7 +18,7 @@ SciMLBase = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
 [compat]
 DiffEqCallbacks = "^2.16.1"
 DifferentialEquations = "^6.16, 7"
-FMIExport = "0.1.1"
+FMIExport = "0.1.0"
 FMIImport = "0.6.0"
 OrdinaryDiffEq = "^5.53.1, 6"
 SciMLBase = "^1.23.1"
