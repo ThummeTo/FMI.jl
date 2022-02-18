@@ -26,10 +26,31 @@ jobs:
           version: ${{ matrix.julia-version }}
           arch: ${{ matrix.julia-arch }}
 
+      - uses: actions/cache@v1
+        env:
+          cache-name: cache-artifacts
+        with:
+          path: ~/.julia/artifacts
+          key: ${{ runner.os }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-test-${{ env.cache-name }}-
+            ${{ runner.os }}-test-
+            ${{ runner.os }}-
+
       # Build FMI.jl package
       - name: "Build package"
         uses: julia-actions/julia-buildpkg@latest
 
       # Run the tests
       - name: "Run tests"
-        uses: julia-actions/julia-runtest@latest
+        uses: julia-actions/julia-runtest@v1
+
+      # Preprocess Coverage
+      - name: "Preprocess Coverage"
+        uses: julia-actions/julia-processcoverage@v1
+
+      # Run codecov
+      - name: "Run CodeCov"
+        uses: codecov/codecov-action@v1
+        with:
+          file: lcov.info

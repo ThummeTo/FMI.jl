@@ -8,9 +8,13 @@ FMI.jl is a free-to-use software library for the Julia programming language whic
 
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) [![](https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg)]() 
 <!--- [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://ThummeTo.github.io/FMI.jl/stable) --->
+[![Dev Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) 
+[![CI Testing](https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions)
+[![Coverage](https://codecov.io/gh/ThummeTo/FMI.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ThummeTo/FMI.jl)
+
 
 ## How can I use FMI.jl?
-1. open a Julia-Command-Window, activate your prefered environment
+1. open a Julia-Command-Window, activate your preferred environment
 1. goto package manager using ```]```
 1. type ```add FMI``` or ```add "https://github.com/ThummeTo/FMI.jl"```
 1. have a look inside the ```example``` folder
