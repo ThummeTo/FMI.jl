@@ -3,7 +3,6 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-using Plots
 using OrdinaryDiffEq: ODESolution
 
 """

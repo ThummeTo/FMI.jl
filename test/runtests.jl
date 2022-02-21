@@ -41,6 +41,10 @@ function runtests(exportingTool)
                 end
             end
         end
+
+        @testset "Plotting" begin
+            include("plots.jl")
+        end
     end
 end
 

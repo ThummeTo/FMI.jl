@@ -3,7 +3,6 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-using Plots
 using OrdinaryDiffEq: ODESolution
 
 """
@@ -14,7 +13,7 @@ Optional keyword argument `maxLabelLength` controls the maximum length for legen
 """
 function fmiPlot(fmu::FMU2, solution::ODESolution; kwargs...)
     fig = Plots.plot(; xlabel="t [s]")
-    fmiPlot!(fmu, solution; kwargs...)
+    fmiPlot!(fig, fmu, solution; kwargs...)
     return fig
 end
 function fmiPlot!(fig, fmu::FMU2, solution::ODESolution; stateIndicies=1:length(fmu.modelDescription.stateValueReferences), maxLabelLength=64, plotkwargs...)
@@ -41,13 +40,6 @@ function fmiPlot!(fig, fmu::FMU2, solution::ODESolution; stateIndicies=1:length(
         end 
     end
     return fig
-end
-
-"""
-Extended the original plot-command by plotting FMUs.
-"""
-function Plots.plot(fmu::FMU2, solution::ODESolution)
-    fmiPlot(fmu, solution)
 end
 
 """
