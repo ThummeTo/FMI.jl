@@ -1,7 +1,7 @@
 name = "FMI"
 uuid = "14a09403-18e3-468f-ad8a-74f8dda2d9ac"
 authors = ["TT <tobias.thummerer@informatik.uni-augsburg.de>", "LM <lars.mikelsons@informatik.uni-augsburg.de>", "JK <josef.kircher@student.uni-augsburg.de>"]
-version = "0.5.1"
+version = "0.5.2"
 
 [deps]
 ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
@@ -19,7 +19,7 @@ ChainRulesCore = "1.12.0"
 DiffEqCallbacks = "^2.16.1"
 DifferentialEquations = "^6.16, 7"
 FMIExport = "0.1.0"
-FMIImport = "0.6.0"
+FMIImport = "^0.6.2"
 ForwardDiff = "0.10.25"
 OrdinaryDiffEq = "^5.53.1, 6"
 SciMLBase = "^1.23.1"

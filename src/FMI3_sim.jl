@@ -5,12 +5,12 @@
 
 using DifferentialEquations, DiffEqCallbacks
 
-using FMIImport: fmi3Component
+using FMIImport: fmi3Instance
 
 ############ Model-Exchange ############
 
 # Read next time event from FMU and provide it to the integrator 
-function time_choice(c::fmi3Component, integrator) 
+function time_choice(c::fmi3Instance, integrator) 
     @debug "time_choice(_, _): Time event @ t=$(integrator.t)"
 
     discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime = fmi3UpdateDiscreteStates(c)
@@ -24,7 +24,7 @@ function time_choice(c::fmi3Component, integrator)
 end
 
 # Handles events and returns the values and nominals of the changed continuous states.
-function handleEvents(c::fmi3Component, enterEventMode::Bool, exitInContinuousMode::Bool)
+function handleEvents(c::fmi3Instance, enterEventMode::Bool, exitInContinuousMode::Bool)
     nominalsChanged = fmi3False
     valuesChanged = fmi3False
     if enterEventMode
@@ -62,7 +62,7 @@ function handleEvents(c::fmi3Component, enterEventMode::Bool, exitInContinuousMo
 end
 
 # Returns the event indicators for an FMU.
-function condition(c::fmi3Component, out, x, t, integrator, inputFunction, inputValues::Array{fmi3ValueReference}) # Event when event_f(u,t) == 0
+function condition(c::fmi3Instance, out, x, t, integrator, inputFunction, inputValues::Array{fmi3ValueReference}) # Event when event_f(u,t) == 0
     if inputFunction !== nothing
         fmi3SetFloat64(c, inputValues, inputFunction(integrator.t))
     end
@@ -89,7 +89,7 @@ function condition(c::fmi3Component, out, x, t, integrator, inputFunction, input
 end
 
 # Handles the upcoming events.
-function affectFMU!(c::fmi3Component, integrator, idx, inputFunction, inputValues::Array{fmi3ValueReference}, force=false)
+function affectFMU!(c::fmi3Instance, integrator, idx, inputFunction, inputValues::Array{fmi3ValueReference}, force=false)
     # Event found - handle it
 
     @debug "affectFMU!(_, _, $(idx), _, _): x:$(integrator.u)   [before handle events]"
@@ -116,7 +116,7 @@ function affectFMU!(c::fmi3Component, integrator, idx, inputFunction, inputValue
 end
 
 # Does one step in the simulation.
-function stepCompleted(c::fmi3Component, x, t, integrator, inputFunction, inputValues::Array{fmi3ValueReference})
+function stepCompleted(c::fmi3Instance, x, t, integrator, inputFunction, inputValues::Array{fmi3ValueReference})
 
     fmi3SetContinuousStates(c, x)
     
@@ -144,7 +144,7 @@ function stepCompleted(c::fmi3Component, x, t, integrator, inputFunction, inputV
 end
 
 # Returns the state derivatives of the FMU.
-function fx(c::fmi3Component, x, p, t)
+function fx(c::fmi3Instance, x, p, t)
     @debug "fx($(x), _, $(t))"
     fmi3SetTime(c, t) 
     fmi3SetContinuousStates(c, x)
@@ -152,7 +152,7 @@ function fx(c::fmi3Component, x, p, t)
 end
 
 # save FMU values 
-function saveValues(c::fmi3Component, recordValues, u, t, integrator)
+function saveValues(c::fmi3Instance, recordValues, u, t, integrator)
     fmi3SetTime(c, t) 
     x = integrator.sol(t)
     fmi3SetContinuousStates(c, x)
@@ -169,7 +169,7 @@ State- and Time-Events are handled correctly.
 Returns a tuple of type (ODESolution, DiffEqCallbacks.SavedValues).
 If keyword `recordValues` is not set, a tuple of type (ODESolution, nothing) is returned for consitency.
 """
-function fmi3SimulateME(c::fmi3Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
+function fmi3SimulateME(c::fmi3Instance, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
     solver = nothing,
     customFx = nothing,
     recordValues::fmi3ValueReferenceFormat = nothing,
@@ -305,7 +305,7 @@ If keyword `recordValues` is not set, a tuple of type (success::Bool, nothing) i
 
 ToDo: Improve Documentation.
 """
-function fmi3SimulateCS(c::fmi3Component, t_start::Real, t_stop::Real;
+function fmi3SimulateCS(c::fmi3Instance, t_start::Real, t_stop::Real;
                         recordValues::fmi3ValueReferenceFormat = nothing,
                         saveat = [],
                         setup::Bool = true,
@@ -437,7 +437,7 @@ function fmi3SimulateCS(c::fmi3Component, t_start::Real, t_stop::Real;
 end
 
 # TODO simulate ScheduledExecution
-function fmi3SimulateSE(c::fmi3Component, t_start::Real, t_stop::Real;
+function fmi3SimulateSE(c::fmi3Instance, t_start::Real, t_stop::Real;
     recordValues::fmi3ValueReferenceFormat = nothing,
     saveat = [],
     setup::Bool = true,
@@ -457,7 +457,7 @@ Returns:
     
 ToDo: Improve Documentation.
 """
-function fmi3Simulate(c::fmi3Component, t_start::Real = 0.0, t_stop::Real = 1.0;kwargs...)
+function fmi3Simulate(c::fmi3Instance, t_start::Real = 0.0, t_stop::Real = 1.0;kwargs...)
 
     if fmi3IsCoSimulation(c.fmu)
         return fmi3SimulateCS(c, t_start, t_stop; kwargs...)
