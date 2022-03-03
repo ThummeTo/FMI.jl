@@ -106,79 +106,69 @@ function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, inputV
     end
 end
 
-# Returns the state derivatives of the FMU.
 function fx(c::FMU2Component, 
-            dx::Array{<:Real}, 
-            x::Array{<:Real}, 
-            p::Array, 
-            t::Real)
+    dx::Array{<:Real},
+    x::Array{<:Real}, 
+    p::Array, 
+    t::Real)
 
     if isa(t, ForwardDiff.Dual) 
         t = ForwardDiff.value(t)
     end 
 
-    if all(isa.(dx, ForwardDiff.Dual))
-        dx = collect(ForwardDiff.value(e) for e in dx)
-    end
-
     fmi2SetTime(c, t) 
     fmi2SetContinuousStates(c, x)
 
     fmi2GetDerivatives!(c, dx)
-
     nothing
+end
+
+function fx(c::FMU2Component, 
+    x::Array{<:Real}, 
+    p::Array, 
+    t::Real)
+
+    dx = zeros(length(x))
+    fx(c, dx, x, p, t)
+    dx
 end
 
 # ForwardDiff-Dispatch for fx
 function fx(comp::FMU2Component,
-            dx::Array{<:Real}, 
             x::Array{<:ForwardDiff.Dual{Tx, Vx, Nx}},
             p::Array,
             t::Real) where {Tx, Vx, Nx}
 
-    _fx_fd((Tx, Vx, Nx), comp, dx, x, p, t)
-
-    nothing
+    return _fx_fd((Tx, Vx, Nx), comp, x, p, t)
 end
 
-# ForwardDiff-Dispatch implementation for fx
-function _fx_fd(TVNx, comp, dx, x, p, t) 
+function _fx_fd(TVNx, comp, x, p, t) 
   
     Tx, Vx, Nx = TVNx
     
-    ȧrgs = [NoTangent(), NoTangent(), collect(ForwardDiff.partials(e) for e in dx), collect(ForwardDiff.partials(e) for e in x), collect(ForwardDiff.partials(e) for e in p), ForwardDiff.partials(t)]
-    args = [fx,          comp,        collect(ForwardDiff.value(e) for e in dx),    collect(ForwardDiff.value(e) for e in x),    collect(ForwardDiff.value(e) for e in p),    ForwardDiff.value(t),  ]
+    ȧrgs = [NoTangent(), NoTangent(), collect(ForwardDiff.partials(e) for e in x), collect(ForwardDiff.partials(e) for e in p), ForwardDiff.partials(t)]
+    args = [fx,          comp,        collect(ForwardDiff.value(e) for e in x),    collect(ForwardDiff.value(e) for e in p),    ForwardDiff.value(t),  ]
 
     ȧrgs = (ȧrgs...,)
     args = (args...,)
      
-    _, sdx, sx, _, _ = ChainRulesCore.frule(ȧrgs, args...)
+    y, _, sx, _, _ = ChainRulesCore.frule(ȧrgs, args...)
 
     if Vx != Float64
         Vx = Float64
     end
 
-    #@info "$Tx   $Vx   $Nx"
-    #@info "$sdx"
-    #@info "$sx"
-    #@info "$x"
-
-    for i in 1:length(x)
-        x[i] = ForwardDiff.Dual{Tx, Vx, Nx}(ForwardDiff.value(x[i]), sx[i]) 
-    end
-
-    nothing
+    [collect( ForwardDiff.Dual{Tx, Vx, Nx}(y[i], sx[i]) for i in 1:length(sx) )...]
 end
 
 # rrule for fx
 function ChainRulesCore.rrule(::typeof(fx), 
                               comp::FMU2Component,
-                              dx,
                               x,
                               p,
                               t)
 
-    fx(comp, dx, x, p, t)
+    y = fx(comp, x, p, t)
     function fx_pullback(ȳ)
 
         if t >= 0.0
@@ -190,33 +180,30 @@ function ChainRulesCore.rrule(::typeof(fx),
         if comp.A == nothing || size(comp.A) != (length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
             comp.A = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
         end 
-
         comp.jacobianFct(comp.A, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
 
         n_dx_x = @thunk(comp.A' * ȳ)
 
         f̄ = NoTangent()
         c̄omp = ZeroTangent()
-        d̄x = ZeroTangent()
         x̄ = n_dx_x
         p̄ = ZeroTangent()
         t̄ = ZeroTangent()
         
-        return f̄, c̄omp, d̄x, x̄, p̄, t̄
+        return f̄, c̄omp, x̄, p̄, t̄
     end
-    return fx_pullback
+    return (y, fx_pullback)
 end
 
 # frule for fx
-function ChainRulesCore.frule((Δself, Δcomp, Δdx, Δx, Δp, Δt), 
+function ChainRulesCore.frule((Δself, Δcomp, Δx, Δp, Δt), 
                               ::typeof(fx), 
                               comp, #::FMU2Component,
-                              dx, 
                               x,#::Array{<:Real},
                               p,
                               t)
 
-    fx(comp, dx, x, p, t)
+    y = fx(comp, x, p, t)
     function fx_pullforward(Δx)
        
         if t >= 0.0 
@@ -233,19 +220,18 @@ function ChainRulesCore.frule((Δself, Δcomp, Δdx, Δx, Δp, Δt),
         if comp.A == nothing || size(comp.A) != (length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
             comp.A = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
         end 
-
         comp.jacobianFct(comp.A, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
+
         n_dx_x = comp.A * Δx
 
         c̄omp = ZeroTangent()
-        d̄x = Δdx
         x̄ = n_dx_x 
         p̄ = ZeroTangent()
         t̄ = ZeroTangent()
        
-        return (c̄omp, d̄x, x̄, p̄, t̄)
+        return (c̄omp, x̄, p̄, t̄)
     end
-    return (fx_pullforward(Δx)...,)
+    return (y, fx_pullforward(Δx)...)
 end
 
 # save FMU values 
@@ -291,6 +277,7 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     inputFunction = nothing,
     parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
     dtmax::Union{Real, Nothing} = nothing,
+    autodiff=false,
     kwargs...)
 
     recordValues = prepareValueReference(c, recordValues)
@@ -370,7 +357,11 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     end
 
     if customFx == nothing
-        customFx = (dx, x, p, t) -> fx(c, dx, x, p, t)
+        if autodiff
+            customFx = (x, p, t) -> fx(c, x, p, t)
+        else 
+            customFx = (dx, x, p, t) -> fx(c, dx, x, p, t)
+        end
     end
     
     # First evaluation of the FMU

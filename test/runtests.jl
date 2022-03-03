@@ -15,6 +15,11 @@ function runtests(exportingTool)
     ENV["EXPORTINGTOOL"] = exportingTool
 
     @testset "Testing FMUs exported from $exportingTool" begin
+
+        @testset "Sensitivities" begin
+            include("sens.jl")
+        end
+
         for str in fmuStructs
             @testset "Functions for $str" begin
                 ENV["FMUSTRUCT"] = str
