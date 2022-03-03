@@ -119,40 +119,45 @@ function fx(c::FMU2Component,
     fmi2SetTime(c, t) 
     fmi2SetContinuousStates(c, x)
 
+    if all(isa.(dx, ForwardDiff.Dual))
+        dx = collect(ForwardDiff.value(e) for e in dx)
+    end
+
     fmi2GetDerivatives!(c, dx)
-    nothing
+    return dx
 end
 
-function fx(c::FMU2Component, 
-    x::Array{<:Real}, 
-    p::Array, 
-    t::Real)
+# function fx(c::FMU2Component, 
+#     x::Array{<:Real}, 
+#     p::Array, 
+#     t::Real)
 
-    dx = zeros(length(x))
-    fx(c, dx, x, p, t)
-    dx
-end
+#     dx = zeros(length(x))
+#     fx(c, dx, x, p, t)
+#     dx
+# end
 
 # ForwardDiff-Dispatch for fx
 function fx(comp::FMU2Component,
+            dx::Array{<:Real},
             x::Array{<:ForwardDiff.Dual{Tx, Vx, Nx}},
             p::Array,
             t::Real) where {Tx, Vx, Nx}
 
-    return _fx_fd((Tx, Vx, Nx), comp, x, p, t)
+    return _fx_fd((Tx, Vx, Nx), comp, dx, x, p, t)
 end
 
-function _fx_fd(TVNx, comp, x, p, t) 
+function _fx_fd(TVNx, comp, dx, x, p, t) 
   
     Tx, Vx, Nx = TVNx
     
-    ȧrgs = [NoTangent(), NoTangent(), collect(ForwardDiff.partials(e) for e in x), collect(ForwardDiff.partials(e) for e in p), ForwardDiff.partials(t)]
-    args = [fx,          comp,        collect(ForwardDiff.value(e) for e in x),    collect(ForwardDiff.value(e) for e in p),    ForwardDiff.value(t),  ]
+    ȧrgs = [NoTangent(), NoTangent(), collect(ForwardDiff.partials(e) for e in dx), collect(ForwardDiff.partials(e) for e in x), collect(ForwardDiff.partials(e) for e in p), ForwardDiff.partials(t)]
+    args = [fx,          comp,        collect(ForwardDiff.value(e) for e in dx), collect(ForwardDiff.value(e) for e in x),    collect(ForwardDiff.value(e) for e in p),    ForwardDiff.value(t),  ]
 
     ȧrgs = (ȧrgs...,)
     args = (args...,)
      
-    y, _, sx, _, _ = ChainRulesCore.frule(ȧrgs, args...)
+    y, _, sdx, sx, _, _ = ChainRulesCore.frule(ȧrgs, args...)
 
     if Vx != Float64
         Vx = Float64
@@ -164,11 +169,12 @@ end
 # rrule for fx
 function ChainRulesCore.rrule(::typeof(fx), 
                               comp::FMU2Component,
+                              dx, 
                               x,
                               p,
                               t)
 
-    y = fx(comp, x, p, t)
+    y = fx(comp, dx, x, p, t)
     function fx_pullback(ȳ)
 
         if t >= 0.0
@@ -186,24 +192,26 @@ function ChainRulesCore.rrule(::typeof(fx),
 
         f̄ = NoTangent()
         c̄omp = ZeroTangent()
+        d̄x = ZeroTangent()
         x̄ = n_dx_x
         p̄ = ZeroTangent()
         t̄ = ZeroTangent()
         
-        return f̄, c̄omp, x̄, p̄, t̄
+        return f̄, c̄omp, d̄x, x̄, p̄, t̄
     end
     return (y, fx_pullback)
 end
 
 # frule for fx
-function ChainRulesCore.frule((Δself, Δcomp, Δx, Δp, Δt), 
+function ChainRulesCore.frule((Δself, Δcomp, Δdx, Δx, Δp, Δt), 
                               ::typeof(fx), 
                               comp, #::FMU2Component,
+                              dx, 
                               x,#::Array{<:Real},
                               p,
                               t)
 
-    y = fx(comp, x, p, t)
+    y = fx(comp, dx, x, p, t)
     function fx_pullforward(Δx)
        
         if t >= 0.0 
@@ -225,11 +233,12 @@ function ChainRulesCore.frule((Δself, Δcomp, Δx, Δp, Δt),
         n_dx_x = comp.A * Δx
 
         c̄omp = ZeroTangent()
+        d̄x = ZeroTangent()
         x̄ = n_dx_x 
         p̄ = ZeroTangent()
         t̄ = ZeroTangent()
        
-        return (c̄omp, x̄, p̄, t̄)
+        return (c̄omp, d̄x, x̄, p̄, t̄)
     end
     return (y, fx_pullforward(Δx)...)
 end
@@ -277,7 +286,6 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     inputFunction = nothing,
     parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
     dtmax::Union{Real, Nothing} = nothing,
-    autodiff=false,
     kwargs...)
 
     recordValues = prepareValueReference(c, recordValues)
@@ -357,11 +365,7 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     end
 
     if customFx == nothing
-        if autodiff
-            customFx = (x, p, t) -> fx(c, x, p, t)
-        else 
-            customFx = (dx, x, p, t) -> fx(c, dx, x, p, t)
-        end
+        customFx = (dx, x, p, t) -> fx(c, dx, x, p, t)
     end
     
     # First evaluation of the FMU

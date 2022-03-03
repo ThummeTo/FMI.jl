@@ -33,8 +33,8 @@ if ENV["EXPORTINGTOOL"] != "OpenModelica/v1.17.0"
         p = []
 
         # Jacobians for x0
-        FD_jac = ForwardDiff.jacobian(x -> FMI.fx(comp, x, p, t), x0)
-        ZG_jac = Zygote.jacobian(FMI.fx, comp, x0, p, t)[2]
+        FD_jac = ForwardDiff.jacobian(x -> FMI.fx(comp, dx, x, p, t), x0)
+        ZG_jac = Zygote.jacobian(FMI.fx, comp, dx, x0, p, t)[3]
         fmiSetContinuousStates(comp, x0)
         samp_jac = fmi2SampleDirectionalDerivative(comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
         auto_jac = fmi2GetJacobian(comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
@@ -46,8 +46,8 @@ if ENV["EXPORTINGTOOL"] != "OpenModelica/v1.17.0"
         # Jacobians for random x0 / dx
         x0 = x0 + rand(numStates)
         dx = dx + rand(numStates)
-        FD_jac = ForwardDiff.jacobian(x -> FMI.fx(comp, x, p, t), x0)
-        ZG_jac = Zygote.jacobian(FMI.fx, comp, x0, p, t)[2]
+        FD_jac = ForwardDiff.jacobian(x -> FMI.fx(comp, dx, x, p, t), x0)
+        ZG_jac = Zygote.jacobian(FMI.fx, comp, dx, x0, p, t)[3]
         fmi2SetContinuousStates(comp, x0)
         samp_jac = fmi2SampleDirectionalDerivative(comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
         auto_jac = fmi2GetJacobian(comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
