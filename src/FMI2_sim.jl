@@ -6,7 +6,7 @@
 using DifferentialEquations, DiffEqCallbacks
 import SciMLBase: RightRootFind
 
-using FMIImport: fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2NewDiscreteStates, fmi2GetContinuousStates, fmi2GetNominalsOfContinuousStates, fmi2SetContinuousStates
+using FMIImport: fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2NewDiscreteStates, fmi2GetContinuousStates, fmi2GetNominalsOfContinuousStates, fmi2SetContinuousStates, fmi2GetDerivatives!
 using FMIImport.FMICore: fmi2StatusOK, fmi2TypeCoSimulation, fmi2TypeModelExchange
 
 using ChainRulesCore
@@ -56,7 +56,7 @@ function handleEvents(c::FMU2Component, enterEventMode::Bool, exitInContinuousMo
 end
 
 # Returns the event indicators for an FMU.
-function condition(c::FMU2Component, out, x, t, integrator, inputFunction, inputValues::Array{fmi2ValueReference}) 
+function condition(c::FMU2Component, out::SubArray{<:Real}, x, t, integrator, inputFunction, inputValues::Array{fmi2ValueReference}) 
 
     if inputFunction !== nothing
         fmi2SetReal(c, inputValues, inputFunction(integrator.t))
@@ -64,9 +64,8 @@ function condition(c::FMU2Component, out, x, t, integrator, inputFunction, input
 
     fmi2SetTime(c, t)
     fmi2SetContinuousStates(c, x)
-    indicators = fmi2GetEventIndicators(c)
-
-    copy!(out, indicators)
+    
+    fmi2GetEventIndicators!(c, out)
 end
 
 # Handles the upcoming events.
@@ -107,11 +106,11 @@ function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, inputV
     end
 end
 
-# Returns the state derivatives of the FMU.
 function fx(c::FMU2Component, 
-            x::Array{<:Real}, 
-            p::Array, 
-            t::Real)
+    dx::Array{<:Real},
+    x::Array{<:Real}, 
+    p::Array, 
+    t::Real)
 
     if isa(t, ForwardDiff.Dual) 
         t = ForwardDiff.value(t)
@@ -119,46 +118,63 @@ function fx(c::FMU2Component,
 
     fmi2SetTime(c, t) 
     fmi2SetContinuousStates(c, x)
-    dx = fmi2GetDerivatives(c)
+
+    if all(isa.(dx, ForwardDiff.Dual))
+        dx = collect(ForwardDiff.value(e) for e in dx)
+    end
+
+    fmi2GetDerivatives!(c, dx)
+    return dx
 end
+
+# function fx(c::FMU2Component, 
+#     x::Array{<:Real}, 
+#     p::Array, 
+#     t::Real)
+
+#     dx = zeros(length(x))
+#     fx(c, dx, x, p, t)
+#     dx
+# end
 
 # ForwardDiff-Dispatch for fx
 function fx(comp::FMU2Component,
+            dx::Array{<:Real},
             x::Array{<:ForwardDiff.Dual{Tx, Vx, Nx}},
             p::Array,
             t::Real) where {Tx, Vx, Nx}
 
-    _fx_fd((Tx, Vx, Nx), comp, x, p, t)
+    return _fx_fd((Tx, Vx, Nx), comp, dx, x, p, t)
 end
 
-# ForwardDiff-Dispatch implementation for fx
-function _fx_fd(TVNx, comp, x, p, t) 
+function _fx_fd(TVNx, comp, dx, x, p, t) 
   
     Tx, Vx, Nx = TVNx
     
-    ȧrgs = [NoTangent(), NoTangent(), collect(ForwardDiff.partials(e) for e in x), collect(ForwardDiff.partials(e) for e in p), ForwardDiff.partials(t)]
-    args = [fx,          comp,        collect(ForwardDiff.value(e) for e in x),    collect(ForwardDiff.value(e) for e in p),    ForwardDiff.value(t),  ]
+    ȧrgs = [NoTangent(), NoTangent(), collect(ForwardDiff.partials(e) for e in dx), collect(ForwardDiff.partials(e) for e in x), collect(ForwardDiff.partials(e) for e in p), ForwardDiff.partials(t)]
+    args = [fx,          comp,        collect(ForwardDiff.value(e) for e in dx), collect(ForwardDiff.value(e) for e in x),    collect(ForwardDiff.value(e) for e in p),    ForwardDiff.value(t),  ]
 
     ȧrgs = (ȧrgs...,)
     args = (args...,)
      
-    y, _, dx, _, _ = ChainRulesCore.frule(ȧrgs, args...)
+    y, _, sdx, sx, _, _ = ChainRulesCore.frule(ȧrgs, args...)
 
     if Vx != Float64
         Vx = Float64
     end
 
-    [collect( ForwardDiff.Dual{Tx, Vx, Nx}(y[i], dx[i]) for i in 1:length(dx) )...]
+    [collect( ForwardDiff.Dual{Tx, Vx, Nx}(y[i], sx[i]) for i in 1:length(sx) )...]
 end
 
 # rrule for fx
 function ChainRulesCore.rrule(::typeof(fx), 
                               comp::FMU2Component,
+                              dx, 
                               x,
                               p,
                               t)
 
-    y = fx(comp, x, p, t)
+    y = fx(comp, dx, x, p, t)
     function fx_pullback(ȳ)
 
         if t >= 0.0
@@ -167,31 +183,35 @@ function ChainRulesCore.rrule(::typeof(fx),
 
         fmi2SetContinuousStates(comp, x)
 
-        jac = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
-        comp.jacobianFct(jac, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
+        if comp.A == nothing || size(comp.A) != (length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
+            comp.A = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
+        end 
+        comp.jacobianFct(comp.A, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
 
-        n_dx_x = @thunk(jac' * ȳ)
+        n_dx_x = @thunk(comp.A' * ȳ)
 
         f̄ = NoTangent()
         c̄omp = ZeroTangent()
+        d̄x = ZeroTangent()
         x̄ = n_dx_x
         p̄ = ZeroTangent()
         t̄ = ZeroTangent()
         
-        return f̄, c̄omp, x̄, p̄, t̄
+        return f̄, c̄omp, d̄x, x̄, p̄, t̄
     end
-    return y, fx_pullback
+    return (y, fx_pullback)
 end
 
 # frule for fx
-function ChainRulesCore.frule((Δself, Δcomp, Δx, Δp, Δt), 
+function ChainRulesCore.frule((Δself, Δcomp, Δdx, Δx, Δp, Δt), 
                               ::typeof(fx), 
                               comp, #::FMU2Component,
+                              dx, 
                               x,#::Array{<:Real},
                               p,
                               t)
 
-    y = fx(comp, x, p, t)
+    y = fx(comp, dx, x, p, t)
     function fx_pullforward(Δx)
        
         if t >= 0.0 
@@ -205,16 +225,20 @@ function ChainRulesCore.frule((Δself, Δcomp, Δx, Δp, Δt),
             fmi2SetContinuousStates(comp, x)
         end
        
-        jac = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
-        comp.jacobianFct(jac, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
-        n_dx_x = jac * Δx
+        if comp.A == nothing || size(comp.A) != (length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
+            comp.A = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
+        end 
+        comp.jacobianFct(comp.A, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
+
+        n_dx_x = comp.A * Δx
 
         c̄omp = ZeroTangent()
+        d̄x = ZeroTangent()
         x̄ = n_dx_x 
         p̄ = ZeroTangent()
         t̄ = ZeroTangent()
        
-        return (c̄omp, x̄, p̄, t̄)
+        return (c̄omp, d̄x, x̄, p̄, t̄)
     end
     return (y, fx_pullforward(Δx)...)
 end
@@ -341,7 +365,7 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     end
 
     if customFx == nothing
-        customFx = (x, p, t) -> fx(c, x, p, t)
+        customFx = (dx, x, p, t) -> fx(c, dx, x, p, t)
     end
     
     # First evaluation of the FMU
@@ -432,7 +456,7 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     recordValues = prepareValueReference(c, recordValues)
     inputValueReferences = prepareValueReference(c, inputValueReferences)
     
-    variableSteps = c.fmu.modelDescription.coSimulation.canHandleVariableCommunicationStepSize 
+    variableSteps = fmi2IsCoSimulation(c.fmu) && c.fmu.modelDescription.coSimulation.canHandleVariableCommunicationStepSize 
     hasParameters = (parameters != nothing)
 
     t_start = t_start === nothing ? fmi2GetDefaultStartTime(c.fmu.modelDescription) : t_start
