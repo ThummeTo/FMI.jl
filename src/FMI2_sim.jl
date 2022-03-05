@@ -144,26 +144,177 @@ function fx(comp::FMU2Component,
             p::Array,
             t::Real) where {Tx, Vx, Nx}
 
-    return _fx_fd((Tx, Vx, Nx), comp, dx, x, p, t)
+    return _fx_fd(comp, dx, x, p, t)
 end
 
-function _fx_fd(TVNx, comp, dx, x, p, t) 
+# function _fx_fd(TVNx, comp, dx, x, p, t) 
   
-    Tx, Vx, Nx = TVNx
+#     Tx, Vx, Nx = TVNx
     
-    ȧrgs = [NoTangent(), NoTangent(), collect(ForwardDiff.partials(e) for e in dx), collect(ForwardDiff.partials(e) for e in x), collect(ForwardDiff.partials(e) for e in p), ForwardDiff.partials(t)]
-    args = [fx,          comp,        collect(ForwardDiff.value(e) for e in dx), collect(ForwardDiff.value(e) for e in x),    collect(ForwardDiff.value(e) for e in p),    ForwardDiff.value(t),  ]
+#     ȧrgs = [NoTangent(), NoTangent(), collect(ForwardDiff.partials(e) for e in dx), collect(ForwardDiff.partials(e) for e in x), collect(ForwardDiff.partials(e) for e in p), ForwardDiff.partials(t)]
+#     args = [fx,          comp,        collect(ForwardDiff.value(e) for e in dx), collect(ForwardDiff.value(e) for e in x),    collect(ForwardDiff.value(e) for e in p),    ForwardDiff.value(t),  ]
 
-    ȧrgs = (ȧrgs...,)
-    args = (args...,)
+#     ȧrgs = (ȧrgs...,)
+#     args = (args...,)
      
-    y, _, sdx, sx, _, _ = ChainRulesCore.frule(ȧrgs, args...)
+#     y, _, sdx, sx, _, _ = ChainRulesCore.frule(ȧrgs, args...)
 
-    if Vx != Float64
-        Vx = Float64
+#     if Vx != Float64
+#         Vx = Float64
+#     end
+
+#     [collect( ForwardDiff.Dual{Tx, Vx, Nx}(y[i], sx[i]) for i in 1:length(sx) )...]
+# end
+
+function _fx_fd(comp, dx, x, p, t) 
+
+    ȧrgs = []
+    args = []
+
+    push!(ȧrgs, NoTangent())
+    push!(args, fx)
+
+    push!(ȧrgs, NoTangent())
+    push!(args, comp)
+
+    T = nothing
+
+    dx_set = length(dx) > 0 && all(isa.(dx, ForwardDiff.Dual))
+    x_set = length(x) > 0 && all(isa.(x, ForwardDiff.Dual))
+    p_set = length(p) > 0 && all(isa.(p, ForwardDiff.Dual))
+    t_set = isa(t, ForwardDiff.Dual)
+
+    if dx_set
+        T, V, N = fd_eltypes(dx)
+        push!(ȧrgs, collect(ForwardDiff.partials(e) for e in dx))
+        push!(args, collect(ForwardDiff.value(e) for e in dx))
+    else 
+        push!(ȧrgs, NoTangent())
+        push!(args, dx)
     end
 
-    [collect( ForwardDiff.Dual{Tx, Vx, Nx}(y[i], sx[i]) for i in 1:length(sx) )...]
+    if x_set
+        T, V, N = fd_eltypes(x)
+        push!(ȧrgs, collect(ForwardDiff.partials(e) for e in x))
+        push!(args, collect(ForwardDiff.value(e) for e in x))
+    else 
+        push!(ȧrgs, NoTangent())
+        push!(args, x)
+    end
+
+    if p_set
+        T, V, N = fd_eltypes(p)
+        push!(ȧrgs, collect(ForwardDiff.partials(e) for e in p))
+        push!(args, collect(ForwardDiff.value(e) for e in p))
+    else 
+        push!(ȧrgs, NoTangent())
+        push!(args, p)
+    end
+
+    if t_set
+        T, V, N = fd_eltypes(t)
+        push!(ȧrgs, ForwardDiff.partials(t))
+        push!(args, ForwardDiff.value(t))
+    else 
+        push!(ȧrgs, NoTangent())
+        push!(args, t)
+    end
+  
+    ȧrgs = (ȧrgs...,)
+    args = (args...,)
+        
+    y, _, sdx, sx, sp, st = ChainRulesCore.frule(ȧrgs, args...)
+
+    ys = []
+
+    #[collect( ForwardDiff.Dual{Tx, Vx, Nx}(y[i], ForwardDiff.partials(x_partials[i], t_partials[i])) for i in 1:length(y) )...]
+    for i in 1:length(y)
+        isdx = NoTangent()
+        isx = NoTangent()
+        isp = NoTangent()
+        ist = NoTangent()
+
+        if dx_set
+            isdx = sdx[i].values
+        end
+        if x_set
+            isx = sx[i].values
+        end
+        if p_set
+            isp = sp[i].values
+        end
+        if t_set
+            ist = st[i].values
+        end
+
+        
+
+        partials = (isdx, isx, isp, ist)
+
+        display(partials)
+
+        V = Float64 
+        N = length(partials)
+
+        push!(ys, ForwardDiff.Dual{T, V, N}(y[i], ForwardDiff.Partials{N, V}(partials)    )   ) #  
+    end 
+
+    ys
+end
+
+# frule for fx
+function ChainRulesCore.frule((Δself, Δcomp, Δdx, Δx, Δp, Δt), 
+                              ::typeof(fx), 
+                              comp, #::FMU2Component,
+                              dx, 
+                              x,#::Array{<:Real},
+                              p,
+                              t)
+
+    y = fx(comp, dx, x, p, t)
+    function fx_pullforward(Δdx, Δx, Δt)
+       
+        # if t >= 0.0 
+        #     fmi2SetTime(comp, t)
+        # end
+        
+        # if all(isa.(x, ForwardDiff.Dual))
+        #     xf = collect(ForwardDiff.value(e) for e in x)
+        #     fmi2SetContinuousStates(comp, xf)
+        # else
+        #     fmi2SetContinuousStates(comp, x)
+        # end
+
+        c̄omp = ZeroTangent()
+        d̄x = ZeroTangent()
+        x̄ = ZeroTangent()
+        p̄ = ZeroTangent()
+        t̄ = ZeroTangent() 
+
+        if Δdx != NoTangent()
+            d̄x = Δdx
+        end
+       
+        if Δx != NoTangent()
+            if comp.A == nothing || size(comp.A) != (length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
+                comp.A = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
+            end 
+            comp.jacobianFct(comp.A, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
+            x̄ = comp.A * Δx
+        end
+
+        if Δt != NoTangent()
+            dt = 1e-6
+            dx1 = fmi2GetDerivatives(comp)
+            fmi2SetTime(comp, t + dt)
+            dx2 = fmi2GetDerivatives(comp)
+            ∂t = (dx2-dx1)/dt 
+            t̄ = ∂t * Δt
+        end
+       
+        return (c̄omp, d̄x, x̄, p̄, t̄)
+    end
+    return (y, fx_pullforward(Δdx, Δx, Δt)...)
 end
 
 # rrule for fx
@@ -203,45 +354,45 @@ function ChainRulesCore.rrule(::typeof(fx),
 end
 
 # frule for fx
-function ChainRulesCore.frule((Δself, Δcomp, Δdx, Δx, Δp, Δt), 
-                              ::typeof(fx), 
-                              comp, #::FMU2Component,
-                              dx, 
-                              x,#::Array{<:Real},
-                              p,
-                              t)
+# function ChainRulesCore.frule((Δself, Δcomp, Δdx, Δx, Δp, Δt), 
+#                               ::typeof(fx), 
+#                               comp, #::FMU2Component,
+#                               dx, 
+#                               x,#::Array{<:Real},
+#                               p,
+#                               t)
 
-    y = fx(comp, dx, x, p, t)
-    function fx_pullforward(Δx)
+#     y = fx(comp, dx, x, p, t)
+#     function fx_pullforward(Δx)
        
-        if t >= 0.0 
-            fmi2SetTime(comp, t)
-        end
+#         if t >= 0.0 
+#             fmi2SetTime(comp, t)
+#         end
         
-        if all(isa.(x, ForwardDiff.Dual))
-            xf = collect(ForwardDiff.value(e) for e in x)
-            fmi2SetContinuousStates(comp, xf)
-        else
-            fmi2SetContinuousStates(comp, x)
-        end
+#         if all(isa.(x, ForwardDiff.Dual))
+#             xf = collect(ForwardDiff.value(e) for e in x)
+#             fmi2SetContinuousStates(comp, xf)
+#         else
+#             fmi2SetContinuousStates(comp, x)
+#         end
        
-        if comp.A == nothing || size(comp.A) != (length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
-            comp.A = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
-        end 
-        comp.jacobianFct(comp.A, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
+#         if comp.A == nothing || size(comp.A) != (length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
+#             comp.A = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
+#         end 
+#         comp.jacobianFct(comp.A, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
 
-        n_dx_x = comp.A * Δx
+#         n_dx_x = comp.A * Δx
 
-        c̄omp = ZeroTangent()
-        d̄x = ZeroTangent()
-        x̄ = n_dx_x 
-        p̄ = ZeroTangent()
-        t̄ = ZeroTangent()
+#         c̄omp = ZeroTangent()
+#         d̄x = ZeroTangent()
+#         x̄ = n_dx_x 
+#         p̄ = ZeroTangent()
+#         t̄ = ZeroTangent()
        
-        return (c̄omp, d̄x, x̄, p̄, t̄)
-    end
-    return (y, fx_pullforward(Δx)...)
-end
+#         return (c̄omp, d̄x, x̄, p̄, t̄)
+#     end
+#     return (y, fx_pullforward(Δx)...)
+# end
 
 # save FMU values 
 function saveValues(c::FMU2Component, recordValues, u, t, integrator)
