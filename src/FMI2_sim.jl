@@ -120,22 +120,16 @@ function fx(c::FMU2Component,
     fmi2SetContinuousStates(c, x)
 
     if all(isa.(dx, ForwardDiff.Dual))
-        dx = collect(ForwardDiff.value(e) for e in dx)
+        dx_tmp = collect(ForwardDiff.value(e) for e in dx)
+        fmi2GetDerivatives!(c, dx_tmp)
+        T, V, N = fd_eltypes(dx)
+        dx[:] = collect(ForwardDiff.Dual{T, V, N}(dx_tmp[i], ForwardDiff.partials(dx[i])    ) for i in 1:length(dx))
+    else 
+        fmi2GetDerivatives!(c, dx)
     end
 
-    fmi2GetDerivatives!(c, dx)
     return dx
 end
-
-# function fx(c::FMU2Component, 
-#     x::Array{<:Real}, 
-#     p::Array, 
-#     t::Real)
-
-#     dx = zeros(length(x))
-#     fx(c, dx, x, p, t)
-#     dx
-# end
 
 # ForwardDiff-Dispatch for fx
 function fx(comp::FMU2Component,
@@ -166,6 +160,12 @@ end
 #     [collect( ForwardDiff.Dual{Tx, Vx, Nx}(y[i], sx[i]) for i in 1:length(sx) )...]
 # end
 
+function fd_eltypes(e::ForwardDiff.Dual{T, V, N}) where {T, V, N}
+    return (T, V, N)
+end
+function fd_eltypes(e::Array{<:ForwardDiff.Dual{T, V, N}}) where {T, V, N}
+    return (T, V, N)
+end
 function _fx_fd(comp, dx, x, p, t) 
 
     ȧrgs = []
@@ -178,6 +178,7 @@ function _fx_fd(comp, dx, x, p, t)
     push!(args, comp)
 
     T = nothing
+    V = nothing
 
     dx_set = length(dx) > 0 && all(isa.(dx, ForwardDiff.Dual))
     x_set = length(x) > 0 && all(isa.(x, ForwardDiff.Dual))
@@ -188,6 +189,7 @@ function _fx_fd(comp, dx, x, p, t)
         T, V, N = fd_eltypes(dx)
         push!(ȧrgs, collect(ForwardDiff.partials(e) for e in dx))
         push!(args, collect(ForwardDiff.value(e) for e in dx))
+        #@info "dx_set num=$(length(dx)) partials=$(length(ForwardDiff.partials(dx[1])))"
     else 
         push!(ȧrgs, NoTangent())
         push!(args, dx)
@@ -197,6 +199,7 @@ function _fx_fd(comp, dx, x, p, t)
         T, V, N = fd_eltypes(x)
         push!(ȧrgs, collect(ForwardDiff.partials(e) for e in x))
         push!(args, collect(ForwardDiff.value(e) for e in x))
+        #@info "x_set num=$(length(x)) partials=$(length(ForwardDiff.partials(x[1])))"
     else 
         push!(ȧrgs, NoTangent())
         push!(args, x)
@@ -229,34 +232,39 @@ function _fx_fd(comp, dx, x, p, t)
 
     #[collect( ForwardDiff.Dual{Tx, Vx, Nx}(y[i], ForwardDiff.partials(x_partials[i], t_partials[i])) for i in 1:length(y) )...]
     for i in 1:length(y)
-        isdx = NoTangent()
-        isx = NoTangent()
-        isp = NoTangent()
-        ist = NoTangent()
-
+        is = NoTangent()
+        
         if dx_set
-            isdx = sdx[i].values
+            is = sdx[i]#.values
         end
         if x_set
-            isx = sx[i].values
+            is = sx[i]#.values
         end
+
         if p_set
-            isp = sp[i].values
+            is = sp[i]#.values
         end
         if t_set
-            ist = st[i].values
+            is = st[i]#.values
         end
 
+        #display("dx: $dx")
+        #display("sdx: $sdx")
+
+        #partials = (isdx, isx, isp, ist)
+
+        #display(partials)
         
 
-        partials = (isdx, isx, isp, ist)
+        #V = Float64 
+        #N = length(partials)
+        #display("$T $V $N")
 
-        display(partials)
+        #display(is)
 
-        V = Float64 
-        N = length(partials)
+        @assert is != ZeroTangent() && is != NoTangent() "is: $(is)"
 
-        push!(ys, ForwardDiff.Dual{T, V, N}(y[i], ForwardDiff.Partials{N, V}(partials)    )   ) #  
+        push!(ys, ForwardDiff.Dual{T, V, N}(y[i], is    )   ) #  ForwardDiff.Partials{N, V}(partials)
     end 
 
     ys
