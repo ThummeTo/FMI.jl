@@ -4,15 +4,46 @@ on:
   push:
     branches:
       - main
-    tags: '*'
+    tags:
+      - '*'
   pull_request:
 
 jobs:
+  sync-jupyter:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        list-files: shell
+        filters: |
+            example:
+                - added|modified: '**.ipynb'
+ 
+    - name: Install Packages if changed files
+      if: ${{ steps.filter.outputs.example == 'true' }}
+      run: |
+        pip install jupyter
+        pip install nbconvert
+ 
+    - name: Synch changed files
+      if: ${{ steps.filter.outputs.example == 'true' }}
+      run: |
+        jupyter nbconvert --to script ${{ steps.filter.outputs.example_files }}
+        jupyter nbconvert --output-dir='./docs/src/examples' --to markdown ${{ steps.filter.outputs.example_files }}
+
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Jupyter nbconvert synch - modified, paired .ipynb files
+     
+
   build:
+    needs: sync-jupyter
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@latest
+      - uses: julia-actions/setup-julia@v1
         with:
           version: '1.6'
       - name: Install dependencies
