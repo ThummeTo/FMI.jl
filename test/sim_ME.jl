@@ -139,7 +139,7 @@ if ENV["EXPORTINGTOOL"] == "Dymola/2020x"
     end
     @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-    solution = fmiSimulateME(fmuStruct, t_start, t_stop; inputValueReferences=["extForce"], inputFunction=extForce, solver=Tsit5())
+    solution = fmiSimulateME(fmuStruct, t_start, t_stop; inputValueReferences=["extForce"], inputFunction=extForce, dtmax=0.01, solver=Tsit5())
     @test length(solution.u) > 0
     @test length(solution.t) > 0
 
@@ -172,7 +172,7 @@ if ENV["EXPORTINGTOOL"] == "Dymola/2020x"
     end
     @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-    solution = fmiSimulateME(fmuStruct, t_start, t_stop; inputValueReferences=["extForce"], inputFunction=extForce, dtmax=0.001, solver=Rosenbrock23(autodiff=true), autodiff=true)
+    solution = fmiSimulateME(fmuStruct, t_start, t_stop; inputValueReferences=["extForce"], inputFunction=extForce, dtmax=0.01, solver=Rosenbrock23(autodiff=true))
     @test length(solution.u) > 0
     @test length(solution.t) > 0
 
@@ -205,7 +205,7 @@ if ENV["EXPORTINGTOOL"] == "Dymola/2020x"
     end
     @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-    solution = fmiSimulateME(fmuStruct, t_start, t_stop; inputValueReferences=["extForce"], inputFunction=extForce, dtmax=0.001, solver=Rosenbrock23(autodiff=false), autodiff=false)
+    solution = fmiSimulateME(fmuStruct, t_start, t_stop; inputValueReferences=["extForce"], inputFunction=extForce, dtmax=0.01, solver=Rosenbrock23(autodiff=false))
     @test length(solution.u) > 0
     @test length(solution.t) > 0
 
