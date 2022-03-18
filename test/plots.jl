@@ -9,10 +9,8 @@ using Plots
 t_start = 0.0
 t_stop = 8.0
 
-pathToFMU = joinpath(dirname(@__FILE__), "..", "model", ENV["EXPORTINGTOOL"], "SpringPendulum1D.fmu")
-
 # load the FMU container
-myFMU = fmiLoad(pathToFMU)
+myFMU = fmiLoad("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 
 # print some useful FMU-information into the REPL
 fmiInfo(myFMU)

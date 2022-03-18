@@ -5,9 +5,7 @@
 
 # case 1: CS-FMU Simulation
 
-pathToFMU = joinpath(dirname(@__FILE__), "..", "model", ENV["EXPORTINGTOOL"], "SpringPendulum1D.fmu")
-
-myFMU = fmiLoad(pathToFMU)
+myFMU = fmiLoad("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 
 comp = fmiInstantiate!(myFMU; loggingOn=false)
 @test comp != 0
@@ -58,35 +56,31 @@ function extForce(t)
     [sin(t)]
 end 
 
-if ENV["EXPORTINGTOOL"] == "Dymola/2020x"
-    pathToFMU = joinpath(dirname(@__FILE__), "..", "model", ENV["EXPORTINGTOOL"], "SpringPendulumExtForce1D.fmu")
+myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 
-    myFMU = fmiLoad(pathToFMU)
+comp = fmiInstantiate!(myFMU; loggingOn=false)
+@test comp != 0
 
-    comp = fmiInstantiate!(myFMU; loggingOn=false)
-    @test comp != 0
-
-    # choose FMU or FMUComponent
-    fmuStruct = nothing
-    envFMUSTRUCT = ENV["FMUSTRUCT"]
-    if envFMUSTRUCT == "FMU"
-        fmuStruct = myFMU
-    elseif envFMUSTRUCT == "FMUCOMPONENT"
-        fmuStruct = comp
-    end
-    @assert fmuStruct !== nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
-
-    success, solution = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2, recordValues=["mass.s", "mass.v"], inputValueReferences=["extForce"], inputFunction=extForce)
-    @test success
-    @test length(solution.saveval) > 0
-    @test length(solution.t) > 0
-
-    @test t[1] == t_start
-    @test t[end] == t_stop
-
-    # reference values from Simulation in Dymola2020x (Dassl)
-    @test [solution.saveval[1]...] == [0.5, 0.0]
-    @test sum(abs.([solution.saveval[end]...] - [0.613371, 0.188633])) < 0.2
-    fmiUnload(myFMU)
+# choose FMU or FMUComponent
+fmuStruct = nothing
+envFMUSTRUCT = ENV["FMUSTRUCT"]
+if envFMUSTRUCT == "FMU"
+    fmuStruct = myFMU
+elseif envFMUSTRUCT == "FMUCOMPONENT"
+    fmuStruct = comp
 end
+@assert fmuStruct !== nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+
+success, solution = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2, recordValues=["mass.s", "mass.v"], inputValueReferences=["extForce"], inputFunction=extForce)
+@test success
+@test length(solution.saveval) > 0
+@test length(solution.t) > 0
+
+@test t[1] == t_start
+@test t[end] == t_stop
+
+# reference values from Simulation in Dymola2020x (Dassl)
+@test [solution.saveval[1]...] == [0.5, 0.0]
+@test sum(abs.([solution.saveval[end]...] - [0.613371, 0.188633])) < 0.2
+fmiUnload(myFMU)
 
