@@ -2,12 +2,10 @@
 # Prepare FMU #
 ###############
 
-pathToFMU = joinpath(dirname(@__FILE__), "..", "model", ENV["EXPORTINGTOOL"], "SpringPendulum1D.fmu")
-
 t_start = 0.0
 t_stop = 1.0
 
-myFMU = fmiLoad(pathToFMU)
+myFMU = fmiLoad("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 @test fmiIsCoSimulation(myFMU)
 @test fmiIsModelExchange(myFMU)
 comp = fmiInstantiate!(myFMU; loggingOn=false)
@@ -28,7 +26,7 @@ fmiUnload(myFMU)
 
 
 
-myFMU = fmiLoad(pathToFMU; type=:ME)
+myFMU = fmiLoad("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"]; type=:ME)
 @test myFMU.type == FMI.fmi2TypeModelExchange
 comp = fmiInstantiate!(myFMU; loggingOn=false)
 fmuStruct = nothing
@@ -44,7 +42,7 @@ fmiUnload(myFMU)
 
 
 
-myFMU = fmiLoad(pathToFMU; type=:CS)
+myFMU = fmiLoad("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"]; type=:CS)
 @test myFMU.type == FMI.fmi2TypeCoSimulation
 comp = fmiInstantiate!(myFMU; loggingOn=false)
 fmuStruct = nothing

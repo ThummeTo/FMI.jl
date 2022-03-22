@@ -4,15 +4,17 @@
 #
 
 using FMI
+using FMIZoo
 using Test
 import Random
 
-exportingToolsWindows = ["Dymola/2020x", "OpenModelica/v1.17.0"]
-exportingToolsLinux = ["OpenModelica/v1.17.0"]
+exportingToolsWindows = [("Dymola", "2022x")]
+exportingToolsLinux = [("Dymola", "2022x")]
 fmuStructs = ["FMU", "FMUCOMPONENT"]
 
 function runtests(exportingTool)
-    ENV["EXPORTINGTOOL"] = exportingTool
+    ENV["EXPORTINGTOOL"] = exportingTool[1]
+    ENV["EXPORTINGVERSION"] = exportingTool[2]
 
     @testset "Testing FMUs exported from $exportingTool" begin
 

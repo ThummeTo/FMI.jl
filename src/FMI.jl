@@ -60,7 +60,7 @@ function __init__()
         include("FMI2_plot.jl")
         include("FMI3_plot.jl")
         export fmiPlot, fmiPlot!
-    end
+    end 
 end
 
 ### EXPORTING LISTS START ###
@@ -92,15 +92,6 @@ export fmiSetFctTerminate, fmiSetFctReset
 export fmiSetFctGetReal, fmiSetFctGetInteger, fmiSetFctGetBoolean, fmiSetFctGetString, fmiSetFctSetReal, fmiSetFctSetInteger, fmiSetFctSetBoolean, fmiSetFctSetString
 export fmiSetFctSetTime, fmiSetFctSetContinuousStates, fmiSetFctEnterEventMode, fmiSetFctNewDiscreteStates, fmiSetFctEnterContinuousTimeMode, fmiSetFctCompletedIntegratorStep
 export fmiSetFctGetDerivatives, fmiSetFctGetEventIndicators, fmiSetFctGetContinuousStates, fmiSetFctGetNominalsOfContinuousStates
-
-# FMI2_sim.jl
-# none
-
-# FMI2_plot.jl
-# none
-
-# FMI3_sim.jl
-# none
 
 ### EXPORTING LISTS END ###
 
