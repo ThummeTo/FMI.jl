@@ -427,6 +427,7 @@ Keywords:
     - inputValueReferences: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
     - inputFunction: Function to retrieve the values to set the inputs to 
     - parameters: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization 
+    - `callbacks`: custom callbacks to add
 
 Returns:
     - If keyword `recordValues` is not set, a struct of type `ODESolution`.
@@ -446,12 +447,12 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     inputFunction = nothing,
     parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
     dtmax::Union{Real, Nothing} = nothing,
+    callbacks = [],
     kwargs...)
 
     recordValues = prepareValueReference(c, recordValues)
     inputValueReferences = prepareValueReference(c, inputValueReferences)
     solution = nothing
-    callbacks = []
     savedValues = nothing
 
     savingValues = (length(recordValues) > 0)
@@ -602,7 +603,6 @@ Keywords:
     - inputValueReferences: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
     - inputFunction: Function to retrieve the values to set the inputs to 
     - parameters: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization 
-
 Returns:
     - If keyword `recordValues` is not set, a boolean `success` is returned (simulation success).
     - If keyword `recordValues` is set, a tuple of type (true, DiffEqCallbacks.SavedValues) or (false, nothing).
