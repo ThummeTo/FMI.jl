@@ -9,12 +9,12 @@
 
 # FMI-spec
 
-function fmi2Simulate(fmu::FMU2, args...; instantiate::Bool=true, kwargs...)
+function fmi2Simulate(fmu::FMU2, args...; instantiate::Bool=false, kwargs...)
 
     if instantiate
         c = fmi2Instantiate!(fmu)
         ret = fmi2Simulate(c, args...; kwargs...)
-        #fmi2FreeInstance!(c)
+        fmi2FreeInstance!(c)
         return ret
     else 
         @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate? Use keyword `instantiate=true` to allocate an instance automatically."]
@@ -23,12 +23,12 @@ function fmi2Simulate(fmu::FMU2, args...; instantiate::Bool=true, kwargs...)
     end
 end
 
-function fmi2SimulateCS(fmu::FMU2, args...; instantiate::Bool=true, kwargs...)
+function fmi2SimulateCS(fmu::FMU2, args...; instantiate::Bool=false, kwargs...)
   
     if instantiate
         c = fmi2Instantiate!(fmu)
         ret = fmi2SimulateCS(c, args...; kwargs...)
-        #fmi2FreeInstance!(c)
+        fmi2FreeInstance!(c)
         return ret
     else 
         @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate? Use keyword `instantiate=true` to allocate an instance automatically."]
@@ -37,12 +37,12 @@ function fmi2SimulateCS(fmu::FMU2, args...; instantiate::Bool=true, kwargs...)
     end
 end
 
-function fmi2SimulateME(fmu::FMU2, args...; instantiate::Bool=true, kwargs...)
+function fmi2SimulateME(fmu::FMU2, args...; instantiate::Bool=false, kwargs...)
 
     if instantiate
         c = fmi2Instantiate!(fmu)
         ret = fmi2SimulateME(c, args...; kwargs...)
-        #fmi2FreeInstance!(c)
+        fmi2FreeInstance!(c)
         return ret
     else 
         @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate? Use keyword `instantiate=true` to allocate an instance automatically."]
