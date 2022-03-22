@@ -613,7 +613,7 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
                         recordValues::fmi2ValueReferenceFormat = nothing,
                         saveat = [],
                         setup::Bool = true,
-                        reset = nothing,
+                        reset::Bool = true,
                         inputValueReferences::fmi2ValueReferenceFormat = nothing,
                         inputFunction = nothing,
                         parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing)
@@ -648,10 +648,6 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
         end
     end
 
-    # auto correct reset if only setup is given
-    if reset == nothing 
-        reset = setup
-    end
     @assert !(setup==false && reset==true) "fmi2SimulateME(...): keyword argument `setup=false`, but `reset=true`. This may cause a FMU crash."
 
     if reset 
