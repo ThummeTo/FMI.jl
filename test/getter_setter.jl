@@ -7,9 +7,7 @@
 # Prepare FMU #
 ###############
 
-pathToFMU = joinpath(dirname(@__FILE__), "..", "model", ENV["EXPORTINGTOOL"], "IO.fmu")
-
-myFMU = fmiLoad(pathToFMU)
+myFMU = fmiLoad("IO", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 comp = fmiInstantiate!(myFMU; loggingOn=false)
 @test comp != 0
 
@@ -64,19 +62,16 @@ cacheString = ""
 @test fmiSetString(fmuStruct, stringValueReferences[1], rndString) == 0
 @test fmiGetString(fmuStruct, stringValueReferences[1]) == rndString
 
-# this is not supported by OMEdit-FMUs in the repository
-if ENV["EXPORTINGTOOL"] != "OpenModelica/v1.17.0"
-    fmiSet(fmuStruct, 
-           [realValueReferences[1], integerValueReferences[1], booleanValueReferences[1], stringValueReferences[1]], 
-           [rndReal,                rndInteger,                rndBoolean,                rndString])
-    @test fmiGet(fmuStruct, 
-                 [realValueReferences[1], integerValueReferences[1], booleanValueReferences[1], stringValueReferences[1]]) == 
-                 [rndReal,                rndInteger,                rndBoolean,                rndString]
+fmiSet(fmuStruct, 
+        [realValueReferences[1], integerValueReferences[1], booleanValueReferences[1], stringValueReferences[1]], 
+        [rndReal,                rndInteger,                rndBoolean,                rndString])
+@test fmiGet(fmuStruct, 
+                [realValueReferences[1], integerValueReferences[1], booleanValueReferences[1], stringValueReferences[1]]) == 
+                [rndReal,                rndInteger,                rndBoolean,                rndString]
 
-    @test fmiGetStartValue(fmuStruct, "p_enumeration") == "myEnumeration1"
-    @test fmiGetStartValue(fmuStruct, "p_string") == "Hello World!"
-    @test fmiGetStartValue(fmuStruct, "p_real") == 0.0
-end 
+#@test fmiGetStartValue(fmuStruct, "p_enumeration") == "myEnumeration1"
+@test fmiGetStartValue(fmuStruct, "p_string") == "Hello World!"
+@test fmiGetStartValue(fmuStruct, "p_real") == 0.0 
 
 ##################
 # Testing Arrays #
@@ -126,24 +121,19 @@ fmiGetBoolean!(fmuStruct, booleanValueReferences, cacheBoolean)
 fmiGetString!(fmuStruct, stringValueReferences, cacheString)
 @test unsafe_string.(cacheString) == rndString
 
-# this is not suppoerted by OMEdit-FMUs in the repository
-if ENV["EXPORTINGTOOL"] != "OpenModelica/v1.17.0"
-    @test fmiGetStartValue(fmuStruct, ["p_enumeration", "p_string", "p_real"]) == ["myEnumeration1", "Hello World!", 0.0] 
+#@test fmiGetStartValue(fmuStruct, ["p_enumeration", "p_string", "p_real"]) == ["myEnumeration1", "Hello World!", 0.0] 
+@test fmiGetStartValue(fmuStruct, ["p_string", "p_real"]) == ["Hello World!", 0.0] 
 
-    # Testing input/output derivatives
-    dirs = fmiGetRealOutputDerivatives(fmuStruct, ["y_real"], ones(Int, 1))
-    @test dirs == -Inf # at this point, derivative is undefined
-    @test fmiSetRealInputDerivatives(fmuStruct, ["u_real"], ones(Int, 1), zeros(1)) == 0
+# Testing input/output derivatives
+dirs = fmiGetRealOutputDerivatives(fmuStruct, ["y_real"], ones(Int, 1))
+@test dirs == -Inf # at this point, derivative is undefined
+@test fmiSetRealInputDerivatives(fmuStruct, ["u_real"], ones(Int, 1), zeros(1)) == 0
 
-    @test fmiExitInitializationMode(fmuStruct) == 0
-    @test fmiDoStep(fmuStruct, 0.1) == 0
+@test fmiExitInitializationMode(fmuStruct) == 0
+@test fmiDoStep(fmuStruct, 0.1) == 0
 
-    dirs = fmiGetRealOutputDerivatives(fmuStruct, ["y_real"], ones(Int, 1))
-    @test dirs == 0.0
-else 
-    @test fmiExitInitializationMode(fmuStruct) == 0
-    @test fmiDoStep(fmuStruct, 0.1) == 0
-end
+dirs = fmiGetRealOutputDerivatives(fmuStruct, ["y_real"], ones(Int, 1))
+@test dirs == 0.0
 
 ############
 # Clean up #
