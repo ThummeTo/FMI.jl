@@ -13,7 +13,7 @@ using FMIImport: fmi2Boolean, fmi2Real, fmi2Integer, fmi2Byte, fmi2String, fmi2F
 using FMIImport: fmi2True, fmi2False
 using FMIImport: fmi2StatusKind, fmi2Status
 using FMIImport: fmi2DependencyKindDependent, fmi2DependencyKindFixed
-using FMIImport: fmi2CallbackFunctions
+using FMIImport: fmi2CallbackFunctions, fmi2Component
 import FMIImport: fmi2VariableNamingConventionFlat, fmi2VariableNamingConventionStructured
 
 """ 
@@ -41,7 +41,7 @@ function fmi2GetDependencies(fmu::FMU2)
             for i in 1:dim
                 modelVariable = fmi2ModelVariablesForValueReference(fmu.modelDescription, fmu.modelDescription.valueReferences[i])[1]
     
-                if modelVariable.dependencies != nothing
+                if modelVariable.dependencies !== nothing
                     indicies = collect(fmu.modelDescription.valueReferenceIndicies[fmu.modelDescription.modelVariables[dependency].valueReference] for dependency in modelVariable.dependencies)
                     dependenciesKind = modelVariable.dependenciesKind
 
@@ -141,5 +141,3 @@ function fmi2Info(fmu::FMU2)
 
     println("##################### End information for FMU #####################")
 end
-
-

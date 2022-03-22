@@ -21,7 +21,7 @@ function time_choice(c::FMU2Component, integrator)
     if Bool(eventInfo.nextEventTimeDefined)
         eventInfo.nextEventTime
     else
-        Inf
+        return nothing
     end
 end
 
@@ -439,8 +439,9 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     customFx = nothing,
     recordValues::fmi2ValueReferenceFormat = nothing,
     saveat = [],
+    x0::Union{Array{<:Real}, Nothing} = nothing,
     setup::Bool = true,
-    reset::Union{Bool, Nothing} = nothing, # nothing = auto
+    reset::Bool = false,
     inputValueReferences::fmi2ValueReferenceFormat = nothing,
     inputFunction = nothing,
     parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
@@ -456,6 +457,7 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     savingValues = (length(recordValues) > 0)
     hasInputs = (length(inputValueReferences) > 0)
     hasParameters = (parameters != nothing)
+    hasStartState = (x0 != nothing)
 
     t_start = t_start === nothing ? fmi2GetDefaultStartTime(c.fmu.modelDescription) : t_start
     t_start = t_start === nothing ? 0.0 : t_start
@@ -483,12 +485,6 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
         solver = Tsit5()
     end
 
-    if reset == nothing 
-        reset = setup 
-    end
-
-    @assert !(setup==false && reset==true) "fmi2SimulateME(...): keyword argument `setup=false`, but `reset=true`. This may cause a FMU crash."
-
     if reset 
         if c.state == fmi2ComponentStateModelInitialized
             retcode = fmi2Terminate(c)
@@ -506,11 +502,21 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
 
         retcode = fmi2EnterInitializationMode(c)
         @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Entering initialization mode failed with return code $(retcode)."
+    end 
 
-        if hasParameters
-            fmi2Set(c, collect(keys(parameters)), collect(values(parameters)) )
+    if hasStartState
+        if fmi2IsModelExchange(c.fmu)
+            fmi2SetContinuousStates(c, x0)
+        else
+            fmi2SetReal(c, c.fmu.modelDescription.stateValueReferences, x0)
         end
+    end
 
+    if hasParameters
+        fmi2Set(c, collect(keys(parameters)), collect(values(parameters)) )
+    end
+
+    if setup
         retcode = fmi2ExitInitializationMode(c)
         @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Exiting initialization mode failed with return code $(retcode)."
     end
@@ -566,7 +572,7 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
         if timeEventHandling
             timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator),
                                             (integrator) -> affectFMU!(c, integrator, 0, inputFunction, inputValueReferences), Float64; 
-                                            initial_affect = true, # ToDo: or better 'false'?
+                                            initial_affect = false, # ToDo: or better 'false'?
                                             save_positions=(false,false))
             push!(callbacks, timeEventCb)
         end
