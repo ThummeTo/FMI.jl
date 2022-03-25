@@ -2,7 +2,7 @@
 # FMI.jl
 
 ## What is FMI.jl?
-FMI.jl is a free-to-use software library for the Julia programming language which integrates FMI ([fmi-standard.org](http://fmi-standard.org/)): load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
+[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is a free-to-use software library for the Julia programming language which integrates FMI ([fmi-standard.org](http://fmi-standard.org/)): load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
 
 **Please notice: A detailed documentation and well formatted doc-strings are under construction and well be published soon.**
 
@@ -45,7 +45,8 @@ fmiUnload(myFMU)
 | ME (continuous)           | ✓✓           | ✓✓     | ~~              | ~      |
 | ME (discontinuous)        | ✓✓           | ✓✓     | ~~              | ~      |
 | Explicit solvers          | ✓✓           | ~~     | ~~              | ~      |
-| Implicit solvers (AD)     | ✓✓           | ~~     | ~~              | ~      |
+| Implicit solvers (autodiff=false)     | ✓✓           | ~~     | ~~              | ~      |
+| Implicit solvers (autodiff=true)     | ~~           | ~~     | ~~              | ~      |
 | get/setState              | ✓✓           | ~      | ~~              | ~      |
 | getDirectionalDerivatives | ✓✓           | ~      | ~~              | ~      |
 | getAjointDerivatives      | -            | -      | ~~              | ~      |
@@ -64,7 +65,7 @@ x  not planned
 
 ## What FMI.jl-Library to use?
 ![FMI.jl Logo](https://github.com/ThummeTo/FMI.jl/blob/main/docs/src/assets/FMI_JL_family.png "FMI.jl Family")
-To keep dependencies nice and clean, the old FMI.jl had been split into new packages:
+To keep dependencies nice and clean, the original package [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) had been split into new packages:
 - [*FMI.jl*](https://github.com/ThummeTo/FMI.jl): High level loading, manipulating, saving or building entire FMUs from scratch
 - [*FMIImport.jl*](https://github.com/ThummeTo/FMIImport.jl): Importing FMUs into Julia
 - [*FMIExport.jl*](https://github.com/ThummeTo/FMIExport.jl): Exporting stand-alone FMUs from Julia Code
@@ -85,7 +86,7 @@ To keep dependencies nice and clean, the old FMI.jl had been split into new pack
 - ...
 
 ## What Platforms are supported?
-FMI.jl is tested (and testing) under Julia Versions *1.6.5 LTS* (64-bit) and *latest* (64-bit) on Windows *latest* (64-bit) and Ubuntu *latest* (64-bit). Mac and Julia (32-bit) should work, but untested.
+[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is tested (and testing) under Julia Versions *1.6.5 LTS* (64-bit) and *latest* (64-bit) on Windows *latest* (64-bit) and Ubuntu *latest* (64-bit). Mac and Julia (32-bit) should work, but untested.
 
 ## How to cite? Related publications?
 Tobias Thummerer, Lars Mikelsons and Josef Kircher. 2021. **NeuralFMU: towards structural integration of FMUs into neural networks.** Martin Sjölund, Lena Buffoni, Adrian Pop and Lennart Ochel (Ed.). Proceedings of 14th Modelica Conference 2021, Linköping, Sweden, September 20-24, 2021. Linköping University Electronic Press, Linköping (Linköping Electronic Conference Proceedings ; 181), 297-306. [DOI: 10.3384/ecp21181297](https://doi.org/10.3384/ecp21181297)
@@ -93,4 +94,4 @@ Tobias Thummerer, Lars Mikelsons and Josef Kircher. 2021. **NeuralFMU: towards s
 Tobias Thummerer, Johannes Tintenherr, Lars Mikelsons 2021 **Hybrid modeling of the human cardiovascular system using NeuralFMUs** Journal of Physics: Conference Series 2090, 1, 012155. [DOI: 10.1088/1742-6596/2090/1/012155](https://doi.org/10.1088/1742-6596/2090/1/012155)
 
 ## Interested in Hybrid Modelling in Julia using FMUs?
-See [FMIFlux.jl](https://github.com/ThummeTo/FMIFlux.jl).
+See [*FMIFlux.jl*](https://github.com/ThummeTo/FMIFlux.jl).

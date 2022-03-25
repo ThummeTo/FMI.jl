@@ -8,6 +8,7 @@ import SciMLBase: RightRootFind
 
 using FMIImport: fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2NewDiscreteStates, fmi2GetContinuousStates, fmi2GetNominalsOfContinuousStates, fmi2SetContinuousStates, fmi2GetDerivatives!
 using FMIImport.FMICore: fmi2StatusOK, fmi2TypeCoSimulation, fmi2TypeModelExchange
+using FMIImport.FMICore: fmi2ComponentState, fmi2ComponentStateInstantiated, fmi2ComponentStateInitializationMode, fmi2ComponentStateEventMode, fmi2ComponentStateContinuousTimeMode, fmi2ComponentStateTerminated, fmi2ComponentStateError, fmi2ComponentStateFatal
 
 using ChainRulesCore
 import ForwardDiff
@@ -16,87 +17,115 @@ import ForwardDiff
 
 # Read next time event from fmu and provide it to the integrator 
 function time_choice(c::FMU2Component, integrator)
-    eventInfo = fmi2NewDiscreteStates(c)
-    fmi2EnterContinuousTimeMode(c)
-    if Bool(eventInfo.nextEventTimeDefined)
-        eventInfo.nextEventTime
+
+    if c.eventInfo.nextEventTimeDefined == fmi2True
+        return c.eventInfo.nextEventTime
     else
         return nothing
     end
 end
 
 # Handles events and returns the values and nominals of the changed continuous states.
-function handleEvents(c::FMU2Component, enterEventMode::Bool, exitInContinuousMode::Bool)
+function handleEvents(c::FMU2Component)
 
-    if enterEventMode
-        fmi2EnterEventMode(c)
-    end
+    @assert c.state == fmi2ComponentStateEventMode "handleEvents(...): Must be in event mode!"
 
-    eventInfo = fmi2NewDiscreteStates(c)
+    # trigger the loop
+    c.eventInfo.newDiscreteStatesNeeded = fmi2True
 
-    valuesOfContinuousStatesChanged = eventInfo.valuesOfContinuousStatesChanged
-    nominalsOfContinuousStatesChanged = eventInfo.nominalsOfContinuousStatesChanged
+    valuesOfContinuousStatesChanged = fmi2False
+    nominalsOfContinuousStatesChanged = fmi2False
+    nextEventTimeDefined = fmi2False
+    nextEventTime = 0.0
 
-    while eventInfo.newDiscreteStatesNeeded == fmi2True
-        # update discrete states
-        eventInfo = fmi2NewDiscreteStates(c)
-        valuesOfContinuousStatesChanged = eventInfo.valuesOfContinuousStatesChanged
-        nominalsOfContinuousStatesChanged = eventInfo.nominalsOfContinuousStatesChanged
+    while c.eventInfo.newDiscreteStatesNeeded == fmi2True
+        fmi2NewDiscreteStates!(c, c.eventInfo)
 
-        if eventInfo.terminateSimulation == fmi2True
-            @error "Event info returned error!"
+        if c.eventInfo.valuesOfContinuousStatesChanged == fmi2True
+            valuesOfContinuousStatesChanged = fmi2True 
+        end 
+
+        if c.eventInfo.nominalsOfContinuousStatesChanged == fmi2True
+            nominalsOfContinuousStatesChanged = fmi2True
+        end
+
+        if c.eventInfo.nextEventTimeDefined == fmi2True
+            nextEventTimeDefined = fmi2True
+            nextEventTime = c.eventInfo.nextEventTime
+        end
+
+        if c.eventInfo.terminateSimulation == fmi2True
+            @error "handleEvents(...): FMU throws `terminateSimulation`!"
         end
     end
 
-    if exitInContinuousMode
-        fmi2EnterContinuousTimeMode(c)
-    end
+    c.eventInfo.valuesOfContinuousStatesChanged = valuesOfContinuousStatesChanged
+    c.eventInfo.nominalsOfContinuousStatesChanged = nominalsOfContinuousStatesChanged
+    c.eventInfo.nextEventTimeDefined = nextEventTimeDefined
+    c.eventInfo.nextEventTime = nextEventTime
 
-    return valuesOfContinuousStatesChanged, nominalsOfContinuousStatesChanged
+    return nothing
 end
 
 # Returns the event indicators for an FMU.
 function condition(c::FMU2Component, out::SubArray{<:Real}, x, t, integrator, inputFunction, inputValues::Array{fmi2ValueReference}) 
 
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "condition(...): Must be called in mode continuous time."
+
+    fmi2SetContinuousStates(c, x)
+    fmi2SetTime(c, integrator.t)
     if inputFunction !== nothing
         fmi2SetReal(c, inputValues, inputFunction(integrator.t))
     end
-
-    fmi2SetTime(c, t)
-    fmi2SetContinuousStates(c, x)
-    
     fmi2GetEventIndicators!(c, out)
+
+    return nothing
 end
 
 # Handles the upcoming events.
 # Sets a new state for the solver from the FMU (if needed).
 function affectFMU!(c::FMU2Component, integrator, idx, inputFunction, inputValues::Array{fmi2ValueReference})
 
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "affectFMU!(...): Must be in continuous time mode!"
+
     # there are fx-evaluations before the event is handled, reset the FMU state to the current integrator step
     fmi2SetContinuousStates(c, integrator.u)
-
-    # Event found - handle it
-    continuousStatesChanged, nominalsChanged = handleEvents(c, true, Bool(sign(idx)))
-
+    fmi2SetTime(c, integrator.t) 
     if inputFunction !== nothing
         fmi2SetReal(c, inputValues, inputFunction(integrator.t))
     end
 
-    if continuousStatesChanged == fmi2True
+    fmi2EnterEventMode(c)
+
+    # Event found - handle it
+    handleEvents(c)
+
+    if c.eventInfo.valuesOfContinuousStatesChanged == fmi2True
         new_u = fmi2GetContinuousStates(c)
-        @debug "affectFMU!(...): Handled event, new state is $(new_u)"
+        @debug "affectFMU!(...): Handled event at t=$(integrator.t), new state is $(new_u)"
         integrator.u = new_u
+    else 
+        @debug "affectFMU!(...): Handled event at t=$(integrator.t), no new state."
     end
 
-    if nominalsChanged == fmi2True
+    if c.eventInfo.nominalsOfContinuousStatesChanged == fmi2True
         x_nom = fmi2GetNominalsOfContinuousStates(c)
     end
+
+    fmi2EnterContinuousTimeMode(c)
 end
 
-# Does one step in the simulation.
+# This callback is called every time the integrator finishes an (accpeted) integration step.
 function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, inputValues::Array{fmi2ValueReference})
 
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "stepCompleted(...): Must be in continuous time mode."
+
     (status, enterEventMode, terminateSimulation) = fmi2CompletedIntegratorStep(c, fmi2True)
+    
+    if terminateSimulation == fmi2True
+        @error "stepCompleted(...): FMU requested termination!"
+    end
+
     if enterEventMode == fmi2True
         affectFMU!(c, integrator, 0, inputFunction, inputValues)
     else
@@ -104,6 +133,23 @@ function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, inputV
             fmi2SetReal(c, inputValues, inputFunction(integrator.t))
         end
     end
+end
+
+# save FMU values 
+function saveValues(c::FMU2Component, recordValues, u, t, integrator)
+
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "stepCompleted(...): Must be in continuous time mode."
+    
+    fmi2SetTime(c, t) 
+
+    if t > integrator.sol.t[end]
+        @warn "saveValues: t is too large ($(t)). Max is $(integrator.sol.t[end])."
+        t = integrator.sol.t[end]
+    end
+    x = integrator.sol(t)
+    fmi2SetContinuousStates(c, x)
+    
+    return (fmiGetReal(c, recordValues)...,)
 end
 
 function fx(c::FMU2Component, 
@@ -116,7 +162,6 @@ function fx(c::FMU2Component,
         t = ForwardDiff.value(t)
     end 
 
-    fmi2SetTime(c, t) 
     fmi2SetContinuousStates(c, x)
 
     if all(isa.(dx, ForwardDiff.Dual))
@@ -402,15 +447,6 @@ end
 #     return (y, fx_pullforward(Δx)...)
 # end
 
-# save FMU values 
-function saveValues(c::FMU2Component, recordValues, u, t, integrator)
-    fmi2SetTime(c, t) 
-    x = integrator.sol(t)
-    fmi2SetContinuousStates(c, x)
-    
-    (fmiGetReal(c, recordValues)...,)
-end
-
 """
 Simulates a FMU instance for the given simulation time interval.
 State- and Time-Events are handled correctly.
@@ -441,8 +477,11 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     recordValues::fmi2ValueReferenceFormat = nothing,
     saveat = [],
     x0::Union{Array{<:Real}, Nothing} = nothing,
-    setup::Bool = true,
-    reset::Bool = true,
+    setup::Union{Bool, Nothing} = nothing,
+    reset::Union{Bool, Nothing} = nothing,
+    instantiate::Union{Bool, Nothing} = nothing,
+    freeInstance::Union{Bool, Nothing} = nothing,
+    terminate::Union{Bool, Nothing} = nothing,
     inputValueReferences::fmi2ValueReferenceFormat = nothing,
     inputFunction = nothing,
     parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
@@ -459,6 +498,26 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     hasInputs = (length(inputValueReferences) > 0)
     hasParameters = (parameters != nothing)
     hasStartState = (x0 != nothing)
+
+    if instantiate === nothing 
+        instantiate = c.fmu.executionConfig.instantiate
+    end
+
+    if terminate === nothing 
+        terminate = c.fmu.executionConfig.terminate
+    end
+
+    if reset === nothing 
+        reset = c.fmu.executionConfig.reset 
+    end
+
+    if setup === nothing 
+        setup = c.fmu.executionConfig.setup 
+    end 
+
+    if freeInstance === nothing 
+        freeInstance = c.fmu.executionConfig.freeInstance
+    end
 
     t_start = t_start === nothing ? fmi2GetDefaultStartTime(c.fmu.modelDescription) : t_start
     t_start = t_start === nothing ? 0.0 : t_start
@@ -486,23 +545,26 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
         solver = Tsit5()
     end
 
-    if reset 
-        if c.state == fmi2ComponentStateModelInitialized
-            retcode = fmi2Terminate(c)
-            @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Termination failed with return code $(retcode)."
-        end
-        if c.state == fmi2ComponentStateModelSetableFMUstate
-            retcode = fmi2Reset(c)
-            @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Reset failed with return code $(retcode)."
-        end
+    # instantiate (hard)
+    if instantiate
+        c = fmi2Instantiate!(c.fmu)
+    end
+
+    # soft terminate (if necessary)
+    if terminate
+        @assert fmi2Terminate(c; soft=true) == fmi2StatusOK "fmi2SimulateME(...): Termination failed with return code $(retcode)."
+    end
+
+    # soft reset (if necessary)
+    if reset
+        @assert fmi2Reset(c; soft=true) == fmi2StatusOK "fmi2SimulateME(...): Reset failed with return code $(retcode)."
     end 
 
+    # enter setup (hard)
     if setup
-        retcode = fmi2SetupExperiment(c, t_start, t_stop)
-        @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Setting up experiment failed with return code $(retcode)."
+        @assert fmi2SetupExperiment(c, t_start, t_stop) == fmi2StatusOK "fmi2SimulateME(...): Setting up experiment failed with return code $(retcode)."
 
-        retcode = fmi2EnterInitializationMode(c)
-        @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Entering initialization mode failed with return code $(retcode)."
+        @assert fmi2EnterInitializationMode(c) == fmi2StatusOK "fmi2SimulateME(...): Entering initialization mode failed with return code $(retcode)."
     end 
 
     if hasStartState
@@ -517,51 +579,42 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
         fmi2Set(c, collect(keys(parameters)), collect(values(parameters)) )
     end
 
+    # exit setup (hard)
     if setup
-        retcode = fmi2ExitInitializationMode(c)
-        @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Exiting initialization mode failed with return code $(retcode)."
+        @assert fmi2ExitInitializationMode(c) == fmi2StatusOK "fmi2SimulateME(...): Exiting initialization mode failed with return code $(retcode)."
     end
 
-    eventHandling = c.fmu.modelDescription.numberOfEventIndicators > 0
-    timeEventHandling = false
+    # from here on, we are in event mode, if `setup=false` this is the job of the user
+    @assert c.state == fmi2ComponentStateEventMode "FMU needs to be in event mode after setup."
 
-    if eventHandling
-        eventInfo = fmi2NewDiscreteStates(c)
-        timeEventHandling = (eventInfo.nextEventTimeDefined == fmi2True)
-    end
+    x0 = fmi2GetContinuousStates(c)
+    x0_nom = fmi2GetNominalsOfContinuousStates(c)
 
-    if customFx == nothing
+    # initial event handling
+    handleEvents(c) 
+    fmi2EnterContinuousTimeMode(c)
+
+    c.fmu.hasStateEvents = (c.fmu.modelDescription.numberOfEventIndicators > 0)
+    c.fmu.hasTimeEvents = (c.eventInfo.nextEventTimeDefined == fmi2True)
+    
+    if customFx === nothing
         customFx = (dx, x, p, t) -> fx(c, dx, x, p, t)
     end
-    
-    # First evaluation of the FMU
-    x0 = fmi2GetContinuousStates(c)
-    x0_nom = fmi2GetNominalsOfContinuousStates(c)
-
-    fmi2SetContinuousStates(c, x0)
-    
-    handleEvents(c, false, false)
-
-    # Get states of handling initial Events
-    x0 = fmi2GetContinuousStates(c)
-    x0_nom = fmi2GetNominalsOfContinuousStates(c)
-
-    fmi2EnterContinuousTimeMode(c)
 
     p = []
     problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
 
-    # callback functions
+    # callback functions / event handlers
     
     # use step callback always if we have inputs or need evenet handling
-    if hasInputs || eventHandling
+    if hasInputs || c.fmu.hasStateEvents || c.fmu.hasTimeEvents
         stepCb = FunctionCallingCallback((x, t, integrator) -> stepCompleted(c, x, t, integrator, inputFunction, inputValueReferences);
                                             func_everystep = true,
                                             func_start = true)
         push!(callbacks, stepCb)
     end
 
-    if eventHandling
+    if c.fmu.hasStateEvents
 
         eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator, inputFunction, inputValueReferences),
                                            (integrator, idx) -> affectFMU!(c, integrator, idx, inputFunction, inputValueReferences),
@@ -569,17 +622,22 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
                                            rootfind = RightRootFind,
                                            save_positions=(false,false))
         push!(callbacks, eventCb)
+    end
 
-        if timeEventHandling
-            timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator),
-                                            (integrator) -> affectFMU!(c, integrator, 0, inputFunction, inputValueReferences), Float64; 
-                                            initial_affect = false, # ToDo: or better 'false'?
-                                            save_positions=(false,false))
-            push!(callbacks, timeEventCb)
-        end
+    if c.fmu.hasTimeEvents
+        timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator),
+                                        (integrator) -> affectFMU!(c, integrator, 0, inputFunction, inputValueReferences), Float64; 
+                                        initial_affect = false, # ToDo: or better 'false'?
+                                        save_positions=(false,false))
+        push!(callbacks, timeEventCb)
     end
 
     solution = solve(problem, solver; callback = CallbackSet(callbacks...), saveat = saveat, tol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
+
+    # freInstance (hard)
+    if freeInstance
+        fmi2FreeInstance!(c)
+    end
 
     if savingValues
         return solution, savedValues
@@ -651,12 +709,8 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     @assert !(setup==false && reset==true) "fmi2SimulateME(...): keyword argument `setup=false`, but `reset=true`. This may cause a FMU crash."
 
     if reset 
-        if c.state == fmi2ComponentStateModelInitialized
-            fmi2Terminate(c)
-        end
-        if c.state == fmi2ComponentStateModelSetableFMUstate
-            fmi2Reset(c)
-        end
+        fmi2Terminate(c; soft=true)
+        fmi2Reset(c; soft=true)
     end 
 
     if setup
