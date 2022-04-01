@@ -13,6 +13,8 @@ using FMIImport.FMICore: fmi2ComponentState, fmi2ComponentStateInstantiated, fmi
 using ChainRulesCore
 import ForwardDiff
 
+import ProgressMeter
+
 ############ Model-Exchange ############
 
 # Read next time event from fmu and provide it to the integrator 
@@ -116,9 +118,13 @@ function affectFMU!(c::FMU2Component, integrator, idx, inputFunction, inputValue
 end
 
 # This callback is called every time the integrator finishes an (accpeted) integration step.
-function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, inputValues::Array{fmi2ValueReference})
+function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, inputValues::Array{fmi2ValueReference}, progressMeter, tStart, tStop)
 
     @assert c.state == fmi2ComponentStateContinuousTimeMode "stepCompleted(...): Must be in continuous time mode."
+
+    if progressMeter !== nothing 
+        ProgressMeter.update!(progressMeter, floor(Integer, 1000.0*(t-tStart)/(tStop-tStart)) )
+    end
 
     (status, enterEventMode, terminateSimulation) = fmi2CompletedIntegratorStep(c, fmi2True)
     
@@ -136,17 +142,11 @@ function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, inputV
 end
 
 # save FMU values 
-function saveValues(c::FMU2Component, recordValues, u, t, integrator)
+function saveValues(c::FMU2Component, recordValues, x, t, integrator)
 
-    @assert c.state == fmi2ComponentStateContinuousTimeMode "stepCompleted(...): Must be in continuous time mode."
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "saveValues(...): Must be in continuous time mode."
     
     fmi2SetTime(c, t) 
-
-    if t > integrator.sol.t[end]
-        @warn "saveValues: t is too large ($(t)). Max is $(integrator.sol.t[end])."
-        t = integrator.sol.t[end]
-    end
-    x = integrator.sol(t)
     fmi2SetContinuousStates(c, x)
     
     return (fmiGetReal(c, recordValues)...,)
@@ -447,6 +447,11 @@ end
 #     return (y, fx_pullforward(Δx)...)
 # end
 
+# wrapper
+function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
+    fmi2SimulateME(c.fmu, c, t_start, t_stop; kwargs...)
+end 
+
 """
 Simulates a FMU instance for the given simulation time interval.
 State- and Time-Events are handled correctly.
@@ -469,7 +474,7 @@ Returns:
     - If keyword `recordValues` is not set, a struct of type `ODESolution`.
     - If keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues).
 """
-function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
+function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
     tolerance::Union{Real, Nothing} = nothing,
     dt::Union{Real, Nothing} = nothing,
     solver = nothing,
@@ -487,58 +492,58 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
     dtmax::Union{Real, Nothing} = nothing,
     callbacks = [],
+    showProgress::Bool = true,
     kwargs...)
 
-    recordValues = prepareValueReference(c, recordValues)
-    inputValueReferences = prepareValueReference(c, inputValueReferences)
+    @assert fmi2IsModelExchange(fmu) "fmi2SimulateME(...): This function supports Model Excahnge FMUs only."
+
+    recordValues = prepareValueReference(fmu, recordValues)
+    inputValueReferences = prepareValueReference(fmu, inputValueReferences)
     solution = nothing
     savedValues = nothing
 
     savingValues = (length(recordValues) > 0)
     hasInputs = (length(inputValueReferences) > 0)
-    hasParameters = (parameters != nothing)
-    hasStartState = (x0 != nothing)
+    hasParameters = (parameters !== nothing)
+    hasStartState = (x0 !== nothing)
+
+    cbs = []
+
+    for cb in callbacks
+        push!(cbs, cb)
+    end
 
     if instantiate === nothing 
-        instantiate = c.fmu.executionConfig.instantiate
+        instantiate = fmu.executionConfig.instantiate
     end
 
     if terminate === nothing 
-        terminate = c.fmu.executionConfig.terminate
+        terminate = fmu.executionConfig.terminate
     end
 
     if reset === nothing 
-        reset = c.fmu.executionConfig.reset 
+        reset = fmu.executionConfig.reset 
     end
 
     if setup === nothing 
-        setup = c.fmu.executionConfig.setup 
+        setup = fmu.executionConfig.setup 
     end 
 
     if freeInstance === nothing 
-        freeInstance = c.fmu.executionConfig.freeInstance
+        freeInstance = fmu.executionConfig.freeInstance
     end
 
-    t_start = t_start === nothing ? fmi2GetDefaultStartTime(c.fmu.modelDescription) : t_start
+    t_start = t_start === nothing ? fmi2GetDefaultStartTime(fmu.modelDescription) : t_start
     t_start = t_start === nothing ? 0.0 : t_start
-    t_stop = t_stop === nothing ? fmi2GetDefaultStopTime(c.fmu.modelDescription) : t_stop
+    t_stop = t_stop === nothing ? fmi2GetDefaultStopTime(fmu.modelDescription) : t_stop
     t_stop = t_stop === nothing ? 1.0 : t_stop
-    tolerance = tolerance === nothing ? fmi2GetDefaultTolerance(c.fmu.modelDescription) : tolerance
+    tolerance = tolerance === nothing ? fmi2GetDefaultTolerance(fmu.modelDescription) : tolerance
     tolerance = tolerance === nothing ? 1e-4 : tolerance
-    dt = dt === nothing ? fmi2GetDefaultStepSize(c.fmu.modelDescription) : dt
+    dt = dt === nothing ? fmi2GetDefaultStepSize(fmu.modelDescription) : dt
     dt = dt === nothing ? 1e-5 : dt 
 
-    if dtmax == nothing
+    if dtmax === nothing
         dtmax = (t_stop-t_start)/100.0
-    end
-
-    if savingValues
-        savedValues = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...})
-
-        savingCB = SavingCallback((u,t,integrator) -> saveValues(c, recordValues, u, t, integrator), 
-                                  savedValues, 
-                                  saveat=saveat)
-        push!(callbacks, savingCB)
     end
 
     if solver === nothing
@@ -547,41 +552,48 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
 
     # instantiate (hard)
     if instantiate
-        c = fmi2Instantiate!(c.fmu)
+        c = fmi2Instantiate!(fmu)
+    else
+        if c === nothing
+            c = fmu.components[end]
+        end
     end
 
     # soft terminate (if necessary)
     if terminate
-        @assert fmi2Terminate(c; soft=true) == fmi2StatusOK "fmi2SimulateME(...): Termination failed with return code $(retcode)."
+        retcode = fmi2Terminate(c; soft=true)
+        @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Termination failed with return code $(retcode)."
     end
 
     # soft reset (if necessary)
     if reset
-        @assert fmi2Reset(c; soft=true) == fmi2StatusOK "fmi2SimulateME(...): Reset failed with return code $(retcode)."
+        retcode = fmi2Reset(c; soft=true)
+        @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Reset failed with return code $(retcode)."
     end 
 
     # enter setup (hard)
     if setup
-        @assert fmi2SetupExperiment(c, t_start, t_stop) == fmi2StatusOK "fmi2SimulateME(...): Setting up experiment failed with return code $(retcode)."
+        retcode = fmi2SetupExperiment(c, t_start, t_stop)
+        @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Setting up experiment failed with return code $(retcode)."
 
-        @assert fmi2EnterInitializationMode(c) == fmi2StatusOK "fmi2SimulateME(...): Entering initialization mode failed with return code $(retcode)."
+        retcode = fmi2EnterInitializationMode(c)
+        @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Entering initialization mode failed with return code $(retcode)."
     end 
 
     if hasStartState
-        if fmi2IsModelExchange(c.fmu)
-            fmi2SetContinuousStates(c, x0)
-        else
-            fmi2SetReal(c, c.fmu.modelDescription.stateValueReferences, x0)
-        end
+        retcode = fmi2SetContinuousStates(c, x0)
+        @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Setting initial state failed with return code $(retcode)."
     end
 
     if hasParameters
-        fmi2Set(c, collect(keys(parameters)), collect(values(parameters)) )
+        retcode = fmi2Set(c, collect(keys(parameters)), collect(values(parameters)) )
+        @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Setting initial parameters failed with return code $(retcode)."
     end
 
     # exit setup (hard)
     if setup
-        @assert fmi2ExitInitializationMode(c) == fmi2StatusOK "fmi2SimulateME(...): Exiting initialization mode failed with return code $(retcode)."
+        retcode = fmi2ExitInitializationMode(c)
+        @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Exiting initialization mode failed with return code $(retcode)."
     end
 
     # from here on, we are in event mode, if `setup=false` this is the job of the user
@@ -604,14 +616,29 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     p = []
     problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
 
-    # callback functions / event handlers
+    progressMeter = nothing
+    if showProgress 
+        progressMeter = ProgressMeter.Progress(1000; desc="Simulating ME-FMU ...", color=:black, dt=1.0) #, barglyphs=ProgressMeter.BarGlyphs("[=> ]"))
+        ProgressMeter.update!(progressMeter, 0) # show it!
+    end
+
+    # callback functions
+
+    if savingValues
+        savedValues = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...})
+
+        savingCB = SavingCallback((u,t,integrator) -> saveValues(c, recordValues, u, t, integrator), 
+                                  savedValues, 
+                                  saveat=saveat)
+        push!(cbs, savingCB)
+    end
     
-    # use step callback always if we have inputs or need evenet handling
-    if hasInputs || c.fmu.hasStateEvents || c.fmu.hasTimeEvents
-        stepCb = FunctionCallingCallback((x, t, integrator) -> stepCompleted(c, x, t, integrator, inputFunction, inputValueReferences);
+    # use step callback always if we have inputs or need event handling (or just want to see our simulation progress)
+    if hasInputs || c.fmu.hasStateEvents || c.fmu.hasTimeEvents || showProgress
+        stepCb = FunctionCallingCallback((x, t, integrator) -> stepCompleted(c, x, t, integrator, inputFunction, inputValueReferences, progressMeter, t_start, t_stop);
                                             func_everystep = true,
                                             func_start = true)
-        push!(callbacks, stepCb)
+        push!(cbs, stepCb)
     end
 
     if c.fmu.hasStateEvents
@@ -621,20 +648,25 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
                                            Int64(c.fmu.modelDescription.numberOfEventIndicators);
                                            rootfind = RightRootFind,
                                            save_positions=(false,false))
-        push!(callbacks, eventCb)
+        push!(cbs, eventCb)
     end
 
     if c.fmu.hasTimeEvents
         timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator),
                                         (integrator) -> affectFMU!(c, integrator, 0, inputFunction, inputValueReferences), Float64; 
-                                        initial_affect = false, # ToDo: or better 'false'?
+                                        initial_affect = (c.eventInfo.nextEventTime == t_start),
                                         save_positions=(false,false))
-        push!(callbacks, timeEventCb)
+        push!(cbs, timeEventCb)
     end
 
-    solution = solve(problem, solver; callback = CallbackSet(callbacks...), saveat = saveat, tol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
+    solution = solve(problem, solver; callback = CallbackSet(cbs...), saveat = saveat, tol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
 
-    # freInstance (hard)
+    # cleanup progress meter
+    if showProgress 
+        ProgressMeter.finish!(progressMeter)
+    end
+
+    # freeInstance (hard)
     if freeInstance
         fmi2FreeInstance!(c)
     end
@@ -674,6 +706,7 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
                         reset::Bool = true,
                         inputValueReferences::fmi2ValueReferenceFormat = nothing,
                         inputFunction = nothing,
+                        showProgress::Bool=true,
                         parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing)
 
     recordValues = prepareValueReference(c, recordValues)
@@ -728,6 +761,12 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
 
     record = length(recordValues) > 0
 
+    progressMeter = nothing
+    if showProgress 
+        progressMeter = ProgressMeter.Progress(1000; desc="Simulating CS-FMU ...", color=:black, dt=1.0) #, barglyphs=ProgressMeter.BarGlyphs("[=> ]"))
+        ProgressMeter.update!(progressMeter, 0) # show it!
+    end
+
     if record
         savedValues = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...} )
 
@@ -757,6 +796,14 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
             svalues = (fmi2GetReal(c, recordValues)...,)
             DiffEqCallbacks.copyat_or_push!(savedValues.t, i, t)
             DiffEqCallbacks.copyat_or_push!(savedValues.saveval, i, svalues, Val{false})
+
+            if progressMeter !== nothing 
+                ProgressMeter.update!(progressMeter, floor(Integer, 1000.0*(t-t_start)/(t_stop-t_start)) )
+            end
+        end
+
+        if progressMeter !== nothing 
+            ProgressMeter.finish!(progressMeter)
         end
 
         success = true
@@ -780,6 +827,14 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
             fmi2DoStep(c, dt; currentCommunicationPoint=t)
             t = t + dt 
             i += 1
+
+            if progressMeter !== nothing 
+                ProgressMeter.update!(progressMeter, floor(Integer, 1000.0*(t-t_start)/(t_stop-t_start)) )
+            end
+        end
+
+        if progressMeter !== nothing 
+            ProgressMeter.finish!(progressMeter)
         end
 
         success = true

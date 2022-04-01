@@ -24,10 +24,7 @@ function fmi2SimulateCS(fmu::FMU2, args...; kwargs...)
 end
 
 function fmi2SimulateME(fmu::FMU2, args...; kwargs...)
-
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate? Use keyword `instantiate=true` to allocate an instance automatically."]
-    c = fmu.components[end]
-    return fmi2SimulateME(c, args...; kwargs...)
+    return fmi2SimulateME(fmu, nothing, args...; kwargs...)
 end
 
 function fmi2FreeInstance!(fmu::FMU2)

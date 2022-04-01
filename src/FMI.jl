@@ -39,7 +39,13 @@ using FMIExport: fmi2Create, fmi2CreateSimple
 
 using FMIImport.FMICore: fmi2ValueReference, fmi3ValueReference
 using FMIImport: fmi2ValueReferenceFormat, fmi3ValueReferenceFormat, fmi2StructMD, fmi3StructMD, fmi2Struct, fmi3Struct
+
 using FMIImport.FMICore: FMU2, FMU3, FMU2Component, FMU3Component
+export FMU2, FMU3, FMU2Component, FMU3Component
+
+using FMIImport.FMICore: FMU2ExecutionConfiguration, FMU_EXECUTION_CONFIGURATION_RESET, FMU_EXECUTION_CONFIGURATION_NO_RESET, FMU_EXECUTION_CONFIGURATION_NO_FREEING
+export FMU2ExecutionConfiguration, FMU_EXECUTION_CONFIGURATION_RESET, FMU_EXECUTION_CONFIGURATION_NO_RESET, FMU_EXECUTION_CONFIGURATION_NO_FREEING
+
 using FMIImport: prepareValue, prepareValueReference
 
 include("FMI1_additional.jl")
