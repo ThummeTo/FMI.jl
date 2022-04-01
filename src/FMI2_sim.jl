@@ -9,6 +9,7 @@ import SciMLBase: RightRootFind
 using FMIImport: fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2NewDiscreteStates, fmi2GetContinuousStates, fmi2GetNominalsOfContinuousStates, fmi2SetContinuousStates, fmi2GetDerivatives!
 using FMIImport.FMICore: fmi2StatusOK, fmi2TypeCoSimulation, fmi2TypeModelExchange
 using FMIImport.FMICore: fmi2ComponentState, fmi2ComponentStateInstantiated, fmi2ComponentStateInitializationMode, fmi2ComponentStateEventMode, fmi2ComponentStateContinuousTimeMode, fmi2ComponentStateTerminated, fmi2ComponentStateError, fmi2ComponentStateFatal
+using FMIImport: FMU2Solution
 
 using ChainRulesCore
 import ForwardDiff
@@ -499,8 +500,8 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
 
     recordValues = prepareValueReference(fmu, recordValues)
     inputValueReferences = prepareValueReference(fmu, inputValueReferences)
-    solution = nothing
-    savedValues = nothing
+    
+    fmusol = FMU2Solution(fmu)
 
     savingValues = (length(recordValues) > 0)
     hasInputs = (length(inputValueReferences) > 0)
@@ -618,17 +619,18 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
 
     progressMeter = nothing
     if showProgress 
-        progressMeter = ProgressMeter.Progress(1000; desc="Simulating ME-FMU ...", color=:black, dt=1.0) #, barglyphs=ProgressMeter.BarGlyphs("[=> ]"))
+        progressMeter = ProgressMeter.Progress(1000; desc="Simulating ME-FMU ...", color=:blue, dt=1.0) #, barglyphs=ProgressMeter.BarGlyphs("[=> ]"))
         ProgressMeter.update!(progressMeter, 0) # show it!
     end
 
     # callback functions
 
     if savingValues
-        savedValues = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...})
+        fmusol.values = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...})
+        fmusol.valueReferences = copy(recordValues)
 
         savingCB = SavingCallback((u,t,integrator) -> saveValues(c, recordValues, u, t, integrator), 
-                                  savedValues, 
+                                  fmusol.values, 
                                   saveat=saveat)
         push!(cbs, savingCB)
     end
@@ -659,7 +661,8 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         push!(cbs, timeEventCb)
     end
 
-    solution = solve(problem, solver; callback = CallbackSet(cbs...), saveat = saveat, tol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
+    fmusol.states = solve(problem, solver; callback = CallbackSet(cbs...), saveat = saveat, tol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
+    fmusol.success = (fmusol.states.retcode == :Success)
 
     # cleanup progress meter
     if showProgress 
@@ -671,11 +674,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         fmi2FreeInstance!(c)
     end
 
-    if savingValues
-        return solution, savedValues
-    else 
-        return solution
-    end
+    return fmusol
 end
 
 ############ Co-Simulation ############
@@ -704,6 +703,7 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
                         saveat = [],
                         setup::Bool = true,
                         reset::Bool = true,
+                        instantiate::Union{Bool, Nothing}=nothing,
                         inputValueReferences::fmi2ValueReferenceFormat = nothing,
                         inputFunction = nothing,
                         showProgress::Bool=true,
@@ -711,6 +711,8 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
 
     recordValues = prepareValueReference(c, recordValues)
     inputValueReferences = prepareValueReference(c, inputValueReferences)
+
+    fmusol = FMU2Solution(c.fmu)
     
     variableSteps = fmi2IsCoSimulation(c.fmu) && c.fmu.modelDescription.coSimulation.canHandleVariableCommunicationStepSize 
     hasParameters = (parameters != nothing)
@@ -723,9 +725,6 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     tolerance = tolerance === nothing ? 0.0 : tolerance
     dt = dt === nothing ? fmi2GetDefaultStepSize(c.fmu.modelDescription) : dt
     dt = dt === nothing ? 1e-3 : dt
-
-    success = false
-    savedValues = nothing
 
     # default setup
     if length(saveat) == 0
@@ -763,18 +762,19 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
 
     progressMeter = nothing
     if showProgress 
-        progressMeter = ProgressMeter.Progress(1000; desc="Simulating CS-FMU ...", color=:black, dt=1.0) #, barglyphs=ProgressMeter.BarGlyphs("[=> ]"))
+        progressMeter = ProgressMeter.Progress(1000; desc="Simulating CS-FMU ...", color=:blue, dt=1.0) #, barglyphs=ProgressMeter.BarGlyphs("[=> ]"))
         ProgressMeter.update!(progressMeter, 0) # show it!
     end
 
     if record
-        savedValues = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...} )
+        fmusol.values = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...} )
+        fmusol.valueReferences = copy(recordValues)
 
         i = 1
 
         svalues = (fmi2GetReal(c, recordValues)...,)
-        DiffEqCallbacks.copyat_or_push!(savedValues.t, i, t)
-        DiffEqCallbacks.copyat_or_push!(savedValues.saveval, i, svalues, Val{false})
+        DiffEqCallbacks.copyat_or_push!(fmusol.values.t, i, t)
+        DiffEqCallbacks.copyat_or_push!(fmusol.values.saveval, i, svalues, Val{false})
 
         while t < t_stop
             if variableSteps
@@ -794,8 +794,8 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
             i += 1
 
             svalues = (fmi2GetReal(c, recordValues)...,)
-            DiffEqCallbacks.copyat_or_push!(savedValues.t, i, t)
-            DiffEqCallbacks.copyat_or_push!(savedValues.saveval, i, svalues, Val{false})
+            DiffEqCallbacks.copyat_or_push!(fmusol.values.t, i, t)
+            DiffEqCallbacks.copyat_or_push!(fmusol.values.saveval, i, svalues, Val{false})
 
             if progressMeter !== nothing 
                 ProgressMeter.update!(progressMeter, floor(Integer, 1000.0*(t-t_start)/(t_stop-t_start)) )
@@ -806,9 +806,8 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
             ProgressMeter.finish!(progressMeter)
         end
 
-        success = true
+        fmusol.success = true
 
-        return success, savedValues
     else
         i = 1
         while t < t_stop
@@ -837,10 +836,10 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
             ProgressMeter.finish!(progressMeter)
         end
 
-        success = true
-
-        return success
+        fmusol.success = true
     end
+
+    return fmusol
 end
 
 ##### CS & ME #####

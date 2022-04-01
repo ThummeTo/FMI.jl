@@ -18,10 +18,10 @@ if envFMUSTRUCT == "FMU"
 elseif envFMUSTRUCT == "FMUCOMPONENT"
     fmuStruct = comp
 end
-success = fmiSimulateCS(fmuStruct, t_start, t_stop)
-@test success
-sol, _ = fmiSimulateME(fmuStruct, t_start, t_stop)
-@test sol.retcode == :Success
+sol = fmiSimulateCS(fmuStruct, t_start, t_stop)
+@test sol.success 
+sol = fmiSimulateME(fmuStruct, t_start, t_stop)
+@test sol.success 
 fmiUnload(myFMU)
 
 
@@ -36,8 +36,8 @@ if envFMUSTRUCT == "FMU"
 elseif envFMUSTRUCT == "FMUCOMPONENT"
     fmuStruct = comp
 end
-sol, _ = fmiSimulate(fmuStruct, t_start, t_stop)
-@test sol.retcode == :Success
+sol = fmiSimulate(fmuStruct, t_start, t_stop)
+@test sol.success
 fmiUnload(myFMU)
 
 
@@ -52,6 +52,6 @@ if envFMUSTRUCT == "FMU"
 elseif envFMUSTRUCT == "FMUCOMPONENT"
     fmuStruct = comp
 end
-success = fmiSimulate(fmuStruct, t_start, t_stop)
-@test success
+sol = fmiSimulate(fmuStruct, t_start, t_stop)
+@test sol.success
 fmiUnload(myFMU)

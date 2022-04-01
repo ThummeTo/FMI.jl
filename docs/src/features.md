@@ -11,6 +11,13 @@ Because not all users need the full potential of this configuration tool, there 
 - `myFMU.executionConfig = FMU_EXECUTION_CONFIGURATION_RESET` is faster for well-implemented FMUs, but needs a fully working `fmi2Reset`-function. So if you know you have a fully working `fmi2Reset`, you may be faster with that option.
 - `myFMU.executionConfig = FMU_EXECUTION_CONFIGURATION_NO_FREEING` should only be the very last choise. If your FMU neither supports `fmi2Reset` nor a propper `fmi2FreeInstance`, you could use this configuration as a last way out. Keep in mind, that new FMU instances are allocated but not freed, as long as your Julia instance is running (memory leak). In general, the amount of leaked memory is small, but you need to know what you are doing, if you do thousands or ten-thousands of simulation runs with such a FMU.
 
+## Model variable identification
+*FMI.jl* offers multiple ways to retrieve your model variables. Any function that accepts a variable identifier can handle the following argument types:
+- `UInt32` or `fmi2ValueReference` for example `1610612742` or `0x16000001`: This is the most performant way of passing a variable identifier, but you need to know up the *value reference*.
+- `String` for example `"der(state1)"`: This is the most intuitive way, because you might know the variable name instead of its identifier.
+- `Symbol` for example `:states`: There are multiple symbol wildcards for interessting variable groups like `:all`, `:none`, `:states`, `:derivatives`, `:inputs` and `:outputs`.
+- `nothing`: If you don't want to record anything (same as `:none`)
+
 ## Event handling
 In FMI2, there are basically two types of events: state and time. 
 State events are triggered, as soon as one or more *event indicators* - scalar values that describe the "distance" in state space to the next state event - crossing zero. 
