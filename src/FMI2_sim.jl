@@ -21,7 +21,7 @@ function time_choice(c::FMU2Component, integrator)
     if Bool(eventInfo.nextEventTimeDefined)
         eventInfo.nextEventTime
     else
-        Inf
+        return nothing
     end
 end
 
@@ -120,22 +120,16 @@ function fx(c::FMU2Component,
     fmi2SetContinuousStates(c, x)
 
     if all(isa.(dx, ForwardDiff.Dual))
-        dx = collect(ForwardDiff.value(e) for e in dx)
+        dx_tmp = collect(ForwardDiff.value(e) for e in dx)
+        fmi2GetDerivatives!(c, dx_tmp)
+        T, V, N = fd_eltypes(dx)
+        dx[:] = collect(ForwardDiff.Dual{T, V, N}(dx_tmp[i], ForwardDiff.partials(dx[i])    ) for i in 1:length(dx))
+    else 
+        fmi2GetDerivatives!(c, dx)
     end
 
-    fmi2GetDerivatives!(c, dx)
     return dx
 end
-
-# function fx(c::FMU2Component, 
-#     x::Array{<:Real}, 
-#     p::Array, 
-#     t::Real)
-
-#     dx = zeros(length(x))
-#     fx(c, dx, x, p, t)
-#     dx
-# end
 
 # ForwardDiff-Dispatch for fx
 function fx(comp::FMU2Component,
@@ -144,26 +138,191 @@ function fx(comp::FMU2Component,
             p::Array,
             t::Real) where {Tx, Vx, Nx}
 
-    return _fx_fd((Tx, Vx, Nx), comp, dx, x, p, t)
+    return _fx_fd(comp, dx, x, p, t)
 end
 
-function _fx_fd(TVNx, comp, dx, x, p, t) 
+# function _fx_fd(TVNx, comp, dx, x, p, t) 
   
-    Tx, Vx, Nx = TVNx
+#     Tx, Vx, Nx = TVNx
     
-    ȧrgs = [NoTangent(), NoTangent(), collect(ForwardDiff.partials(e) for e in dx), collect(ForwardDiff.partials(e) for e in x), collect(ForwardDiff.partials(e) for e in p), ForwardDiff.partials(t)]
-    args = [fx,          comp,        collect(ForwardDiff.value(e) for e in dx), collect(ForwardDiff.value(e) for e in x),    collect(ForwardDiff.value(e) for e in p),    ForwardDiff.value(t),  ]
+#     ȧrgs = [NoTangent(), NoTangent(), collect(ForwardDiff.partials(e) for e in dx), collect(ForwardDiff.partials(e) for e in x), collect(ForwardDiff.partials(e) for e in p), ForwardDiff.partials(t)]
+#     args = [fx,          comp,        collect(ForwardDiff.value(e) for e in dx), collect(ForwardDiff.value(e) for e in x),    collect(ForwardDiff.value(e) for e in p),    ForwardDiff.value(t),  ]
 
-    ȧrgs = (ȧrgs...,)
-    args = (args...,)
+#     ȧrgs = (ȧrgs...,)
+#     args = (args...,)
      
-    y, _, sdx, sx, _, _ = ChainRulesCore.frule(ȧrgs, args...)
+#     y, _, sdx, sx, _, _ = ChainRulesCore.frule(ȧrgs, args...)
 
-    if Vx != Float64
-        Vx = Float64
+#     if Vx != Float64
+#         Vx = Float64
+#     end
+
+#     [collect( ForwardDiff.Dual{Tx, Vx, Nx}(y[i], sx[i]) for i in 1:length(sx) )...]
+# end
+
+function fd_eltypes(e::ForwardDiff.Dual{T, V, N}) where {T, V, N}
+    return (T, V, N)
+end
+function fd_eltypes(e::Array{<:ForwardDiff.Dual{T, V, N}}) where {T, V, N}
+    return (T, V, N)
+end
+function _fx_fd(comp, dx, x, p, t) 
+
+    ȧrgs = []
+    args = []
+
+    push!(ȧrgs, NoTangent())
+    push!(args, fx)
+
+    push!(ȧrgs, NoTangent())
+    push!(args, comp)
+
+    T = nothing
+    V = nothing
+
+    dx_set = length(dx) > 0 && all(isa.(dx, ForwardDiff.Dual))
+    x_set = length(x) > 0 && all(isa.(x, ForwardDiff.Dual))
+    p_set = length(p) > 0 && all(isa.(p, ForwardDiff.Dual))
+    t_set = isa(t, ForwardDiff.Dual)
+
+    if dx_set
+        T, V, N = fd_eltypes(dx)
+        push!(ȧrgs, collect(ForwardDiff.partials(e) for e in dx))
+        push!(args, collect(ForwardDiff.value(e) for e in dx))
+        #@info "dx_set num=$(length(dx)) partials=$(length(ForwardDiff.partials(dx[1])))"
+    else 
+        push!(ȧrgs, NoTangent())
+        push!(args, dx)
     end
 
-    [collect( ForwardDiff.Dual{Tx, Vx, Nx}(y[i], sx[i]) for i in 1:length(sx) )...]
+    if x_set
+        T, V, N = fd_eltypes(x)
+        push!(ȧrgs, collect(ForwardDiff.partials(e) for e in x))
+        push!(args, collect(ForwardDiff.value(e) for e in x))
+        #@info "x_set num=$(length(x)) partials=$(length(ForwardDiff.partials(x[1])))"
+    else 
+        push!(ȧrgs, NoTangent())
+        push!(args, x)
+    end
+
+    if p_set
+        T, V, N = fd_eltypes(p)
+        push!(ȧrgs, collect(ForwardDiff.partials(e) for e in p))
+        push!(args, collect(ForwardDiff.value(e) for e in p))
+    else 
+        push!(ȧrgs, NoTangent())
+        push!(args, p)
+    end
+
+    if t_set
+        T, V, N = fd_eltypes(t)
+        push!(ȧrgs, ForwardDiff.partials(t))
+        push!(args, ForwardDiff.value(t))
+    else 
+        push!(ȧrgs, NoTangent())
+        push!(args, t)
+    end
+  
+    ȧrgs = (ȧrgs...,)
+    args = (args...,)
+        
+    y, _, sdx, sx, sp, st = ChainRulesCore.frule(ȧrgs, args...)
+
+    ys = []
+
+    #[collect( ForwardDiff.Dual{Tx, Vx, Nx}(y[i], ForwardDiff.partials(x_partials[i], t_partials[i])) for i in 1:length(y) )...]
+    for i in 1:length(y)
+        is = NoTangent()
+        
+        if dx_set
+            is = sdx[i]#.values
+        end
+        if x_set
+            is = sx[i]#.values
+        end
+
+        if p_set
+            is = sp[i]#.values
+        end
+        if t_set
+            is = st[i]#.values
+        end
+
+        #display("dx: $dx")
+        #display("sdx: $sdx")
+
+        #partials = (isdx, isx, isp, ist)
+
+        #display(partials)
+        
+
+        #V = Float64 
+        #N = length(partials)
+        #display("$T $V $N")
+
+        #display(is)
+
+        @assert is != ZeroTangent() && is != NoTangent() "is: $(is)"
+
+        push!(ys, ForwardDiff.Dual{T, V, N}(y[i], is    )   ) #  ForwardDiff.Partials{N, V}(partials)
+    end 
+
+    ys
+end
+
+# frule for fx
+function ChainRulesCore.frule((Δself, Δcomp, Δdx, Δx, Δp, Δt), 
+                              ::typeof(fx), 
+                              comp, #::FMU2Component,
+                              dx, 
+                              x,#::Array{<:Real},
+                              p,
+                              t)
+
+    y = fx(comp, dx, x, p, t)
+    function fx_pullforward(Δdx, Δx, Δt)
+       
+        # if t >= 0.0 
+        #     fmi2SetTime(comp, t)
+        # end
+        
+        # if all(isa.(x, ForwardDiff.Dual))
+        #     xf = collect(ForwardDiff.value(e) for e in x)
+        #     fmi2SetContinuousStates(comp, xf)
+        # else
+        #     fmi2SetContinuousStates(comp, x)
+        # end
+
+        c̄omp = ZeroTangent()
+        d̄x = ZeroTangent()
+        x̄ = ZeroTangent()
+        p̄ = ZeroTangent()
+        t̄ = ZeroTangent() 
+
+        if Δdx != NoTangent()
+            d̄x = Δdx
+        end
+       
+        if Δx != NoTangent()
+            if comp.A == nothing || size(comp.A) != (length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
+                comp.A = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
+            end 
+            comp.jacobianFct(comp.A, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
+            x̄ = comp.A * Δx
+        end
+
+        if Δt != NoTangent()
+            dt = 1e-6
+            dx1 = fmi2GetDerivatives(comp)
+            fmi2SetTime(comp, t + dt)
+            dx2 = fmi2GetDerivatives(comp)
+            ∂t = (dx2-dx1)/dt 
+            t̄ = ∂t * Δt
+        end
+       
+        return (c̄omp, d̄x, x̄, p̄, t̄)
+    end
+    return (y, fx_pullforward(Δdx, Δx, Δt)...)
 end
 
 # rrule for fx
@@ -203,45 +362,45 @@ function ChainRulesCore.rrule(::typeof(fx),
 end
 
 # frule for fx
-function ChainRulesCore.frule((Δself, Δcomp, Δdx, Δx, Δp, Δt), 
-                              ::typeof(fx), 
-                              comp, #::FMU2Component,
-                              dx, 
-                              x,#::Array{<:Real},
-                              p,
-                              t)
+# function ChainRulesCore.frule((Δself, Δcomp, Δdx, Δx, Δp, Δt), 
+#                               ::typeof(fx), 
+#                               comp, #::FMU2Component,
+#                               dx, 
+#                               x,#::Array{<:Real},
+#                               p,
+#                               t)
 
-    y = fx(comp, dx, x, p, t)
-    function fx_pullforward(Δx)
+#     y = fx(comp, dx, x, p, t)
+#     function fx_pullforward(Δx)
        
-        if t >= 0.0 
-            fmi2SetTime(comp, t)
-        end
+#         if t >= 0.0 
+#             fmi2SetTime(comp, t)
+#         end
         
-        if all(isa.(x, ForwardDiff.Dual))
-            xf = collect(ForwardDiff.value(e) for e in x)
-            fmi2SetContinuousStates(comp, xf)
-        else
-            fmi2SetContinuousStates(comp, x)
-        end
+#         if all(isa.(x, ForwardDiff.Dual))
+#             xf = collect(ForwardDiff.value(e) for e in x)
+#             fmi2SetContinuousStates(comp, xf)
+#         else
+#             fmi2SetContinuousStates(comp, x)
+#         end
        
-        if comp.A == nothing || size(comp.A) != (length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
-            comp.A = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
-        end 
-        comp.jacobianFct(comp.A, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
+#         if comp.A == nothing || size(comp.A) != (length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
+#             comp.A = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
+#         end 
+#         comp.jacobianFct(comp.A, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
 
-        n_dx_x = comp.A * Δx
+#         n_dx_x = comp.A * Δx
 
-        c̄omp = ZeroTangent()
-        d̄x = ZeroTangent()
-        x̄ = n_dx_x 
-        p̄ = ZeroTangent()
-        t̄ = ZeroTangent()
+#         c̄omp = ZeroTangent()
+#         d̄x = ZeroTangent()
+#         x̄ = n_dx_x 
+#         p̄ = ZeroTangent()
+#         t̄ = ZeroTangent()
        
-        return (c̄omp, d̄x, x̄, p̄, t̄)
-    end
-    return (y, fx_pullforward(Δx)...)
-end
+#         return (c̄omp, d̄x, x̄, p̄, t̄)
+#     end
+#     return (y, fx_pullforward(Δx)...)
+# end
 
 # save FMU values 
 function saveValues(c::FMU2Component, recordValues, u, t, integrator)
@@ -268,6 +427,7 @@ Keywords:
     - inputValueReferences: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
     - inputFunction: Function to retrieve the values to set the inputs to 
     - parameters: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization 
+    - `callbacks`: custom callbacks to add
 
 Returns:
     - If keyword `recordValues` is not set, a struct of type `ODESolution`.
@@ -280,23 +440,25 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     customFx = nothing,
     recordValues::fmi2ValueReferenceFormat = nothing,
     saveat = [],
+    x0::Union{Array{<:Real}, Nothing} = nothing,
     setup::Bool = true,
-    reset::Union{Bool, Nothing} = nothing, # nothing = auto
+    reset::Bool = true,
     inputValueReferences::fmi2ValueReferenceFormat = nothing,
     inputFunction = nothing,
     parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
     dtmax::Union{Real, Nothing} = nothing,
+    callbacks = [],
     kwargs...)
 
     recordValues = prepareValueReference(c, recordValues)
     inputValueReferences = prepareValueReference(c, inputValueReferences)
     solution = nothing
-    callbacks = []
     savedValues = nothing
 
     savingValues = (length(recordValues) > 0)
     hasInputs = (length(inputValueReferences) > 0)
     hasParameters = (parameters != nothing)
+    hasStartState = (x0 != nothing)
 
     t_start = t_start === nothing ? fmi2GetDefaultStartTime(c.fmu.modelDescription) : t_start
     t_start = t_start === nothing ? 0.0 : t_start
@@ -324,12 +486,6 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
         solver = Tsit5()
     end
 
-    if reset == nothing 
-        reset = setup 
-    end
-
-    @assert !(setup==false && reset==true) "fmi2SimulateME(...): keyword argument `setup=false`, but `reset=true`. This may cause a FMU crash."
-
     if reset 
         if c.state == fmi2ComponentStateModelInitialized
             retcode = fmi2Terminate(c)
@@ -347,11 +503,21 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
 
         retcode = fmi2EnterInitializationMode(c)
         @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Entering initialization mode failed with return code $(retcode)."
+    end 
 
-        if hasParameters
-            fmi2Set(c, collect(keys(parameters)), collect(values(parameters)) )
+    if hasStartState
+        if fmi2IsModelExchange(c.fmu)
+            fmi2SetContinuousStates(c, x0)
+        else
+            fmi2SetReal(c, c.fmu.modelDescription.stateValueReferences, x0)
         end
+    end
 
+    if hasParameters
+        fmi2Set(c, collect(keys(parameters)), collect(values(parameters)) )
+    end
+
+    if setup
         retcode = fmi2ExitInitializationMode(c)
         @assert retcode == fmi2StatusOK "fmi2SimulateME(...): Exiting initialization mode failed with return code $(retcode)."
     end
@@ -407,7 +573,7 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
         if timeEventHandling
             timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator),
                                             (integrator) -> affectFMU!(c, integrator, 0, inputFunction, inputValueReferences), Float64; 
-                                            initial_affect = true, # ToDo: or better 'false'?
+                                            initial_affect = false, # ToDo: or better 'false'?
                                             save_positions=(false,false))
             push!(callbacks, timeEventCb)
         end
@@ -437,7 +603,6 @@ Keywords:
     - inputValueReferences: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
     - inputFunction: Function to retrieve the values to set the inputs to 
     - parameters: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization 
-
 Returns:
     - If keyword `recordValues` is not set, a boolean `success` is returned (simulation success).
     - If keyword `recordValues` is set, a tuple of type (true, DiffEqCallbacks.SavedValues) or (false, nothing).
@@ -448,7 +613,7 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
                         recordValues::fmi2ValueReferenceFormat = nothing,
                         saveat = [],
                         setup::Bool = true,
-                        reset = nothing,
+                        reset::Bool = true,
                         inputValueReferences::fmi2ValueReferenceFormat = nothing,
                         inputFunction = nothing,
                         parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing)
@@ -483,10 +648,6 @@ function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
         end
     end
 
-    # auto correct reset if only setup is given
-    if reset == nothing 
-        reset = setup
-    end
     @assert !(setup==false && reset==true) "fmi2SimulateME(...): keyword argument `setup=false`, but `reset=true`. This may cause a FMU crash."
 
     if reset 

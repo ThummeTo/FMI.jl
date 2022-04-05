@@ -12,8 +12,9 @@ using FMIImport: FMU2, fmi2ModelDescription
 using FMIImport: fmi2Boolean, fmi2Real, fmi2Integer, fmi2Byte, fmi2String, fmi2FMUstate
 using FMIImport: fmi2True, fmi2False
 using FMIImport: fmi2StatusKind, fmi2Status
-using FMIImport: fmi2DependencyKindUnknown, fmi2DependencyKindDependent, fmi2DependencyKindFixed
-using FMIImport: fmi2CallbackFunctions
+using FMIImport: fmi2DependencyKindDependent, fmi2DependencyKindFixed
+using FMIImport: fmi2CallbackFunctions, fmi2Component
+import FMIImport: fmi2VariableNamingConventionFlat, fmi2VariableNamingConventionStructured
 
 """ 
 Returns how a variable depends on another variable based on the model description.
@@ -35,12 +36,12 @@ function fmi2GetDependencies(fmu::FMU2)
         @info "fmi2GetDependencies: Started building dependency matrix $(dim) x $(dim) ..."
 
         if fmi2DependenciesSupported(fmu.modelDescription)
-            fmu.dependencies = fill(fmi2DependencyKindUnknown, dim, dim)
+            fmu.dependencies = fill(nothing, dim, dim)
 
             for i in 1:dim
                 modelVariable = fmi2ModelVariablesForValueReference(fmu.modelDescription, fmu.modelDescription.valueReferences[i])[1]
     
-                if modelVariable.dependencies != nothing
+                if modelVariable.dependencies !== nothing
                     indicies = collect(fmu.modelDescription.valueReferenceIndicies[fmu.modelDescription.modelVariables[dependency].valueReference] for dependency in modelVariable.dependencies)
                     dependenciesKind = modelVariable.dependenciesKind
 
@@ -60,7 +61,7 @@ function fmi2GetDependencies(fmu::FMU2)
                 end
             end 
         else 
-            fmu.dependencies = fill(fmi2DependencyKindUnknown, dim, dim)
+            fmu.dependencies = fill(nothing, dim, dim)
         end
 
         @info "fmi2GetDependencies: Building dependency matrix $(dim) x $(dim) finished."
@@ -93,7 +94,14 @@ function fmi2Info(fmu::FMU2)
     println("\tGUID:\t\t\t\t$(fmi2GetGUID(fmu))")
     println("\tGeneration tool:\t\t$(fmi2GetGenerationTool(fmu))")
     println("\tGeneration time:\t\t$(fmi2GetGenerationDateAndTime(fmu))")
-    println("\tVar. naming conv.:\t\t$(fmi2GetVariableNamingConvention(fmu))")
+    print("\tVar. naming conv.:\t\t")
+    if fmi2GetVariableNamingConvention(fmu) == fmi2VariableNamingConventionFlat
+        println("flat")
+    elseif fmi2GetVariableNamingConvention(fmu) == fmi2VariableNamingConventionStructured
+        println("structured")
+    else 
+        println("[unknown]")
+    end
     println("\tEvent indicators:\t\t$(fmi2GetNumberOfEventIndicators(fmu))")
 
     println("\tInputs:\t\t\t\t$(length(fmu.modelDescription.inputValueReferences))")
@@ -133,5 +141,3 @@ function fmi2Info(fmu::FMU2)
 
     println("##################### End information for FMU #####################")
 end
-
-

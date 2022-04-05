@@ -65,15 +65,17 @@ x  not planned
 ## What FMI.jl-Library to use?
 ![FMI.jl Logo](https://github.com/ThummeTo/FMI.jl/blob/main/docs/src/assets/FMI_JL_family.png "FMI.jl Family")
 To keep dependencies nice and clean, the old FMI.jl had been split into new packages:
-- **FMI.jl:** High level loading, manipulationg, saving or building entire FMUs from scratch
-- **FMIImport.jl:** Importing FMUs into Julia
-- **FMIExport.jl:** Exporting FMUs from Julia Code
-- **FMICore.jl:** C-code wrapper for the FMI-standard
-- **FMIBuild.jl:** Compiler dependencies for FMIExport.jl, holds dependencies not suitable for exported FMUs
-- **FMIFlux.jl:** Machine Learning with FMUs (differentiation over FMUs)
+- [*FMI.jl*](https://github.com/ThummeTo/FMI.jl): High level loading, manipulating, saving or building entire FMUs from scratch
+- [*FMIImport.jl*](https://github.com/ThummeTo/FMIImport.jl): Importing FMUs into Julia
+- [*FMIExport.jl*](https://github.com/ThummeTo/FMIExport.jl): Exporting stand-alone FMUs from Julia Code
+- [*FMICore.jl*](https://github.com/ThummeTo/FMICore.jl): C-code wrapper for the FMI-standard
+- [*FMIBuild.jl*](https://github.com/ThummeTo/FMIBuild.jl): Compiler/Compilation dependencies for FMIExport.jl
+- [*FMIFlux.jl*](https://github.com/ThummeTo/FMIFlux.jl): Machine Learning with FMUs (differentiation over FMUs)
+- [*FMIZoo.jl*](https://github.com/ThummeTo/FMIZoo.jl): A collection of testing and example FMUs
 
 ## What is further under development in FMI.jl?
 - FMI Cross Checks
+- nice documentation
 - more examples
 - ...
 

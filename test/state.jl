@@ -7,9 +7,7 @@
 # Prepare FMU #
 ###############
 
-pathToFMU = joinpath(dirname(@__FILE__), "..", "model", ENV["EXPORTINGTOOL"], "SpringPendulum1D.fmu")
-
-myFMU = fmiLoad(pathToFMU)
+myFMU = fmiLoad("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 
 comp = fmiInstantiate!(myFMU; loggingOn=true)
 @test comp != 0
