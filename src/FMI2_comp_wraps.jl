@@ -10,17 +10,11 @@
 # FMI-spec
 
 function fmi2Simulate(fmu::FMU2, args...; kwargs...)
-
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate? Use keyword `instantiate=true` to allocate an instance automatically."]
-    c = fmu.components[end]
-    return fmi2Simulate(c, args...; kwargs...)
+    return fmi2Simulate(fmu, nothing, args...; kwargs...)
 end
 
 function fmi2SimulateCS(fmu::FMU2, args...; kwargs...)
-  
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate? Use keyword `instantiate=true` to allocate an instance automatically."]
-    c = fmu.components[end]
-    return fmi2SimulateCS(c, args...; kwargs...)
+    return fmi2SimulateCS(fmu, nothing, args...; kwargs...)
 end
 
 function fmi2SimulateME(fmu::FMU2, args...; kwargs...)

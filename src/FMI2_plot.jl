@@ -20,6 +20,8 @@ end
 function fmiPlot!(fig, solution::FMU2Solution; 
     states::Union{Bool, Nothing}=nothing, 
     values::Union{Bool, Nothing}=nothing, 
+    stateEvents::Union{Bool, Nothing}=nothing, 
+    timeEvents::Union{Bool, Nothing}=nothing, 
     stateIndices=nothing, 
     valueIndices=nothing, 
     maxLabelLength=64, 
@@ -33,6 +35,26 @@ function fmiPlot!(fig, solution::FMU2Solution;
         values = (solution.values !== nothing)
     end
 
+    if stateEvents === nothing 
+        stateEvents = false
+        for e in solution.events 
+            if e.indicator > 0
+                stateEvents = true 
+                break 
+            end 
+        end 
+    end
+
+    if timeEvents === nothing 
+        timeEvents = false
+        for e in solution.events 
+            if e.indicator == 0
+                timeEvents = true 
+                break 
+            end 
+        end 
+    end
+
     if stateIndices === nothing 
         stateIndices = 1:length(solution.fmu.modelDescription.stateValueReferences)
     end
@@ -42,6 +64,9 @@ function fmiPlot!(fig, solution::FMU2Solution;
             valueIndices = 1:length(solution.values.saveval[1])
         end
     end
+
+    plot_min = Inf
+    plot_max = -Inf
 
     # plot states
     if states 
@@ -55,6 +80,9 @@ function fmiPlot!(fig, solution::FMU2Solution;
                 vrName = vrNames[1]
     
                 vals = collect(data[v] for data in solution.states.u)
+
+                plot_min = min(plot_min, vals...)
+                plot_max = max(plot_max, vals...)
     
                 # prevent legend labels from getting too long
                 label = "$vrName ($vr)"
@@ -80,6 +108,9 @@ function fmiPlot!(fig, solution::FMU2Solution;
                 vrName = vrNames[1]
     
                 vals = collect(data[v] for data in solution.values.saveval)
+
+                plot_min = min(plot_min, vals...)
+                plot_max = max(plot_max, vals...)
     
                 # prevent legend labels from getting too long
                 label = "$vrName ($vr)"
@@ -90,6 +121,26 @@ function fmiPlot!(fig, solution::FMU2Solution;
     
                 Plots.plot!(fig, t, vals; label=label, plotkwargs...)
             end 
+        end
+    end
+
+    if stateEvents
+        first = true
+        for e in solution.events
+            if e.indicator > 0
+                Plots.plot!(fig, [e.t, e.t], [plot_min, plot_max]; label=(first ? "State event(s)" : nothing), style=:dash, color=:blue)
+                first = false
+            end
+        end
+    end
+
+    if timeEvents
+        first = true
+        for e in solution.events
+            if e.indicator == 0
+                Plots.plot!(fig, [e.t, e.t], [plot_min, plot_max]; label=(first ? "Time event(s)" : nothing), style=:dash, color=:red)
+                first = false
+            end
         end
     end
     

@@ -21,13 +21,12 @@
 ```julia
 # load and instantiate a FMU
 myFMU = fmiLoad(pathToFMU)
-fmiInstantiate!(myFMU)
 
 # simulate from t=0.0s until t=10.0s and record the FMU variable named "mass.s"
-success, simData = fmiSimulate(myFMU, 0.0, 10.0; recordValues=["mass.s"])
+simData = fmiSimulate(myFMU, 0.0, 10.0; recordValues=["mass.s"])
 
 # plot it!
-plot(myFMU, ["mass.s"], simData)
+plot(simData)
 
 # free memory
 fmiUnload(myFMU)

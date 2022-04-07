@@ -4,19 +4,14 @@
 #
 
 using FMI
-using Plots
+import FMIZoo
 
 # our simulation setup
 t_start = 0.0
 t_stop = 8.0
 
-# this FMU runs under Windows/Linux
-pathToFMU = joinpath(dirname(@__FILE__), "../model/OpenModelica/v1.17.0/SpringFrictionPendulum1D.fmu")
-
-# this FMU runs only under Windows
-if Sys.iswindows()
-    pathToFMU = joinpath(dirname(@__FILE__), "../model/Dymola/2020x/SpringFrictionPendulum1D.fmu")
-end
+# we use a FMU from the FMIZoo.jl
+pathToFMU = FMIZoo.get_model_filename("SpringFrictionPendulum1D", "Dymola", "2022x")
 
 # load the FMU container
 myFMU = fmiLoad(pathToFMU)
@@ -27,14 +22,15 @@ fmiInfo(myFMU)
 # values we want to record 
 rvs = ["mass.s"]
 
-# make an instance from the FMU
-fmiInstantiate!(myFMU; loggingOn=true)
+# make an instance from the FMU, this is optional if you are not interessted into instances
+# fmiInstantiate!(myFMU; loggingOn=true)
 
 # run the FMU in mode Model-Exchange (ME) with adaptive step sizes, result values are stored in `solution`
-solution, recordedValues = fmiSimulateME(myFMU, t_start, t_stop; recordValues=rvs)
+recordedValues = fmiSimulateME(myFMU, t_start, t_stop; recordValues=rvs)
 
 # plot the results
-fig = fmiPlot(myFMU, rvs, recordedValues)
+using Plots
+fig = fmiPlot(recordedValues)
 
 # load in the FMI2.0.3 keywords like fmi2Component, fmi2Real, etc.
 using FMICore 
@@ -66,10 +62,10 @@ end
 fmiSetFctGetReal(myFMU, myGetReal!)
 
 # run the *manipulated* FMU in mode Model-Exchange (ME) with adaptive step sizes, result values are stored in `solution`
-solution, recordedValues = fmiSimulateME(myFMU, t_start, t_stop; recordValues=rvs)
+recordedValues = fmiSimulateME(myFMU, t_start, t_stop; recordValues=rvs)
 
 # plot the results, this time, everything has doubled!
-fmiPlot!(fig, myFMU, rvs, recordedValues; style=:dash)
+fmiPlot!(fig, recordedValues; stateEvents=false, style=:dash)
 
 # unload the FMU, remove unpacked data on disc ("clean up")
 fmiUnload(myFMU)

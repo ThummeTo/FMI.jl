@@ -6,7 +6,8 @@
 using FMI
 using Plots
 
-pathToFMU = joinpath(dirname(@__FILE__), "../model/Dymola/2020x/SpringPendulum1D.fmu")
+# we use a FMU from the FMIZoo.jl
+pathToFMU = FMIZoo.get_model_filename("SpringPendulum1D", "Dymola", "2022x")
 
 myFMU = fmiLoad(pathToFMU)
 
@@ -17,13 +18,13 @@ rvs = ["mass.s"]
 #create an instance and simulate it
 comp1 = fmiInstantiate!(myFMU; loggingOn=true)
 param1 = Dict("spring.c"=>10.0, "mass.s"=>1.0)
-_, data1 = fmiSimulateCS(comp1, t_start, t_stop; recordValues=rvs, parameters=param1)
-plot(myFMU, rvs, data1)
+data1 = fmiSimulateCS(comp1, t_start, t_stop; recordValues=rvs, parameters=param1)
+fig = fmiPlot(data1)
 
 #create another instance, change the spring stiffness and simulate it
 comp2 = fmiInstantiate!(myFMU; loggingOn=true)
 param2 = Dict("spring.c"=>1.0, "mass.s"=>2.0)
-_, data2 = fmiSimulateCS(comp2, t_start, t_stop; recordValues=rvs, parameters=param2)
-fmiPlot(myFMU, rvs, data2)
+data2 = fmiSimulateCS(comp2, t_start, t_stop; recordValues=rvs, parameters=param2)
+fmiPlot!(fig, data2)
 
 fmiUnload(myFMU)
