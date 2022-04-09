@@ -19,21 +19,19 @@ fmiInfo(myFMU)
 fmiInstantiate!(myFMU)
 
 recordValues = ["mass.s", "mass.v"]
-solution, savedValuesME = fmiSimulateME(myFMU, t_start, t_stop; recordValues=recordValues)
-success, savedValuesCS = fmiSimulateCS(myFMU, t_start, t_stop; recordValues=recordValues)
+solutionME = fmiSimulateME(myFMU, t_start, t_stop; recordValues=recordValues)
+solutionCS = fmiSimulateCS(myFMU, t_start, t_stop; recordValues=recordValues)
 
 # plot the results
-fig = fmiPlot(myFMU, solution)
-fmiPlot!(fig, myFMU, solution)
+fig = fmiPlot(solutionME)
 
-#fig = plot(myFMU, solution)
-#plot!(fig, myFMU, solution)
+fig = Plots.plot()
+fmiPlot!(fig, solutionME)
 
-fig = fmiPlot(myFMU, recordValues, savedValuesCS)
-fmiPlot!(fig, myFMU, recordValues, savedValuesCS)
+fig = fmiPlot(solutionCS)
 
-#fig = plot(myFMU, recordValues, savedValuesCS)
-#plot!(fig, myFMU, recordValues, savedValuesCS)
+fig = Plots.plot()
+fmiPlot!(fig, solutionCS)
 
 # unload the FMU, remove unpacked data on disc ("clean up")
 fmiUnload(myFMU)

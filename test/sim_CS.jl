@@ -24,18 +24,18 @@ t_start = 0.0
 t_stop = 8.0
 
 # test without recording values (but why?)
-success = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2)
-@test success
+solution = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2)
+@test solution.success
 
 # test with recording values
-success, savedValues = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2, recordValues=["mass.s", "mass.v"])
-@test success
-@test length(savedValues.saveval) == t_start:1e-2:t_stop |> length
-@test length(savedValues.saveval[1]) == 2
+solution = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2, recordValues=["mass.s", "mass.v"])
+@test solution.success
+@test length(solution.values.saveval) == t_start:1e-2:t_stop |> length
+@test length(solution.values.saveval[1]) == 2
 
-t = savedValues.t
-s = collect(d[1] for d in savedValues.saveval)
-v = collect(d[2] for d in savedValues.saveval)
+t = solution.values.t
+s = collect(d[1] for d in solution.values.saveval)
+v = collect(d[2] for d in solution.values.saveval)
 @test t[1] == t_start
 @test t[end] == t_stop
 
@@ -71,16 +71,16 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct !== nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-success, solution = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2, recordValues=["mass.s", "mass.v"], inputValueReferences=["extForce"], inputFunction=extForce)
-@test success
-@test length(solution.saveval) > 0
-@test length(solution.t) > 0
+solution = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2, recordValues=["mass.s", "mass.v"], inputValueReferences=["extForce"], inputFunction=extForce)
+@test solution.success
+@test length(solution.values.saveval) > 0
+@test length(solution.values.t) > 0
 
 @test t[1] == t_start
 @test t[end] == t_stop
 
 # reference values from Simulation in Dymola2020x (Dassl)
-@test [solution.saveval[1]...] == [0.5, 0.0]
-@test sum(abs.([solution.saveval[end]...] - [0.613371, 0.188633])) < 0.2
+@test [solution.values.saveval[1]...] == [0.5, 0.0]
+@test sum(abs.([solution.values.saveval[end]...] - [0.613371, 0.188633])) < 0.2
 fmiUnload(myFMU)
 

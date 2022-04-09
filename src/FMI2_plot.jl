@@ -4,6 +4,7 @@
 #
 
 using OrdinaryDiffEq: ODESolution
+using FMIImport: FMU2Solution
 
 """
 Plots data from a ME-FMU.
@@ -11,67 +12,138 @@ Plots data from a ME-FMU.
 Optional `t_in_solution` controls if the first state in the solution is interpreted as t(ime).
 Optional keyword argument `maxLabelLength` controls the maximum length for legend labels (too long labels are cut from front).
 """
-function fmiPlot(fmu::FMU2, solution::ODESolution; kwargs...)
+function fmiPlot(solution::FMU2Solution; kwargs...)
     fig = Plots.plot(; xlabel="t [s]")
-    fmiPlot!(fig, fmu, solution; kwargs...)
+    fmiPlot!(fig, solution; kwargs...)
     return fig
 end
-function fmiPlot!(fig, fmu::FMU2, solution::ODESolution; stateIndicies=1:length(fmu.modelDescription.stateValueReferences), maxLabelLength=64, plotkwargs...)
+function fmiPlot!(fig, solution::FMU2Solution; 
+    states::Union{Bool, Nothing}=nothing, 
+    values::Union{Bool, Nothing}=nothing, 
+    stateEvents::Union{Bool, Nothing}=nothing, 
+    timeEvents::Union{Bool, Nothing}=nothing, 
+    stateIndices=nothing, 
+    valueIndices=nothing, 
+    maxLabelLength=64, 
+    plotkwargs...)
   
-    t = solution.t
+    if states === nothing 
+        states = (solution.states !== nothing)
+    end
 
-    numStates = length(solution.u[1])
+    if values === nothing 
+        values = (solution.values !== nothing)
+    end
 
-    for s in 1:numStates
-        if s ∈ stateIndicies
-            vr = fmu.modelDescription.stateValueReferences[s]
-            vrName = fmi2ValueReferenceToString(fmu, vr)[1]
-
-            values = collect(data[s] for data in solution.u)
-
-            # prevent legend labels from getting too long
-            label = "$vrName ($vr)"
-            labelLength = length(label)
-            if labelLength > maxLabelLength
-                label = "..." * label[labelLength-maxLabelLength:end]
-            end
-
-            Plots.plot!(fig, t, values; label=label, plotkwargs...)
+    if stateEvents === nothing 
+        stateEvents = false
+        for e in solution.events 
+            if e.indicator > 0
+                stateEvents = true 
+                break 
+            end 
         end 
     end
-    return fig
-end
 
-"""
-Plots data from a CS-FMU.
-"""
-function fmiPlot(fmu::FMU2, recordValues::fmi2ValueReferenceFormat, savedValues::DiffEqCallbacks.SavedValues; kwargs...)
-    fig = Plots.plot(; xlabel="t [s]")
-    fmiPlot!(fig, fmu, recordValues, savedValues; kwargs...)
-    return fig
-end
-function fmiPlot!(fig, fmu::FMU2, recordValues::fmi2ValueReferenceFormat, savedValues::DiffEqCallbacks.SavedValues; maxLabelLength=64, plotkwargs...)
-
-    ts = savedValues.t
-
-    recordValues = prepareValueReference(fmu, recordValues)
-
-    numVars = length(recordValues)
-
-    for i in 1:numVars
-        vr = recordValues[i]
-        vrName = fmi2ValueReferenceToString(fmu, vr)[1]
-        values = collect(data[i] for data in savedValues.saveval)
-
-        # prevent legend labels from getting too long
-        label = "$vrName ($vr)"
-        labelLength = length(label)
-        if labelLength > maxLabelLength
-            label = "..." * label[labelLength-maxLabelLength:end]
-        end
-
-        Plots.plot!(fig, ts, values; label=label, plotkwargs...)
+    if timeEvents === nothing 
+        timeEvents = false
+        for e in solution.events 
+            if e.indicator == 0
+                timeEvents = true 
+                break 
+            end 
+        end 
     end
+
+    if stateIndices === nothing 
+        stateIndices = 1:length(solution.fmu.modelDescription.stateValueReferences)
+    end
+
+    if valueIndices === nothing 
+        if solution.values !== nothing
+            valueIndices = 1:length(solution.values.saveval[1])
+        end
+    end
+
+    plot_min = Inf
+    plot_max = -Inf
+
+    # plot states
+    if states 
+        t = solution.states.t
+        numValues = length(solution.states.u[1])
+
+        for v in 1:numValues
+            if v ∈ stateIndices
+                vr = solution.fmu.modelDescription.stateValueReferences[v]
+                vrNames = fmi2ValueReferenceToString(solution.fmu, vr)
+                vrName = vrNames[1]
+    
+                vals = collect(data[v] for data in solution.states.u)
+
+                plot_min = min(plot_min, vals...)
+                plot_max = max(plot_max, vals...)
+    
+                # prevent legend labels from getting too long
+                label = "$vrName ($vr)"
+                labelLength = length(label)
+                if labelLength > maxLabelLength
+                    label = "..." * label[labelLength-maxLabelLength:end]
+                end
+    
+                Plots.plot!(fig, t, vals; label=label, plotkwargs...)
+            end 
+        end
+    end 
+
+    # plot recorded values
+    if values
+        t = solution.values.t
+        numValues = length(solution.values.saveval[1])
+
+        for v in 1:numValues
+            if v ∈ valueIndices
+                vr = solution.valueReferences[v]
+                vrNames = fmi2ValueReferenceToString(solution.fmu, vr)
+                vrName = vrNames[1]
+    
+                vals = collect(data[v] for data in solution.values.saveval)
+
+                plot_min = min(plot_min, vals...)
+                plot_max = max(plot_max, vals...)
+    
+                # prevent legend labels from getting too long
+                label = "$vrName ($vr)"
+                labelLength = length(label)
+                if labelLength > maxLabelLength
+                    label = "..." * label[labelLength-maxLabelLength:end]
+                end
+    
+                Plots.plot!(fig, t, vals; label=label, plotkwargs...)
+            end 
+        end
+    end
+
+    if stateEvents
+        first = true
+        for e in solution.events
+            if e.indicator > 0
+                Plots.plot!(fig, [e.t, e.t], [plot_min, plot_max]; label=(first ? "State event(s)" : nothing), style=:dash, color=:blue)
+                first = false
+            end
+        end
+    end
+
+    if timeEvents
+        first = true
+        for e in solution.events
+            if e.indicator == 0
+                Plots.plot!(fig, [e.t, e.t], [plot_min, plot_max]; label=(first ? "Time event(s)" : nothing), style=:dash, color=:red)
+                first = false
+            end
+        end
+    end
+    
     return fig
 end
 
