@@ -9,21 +9,19 @@
 ################################ END INSTALLATION #############################################
 
 using FMI
+import FMIZoo
 
-# this FMU runs under Windows and Linux
-pathToFMU = joinpath(dirname(@__FILE__), "../model/OpenModelica/v1.17.0/SpringFrictionPendulum1D.fmu")
-
-# this FMU runs only under Windows
-if Sys.iswindows()
-    pathToFMU = joinpath(dirname(@__FILE__), "../model/Dymola/2020x/SpringFrictionPendulum1D.fmu")
-end
+# we use a FMU from the FMIZoo.jl
+pathToFMU = FMIZoo.get_model_filename("SpringFrictionPendulum1D", "Dymola", "2022x")
 
 # this is how you can quickly simulate a FMU
 myFMU = fmiLoad(pathToFMU)
-fmiInstantiate!(myFMU)
-rvs = ["mass.s"]
-_, simData = fmiSimulate(myFMU, 0.0, 10.0; recordValues=rvs)
-fmiPlot(myFMU, rvs, simData)
+simData = fmiSimulate(myFMU, 0.0, 10.0; recordValues=["mass.s"])
+
+# ... and plot it
+using Plots
+fmiPlot(simData)
+
 fmiUnload(myFMU)
 
 # this is how you can simulate a FMU with more possibilities
@@ -35,7 +33,13 @@ fmiExitInitializationMode(fmuComp)
 dt = 0.1
 ts = 0.0:dt:(10.0-dt)
 for t in ts
+    # set model inputs 
+    # ...
+
     fmiDoStep(fmuComp, dt)
+
+    # get model outputs
+    # ...
 end
 fmiTerminate(fmuComp)
 fmiFreeInstance!(fmuComp)

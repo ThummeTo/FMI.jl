@@ -6,7 +6,7 @@
 using Test
 using Plots
 
-examples = ["ME_simulate", "CS_simulate", "multiple_instances", "parameterize", "modelica_conference_2021", "manipulation"]
+examples = ["CS_simulate", "manipulation", "ME_simulate", "modelica_conference_2021", "multiple_instances", "parameterize"]
 
 @testset "FMI.jl Examples" begin
     for example in examples

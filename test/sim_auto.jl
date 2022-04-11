@@ -34,18 +34,18 @@ t_start = 0.0
 t_stop = 8.0
 
 # test without recording values (but why?)
-success = fmiSimulate(fmuStruct, t_start, t_stop; dt=1e-2)
-@test success
+sol = fmiSimulate(fmuStruct, t_start, t_stop; dt=1e-2)
+@test sol.success
 
 # test with recording values
-success, savedValues = fmiSimulate(fmuStruct, t_start, t_stop; dt=1e-2, recordValues=["mass.s", "mass.v"], setup=true)
-@test success
-@test length(savedValues.saveval) == t_start:1e-2:t_stop |> length
-@test length(savedValues.saveval[1]) == 2
+solution = fmiSimulate(fmuStruct, t_start, t_stop; dt=1e-2, recordValues=["mass.s", "mass.v"], setup=true)
+@test solution.success
+@test length(solution.values.saveval) == t_start:1e-2:t_stop |> length
+@test length(solution.values.saveval[1]) == 2
 
-t = savedValues.t
-s = collect(d[1] for d in savedValues.saveval)
-v = collect(d[2] for d in savedValues.saveval)
+t = solution.values.t
+s = collect(d[1] for d in solution.values.saveval)
+v = collect(d[2] for d in solution.values.saveval)
 @test t[1] == t_start
 @test t[end] == t_stop
 

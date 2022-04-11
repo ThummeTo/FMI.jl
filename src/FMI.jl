@@ -11,7 +11,7 @@ using Requires
 
 using FMIImport
 import FMIImport: fmi2CallbackLogger, fmi2CallbackAllocateMemory, fmi2CallbackFreeMemory, fmi2CallbackStepFinished
-import FMIImport: fmi2ComponentState, fmi2ComponentStateModelSetableFMUstate, fmi2ComponentStateModelUnderEvaluation, fmi2ComponentStateModelInitialized
+import FMIImport: fmi2ComponentState, fmi2ComponentStateInstantiated, fmi2ComponentStateInitializationMode, fmi2ComponentStateEventMode, fmi2ComponentStateContinuousTimeMode, fmi2ComponentStateTerminated, fmi2ComponentStateError, fmi2ComponentStateFatal
 import FMIImport: fmi2Instantiate, fmi2FreeInstance!, fmi2GetTypesPlatform, fmi2GetVersion
 import FMIImport: fmi2SetDebugLogging, fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2Terminate, fmi2Reset
 import FMIImport: fmi2GetReal!, fmi2SetReal, fmi2GetInteger!, fmi2SetInteger, fmi2GetBoolean!, fmi2SetBoolean, fmi2GetString!, fmi2SetString
@@ -33,13 +33,21 @@ import FMIImport: fmi2GetDefaultStartTime, fmi2GetDefaultStopTime, fmi2GetDefaul
 import FMIImport: fmi2GetModelName, fmi2GetGUID, fmi2GetGenerationTool, fmi2GetGenerationDateAndTime, fmi2GetVariableNamingConvention, fmi2GetNumberOfEventIndicators, fmi2GetNumberOfStates, fmi2IsCoSimulation, fmi2IsModelExchange
 import FMIImport: fmi2DependenciesSupported, fmi2GetModelIdentifier, fmi2CanGetSetState, fmi2CanSerializeFMUstate, fmi2ProvidesDirectionalDerivative
 import FMIImport: fmi2Get, fmi2Get!, fmi2Set 
+import FMIImport: fmi2GetSolutionTime, fmi2GetSolutionState, fmi2GetSolutionValue
+export fmi2GetSolutionTime, fmi2GetSolutionState, fmi2GetSolutionValue
 
 using FMIExport 
 using FMIExport: fmi2Create, fmi2CreateSimple 
 
 using FMIImport.FMICore: fmi2ValueReference, fmi3ValueReference
 using FMIImport: fmi2ValueReferenceFormat, fmi3ValueReferenceFormat, fmi2StructMD, fmi3StructMD, fmi2Struct, fmi3Struct
+
 using FMIImport.FMICore: FMU2, FMU3, FMU2Component, FMU3Component
+export FMU2, FMU3, FMU2Component, FMU3Component
+
+using FMIImport.FMICore: FMU2ExecutionConfiguration, FMU_EXECUTION_CONFIGURATION_RESET, FMU_EXECUTION_CONFIGURATION_NO_RESET, FMU_EXECUTION_CONFIGURATION_NO_FREEING
+export FMU2ExecutionConfiguration, FMU_EXECUTION_CONFIGURATION_RESET, FMU_EXECUTION_CONFIGURATION_NO_RESET, FMU_EXECUTION_CONFIGURATION_NO_FREEING
+
 using FMIImport: prepareValue, prepareValueReference
 
 include("FMI1_additional.jl")
@@ -85,6 +93,7 @@ export fmiGetDependencies
 export fmiGetStartValue
 export fmiSimulate, fmiSimulateCS, fmiSimulateME
 export fmiGet, fmiGet!, fmiSet
+export fmiGetSolutionTime, fmiGetSolutionState, fmiGetSolutionValue
 
 export fmiSetFctGetTypesPlatform, fmiSetFctGetVersion
 export fmiSetFctInstantiate, fmiSetFctFreeInstance, fmiSetFctSetDebugLogging, fmiSetFctSetupExperiment, fmiSetEnterInitializationMode, fmiSetFctExitInitializationMode
@@ -716,6 +725,18 @@ end
 
 function fmiSetFctGetNominalsOfContinuousStates(fmu::FMU2, fun)
     fmi2SetFctGetNominalsOfContinuousStates(fmu, fun)
+end
+
+function fmiGetSolutionTime(solution::FMU2Solution)
+    fmi2GetSolutionTime(solution)
+end
+
+function fmiGetSolutionState(solution::FMU2Solution)
+    fmi2GetSolutionState(solution)
+end
+
+function fmiGetSolutionValue(solution::FMU2Solution)
+    fmi2GetSolutionValue(solution)
 end
 
 ##### Multiple Dispatch fallback for FMUs with unsupported versions #####
