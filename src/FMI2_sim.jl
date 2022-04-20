@@ -461,6 +461,7 @@ end
 
 function prepareFMU(fmu::FMU2, c::Union{Nothing, FMU2Component}, instantiate::Union{Nothing, Bool}, terminate::Union{Nothing, Bool}, reset::Union{Nothing, Bool}, setup::Union{Nothing, Bool}, parameters::Union{Dict{<:Any, <:Any}, Nothing}, t_start, t_stop, tolerance;
     x0::Union{Array{<:Real}, Nothing}=nothing)
+
     if instantiate === nothing 
         instantiate = fmu.executionConfig.instantiate
     end
@@ -627,9 +628,11 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
     # from here on, we are in event mode, if `setup=false` this is the job of the user
     @assert c.state == fmi2ComponentStateEventMode "FMU needs to be in event mode after setup."
 
-    x0 = fmi2GetContinuousStates(c)
-    x0_nom = fmi2GetNominalsOfContinuousStates(c)
-
+    if x0 === nothing
+        x0 = fmi2GetContinuousStates(c)
+        x0_nom = fmi2GetNominalsOfContinuousStates(c)
+    end
+   
     # initial event handling
     handleEvents(c) 
     fmi2EnterContinuousTimeMode(c)
@@ -688,7 +691,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         push!(cbs, timeEventCb)
     end
 
-    fmusol.states = solve(problem, solver; callback = CallbackSet(cbs...), saveat = saveat, tol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
+    fmusol.states = solve(problem, solver; callback = CallbackSet(cbs...), saveat = saveat, reltol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
     fmusol.success = (fmusol.states.retcode == :Success)
 
     # cleanup progress meter
