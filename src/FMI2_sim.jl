@@ -19,13 +19,21 @@ import ProgressMeter
 ############ Model-Exchange ############
 
 # Read next time event from fmu and provide it to the integrator 
-function time_choice(c::FMU2Component, integrator)
+function time_choice(c::FMU2Component, integrator, tStart, tStop)
 
     if c.eventInfo.nextEventTimeDefined == fmi2True
-        return c.eventInfo.nextEventTime
+
+        if c.eventInfo.nextEventTime >= tStart && c.eventInfo.nextEventTime <= tStop
+            return c.eventInfo.nextEventTime
+        else
+            # the time event is outside the simulation range!
+            @debug "Next time event @$(c.eventInfo.nextEventTime)s is outside simulation time range ($(tStart), $(tStop)), skipping."
+            return nothing 
+        end
     else
         return nothing
     end
+
 end
 
 # Handles events and returns the values and nominals of the changed continuous states.
@@ -66,6 +74,8 @@ function handleEvents(c::FMU2Component)
     c.eventInfo.nominalsOfContinuousStatesChanged = nominalsOfContinuousStatesChanged
     c.eventInfo.nextEventTimeDefined = nextEventTimeDefined
     c.eventInfo.nextEventTime = nextEventTime
+
+    fmi2EnterContinuousTimeMode(c)
 
     return nothing
 end
@@ -126,7 +136,7 @@ function affectFMU!(c::FMU2Component, integrator, idx, inputFunction, inputValue
         end
     end 
 
-    fmi2EnterContinuousTimeMode(c)
+    #fmi2EnterContinuousTimeMode(c)
 end
 
 # This callback is called every time the integrator finishes an (accpeted) integration step.
@@ -158,8 +168,8 @@ function saveValues(c::FMU2Component, recordValues, x, t, integrator)
 
     @assert c.state == fmi2ComponentStateContinuousTimeMode "saveValues(...): Must be in continuous time mode."
     
-    fmi2SetTime(c, t) 
     fmi2SetContinuousStates(c, x)
+    fmi2SetTime(c, t) 
     
     return (fmiGetReal(c, recordValues)...,)
 end
@@ -635,7 +645,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
    
     # initial event handling
     handleEvents(c) 
-    fmi2EnterContinuousTimeMode(c)
+    #fmi2EnterContinuousTimeMode(c)
 
     c.fmu.hasStateEvents = (c.fmu.modelDescription.numberOfEventIndicators > 0)
     c.fmu.hasTimeEvents = (c.eventInfo.nextEventTimeDefined == fmi2True)

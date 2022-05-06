@@ -727,16 +727,16 @@ function fmiSetFctGetNominalsOfContinuousStates(fmu::FMU2, fun)
     fmi2SetFctGetNominalsOfContinuousStates(fmu, fun)
 end
 
-function fmiGetSolutionTime(solution::FMU2Solution)
-    fmi2GetSolutionTime(solution)
+function fmiGetSolutionTime(solution::FMU2Solution, args...; kwargs...)
+    fmi2GetSolutionTime(solution, args...; kwargs...)
 end
 
-function fmiGetSolutionState(solution::FMU2Solution)
-    fmi2GetSolutionState(solution)
+function fmiGetSolutionState(solution::FMU2Solution, args...; kwargs...)
+    fmi2GetSolutionState(solution, args...; kwargs...)
 end
 
-function fmiGetSolutionValue(solution::FMU2Solution)
-    fmi2GetSolutionValue(solution)
+function fmiGetSolutionValue(solution::FMU2Solution, args...; kwargs...)
+    fmi2GetSolutionValue(solution, args...; kwargs...)
 end
 
 ##### Multiple Dispatch fallback for FMUs with unsupported versions #####
