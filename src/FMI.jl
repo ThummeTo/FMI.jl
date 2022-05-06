@@ -114,7 +114,7 @@ export fmiSetFctGetDerivatives, fmiSetFctGetEventIndicators, fmiSetFctGetContinu
 
     fmiGetDependencies(fmu::FMU2)
 
-Building dependency matrix $(dim) x $(dim) for fast look-ups on variable dependencies.    
+Building dependency matrix `dim x dim` for fast look-ups on variable dependencies (`dim` is number of states).    
 
 #Arguments
 - `fmu::FMU2`: Mutable Struct representing a FMU in [FMI Standard Version 2.0.2](https://fmi-standard.org/).
