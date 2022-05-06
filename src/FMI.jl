@@ -11,7 +11,7 @@ using Requires
 
 using FMIImport
 import FMIImport: fmi2CallbackLogger, fmi2CallbackAllocateMemory, fmi2CallbackFreeMemory, fmi2CallbackStepFinished
-import FMIImport: fmi2ComponentState, fmi2ComponentStateModelSetableFMUstate, fmi2ComponentStateModelUnderEvaluation, fmi2ComponentStateModelInitialized
+import FMIImport: fmi2ComponentState, fmi2ComponentStateInstantiated, fmi2ComponentStateInitializationMode, fmi2ComponentStateEventMode, fmi2ComponentStateContinuousTimeMode, fmi2ComponentStateTerminated, fmi2ComponentStateError, fmi2ComponentStateFatal
 import FMIImport: fmi2Instantiate, fmi2FreeInstance!, fmi2GetTypesPlatform, fmi2GetVersion
 import FMIImport: fmi2SetDebugLogging, fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2Terminate, fmi2Reset
 import FMIImport: fmi2GetReal!, fmi2SetReal, fmi2GetInteger!, fmi2SetInteger, fmi2GetBoolean!, fmi2SetBoolean, fmi2GetString!, fmi2SetString
@@ -32,14 +32,22 @@ import FMIImport: fmi2LoadModelDescription
 import FMIImport: fmi2GetDefaultStartTime, fmi2GetDefaultStopTime, fmi2GetDefaultTolerance, fmi2GetDefaultStepSize
 import FMIImport: fmi2GetModelName, fmi2GetGUID, fmi2GetGenerationTool, fmi2GetGenerationDateAndTime, fmi2GetVariableNamingConvention, fmi2GetNumberOfEventIndicators, fmi2GetNumberOfStates, fmi2IsCoSimulation, fmi2IsModelExchange
 import FMIImport: fmi2DependenciesSupported, fmi2GetModelIdentifier, fmi2CanGetSetState, fmi2CanSerializeFMUstate, fmi2ProvidesDirectionalDerivative
-import FMIImport: fmi2Get, fmi2Get!, fmi2Set
+import FMIImport: fmi2Get, fmi2Get!, fmi2Set 
+import FMIImport: fmi2GetSolutionTime, fmi2GetSolutionState, fmi2GetSolutionValue
+export fmi2GetSolutionTime, fmi2GetSolutionState, fmi2GetSolutionValue
 
 using FMIExport
 using FMIExport: fmi2Create, fmi2CreateSimple
 
 using FMIImport.FMICore: fmi2ValueReference, fmi3ValueReference
 using FMIImport: fmi2ValueReferenceFormat, fmi3ValueReferenceFormat, fmi2StructMD, fmi3StructMD, fmi2Struct, fmi3Struct
+
 using FMIImport.FMICore: FMU2, FMU3, FMU2Component, FMU3Component
+export FMU2, FMU3, FMU2Component, FMU3Component
+
+using FMIImport.FMICore: FMU2ExecutionConfiguration, FMU_EXECUTION_CONFIGURATION_RESET, FMU_EXECUTION_CONFIGURATION_NO_RESET, FMU_EXECUTION_CONFIGURATION_NO_FREEING
+export FMU2ExecutionConfiguration, FMU_EXECUTION_CONFIGURATION_RESET, FMU_EXECUTION_CONFIGURATION_NO_RESET, FMU_EXECUTION_CONFIGURATION_NO_FREEING
+
 using FMIImport: prepareValue, prepareValueReference
 
 include("FMI1_additional.jl")
@@ -54,14 +62,20 @@ include("FMI3_comp_wraps.jl")
 include("FMI2_sim.jl")
 include("FMI3_sim.jl")
 
+function fmiPlot(solution::FMU2Solution; kwargs...)
+    @warn "fmiPlot(...) needs `Plots` package. Please do `using Plots` or `import Plots`."
+end
+function fmiPlot!(fig, solution::FMU2Solution; kwargs...)
+    @warn "fmiPlot!(...) needs `Plots` package. Please do `using Plots` or `import Plots`." 
+end
 function __init__()
     @require Plots="91a5bcdd-55d7-5caf-9e0b-520d859cae80" begin
         import .Plots
         include("FMI2_plot.jl")
         include("FMI3_plot.jl")
-        export fmiPlot, fmiPlot!
-    end
+    end 
 end
+export fmiPlot, fmiPlot!
 
 ### EXPORTING LISTS START ###
 
@@ -85,6 +99,7 @@ export fmiGetDependencies
 export fmiGetStartValue
 export fmiSimulate, fmiSimulateCS, fmiSimulateME
 export fmiGet, fmiGet!, fmiSet
+export fmiGetSolutionTime, fmiGetSolutionState, fmiGetSolutionValue
 
 export fmiSetFctGetTypesPlatform, fmiSetFctGetVersion
 export fmiSetFctInstantiate, fmiSetFctFreeInstance, fmiSetFctSetDebugLogging, fmiSetFctSetupExperiment, fmiSetEnterInitializationMode, fmiSetFctExitInitializationMode
@@ -1271,6 +1286,18 @@ end
 
 function fmiSetFctGetNominalsOfContinuousStates(fmu::FMU2, fun)
     fmi2SetFctGetNominalsOfContinuousStates(fmu, fun)
+end
+
+function fmiGetSolutionTime(solution::FMU2Solution, args...; kwargs...)
+    fmi2GetSolutionTime(solution, args...; kwargs...)
+end
+
+function fmiGetSolutionState(solution::FMU2Solution, args...; kwargs...)
+    fmi2GetSolutionState(solution, args...; kwargs...)
+end
+
+function fmiGetSolutionValue(solution::FMU2Solution, args...; kwargs...)
+    fmi2GetSolutionValue(solution, args...; kwargs...)
 end
 
 ##### Multiple Dispatch fallback for FMUs with unsupported versions #####
