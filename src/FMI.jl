@@ -663,15 +663,20 @@ end
 Returns the version of the FMU, version independent.
 
 # Arguments
-- `str::fmi2Struct`:  Representative for an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+- `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
 More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
- - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
- - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+ - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
+ - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
 
 # Returns
-- Returns the version of the “fmi2Functions.h” header file which was used to compile the functions of the FMU. The function returns “fmiVersion” which is defined in this header file. The standard header file as documented in this specification has version “2.0” ([FMI 2.0.2 Standard](https://fmi-standard.org/))
+- Returns a string from the address of a C-style (NUL-terminated) string. The string represents the version of the “fmi2Functions.h” header file which was used to compile the functions of the FMU. The function returns “fmiVersion” which is defined in this header file. The standard header file as documented in this specification has version “2.0”
 
-See also [`fmi2GetVersion`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
+# Source
+ - FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+ - FMISpec2.0.2[p.22]: 2.1.4 Inquire Platform and Version Number of Header Files
+ - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
+
+See also [`fmi2GetVersion`](@ref), [`unsafe_string`](https://docs.julialang.org/en/v1/base/strings/#Base.unsafe_string), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 """
 function fmiGetVersion(str::fmi2Struct)
     fmi2GetVersion(str)
@@ -684,10 +689,13 @@ end
 Prints FMU-specific information into the REPL.
 
 # Arguments
-- `str::fmi2Struct`:  Representative for an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+- `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
 More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
- - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
- - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+ - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
+ - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
+
+# Source
+ - FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
 
 See also [`fmi2Info`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 """
@@ -702,8 +710,10 @@ end
 
 Creates a new instance of the FMU, version independent.
 
+Create a new instance of the given fmu, adds a logger if logginOn == true.
+
 # Arguments
- - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+ - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
 
 # Keywords
 - `pushComponents::Bool = true`:  `pushComponents` if the item `component` should be inserted in `fmu.components`(default = `true`).
@@ -718,7 +728,12 @@ Creates a new instance of the FMU, version independent.
 - `logStatusPending::Bool=true`: `logStatusPending` whether to log status of kind `fmi2Pending` (default=`true`)
 
 # Returns
-- Returns the instance of a new FMU component.
+- `nothing`: if the instantiation failed. In addition, an error message appears.
+- `component`: Returns the instance of a new FMU component.
+
+# Source
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec2.0.2[p.19]: 2.1.5 Creation, Destruction and Logging of FMU Instances
 
 See also [`fmi2Instantiate!`](@ref), [`fmi2Instantiate`](@ref), [`FMU2`](@ref).
 """
@@ -733,13 +748,18 @@ end
 Frees the allocated memory of the last instance of the FMU.
 
 # Arguments
-- `str::fmi2Struct`:  Representative for an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+- `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
 More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
- - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
- - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+ - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
+ - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
+
+# Returns
+- `status::fmi2Status`: returned by all functions to indicate the success of the function call
 
 # Source
-- FMISpec2.0.2[p.22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
+- FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
 See also [fmi2FreeInstance](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 """
@@ -754,13 +774,14 @@ end
 Control the use of the logging callback function, version independent.
 
 # Arguments
-- `str::fmi2Struct`:  Representative for an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+- `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
 More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
- - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
- - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+ - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
+ - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
 
 # Source
--  FMISpec2.0.2[p.22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec2.0.2[p.22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
 """
 function fmiSetDebugLogging(str::fmi2Struct)
     fmi2SetDebugLogging(str)
@@ -773,18 +794,24 @@ end
 Initialize the Simulation boundries
 
 # Arguments
-- `str::fmi2Struct`:  Representative for an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+- `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
 More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
- - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
- - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+ - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
+ - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
 - `startTime::Union{Real, Nothing} = nothing`: `startTime` is a real number which sets the value of starting time of the experiment. The default value is set automatically if doing nothing (default = `nothing`).
 - `stopTime::Union{Real, Nothing} = nothing`: `stopTime` is a real number which sets the value of ending time of the experiment. The default value is set automatically if doing nothing (default = `nothing`).
 
 # Keywords
 - `tolerance::Union{Real, Nothing} = nothing`: `tolerance` is a real number which sets the value of tolerance range. The default value is set automatically if doing nothing (default = `nothing`).
 
+# Returns
+- Returns a warning if `str.state` is not called in `fmi2ComponentStateInstantiated`.
+- `status::fmi2Status`: returned by all functions to indicate the success of the function call
+
 # Source
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
 - FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
+- FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
 See also [fmi2SetupExperiment](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 """
@@ -799,13 +826,19 @@ end
 Informs the FMU to enter initializaton mode, version independent.
 
 # Arguments
-- `str::fmi2Struct`:  Representative for an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+- `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
 More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
- - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
- - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+ - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
+ - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
+
+# Returns
+-  Returns a warning if `str.state` is not called in `fmi2ComponentStateInstantiated`.
+-  `status::fmi2Status`: returned by all functions to indicate the success of the function call
 
 # Source
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
 - FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
+- FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
  See also [fmi2EnterInitializationMode](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 """
@@ -814,7 +847,27 @@ function fmiEnterInitializationMode(str::fmi2Struct)
 end
 
 """
+
+    fmiExitInitializationMode(str::fmi2Struct)
+
 Informs the FMU to exit initialization mode, version independent.
+
+# Arguments
+- `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
+More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
+ - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
+ - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
+
+# Returns
+-  Returns a warning if `str.state` is not called in `fmi2ComponentStateInitializationMode`.
+-  `status::fmi2Status`: returned by all functions to indicate the success of the function call
+
+# Source
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
+- FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
+
+ See also [fmi2ExitInitializationMode](@ref)
 """
 function fmiExitInitializationMode(str::fmi2Struct)
     fmi2ExitInitializationMode(str)
