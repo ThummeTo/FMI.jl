@@ -694,7 +694,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
     end
 
     if c.fmu.hasTimeEvents
-        timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator),
+        timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator, t_start, t_stop),
                                         (integrator) -> affectFMU!(c, integrator, 0, inputFunction, inputValueReferences, fmusol), Float64; 
                                         initial_affect = (c.eventInfo.nextEventTime == t_start),
                                         save_positions=(false,false))
