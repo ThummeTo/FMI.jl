@@ -62,14 +62,20 @@ include("FMI3_comp_wraps.jl")
 include("FMI2_sim.jl")
 include("FMI3_sim.jl")
 
+function fmiPlot(solution::FMU2Solution; kwargs...)
+    @warn "fmiPlot(...) needs `Plots` package. Please do `using Plots` or `import Plots`."
+end
+function fmiPlot!(fig, solution::FMU2Solution; kwargs...)
+    @warn "fmiPlot!(...) needs `Plots` package. Please do `using Plots` or `import Plots`." 
+end
 function __init__()
     @require Plots="91a5bcdd-55d7-5caf-9e0b-520d859cae80" begin 
         import .Plots
         include("FMI2_plot.jl")
         include("FMI3_plot.jl")
-        export fmiPlot, fmiPlot!
     end 
 end
+export fmiPlot, fmiPlot!
 
 ### EXPORTING LISTS START ###
 

@@ -13,8 +13,10 @@ Because not all users need the full potential of this configuration tool, there 
 
 ## Model variable identification
 *FMI.jl* offers multiple ways to retrieve your model variables. Any function that accepts a variable identifier can handle the following argument types:
-- `UInt32` or `fmi2ValueReference` for example `1610612742` or `0x16000001`: This is the most performant way of passing a variable identifier, but you need to know up the *value reference*.
-- `String` for example `"der(state1)"`: This is the most intuitive way, because you might know the variable name instead of its identifier.
+- `UInt32` or `fmi2ValueReference` for example `1610612742` or `0x16000001`: This is the most performant way of passing a variable identifier, but you need to know the *value reference* (you can determine them by having a look in the `modelDescription.xml`).
+- `Array{UInt32}` or `Array{fmi2ValueReference}` for example `[1610612742, 1610612743]` or `[0x16000001, 0x16000002]`: This is the most performant way of passing multiple variable identifiers, but you need to know the *value references*.
+- `String` for example `"ball.s"`: This is the most intuitive way, because you might already know the variable name from your modelling environment or model documentation.
+- `Array{String]` for example `["ball.s", "der(ball.s)"]`: This is the most intuitive way, because you might already know the variable names from your modelling environment or model documentation.
 - `Symbol` for example `:states`: There are multiple symbol wildcards for interessting variable groups like `:all`, `:none`, `:states`, `:derivatives`, `:inputs` and `:outputs`.
 - `nothing`: If you don't want to record anything (same as `:none`)
 
