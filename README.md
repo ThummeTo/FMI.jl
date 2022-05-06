@@ -19,6 +19,8 @@
 
 ## How can I simulate a FMU and plot values?
 ```julia
+using FMI, Plots
+
 # load and instantiate a FMU
 myFMU = fmiLoad(pathToFMU)
 
@@ -33,7 +35,7 @@ fmiUnload(myFMU)
 ```
 
 ## What is currently supported in FMI.jl?
-- importing the full FMI 2.0.3 command set, including optional specials like getState, setState and getDirectionalDerivative
+- importing the full FMI 2.0.3 command set, including optional specials like `fmi2GetState`, `fmi2SetState` and `fmi2GetDirectionalDerivatives`
 - parameterization, simulation & plotting of CS- and ME-FMUs
 - event-handling for imported discontinuous ME-FMUs
 
