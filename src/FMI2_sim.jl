@@ -629,10 +629,6 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         dtmax = (t_stop-t_start)/100.0
     end
 
-    if solver === nothing
-        solver = Tsit5()
-    end
-
     c = prepareFMU(fmu, c, instantiate, terminate, reset, setup, parameters, t_start, t_stop, tolerance; x0=x0)
 
     # from here on, we are in event mode, if `setup=false` this is the job of the user
@@ -701,7 +697,12 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         push!(cbs, timeEventCb)
     end
 
-    fmusol.states = solve(problem, solver; callback = CallbackSet(cbs...), saveat = saveat, reltol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
+    if solver === nothing
+        fmusol.states = solve(problem; callback = CallbackSet(cbs...), saveat = saveat, reltol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
+    else
+        fmusol.states = solve(problem, solver; callback = CallbackSet(cbs...), saveat = saveat, reltol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
+    end
+
     fmusol.success = (fmusol.states.retcode == :Success)
 
     # cleanup progress meter
