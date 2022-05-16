@@ -19,13 +19,21 @@ import ProgressMeter
 ############ Model-Exchange ############
 
 # Read next time event from fmu and provide it to the integrator 
-function time_choice(c::FMU2Component, integrator)
+function time_choice(c::FMU2Component, integrator, tStart, tStop)
 
     if c.eventInfo.nextEventTimeDefined == fmi2True
-        return c.eventInfo.nextEventTime
+
+        if c.eventInfo.nextEventTime >= tStart && c.eventInfo.nextEventTime <= tStop
+            return c.eventInfo.nextEventTime
+        else
+            # the time event is outside the simulation range!
+            @debug "Next time event @$(c.eventInfo.nextEventTime)s is outside simulation time range ($(tStart), $(tStop)), skipping."
+            return nothing 
+        end
     else
         return nothing
     end
+
 end
 
 # Handles events and returns the values and nominals of the changed continuous states.
@@ -66,6 +74,8 @@ function handleEvents(c::FMU2Component)
     c.eventInfo.nominalsOfContinuousStatesChanged = nominalsOfContinuousStatesChanged
     c.eventInfo.nextEventTimeDefined = nextEventTimeDefined
     c.eventInfo.nextEventTime = nextEventTime
+
+    fmi2EnterContinuousTimeMode(c)
 
     return nothing
 end
@@ -126,7 +136,7 @@ function affectFMU!(c::FMU2Component, integrator, idx, inputFunction, inputValue
         end
     end 
 
-    fmi2EnterContinuousTimeMode(c)
+    #fmi2EnterContinuousTimeMode(c)
 end
 
 # This callback is called every time the integrator finishes an (accpeted) integration step.
@@ -158,8 +168,8 @@ function saveValues(c::FMU2Component, recordValues, x, t, integrator)
 
     @assert c.state == fmi2ComponentStateContinuousTimeMode "saveValues(...): Must be in continuous time mode."
     
-    fmi2SetTime(c, t) 
     fmi2SetContinuousStates(c, x)
+    fmi2SetTime(c, t) 
     
     return (fmiGetReal(c, recordValues)...,)
 end
@@ -461,6 +471,7 @@ end
 
 function prepareFMU(fmu::FMU2, c::Union{Nothing, FMU2Component}, instantiate::Union{Nothing, Bool}, terminate::Union{Nothing, Bool}, reset::Union{Nothing, Bool}, setup::Union{Nothing, Bool}, parameters::Union{Dict{<:Any, <:Any}, Nothing}, t_start, t_stop, tolerance;
     x0::Union{Array{<:Real}, Nothing}=nothing)
+
     if instantiate === nothing 
         instantiate = fmu.executionConfig.instantiate
     end
@@ -618,21 +629,19 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         dtmax = (t_stop-t_start)/100.0
     end
 
-    if solver === nothing
-        solver = Tsit5()
-    end
-
     c = prepareFMU(fmu, c, instantiate, terminate, reset, setup, parameters, t_start, t_stop, tolerance; x0=x0)
 
     # from here on, we are in event mode, if `setup=false` this is the job of the user
     @assert c.state == fmi2ComponentStateEventMode "FMU needs to be in event mode after setup."
 
-    x0 = fmi2GetContinuousStates(c)
-    x0_nom = fmi2GetNominalsOfContinuousStates(c)
-
+    if x0 === nothing
+        x0 = fmi2GetContinuousStates(c)
+        x0_nom = fmi2GetNominalsOfContinuousStates(c)
+    end
+   
     # initial event handling
     handleEvents(c) 
-    fmi2EnterContinuousTimeMode(c)
+    #fmi2EnterContinuousTimeMode(c)
 
     c.fmu.hasStateEvents = (c.fmu.modelDescription.numberOfEventIndicators > 0)
     c.fmu.hasTimeEvents = (c.eventInfo.nextEventTimeDefined == fmi2True)
@@ -681,14 +690,19 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
     end
 
     if c.fmu.hasTimeEvents
-        timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator),
+        timeEventCb = IterativeCallback((integrator) -> time_choice(c, integrator, t_start, t_stop),
                                         (integrator) -> affectFMU!(c, integrator, 0, inputFunction, inputValueReferences, fmusol), Float64; 
                                         initial_affect = (c.eventInfo.nextEventTime == t_start),
                                         save_positions=(false,false))
         push!(cbs, timeEventCb)
     end
 
-    fmusol.states = solve(problem, solver; callback = CallbackSet(cbs...), saveat = saveat, tol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
+    if solver === nothing
+        fmusol.states = solve(problem; callback = CallbackSet(cbs...), saveat = saveat, reltol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
+    else
+        fmusol.states = solve(problem, solver; callback = CallbackSet(cbs...), saveat = saveat, reltol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
+    end
+
     fmusol.success = (fmusol.states.retcode == :Success)
 
     # cleanup progress meter

@@ -231,3 +231,31 @@ for i in 1:length(tData)
 end
 
 fmiUnload(myFMU)
+
+# case 5: ME-FMU with different (random) start state
+
+myFMU = fmiLoad("SpringFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
+
+comp = fmiInstantiate!(myFMU; loggingOn=false)
+@test comp != 0
+
+# choose FMU or FMUComponent
+fmuStruct = nothing
+envFMUSTRUCT = ENV["FMUSTRUCT"]
+if envFMUSTRUCT == "FMU"
+    fmuStruct = myFMU
+elseif envFMUSTRUCT == "FMUCOMPONENT"
+    fmuStruct = comp
+end
+@assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+
+rand_x0 = rand(2)
+solution = fmiSimulateME(fmuStruct, t_start, t_stop; x0=rand_x0)
+@test length(solution.states.u) > 0
+@test length(solution.states.t) > 0
+
+@test solution.states.t[1] == t_start 
+@test solution.states.t[end] == t_stop 
+
+@test solution.states.u[1] == rand_x0
+fmiUnload(myFMU)

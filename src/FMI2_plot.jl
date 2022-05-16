@@ -26,6 +26,16 @@ function fmiPlot!(fig, solution::FMU2Solution;
     valueIndices=nothing, 
     maxLabelLength=64, 
     plotkwargs...)
+
+    numStateEvents = 0
+    numTimeEvents = 0
+    for e in solution.events
+        if e.indicator > 0
+            numStateEvents += 1
+        else
+            numTimeEvents += 1
+        end
+    end
   
     if states === nothing 
         states = (solution.states !== nothing)
@@ -43,6 +53,11 @@ function fmiPlot!(fig, solution::FMU2Solution;
                 break 
             end 
         end 
+
+        if numStateEvents > 100
+            @info "fmiPlot(...): Number of state events ($(numStateEvents)) exceeding 100, disabling automatic plotting of state events (can be forced with keyword `stateEvents=true`)."
+            stateEvents = false 
+        end
     end
 
     if timeEvents === nothing 
@@ -53,6 +68,11 @@ function fmiPlot!(fig, solution::FMU2Solution;
                 break 
             end 
         end 
+
+        if numTimeEvents > 100
+            @info "fmiPlot(...): Number of time events ($(numTimeEvents)) exceeding 100, disabling automatic plotting of time events (can be forced with keyword `timeEvents=true`)."
+            timeEvents = false 
+        end
     end
 
     if stateIndices === nothing 

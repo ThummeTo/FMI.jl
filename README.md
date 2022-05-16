@@ -9,6 +9,7 @@
 [![Dev Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) 
 [![CI Testing](https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions)
 [![Coverage](https://codecov.io/gh/ThummeTo/FMI.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ThummeTo/FMI.jl)
+[![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
 
 
 ## How can I use FMI.jl?
@@ -19,6 +20,8 @@
 
 ## How can I simulate a FMU and plot values?
 ```julia
+using FMI, Plots
+
 # load and instantiate a FMU
 myFMU = fmiLoad(pathToFMU)
 
@@ -33,7 +36,7 @@ fmiUnload(myFMU)
 ```
 
 ## What is currently supported in FMI.jl?
-- importing the full FMI 2.0.3 command set, including optional specials like getState, setState and getDirectionalDerivative
+- importing the full FMI 2.0.3 command set, including optional specials like `fmi2GetState`, `fmi2SetState` and `fmi2GetDirectionalDerivatives`
 - parameterization, simulation & plotting of CS- and ME-FMUs
 - event-handling for imported discontinuous ME-FMUs
 
