@@ -1,30 +1,39 @@
-#
-# Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher
-# Licensed under the MIT license. See LICENSE file in the project root for details.
-#
-
+# imports
 using FMI
+using FMIZoo
 using Plots
 
+tStart = 0.0
+tStop = 8.0
+
+vrs = ["mass.s"]
+
 # we use a FMU from the FMIZoo.jl
-pathToFMU = FMIZoo.get_model_filename("SpringPendulum1D", "Dymola", "2022x")
+pathToFMU = get_model_filename("SpringPendulum1D", "Dymola", "2022x")
 
 myFMU = fmiLoad(pathToFMU)
+fmiInfo(myFMU)
 
-t_start = 0.0
-t_stop = 8.0
-rvs = ["mass.s"]
-
-#create an instance and simulate it
 comp1 = fmiInstantiate!(myFMU; loggingOn=true)
-param1 = Dict("spring.c"=>10.0, "mass.s"=>1.0)
-data1 = fmiSimulateCS(comp1, t_start, t_stop; recordValues=rvs, parameters=param1)
+comp1Address= comp1.compAddr
+println(comp1)
+
+param1 = Dict("spring.c"=>10.0, "mass_s0"=>1.0)
+data1 = fmiSimulate(comp1, tStart, tStop; parameters=param1, recordValues=vrs)
 fig = fmiPlot(data1)
 
-#create another instance, change the spring stiffness and simulate it
+@assert comp1.compAddr === comp1Address
+
 comp2 = fmiInstantiate!(myFMU; loggingOn=true)
+comp2Address= comp2.compAddr
+println(comp2)
+
+@assert comp1Address !== comp2Address
+
 param2 = Dict("spring.c"=>1.0, "mass.s"=>2.0)
-data2 = fmiSimulateCS(comp2, t_start, t_stop; recordValues=rvs, parameters=param2)
+data2 = fmiSimulateCS(comp2, tStart, tStop;  parameters=param2, recordValues=vrs)
 fmiPlot!(fig, data2)
+
+@assert comp2.compAddr === comp2Address
 
 fmiUnload(myFMU)
