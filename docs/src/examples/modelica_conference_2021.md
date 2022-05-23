@@ -7,10 +7,10 @@ Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher, Johannes Sto
 Licensed under the MIT license. See [LICENSE](https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.
 
 ## Motivation
-This Julia Package *FMI.jl* is motivated by the use of simulation models in Julia. Here the FMI specification is implemented. FMI *Functional Mock-up Interface* is a free standard ([fmi-standard.org](http://fmi-standard.org/)) that defines a container and an interface to exchange dynamic models using a combination of XML files, binaries and C code zipped into a single file. The user can thus use simulation models in the form of a *Functional Mock-up Units* FMU. Besides loading the FMU, the user can also set values of parameters and states and simulate the FMU both as co-simulation and model exchange simulation.
+This Julia Package *FMI.jl* is motivated by the use of simulation models in Julia. Here the FMI specification is implemented. FMI (*Functional Mock-up Interface*) is a free standard ([fmi-standard.org](http://fmi-standard.org/)) that defines a container and an interface to exchange dynamic models using a combination of XML files, binaries and C code zipped into a single file. The user can thus use simulation models in the form of an FMU (*Functional Mock-up Units*). Besides loading the FMU, the user can also set values for parameters and states and simulate the FMU both as co-simulation and model exchange simulation.
 
 ## Introduction to the example
-In this example we would like to show that besides the simple simulation of an FMU there is also a more advanced version of the simulation. The advantage of the more advanced variant is that there are more possibilities to intervene in the simulation to make changes. After the FMU has been simulated, the simulation results are displayed in a graph. The model used is a one-dimensional spring pendulum with friction. The object-orientated structure of the *SpringFrictionPendulum1D* can be seen in the following graphic.
+In this example we would like to show that besides the simple simulation of an FMU there is also a more advanced version of the simulation. The advantage of the more advanced variant is that there are more possibilities to intervene in the simulation to make changes. After the FMU has been simulated, the simulation results are displayed in a graph. The used model is a one-dimensional spring pendulum with friction. The object-orientated structure of the *SpringFrictionPendulum1D* can be seen in the following graphic.
 
 ![svg](https://github.com/thummeto/FMI.jl/blob/main/docs/src/examples/pics/SpringFrictionPendulum1D.svg?raw=true)  
 
@@ -70,16 +70,16 @@ In the next lines of code the FMU model from *FMIZoo.jl* is loaded and the infor
 
 
 ```julia
-# we use a FMU from the FMIZoo.jl
+# we use an FMU from the FMIZoo.jl
 pathToFMU = get_model_filename("SpringFrictionPendulum1D", "Dymola", "2022x")
 
 myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_zo6zRJ/SpringFrictionPendulum1D`.
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_6AWFMC/SpringFrictionPendulum1D`.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:75
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_zo6zRJ/SpringFrictionPendulum1D/resources`
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_6AWFMC/SpringFrictionPendulum1D/resources`
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:190
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:193
@@ -114,7 +114,7 @@ fmiInfo(myFMU)
     ##################### End information for FMU #####################
 
 
-In the next commands the FMU is simulated, for which the start and end time and which variables are recorded. Afterwards the simulation result is shown in a graph. In the plot for the FMU, it can be seen that the oscillation keeps decreasing due to the effect of friction. If one simulates long enough, the oscillation comes to a standstill after a certain time.
+In the next commands the FMU is simulated, for which the start and end time and recorded variables are declared. Afterwards the simulation result is shown in a graph. In the plot for the FMU, it can be seen that the oscillation keeps decreasing due to the effect of friction. If one simulates long enough, the oscillation comes to a standstill after a certain time.
 
 
 ```julia
@@ -131,7 +131,7 @@ fmiPlot(simData)
 
 
 
-After ploting the data, the FMU is unloaded and all unpacked data on disc is removed.
+After plotting the data, the FMU is unloaded and all unpacked data on disc is removed.
 
 
 ```julia
@@ -140,16 +140,16 @@ fmiUnload(myFMU)
 
 ### Advanced FMU Simulation
 
-In the following type of simulation a more advanced variant is presented, which allows to intervene more in the simulation process. Analogous to the simple variant, an FMU model must be loaded.
+In the following type of simulation a more advanced variant is presented, which allows intervening more in the simulation process. Analogous to the simple variant, an FMU model must be loaded.
 
 
 ```julia
 myFMU = fmiLoad(pathToFMU);
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_wMDIVJ/SpringFrictionPendulum1D`.
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_ldqhaF/SpringFrictionPendulum1D`.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:75
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_wMDIVJ/SpringFrictionPendulum1D/resources`
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_ldqhaF/SpringFrictionPendulum1D/resources`
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:190
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:193
@@ -167,15 +167,15 @@ instanceFMU = fmiInstantiate!(myFMU)
 
     FMU:            SpringFrictionPendulum1D
     InstanceName:   [not defined]
-    Address:        Ptr{Nothing} @0x0000000007c18210
+    Address:        Ptr{Nothing} @0x0000000005dfdac0
     State:          fmi2ComponentStateInstantiated
-    Logging:        true
+    Logging:        false
     FMU time:       -Inf
     FMU states:     nothing
 
 
 
-In the following code block, start and end time for the simulation is set by the `fmiSetupExperiment()` command. Next, the FMU is initialized by the calls of `fmiEnterInitializationMode()` and `fmiExitInitializationMode()`. It would also be possible to set initial states for the FMu between these two commands. 
+In the following code block, start and end time for the simulation is set by the `fmiSetupExperiment()` command. Next, the FMU is initialized by the calls of `fmiEnterInitializationMode()` and `fmiExitInitializationMode()`. It would also be possible to set initial states for the FMU between these two commands. 
 
 
 ```julia
@@ -192,7 +192,7 @@ fmiExitInitializationMode(instanceFMU)
 
 
 
-The actual simulation loop is shown in the following block. Here in fixed time steps always a simulation step `fmiDoStep()` with the step size `tStep` is executed. As indicated in the code by the comments, the input values and output value of the FMU could be changed in the simulation loop as desired, whereby the higher possibility of adjustments arises.
+The actual simulation loop is shown in the following block. Here a simulation step `fmiDoStep()` with the fixed step size `tStep` is executed. As indicated in the code by the comments, the input values and output values of the FMU could be changed in the simulation loop as desired, whereby the higher possibility of adjustments arises.
 
 
 ```julia

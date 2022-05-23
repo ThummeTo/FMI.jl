@@ -8,7 +8,7 @@ tStop = 8.0
 
 vrs = ["mass.s"]
 
-# we use a FMU from the FMIZoo.jl
+# we use an FMU from the FMIZoo.jl
 pathToFMU = get_model_filename("SpringPendulum1D", "Dymola", "2022x")
 
 myFMU = fmiLoad(pathToFMU)
