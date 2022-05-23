@@ -46,7 +46,7 @@ fmiSetString
 ```@docs
 fmiGetFMUstate
 fmiSetFMUstate
-fmiFreeFMUstate
+fmiFreeFMUstate!
 fmiSerializedFMUstateSize
 fmiSerializeFMUstate
 fmiDeSerializeFMUstate
