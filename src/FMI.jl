@@ -1034,7 +1034,7 @@ end
 
 """
 Free the memory for the allocated FMU state
-    """
+"""
 function fmiFreeFMUstate!(str::fmi2Struct, args...; kwargs...)
     fmi2FreeFMUstate!(str, args...; kwargs...)
 end
