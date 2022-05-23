@@ -7,7 +7,7 @@ In this directory various examples of applications of the FMI.jl library can be 
 ## Install Jupyter in Visual Studio Code
 The Jupyter Notebooks extension for Visual Studio Code can be [here](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter).
 
-## Add Julia Kernel to Juypter
+## Add Julia Kernel to Jupyter
 To run Julia as kernel in a jupyter notebook it is necessary to add the **IJulia** package.
 
 1. Start the Julia REPL.
