@@ -1,4 +1,4 @@
-# Multiple Instances of a FMU
+# Multiple Instances of an FMU
 Tutorial by Johannes Stoljar, Tobias Thummerer
 
 ## License
@@ -7,10 +7,10 @@ Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher, Johannes Sto
 Licensed under the MIT license. See [LICENSE](https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.
 
 ## Motivation
-This Julia Package *FMI.jl* is motivated by the use of simulation models in Julia. Here the FMI specification is implemented. FMI *Functional Mock-up Interface* is a free standard ([fmi-standard.org](http://fmi-standard.org/)) that defines a container and an interface to exchange dynamic models using a combination of XML files, binaries and C code zipped into a single file. The user can thus use simulation models in the form of a *Functional Mock-up Units* FMU. Besides loading the FMU, the user can also set values of parameters and states and simulate the FMU both as co-simulation and model exchange simulation.
+This Julia Package *FMI.jl* is motivated by the use of simulation models in Julia. Here the FMI specification is implemented. FMI (*Functional Mock-up Interface*) is a free standard ([fmi-standard.org](http://fmi-standard.org/)) that defines a container and an interface to exchange dynamic models using a combination of XML files, binaries and C code zipped into a single file. The user can thus use simulation models in the form of an FMU (*Functional Mock-up Units*). Besides loading the FMU, the user can also set values for parameters and states and simulate the FMU both as co-simulation and model exchange simulation.
 
 ## Introduction to the example
-In this example we want to show that it is possible to create different instances of an FMU. The different instances can then be used to run independent simulations. After the FMU has been simulated, the simulation results are displayed in a graph. The model used is a one-dimensional spring pendulum without friction. The object-orientated structure of the *SpringPendulum1D* can be seen in the following graphic.
+In this example we want to show that it is possible to create different instances of an FMU. The different instances can then be used to run independent simulations. After the FMU has been simulated, the simulation results are displayed in a graph. The used model is a one-dimensional spring pendulum without friction. The object-orientated structure of the *SpringPendulum1D* can be seen in the following graphic.
 
 ![svg](https://github.com/thummeto/FMI.jl/blob/main/docs/src/examples/pics/SpringPendulum1D.svg?raw=true)  
 
@@ -71,16 +71,16 @@ In the next lines of code the FMU model from *FMIZoo.jl* is loaded and the infor
 
 
 ```julia
-# we use a FMU from the FMIZoo.jl
+# we use an FMU from the FMIZoo.jl
 pathToFMU = get_model_filename("SpringPendulum1D", "Dymola", "2022x")
 
 myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_opVFg6/SpringPendulum1D`.
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_i6FgRT/SpringPendulum1D`.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:75
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_opVFg6/SpringPendulum1D/resources`
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_i6FgRT/SpringPendulum1D/resources`
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:190
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:193
@@ -128,14 +128,14 @@ println(comp1)
 
     FMU:            SpringPendulum1D
     InstanceName:   [not defined]
-    Address:        Ptr{Nothing} @0x00000000063afb10
+    Address:        Ptr{Nothing} @0x00000000060cd640
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
     FMU states:     nothing
 
 
-Next, a dictionary for the parameters is created. With this dictionary you can set the initial states of the variables of the FMU. For the spring constant `spring.c` a value of $10.0 \frac{N}{m}$ and the position of the mass `mass.s` a value of $1.0 m$ is set. The created dictionary with the specified variables for recording are passed to the command for simulation.
+Next, a dictionary for the parameters is created. With this dictionary you can set the initial states of the variables of the FMU. For the spring constant `spring.c` a value of $10.0 \frac{N}{m}$ and for the position of the mass `mass.s` a value of $1.0 m$ is set. The created dictionary with the specified variables for recording are passed to the command for simulation.
 
 
 ```julia
@@ -153,7 +153,7 @@ fig = fmiPlot(data1)
 
 
 
-For control you can compare again the address of the instance to the previous address and it should be the same address. As soon as this would not be the case an error is thrown by the macro `@assert`.
+For control, you can compare again the address of the instance to the previous address, and it should be the same address. As soon as this is not the case an error would be thrown by the macro `@assert`.
 
 
 ```julia
@@ -162,7 +162,7 @@ For control you can compare again the address of the instance to the previous ad
 
 ### Second Instance
 
-To create an second instance of the FMU it is necessary to call the command `fmiInstantiate!()`. With the component address you now have a unique instance of the FMU.
+To create a second instance of the FMU it is necessary to call the command `fmiInstantiate!()`. With the component address you now have a unique instance of the FMU.
 
 
 ```julia
@@ -173,21 +173,21 @@ println(comp2)
 
     FMU:            SpringPendulum1D
     InstanceName:   [not defined]
-    Address:        Ptr{Nothing} @0x0000000006fabb90
+    Address:        Ptr{Nothing} @0x0000000007e64580
     State:          fmi2ComponentStateInstantiated
-    Logging:        false
+    Logging:        true
     FMU time:       -Inf
     FMU states:     nothing
 
 
-The addresses of the instantiated FMUs must differ and you can see that in the comparison below.
+The addresses of the instantiated FMUs must differ, and you can see that in the comparison below.
 
 
 ```julia
 @assert comp1Address !== comp2Address
 ```
 
-Again, a dictionary for the parameters is created. With this dictionary you can set the initial states of the variables of the FMU. For the spring constant `spring.c` a value of $1.0 \frac{N}{m}$ and the position of the mass `mass.s` a value of $2.0 m$ is set. The created dictionary with the specified variables for recording are passed to the command for simulation.
+Again, a dictionary for the parameters is created. With this dictionary you can set the initial states of the variables of the FMU. For the spring constant `spring.c` a value of $1.0 \frac{N}{m}$ and for the position of the mass `mass.s` a value of $2.0 m$ is set. The created dictionary with the specified variables for recording are passed to the command for simulation.
 
 
 ```julia
@@ -205,7 +205,7 @@ fmiPlot!(fig, data2)
 
 
 
-For control you can compare again the address of the instance `comp2` to the previous address `comp2Address` and it should be the same address.
+For control, you can compare again the address of the instance `comp2` to the previous address `comp2Address` and it should be the same address.
 
 
 ```julia
@@ -214,7 +214,7 @@ For control you can compare again the address of the instance `comp2` to the pre
 
 ### Unload FMU
 
-After ploting the data, the FMU is unloaded and all unpacked data on disc is removed.
+After plotting the data, the FMU is unloaded and all unpacked data on disc is removed.
 
 
 ```julia
@@ -223,4 +223,4 @@ fmiUnload(myFMU)
 
 ### Summary
 
-Based on the example it can be seen that it is possible to create different instances of a FMU. The different instances can then be used to perform different simulations.
+Based on the example it can be seen that it is possible to create different instances of an FMU. The different instances can then be used to perform different simulations.

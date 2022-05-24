@@ -1,4 +1,4 @@
-# Paramterize an FMU
+# Parameterize an FMU
 Tutorial by Johannes Stoljar, Tobias Thummerer
 
 ## License
@@ -7,10 +7,10 @@ Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher, Johannes Sto
 Licensed under the MIT license. See [LICENSE](https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.
 
 ## Motivation
-This Julia Package *FMI.jl* is motivated by the use of simulation models in Julia. Here the FMI specification is implemented. FMI *Functional Mock-up Interface* is a free standard ([fmi-standard.org](http://fmi-standard.org/)) that defines a container and an interface to exchange dynamic models using a combination of XML files, binaries and C code zipped into a single file. The user can thus use simulation models in the form of a *Functional Mock-up Units* FMU. Besides loading the FMU, the user can also set values of parameters and states and simulate the FMU both as co-simulation and model exchange simulation.
+This Julia Package *FMI.jl* is motivated by the use of simulation models in Julia. Here the FMI specification is implemented. FMI (*Functional Mock-up Interface*) is a free standard ([fmi-standard.org](http://fmi-standard.org/)) that defines a container and an interface to exchange dynamic models using a combination of XML files, binaries and C code zipped into a single file. The user can thus use simulation models in the form of an FMU (*Functional Mock-up Units*). Besides loading the FMU, the user can also set values for parameters and states and simulate the FMU both as co-simulation and model exchange simulation.
 
 ## Introduction to the example
-This example shows how the parameterization of an FMU works. For this purpose, an IO-FMU model is loaded and the various commands for parameterization are shown on the basis of this model. With this example the user shall be guided how he can make certain settings at a FMU.
+This example shows how the parameterization of an FMU works. For this purpose, an IO-FMU model is loaded and the various commands for parameterization are shown on the basis of this model. With this example the user shall be guided how to make certain settings at an FMU.
 
 ## Target group
 The example is primarily intended for users who work in the field of simulation exchange. The example wants to show how simple it is to use FMUs in Julia.
@@ -63,16 +63,16 @@ In the next lines of code the FMU model from *FMIZoo.jl* is loaded and the infor
 
 
 ```julia
-# we use a FMU from the FMIZoo.jl
+# we use an FMU from the FMIZoo.jl
 pathToFMU = get_model_filename("IO", "Dymola", "2022x")
 
 myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_Ya1ri0/IO`.
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_87V5Ih/IO`.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:75
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_Ya1ri0/IO/resources`
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_87V5Ih/IO/resources`
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:190
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:193
@@ -113,7 +113,7 @@ fmiInfo(myFMU)
 
 ### Instantiate and Setup FMU
 
-Next it is necessary to create an instance of the FMU, this is achieved by the command `fmiInstantiate!()`.
+Next it is necessary to create an instance of the FMU. This is achieved by the command `fmiInstantiate!()`.
 
 
 ```julia
@@ -125,7 +125,7 @@ fmiInstantiate!(myFMU; loggingOn=true)
 
     FMU:            IO
     InstanceName:   [not defined]
-    Address:        Ptr{Nothing} @0x0000000003b8ffb0
+    Address:        Ptr{Nothing} @0x0000000003bc6e90
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
@@ -163,7 +163,7 @@ fmiEnterInitializationMode(myFMU)
 
 
 
-Within this mode it is then possible to change the different parameters. For this in this example of each data type (`real`, `integer`, `boolean` and `string)` a corresponding parameter is selected. At the beginning the initial state of these parameters is displayed with `fmiGet()`.
+Within this mode it is then possible to change the different parameters. In this example, for each data type (`real`, `integer`, `boolean` and `string)` a corresponding parameter is selected. At the beginning the initial state of these parameters is displayed with `fmiGet()`.
 
 
 ```julia
@@ -182,7 +182,7 @@ fmiGet(myFMU, params)
 
 
 
-In the next step, a function is defined that generates a random value for each parameter. For the parameter 'p_string' a random number is inserted into the string. All parameters are combined to a vector and output.
+In the next step, a function is defined that generates a random value for each parameter. For the parameter `p_string` a random number is inserted into the string. All parameters are combined to a vector and output.
 
 
 ```julia
@@ -212,7 +212,7 @@ The previously defined function is called and the results are displayed in the c
 paramsVal = generateRandomNumbers();
 ```
 
-    Any[36.66374759729531, 19, true, "Random number 33.35521735697653!"]
+    Any[63.806713156341345, 18, true, "Random number 43.376758431208984!"]
 
 
 #### First variant
@@ -228,21 +228,21 @@ print(values)
 @assert paramsVal == values
 ```
 
-    Any[36.66374759729531, 19, 1, "Random number 33.35521735697653!"]
+    Any[63.806713156341345, 18, 1, "Random number 43.376758431208984!"]
 
 #### Second variant
 
-To make sure that the functions work it is necessary to generate random numbers again. As already above we call the defined function `generateRandomNumbers()` and output the values.
+To make sure that the functions work it is necessary to generate random numbers again. As shown already, we call the defined function `generateRandomNumbers()` and output the values.
 
 
 ```julia
 rndReal, rndInteger, rndBoolean, rndString = generateRandomNumbers();
 ```
 
-    Any[19.992987498699357, 23, true, "Random number 6.136768061996967!"]
+    Any[12.309042839550454, 83, true, "Random number 49.46611902390683!"]
 
 
-In the second variant, the value for each data type is set separately by the corresponding command. By this Varinate one has the maximum control and can be sure that also the correct data type is set. To illustrate the functionality of the parameterization with the separate functions, the corresponding get function is also called separately for each data type:
+In the second variant, the value for each data type is set separately by the corresponding command. By this variant one has the maximum control and can be sure that also the correct data type is set. To illustrate the functionality of the parameterization with the separate functions, the corresponding get function is also called separately for each data type:
 * `fmiSetReal()` <---> `fmiGetReal()`
 * `fmiSetInteger()` <---> `fmiGetInteger()`
 * `fmiSetBoolean()` <---> `fmiGetBoolean()`
@@ -264,11 +264,11 @@ display("$rndString == $(fmiGetString(myFMU, "p_string"))")
 ```
 
 
-    "19.992987498699357 == 19.992987498699357"
+    "12.309042839550454 == 12.309042839550454"
 
 
 
-    "23 == 23"
+    "83 == 83"
 
 
 
@@ -276,7 +276,7 @@ display("$rndString == $(fmiGetString(myFMU, "p_string"))")
 
 
 
-    "Random number 6.136768061996967! == Random number 6.136768061996967!"
+    "Random number 49.46611902390683! == Random number 49.46611902390683!"
 
 
 After seeing that both variants set the parameters correctly, the initialization mode is terminated with the function `fmiExitInitializationMode()`.
@@ -304,4 +304,4 @@ fmiUnload(myFMU)
 
 ### Summary
 
-Based on this tutorial it can be seen that is has two different variants to set and get parameters.These examples should make it clear to the user how parameters can also be set with different data types.
+Based on this tutorial it can be seen that there are two different variants to set and get parameters.These examples should make it clear to the user how parameters can also be set with different data types.

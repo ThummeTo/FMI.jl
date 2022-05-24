@@ -8,7 +8,7 @@ tStep = 0.1
 tStop = 8.0
 tSave = tStart:tStep:tStop
 
-# we use a FMU from the FMIZoo.jl
+# we use an FMU from the FMIZoo.jl
 pathToFMU = get_model_filename("SpringFrictionPendulum1D", "Dymola", "2022x")
 
 myFMU = fmiLoad(pathToFMU)

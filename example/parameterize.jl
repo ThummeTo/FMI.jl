@@ -5,7 +5,7 @@ using FMIZoo
 tStart = 0.0
 tStop = 8.0
 
-# we use a FMU from the FMIZoo.jl
+# we use an FMU from the FMIZoo.jl
 pathToFMU = get_model_filename("IO", "Dymola", "2022x")
 
 myFMU = fmiLoad(pathToFMU)
