@@ -1,46 +1,41 @@
-#
-# Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher
-# Licensed under the MIT license. See LICENSE file in the project root for details.
-#
-
-################################## INSTALLATION ###############################################
-# (1) Enter Package Manager via     ]
-# (2) Install FMI via               add FMI     or    add "https://github.com/ThummeTo/FMI.jl"
-################################ END INSTALLATION #############################################
-
+# imports
 using FMI
-import FMIZoo
-
-# we use a FMU from the FMIZoo.jl
-pathToFMU = FMIZoo.get_model_filename("SpringFrictionPendulum1D", "Dymola", "2022x")
-
-# this is how you can quickly simulate a FMU
-myFMU = fmiLoad(pathToFMU)
-simData = fmiSimulate(myFMU, 0.0, 10.0; recordValues=["mass.s"])
-
-# ... and plot it
+using FMIZoo
 using Plots
+
+tStart = 0.0
+tStep = 0.1
+tStop = 8.0
+tSave = tStart:tStep:tStop
+
+# we use an FMU from the FMIZoo.jl
+pathToFMU = get_model_filename("SpringFrictionPendulum1D", "Dymola", "2022x")
+
+myFMU = fmiLoad(pathToFMU)
+fmiInfo(myFMU)
+
+simData = fmiSimulate(myFMU, tStart, tStop; recordValues=["mass.s"], saveat=tSave)
 fmiPlot(simData)
 
 fmiUnload(myFMU)
 
-# this is how you can simulate a FMU with more possibilities
-myFMU = fmiLoad(pathToFMU)
-fmuComp = fmiInstantiate!(myFMU)
-fmiSetupExperiment(fmuComp, 0.0, 10.0)
-fmiEnterInitializationMode(fmuComp)
-fmiExitInitializationMode(fmuComp)
-dt = 0.1
-ts = 0.0:dt:(10.0-dt)
-for t in ts
+myFMU = fmiLoad(pathToFMU);
+
+instanceFMU = fmiInstantiate!(myFMU)
+
+fmiSetupExperiment(instanceFMU, tStart, tStop)
+fmiEnterInitializationMode(instanceFMU)
+# set initial model states
+fmiExitInitializationMode(instanceFMU)
+
+for t in tSave
     # set model inputs 
     # ...
-
-    fmiDoStep(fmuComp, dt)
-
+    fmiDoStep(instanceFMU, tStep)
     # get model outputs
     # ...
 end
-fmiTerminate(fmuComp)
-fmiFreeInstance!(fmuComp)
+
+fmiTerminate(instanceFMU)
+fmiFreeInstance!(instanceFMU)
 fmiUnload(myFMU)

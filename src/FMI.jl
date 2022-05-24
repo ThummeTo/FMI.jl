@@ -62,6 +62,12 @@ include("FMI3_comp_wraps.jl")
 include("FMI2_sim.jl")
 include("FMI3_sim.jl")
 
+"""
+Plots data from a ME-FMU.
+
+Optional `t_in_solution` controls if the first state in the solution is interpreted as t(ime).
+Optional keyword argument `maxLabelLength` controls the maximum length for legend labels (too long labels are cut from front).
+"""
 function fmiPlot(solution::FMU2Solution; kwargs...)
     @warn "fmiPlot(...) needs `Plots` package. Please do `using Plots` or `import Plots`."
 end
@@ -96,7 +102,7 @@ export fmiCanGetSetState, fmiCanSerializeFMUstate
 export fmiProvidesDirectionalDerivative
 export fmiIsCoSimulation, fmiIsModelExchange
 export fmiGetDependencies
-export fmiGetStartValue
+export fmiGetStartValue, fmiStringToValueReference
 export fmiSimulate, fmiSimulateCS, fmiSimulateME
 export fmiGet, fmiGet!, fmiSet
 export fmiGetSolutionTime, fmiGetSolutionState, fmiGetSolutionValue
@@ -1034,7 +1040,7 @@ end
 
 """
 Free the memory for the allocated FMU state
-    """
+"""
 function fmiFreeFMUstate!(str::fmi2Struct, args...; kwargs...)
     fmi2FreeFMUstate!(str, args...; kwargs...)
 end

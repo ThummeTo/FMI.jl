@@ -1,36 +1,45 @@
-#
-# Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher
-# Licensed under the MIT license. See LICENSE file in the project root for details.
-#
-
+# imports
 using FMI
-import FMIZoo
+using FMIZoo
 
-# our simulation setup
-t_start = 0.0
-t_stop = 8.0
+tStart = 0.0
+tStop = 8.0
 
-# we use a FMU from the FMIZoo.jl
-pathToFMU = FMIZoo.get_model_filename("IO", "Dymola", "2022x")
+# we use an FMU from the FMIZoo.jl
+pathToFMU = get_model_filename("IO", "Dymola", "2022x")
 
 myFMU = fmiLoad(pathToFMU)
+fmiInfo(myFMU)
+
 fmiInstantiate!(myFMU; loggingOn=true)
-fmiSetupExperiment(myFMU, 0.0)
+
+fmiSetupExperiment(myFMU, tStart, tStop)
+
 fmiEnterInitializationMode(myFMU)
 
-fmiGetString(myFMU, "p_string")
+params = ["p_real", "p_integer", "p_boolean", "p_string"]
+fmiGet(myFMU, params)
 
-rndReal = 100 * rand()
-rndInteger = round(Integer, 100 * rand())
-rndBoolean = rand() > 0.5
-rndString = "Not random!"
+function generateRandomNumbers()
+    rndReal = 100 * rand()
+    rndInteger = round(Integer, 100 * rand())
+    rndBoolean = rand() > 0.5
+    rndString = "Random number $(100 * rand())!"
 
-# case A: The fast way ...
+    randValues = [rndReal, rndInteger, rndBoolean, rndString]
+    println(randValues)
+    return randValues
+end
 
-fmiSet(myFMU, ["p_real", "p_integer", "p_boolean", "p_string"], [rndReal, rndInteger, rndBoolean, rndString])
-fmiGet(myFMU, ["p_real", "p_integer", "p_boolean", "p_string"])
+paramsVal = generateRandomNumbers();
 
-# case B: Maximum control over what happens ...
+fmiSet(myFMU, params, paramsVal)
+values = fmiGet(myFMU, params)
+print(values)
+
+@assert paramsVal == values
+
+rndReal, rndInteger, rndBoolean, rndString = generateRandomNumbers();
 
 fmiSetReal(myFMU, "p_real", rndReal)
 display("$rndReal == $(fmiGetReal(myFMU, "p_real"))")
@@ -43,8 +52,6 @@ display("$rndBoolean == $(fmiGetBoolean(myFMU, "p_boolean"))")
 
 fmiSetString(myFMU, "p_string", rndString)
 display("$rndString == $(fmiGetString(myFMU, "p_string"))")
-
-# clean up
 
 fmiExitInitializationMode(myFMU)
 

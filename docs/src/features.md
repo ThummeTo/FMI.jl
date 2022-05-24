@@ -9,7 +9,7 @@ The content of the execution configuration may change in future (together with n
 Because not all users need the full potential of this configuration tool, there are three presets given: 
 - `myFMU.executionConfig = FMU_EXECUTION_CONFIGURATION_NO_RESET` is the default operation mode for FMUs. FMUs are not reset via `fmi2Reset`, but new instantiated for every simulation run (or training step). This is not the most efficient way, but many FMU have problems with resetting.
 - `myFMU.executionConfig = FMU_EXECUTION_CONFIGURATION_RESET` is faster for well-implemented FMUs, but needs a fully working `fmi2Reset`-function. So if you know you have a fully working `fmi2Reset`, you may be faster with that option.
-- `myFMU.executionConfig = FMU_EXECUTION_CONFIGURATION_NO_FREEING` should only be the very last choise. If your FMU neither supports `fmi2Reset` nor a propper `fmi2FreeInstance`, you could use this configuration as a last way out. Keep in mind, that new FMU instances are allocated but not freed, as long as your Julia instance is running (memory leak). In general, the amount of leaked memory is small, but you need to know what you are doing, if you do thousands or ten-thousands of simulation runs with such a FMU.
+- `myFMU.executionConfig = FMU_EXECUTION_CONFIGURATION_NO_FREEING` should only be the very last choise. If your FMU neither supports `fmi2Reset` nor a proper `fmi2FreeInstance`, you could use this configuration as a last way out. Keep in mind, that new FMU instances are allocated but not freed, as long as your Julia instance is running (memory leak). In general, the amount of leaked memory is small, but you need to know what you are doing, if you do thousands or ten-thousands of simulation runs with such a FMU.
 
 ## Model variable identification
 *FMI.jl* offers multiple ways to retrieve your model variables. Any function that accepts a variable identifier can handle the following argument types:
@@ -17,7 +17,7 @@ Because not all users need the full potential of this configuration tool, there 
 - `Array{UInt32}` or `Array{fmi2ValueReference}` for example `[1610612742, 1610612743]` or `[0x16000001, 0x16000002]`: This is the most performant way of passing multiple variable identifiers, but you need to know the *value references*.
 - `String` for example `"ball.s"`: This is the most intuitive way, because you might already know the variable name from your modelling environment or model documentation.
 - `Array{String]` for example `["ball.s", "der(ball.s)"]`: This is the most intuitive way, because you might already know the variable names from your modelling environment or model documentation.
-- `Symbol` for example `:states`: There are multiple symbol wildcards for interessting variable groups like `:all`, `:none`, `:states`, `:derivatives`, `:inputs` and `:outputs`.
+- `Symbol` for example `:states`: There are multiple symbol wildcards for interesting variable groups like `:all`, `:none`, `:states`, `:derivatives`, `:inputs` and `:outputs`.
 - `nothing`: If you don't want to record anything (same as `:none`)
 
 ## Event handling
@@ -28,7 +28,7 @@ If your model has state and/or time events is detected automatically by *FMI.jl*
 
 ## Model exchange (ME) and co-simulation (CS)
 There are two different model types for FMUs in FMI2: Model exchange (ME) and co-simulation (CS). 
-If you have a FMU and are only interessted in getting it simulated, use `fmiSimulate` so *FMI.jl* will automatically pick CS if available and otherwise ME.
+If you have a FMU and are only interested in getting it simulated, use `fmiSimulate` so *FMI.jl* will automatically pick CS if available and otherwise ME.
 If you want to force a specific simulation mode, you can use `fmiSimulateME` (for ME) or `fmiSimulateCS` (for CS).
 
 ## Simulate arbitrary time intervals
@@ -37,7 +37,7 @@ Because many FMUs don't support `startTime != 0.0` and will throw an error or wa
 If you don't want this feature (maybe because you are simulating time-dependent systems), you may use the execution configuration `myFMU.executionConfig.autoTimeShift=false` while providing a `startTime != 0.0`.
 
 ## Performance
-Many commands in *FMI.jl* are available in in-place and out-of-place sematics. Of course, in-place-calls are faster, because they don't need to allocate new memory at every call (for the return values).
+Many commands in *FMI.jl* are available in in-place and out-of-place semantics. Of course, in-place-calls are faster, because they don't need to allocate new memory at every call (for the return values).
 So if you have an eye on performance (or *must* have), a good starting point is to substitute out-of-place- with in-place-calls. Typical improvements are:
 - `valueArray = fmi2GetReal(args...)` -> `fmi2GetReal!(args..., valueArray)`
 - `valueArray = fmi2GetDerivatives(args...)` -> `fmi2GetDerivatives!(args..., valueArray)`

@@ -26,3 +26,4 @@ Manifest.toml
 # Custom
 tmp/
 .vscode/settings.json
+example/.ipynb_checkpoints/
