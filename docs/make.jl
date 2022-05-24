@@ -22,9 +22,7 @@ makedocs(sitename="FMI.jl",
                 "examples/manipulation.md"
             ]
             "Library Functions" => Any[
-                "FMI 2 library functions" => "library/library.md",
-                "FMI version independent functions" => "library/library_ind.md",
-                "FMU 2 functions" => "library/fmu2.md",
+                "FMI version independent library functions" => "library/library.md",
                 "FMU version independent functions" => "library/fmu.md"
             ]
             "Related Publication" => "related.md"
