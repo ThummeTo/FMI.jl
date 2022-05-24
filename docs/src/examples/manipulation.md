@@ -47,6 +47,10 @@ using FMICore
 using Plots
 ```
 
+    ┌ Warning: Replacing docs for `FMI.fmiPlot :: Tuple{FMU2Solution}` in module `FMI`
+    └ @ Base.Docs docs/Docs.jl:240
+
+
 ### Simulation setup
 
 Next, the start time and end time of the simulation are set.
@@ -78,9 +82,9 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_easjZL/SpringFrictionPendulum1D`.
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_T6UDht/SpringFrictionPendulum1D`.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:75
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_easjZL/SpringFrictionPendulum1D/resources`
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_T6UDht/SpringFrictionPendulum1D/resources`
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:190
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:193
@@ -126,7 +130,7 @@ vrs = ["mass.s"]
 simData = fmiSimulateME(myFMU, tStart, tStop; recordValues=vrs)
 ```
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:09[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:10[39m
 
 
 
@@ -202,7 +206,7 @@ originalGetReal = myFMU.cGetReal
 
 
 
-    Ptr{Nothing} @0x00007f55c89dcfaf
+    Ptr{Nothing} @0x00007f184582dfaf
 
 
 
@@ -250,7 +254,7 @@ fmiSetFctGetReal(myFMU, myGetReal!)
 
 
 
-    Ptr{Nothing} @0x00007f5615853fc0
+    Ptr{Nothing} @0x00007f188e5f4fc0
 
 
 
