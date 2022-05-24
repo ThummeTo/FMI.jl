@@ -9,6 +9,8 @@
 
 # FMI-spec
 """
+    fmi2Simulate(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2Simulate() in FMI/FMI2_sim.jl
 """
 function fmi2Simulate(fmu::FMU2, args...; kwargs...)
@@ -16,6 +18,8 @@ function fmi2Simulate(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2SimulateCS(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2SimulateCS() in FMI/FMI2_sim.jl
 """
 function fmi2SimulateCS(fmu::FMU2, args...; kwargs...)
@@ -23,6 +27,8 @@ function fmi2SimulateCS(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2SimulateME(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2SimulateME() in FMI/FMI2_sim.jl
 """
 function fmi2SimulateME(fmu::FMU2, args...; kwargs...)
@@ -30,6 +36,8 @@ function fmi2SimulateME(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2FreeInstance!(fmu::FMU2)
+
 Wrapper for fmi2FreeInstance!() in FMIImport/FMI2_c.jl
 """
 function fmi2FreeInstance!(fmu::FMU2)
@@ -38,6 +46,8 @@ function fmi2FreeInstance!(fmu::FMU2)
 end
 
 """
+    fmi2SetDebugLogging(fmu::FMU2)
+
 Wrapper for fmi2SetDebugLogging() in FMIImport/FMI2_int.jl
 """
 function fmi2SetDebugLogging(fmu::FMU2)
@@ -46,6 +56,8 @@ function fmi2SetDebugLogging(fmu::FMU2)
 end
 
 """
+    fmi2SetupExperiment(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2SetupExperiment() in FMIImport/FMI2_int.jl
 """
 function fmi2SetupExperiment(fmu::FMU2, args...; kwargs...)
@@ -54,6 +66,8 @@ function fmi2SetupExperiment(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2EnterInitializationMode(fmu::FMU2)
+
 Wrapper for fmi2EnterInitializationMode() in FMIImport/FMI2_c.jl
 """
 function fmi2EnterInitializationMode(fmu::FMU2)
@@ -62,6 +76,8 @@ function fmi2EnterInitializationMode(fmu::FMU2)
 end
 
 """
+    fmi2ExitInitializationMode(fmu::FMU2)
+
 Wrapper for fmi2ExitInitializationMode() in FMIImport/FMI2_c.jl
 """
 function fmi2ExitInitializationMode(fmu::FMU2)
@@ -70,6 +86,8 @@ function fmi2ExitInitializationMode(fmu::FMU2)
 end
 
 """
+    fmi2Terminate(fmu::FMU2)
+
 Wrapper for fmi2Terminate() in FMIImport/FMI2_c.jl
 """
 function fmi2Terminate(fmu::FMU2)
@@ -78,6 +96,8 @@ function fmi2Terminate(fmu::FMU2)
 end
 
 """
+    fmi2Reset(fmu::FMU2)
+
 Wrapper for fmi2Reset() in FMIImport/FMI2_c.jl
 """
 function fmi2Reset(fmu::FMU2)
@@ -86,6 +106,8 @@ function fmi2Reset(fmu::FMU2)
 end
 
 """
+    fmi2GetReal(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetReal() in FMIImport/FMI2_int.jl
 """
 function fmi2GetReal(fmu::FMU2, args...; kwargs...)
@@ -94,6 +116,8 @@ function fmi2GetReal(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetReal!(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetReal!() in FMIImport/FMI2_int.jl
 """
 function fmi2GetReal!(fmu::FMU2, args...; kwargs...)
@@ -102,6 +126,8 @@ function fmi2GetReal!(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmiGet(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmiGet() in FMIImport/FMI2_ext.jl
 """
 function fmiGet(fmu::FMU2, args...; kwargs...)
@@ -110,6 +136,8 @@ function fmiGet(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmiGet!(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmiGet!() in FMIImport/FMI2_ext.jl
 """
 function fmiGet!(fmu::FMU2, args...; kwargs...)
@@ -118,6 +146,8 @@ function fmiGet!(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmiSet(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmiSet() in FMIImport/FMI2_ext.jl
 """
 function fmiSet(fmu::FMU2, args...; kwargs...)
@@ -126,6 +156,8 @@ function fmiSet(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetRealOutputDerivatives(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetRealOutputDerivatives() in FMIImport/FMI2_int.jl
 """
 function fmi2GetRealOutputDerivatives(fmu::FMU2, args...; kwargs...)
@@ -134,6 +166,8 @@ function fmi2GetRealOutputDerivatives(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2SetReal(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2SetReal() in FMIImport/FMI2_int.jl
 """
 function fmi2SetReal(fmu::FMU2, args...; kwargs...)
@@ -142,6 +176,8 @@ function fmi2SetReal(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2SetRealInputDerivatives(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2SetRealInputDerivatives() in FMIImport/FMI2_int.jl
 """
 function fmi2SetRealInputDerivatives(fmu::FMU2, args...; kwargs...)
@@ -150,6 +186,8 @@ function fmi2SetRealInputDerivatives(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetInteger(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetInteger() in FMIImport/FMI2_int.jl
 """
 function fmi2GetInteger(fmu::FMU2, args...; kwargs...)
@@ -158,6 +196,8 @@ function fmi2GetInteger(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetInteger!(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetInteger!() in FMIImport/FMI2_int.jl
 """
 function fmi2GetInteger!(fmu::FMU2, args...; kwargs...)
@@ -166,6 +206,8 @@ function fmi2GetInteger!(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2SetInteger(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2SetInteger() in FMIImport/FMI2_int.jl
 """
 function fmi2SetInteger(fmu::FMU2, args...; kwargs...)
@@ -174,6 +216,8 @@ function fmi2SetInteger(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetBoolean(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetBoolean() in FMIImport/FMI2_int.jl
 """
 function fmi2GetBoolean(fmu::FMU2, args...; kwargs...)
@@ -182,6 +226,8 @@ function fmi2GetBoolean(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetBoolean!(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetBoolean!() in FMIImport/FMI2_int.jl
 """
 function fmi2GetBoolean!(fmu::FMU2, args...; kwargs...)
@@ -190,6 +236,8 @@ function fmi2GetBoolean!(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2SetBoolean(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2SetBoolean() in FMIImport/FMI2_int.jl
 """
 function fmi2SetBoolean(fmu::FMU2, args...; kwargs...)
@@ -198,6 +246,8 @@ function fmi2SetBoolean(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetString(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetString() in FMIImport/FMI2_int.jl
 """
 function fmi2GetString(fmu::FMU2, args...; kwargs...)
@@ -206,6 +256,8 @@ function fmi2GetString(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetString!(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetString!() in FMIImport/FMI2_int.jl
 """
 function fmi2GetString!(fmu::FMU2, args...; kwargs...)
@@ -214,6 +266,8 @@ function fmi2GetString!(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2SetString(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2SetString() in FMIImport/FMI2_int.jl
 """
 function fmi2SetString(fmu::FMU2, args...; kwargs...)
@@ -222,6 +276,8 @@ function fmi2SetString(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetFMUstate(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetFMUstate() in FMIImport/FMI2_int.jl
 """
 function fmi2GetFMUstate(fmu::FMU2, args...; kwargs...)
@@ -230,6 +286,8 @@ function fmi2GetFMUstate(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2SetFMUstate(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2SetFMUstate() in FMIImport/FMI2_c.jl
 """
 function fmi2SetFMUstate(fmu::FMU2, args...; kwargs...)
@@ -238,6 +296,8 @@ function fmi2SetFMUstate(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2FreeFMUstate!(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2FreeFMUstate!() in FMIImport/FMI2_int.jl
 """
 function fmi2FreeFMUstate!(fmu::FMU2, args...; kwargs...)
@@ -246,6 +306,8 @@ function fmi2FreeFMUstate!(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2SerializedFMUstateSize(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2SerializedFMUstateSize() in FMIImport/FMI2_int.jl
 """
 function fmi2SerializedFMUstateSize(fmu::FMU2, args...; kwargs...)
@@ -254,6 +316,8 @@ function fmi2SerializedFMUstateSize(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2SerializeFMUstate(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2SerializeFMUstate() in FMIImport/FMI2_int.jl
 """
 function fmi2SerializeFMUstate(fmu::FMU2, args...; kwargs...)
@@ -262,6 +326,8 @@ function fmi2SerializeFMUstate(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2DeSerializeFMUstate(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2DeSerializeFMUstate() in FMIImport/FMI2_int.jl
 """
 function fmi2DeSerializeFMUstate(fmu::FMU2, args...; kwargs...)
@@ -270,6 +336,8 @@ function fmi2DeSerializeFMUstate(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetDirectionalDerivative!(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetDirectionalDerivative!() in FMIImport/FMI2_int.jl
 """
 function fmi2GetDirectionalDerivative!(fmu::FMU2, args...; kwargs...)
@@ -278,6 +346,8 @@ function fmi2GetDirectionalDerivative!(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetDirectionalDerivative(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetDirectionalDerivative() in FMIImport/FMI2_int.jl
 """
 function fmi2GetDirectionalDerivative(fmu::FMU2, args...; kwargs...)
@@ -286,6 +356,8 @@ function fmi2GetDirectionalDerivative(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2SampleDirectionalDerivative!(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2SampleDirectionalDerivative!() in FMIImport/FMI2_ext.jl
 """
 function fmi2SampleDirectionalDerivative!(fmu::FMU2, args...; kwargs...)
@@ -294,6 +366,8 @@ function fmi2SampleDirectionalDerivative!(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2SampleDirectionalDerivative(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2SampleDirectionalDerivative() in FMIImport/FMI2_ext.jl
 """
 function fmi2SampleDirectionalDerivative(fmu::FMU2, args...; kwargs...)
@@ -302,6 +376,8 @@ function fmi2SampleDirectionalDerivative(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetJacobian!(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetJacobian!() in FMIImport/FMI2_ext.jl
 """
 function fmi2GetJacobian!(fmu::FMU2, args...; kwargs...)
@@ -310,6 +386,8 @@ function fmi2GetJacobian!(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetJacobian(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetJacobian() in FMIImport/FMI2_ext.jl
 """
 function fmi2GetJacobian(fmu::FMU2, args...; kwargs...)
@@ -318,6 +396,8 @@ function fmi2GetJacobian(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2DoStep(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2DoStep() in FMIImport/FMI2_c.jl
 """
 function fmi2DoStep(fmu::FMU2, args...; kwargs...)
@@ -326,6 +406,8 @@ function fmi2DoStep(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2CancelStep(fmu::FMU2)
+
 Wrapper for fmi2CancelStep() in FMIImport/FMI2_c.jl
 """
 function fmi2CancelStep(fmu::FMU2)
@@ -334,6 +416,8 @@ function fmi2CancelStep(fmu::FMU2)
 end
 
 """
+    fmi2GetStatus(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetStatus!() in FMIImport/FMI2_c.jl
 """
 function fmi2GetStatus(fmu::FMU2, args...; kwargs...)
@@ -342,6 +426,8 @@ function fmi2GetStatus(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetRealStatus(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetRealStatus!() in FMIImport/FMI2_c.jl
 """
 function fmi2GetRealStatus(fmu::FMU2, args...; kwargs...)
@@ -350,6 +436,8 @@ function fmi2GetRealStatus(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetIntegerStatus(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetIntegerStatus!() in FMIImport/FMI2_c.jl
 """
 function fmi2GetIntegerStatus(fmu::FMU2, args...; kwargs...)
@@ -358,6 +446,8 @@ function fmi2GetIntegerStatus(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetBooleanStatus(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetBooleanStatus!() in FMIImport/FMI2_c.jl
 """
 function fmi2GetBooleanStatus(fmu::FMU2, args...; kwargs...)
@@ -366,6 +456,8 @@ function fmi2GetBooleanStatus(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetStringStatus(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2GetStringStatus!() in FMIImport/FMI2_c.jl
 """
 function fmi2GetStringStatus(fmu::FMU2, args...; kwargs...)
@@ -374,6 +466,8 @@ function fmi2GetStringStatus(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2SetTime(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2SetTime() in FMIImport/FMI2_c.jl
 """
 function fmi2SetTime(fmu::FMU2, args...; kwargs...)
@@ -382,6 +476,8 @@ function fmi2SetTime(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2SetContinuousStates(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2SetContinuousStates() in FMIImport/FMI2_c.jl
 """
 function fmi2SetContinuousStates(fmu::FMU2, args...; kwargs...)
@@ -390,6 +486,8 @@ function fmi2SetContinuousStates(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2EnterEventMode(fmu::FMU2)
+
 Wrapper for fmi2EnterEventMode() in FMIImport/FMI2_c.jl
 """
 function fmi2EnterEventMode(fmu::FMU2)
@@ -398,6 +496,8 @@ function fmi2EnterEventMode(fmu::FMU2)
 end
 
 """
+    fmi2NewDiscreteStates(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2NewDiscreteStates() in FMIImport/FMI2_c.jl
 """
 function fmi2NewDiscreteStates(fmu::FMU2, args...; kwargs...)
@@ -406,6 +506,8 @@ function fmi2NewDiscreteStates(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2EnterContinuousTimeMode(fmu::FMU2)
+
 Wrapper for fmi2EnterContinuousTimeMode() in FMIImport/FMI2_c.jl
 """
 function fmi2EnterContinuousTimeMode(fmu::FMU2)
@@ -414,6 +516,8 @@ function fmi2EnterContinuousTimeMode(fmu::FMU2)
 end
 
 """
+    fmi2CompletedIntegratorStep(fmu::FMU2, args...; kwargs...)
+
 Wrapper for fmi2CompletedIntegratorStep() in FMIImport/FMI2_c.jl
 """
 function fmi2CompletedIntegratorStep(fmu::FMU2, args...; kwargs...)
@@ -422,6 +526,8 @@ function fmi2CompletedIntegratorStep(fmu::FMU2, args...; kwargs...)
 end
 
 """
+    fmi2GetDerivatives(fmu::FMU2)
+
 Wrapper for fmi2GetDerivatives() in FMIImport/FMI2_c.jl
 """
 function fmi2GetDerivatives(fmu::FMU2)
@@ -430,6 +536,8 @@ function fmi2GetDerivatives(fmu::FMU2)
 end
 
 """
+    fmi2GetEventIndicators(fmu::FMU2)
+
 Wrapper for fmi2GetEventIndicators() in FMIImport/FMI2_c.jl
 """
 function fmi2GetEventIndicators(fmu::FMU2)
@@ -438,6 +546,8 @@ function fmi2GetEventIndicators(fmu::FMU2)
 end
 
 """
+    fmi2GetContinuousStates(fmu::FMU2)
+
 Wrapper for fmi2GetContinuousStates() in FMIImport/FMI2_c.jl
 """
 function fmi2GetContinuousStates(fmu::FMU2)
@@ -446,6 +556,8 @@ function fmi2GetContinuousStates(fmu::FMU2)
 end
 
 """
+    fmi2GetNominalsOfContinuousStates(fmu::FMU2)
+
 Wrapper for fmi2GetNominalsOfContinuousStates() in FMIImport/FMI2_c.jl
 """
 function fmi2GetNominalsOfContinuousStates(fmu::FMU2)
@@ -455,6 +567,8 @@ end
 
 # additionals
 """
+    fmi2GetStartValue(fmu::FMU2, args...; kwargs...)
+    
 Wrapper for fmi2GetStartValue() in FMIImport/FMI2_c.jl
 """
 function fmi2GetStartValue(fmu::FMU2, args...; kwargs...)
