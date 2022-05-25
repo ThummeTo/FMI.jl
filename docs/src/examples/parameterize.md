@@ -1,4 +1,4 @@
-# Parameterize an FMU
+# Manually parameterize an FMU
 Tutorial by Johannes Stoljar, Tobias Thummerer
 
 ## License
@@ -10,7 +10,7 @@ Licensed under the MIT license. See [LICENSE](https://github.com/thummeto/FMI.jl
 This Julia Package *FMI.jl* is motivated by the use of simulation models in Julia. Here the FMI specification is implemented. FMI (*Functional Mock-up Interface*) is a free standard ([fmi-standard.org](http://fmi-standard.org/)) that defines a container and an interface to exchange dynamic models using a combination of XML files, binaries and C code zipped into a single file. The user can thus use simulation models in the form of an FMU (*Functional Mock-up Units*). Besides loading the FMU, the user can also set values for parameters and states and simulate the FMU both as co-simulation and model exchange simulation.
 
 ## Introduction to the example
-This example shows how the parameterization of an FMU works. For this purpose, an IO-FMU model is loaded and the various commands for parameterization are shown on the basis of this model. With this example the user shall be guided how to make certain settings at an FMU.
+This example shows how the manually parameterization of an FMU works if very specific adjustments during system initialization is needed. For this purpose, an IO-FMU model is loaded and the various commands for parameterization are shown on the basis of this model. With this example the user shall be guided how to make certain settings at an FMU. Please note, that parameterization of a simulation is possible in a much easier fashion: Using `fmiSimulate`, `fmiSimulateME` or `fmiSimulateCS` together with a parameter dictionary for the keyword `parameters`.
 
 ## Target group
 The example is primarily intended for users who work in the field of simulation exchange. The example wants to show how simple it is to use FMUs in Julia.
@@ -70,12 +70,12 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_DJXsxR/IO`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:75
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_DJXsxR/IO/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:190
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_MTsDHN/IO`.
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/OUODz/src/FMI2_ext.jl:75
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_MTsDHN/IO/resources`
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/OUODz/src/FMI2_ext.jl:190
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:193
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/OUODz/src/FMI2_ext.jl:193
 
 
     #################### Begin information for FMU ####################
@@ -125,7 +125,7 @@ fmiInstantiate!(myFMU; loggingOn=true)
 
     FMU:            IO
     InstanceName:   [not defined]
-    Address:        Ptr{Nothing} @0x0000000004b942e0
+    Address:        Ptr{Nothing} @0x0000000004a2eee0
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
@@ -212,7 +212,7 @@ The previously defined function is called and the results are displayed in the c
 paramsVal = generateRandomNumbers();
 ```
 
-    Any[87.3783597742214, 4, false, "Random number 94.5476605809723!"]
+    Any[67.03624115735862, 35, false, "Random number 65.20982390956169!"]
 
 
 #### First variant
@@ -228,7 +228,7 @@ print(values)
 @assert paramsVal == values
 ```
 
-    Any[87.3783597742214, 4, 0, "Random number 94.5476605809723!"]
+    Any[67.03624115735862, 35, 0, "Random number 65.20982390956169!"]
 
 #### Second variant
 
@@ -239,7 +239,7 @@ To make sure that the functions work it is necessary to generate random numbers 
 rndReal, rndInteger, rndBoolean, rndString = generateRandomNumbers();
 ```
 
-    Any[70.45219235533683, 37, true, "Random number 59.487280600206475!"]
+    Any[0.8581154172081273, 79, false, "Random number 43.68305411903015!"]
 
 
 In the second variant, the value for each data type is set separately by the corresponding command. By this variant one has the maximum control and can be sure that also the correct data type is set. To illustrate the functionality of the parameterization with the separate functions, the corresponding get function is also called separately for each data type:
@@ -264,19 +264,19 @@ display("$rndString == $(fmiGetString(myFMU, "p_string"))")
 ```
 
 
-    "70.45219235533683 == 70.45219235533683"
+    "0.8581154172081273 == 0.8581154172081273"
 
 
 
-    "37 == 37"
+    "79 == 79"
 
 
 
-    "true == 1"
+    "false == 0"
 
 
 
-    "Random number 59.487280600206475! == Random number 59.487280600206475!"
+    "Random number 43.68305411903015! == Random number 43.68305411903015!"
 
 
 After seeing that both variants set the parameters correctly, the initialization mode is terminated with the function `fmiExitInitializationMode()`.
@@ -292,6 +292,11 @@ fmiExitInitializationMode(myFMU)
     0x00000000
 
 
+
+From here on, you may want to simulate the FMU. Please note, that with the default `executionConfig`, it is necessary to prevent a new instantiation using the keyword `instantiate=false`. Otherwise, a new instance is allocated for the simulation-call and the parameters set for the previous instance are not transfered.
+
+Example:
+`fmiSimulate(...; instantiate=false, ...)`
 
 ### Unload FMU
 
