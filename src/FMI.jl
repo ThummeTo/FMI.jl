@@ -112,7 +112,7 @@ export fmiCanGetSetState, fmiCanSerializeFMUstate
 export fmiProvidesDirectionalDerivative
 export fmiIsCoSimulation, fmiIsModelExchange
 export fmiGetDependencies
-export fmiGetStartValue
+export fmiGetStartValue, fmiStringToValueReference
 export fmiSimulate, fmiSimulateCS, fmiSimulateME
 export fmiGet, fmiGet!, fmiSet
 export fmiGetSolutionTime, fmiGetSolutionState, fmiGetSolutionValue
@@ -1050,7 +1050,7 @@ end
 
 """
 Free the memory for the allocated FMU state
-    """
+"""
 function fmiFreeFMUstate!(str::fmi2Struct, args...; kwargs...)
     fmi2FreeFMUstate!(str, args...; kwargs...)
 end

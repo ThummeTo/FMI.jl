@@ -208,10 +208,6 @@ function fmi3SimulateME(c::fmi3Instance, t_start::Union{Real, Nothing} = nothing
         push!(callbacks, savingCB)
     end
 
-    if solver === nothing
-        solver = Tsit5()
-    end
-
     # auto correct reset if only setup is given
     if reset === nothing 
         reset = setup
@@ -286,7 +282,11 @@ function fmi3SimulateME(c::fmi3Instance, t_start::Union{Real, Nothing} = nothing
         end
     end
 
-    solution = solve(problem, solver; callback = CallbackSet(callbacks...), saveat = saveat, kwargs...)
+    if solver === nothing
+        solution = solve(problem; callback = CallbackSet(callbacks...), saveat = saveat, kwargs...) 
+    else
+        solution = solve(problem, solver; callback = CallbackSet(callbacks...), saveat = saveat, kwargs...)
+    end
 
     if savingValues
         return solution, savedValues
