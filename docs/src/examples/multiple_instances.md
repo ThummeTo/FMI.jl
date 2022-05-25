@@ -45,10 +45,6 @@ using FMIZoo
 using Plots
 ```
 
-    ┌ Warning: Replacing docs for `FMI.fmiPlot :: Tuple{FMICore.FMU2Solution}` in module `FMI`
-    └ @ Base.Docs docs/Docs.jl:240
-
-
 ### Simulation setup
 
 Next, the start time and end time of the simulation are set. Finally, the recorded values are specified to store the results of the simulation.
@@ -82,12 +78,12 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_yE0qpj/SpringPendulum1D`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:75
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_yE0qpj/SpringPendulum1D/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:190
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_l8VuEm/SpringPendulum1D`.
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/OUODz/src/FMI2_ext.jl:75
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_l8VuEm/SpringPendulum1D/resources`
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/OUODz/src/FMI2_ext.jl:190
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:193
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/OUODz/src/FMI2_ext.jl:193
 
 
     #################### Begin information for FMU ####################
@@ -132,7 +128,7 @@ println(comp1)
 
     FMU:            SpringPendulum1D
     InstanceName:   [not defined]
-    Address:        Ptr{Nothing} @0x0000000004cccfb0
+    Address:        Ptr{Nothing} @0x0000000004f3d7e0
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
@@ -144,7 +140,7 @@ Next, a dictionary for the parameters is created. With this dictionary you can s
 
 ```julia
 param1 = Dict("spring.c"=>10.0, "mass_s0"=>1.0)
-data1 = fmiSimulate(comp1, tStart, tStop; parameters=param1, recordValues=vrs)
+data1 = fmiSimulate(comp1, tStart, tStop; parameters=param1, recordValues=vrs, instantiate=false)
 fig = fmiPlot(data1)
 ```
 
@@ -177,7 +173,7 @@ println(comp2)
 
     FMU:            SpringPendulum1D
     InstanceName:   [not defined]
-    Address:        Ptr{Nothing} @0x0000000001640d00
+    Address:        Ptr{Nothing} @0x0000000005fc7070
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
@@ -196,7 +192,7 @@ Again, a dictionary for the parameters is created. With this dictionary you can 
 
 ```julia
 param2 = Dict("spring.c"=>1.0, "mass.s"=>2.0)
-data2 = fmiSimulateCS(comp2, tStart, tStop;  parameters=param2, recordValues=vrs)
+data2 = fmiSimulateCS(comp2, tStart, tStop;  parameters=param2, recordValues=vrs, instantiate=false)
 fmiPlot!(fig, data2)
 ```
 
