@@ -62,20 +62,36 @@ include("FMI3_comp_wraps.jl")
 include("FMI2_sim.jl")
 include("FMI3_sim.jl")
 
+# from FMI2_plot.jl
 function fmiPlot(solution::FMU2Solution; kwargs...)
-    @warn "fmiPlot(...) needs `Plots` package. Please do `using Plots` or `import Plots`."
+    @warn "fmiPlot(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`."
 end
 function fmiPlot!(fig, solution::FMU2Solution; kwargs...)
-    @warn "fmiPlot!(...) needs `Plots` package. Please do `using Plots` or `import Plots`." 
+    @warn "fmiPlot!(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`." 
 end
+export fmiPlot, fmiPlot!
+
+# from FMI2_JLD2.jl
+function fmiSaveSolution(solution::FMU2Solution, filepath::AbstractString; keyword="solution") 
+    @warn "fmiSave(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
+end
+function fmiLoadSolution(path::AbstractString; keyword="solution")
+    @warn "fmiLoad(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
+end
+export fmiSaveSolution, fmiLoadSolution
+
+# Requires init
 function __init__()
     @require Plots="91a5bcdd-55d7-5caf-9e0b-520d859cae80" begin
         import .Plots
         include("FMI2_plot.jl")
         include("FMI3_plot.jl")
     end 
+    @require JLD2="033835bb-8acc-5ee8-8aae-3f567f8a3819" begin
+        import .JLD2
+        include("FMI2_JLD2.jl")
+    end 
 end
-export fmiPlot, fmiPlot!
 
 ### EXPORTING LISTS START ###
 

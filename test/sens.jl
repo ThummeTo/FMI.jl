@@ -41,6 +41,8 @@ for FMUPath in FMUPaths
     @test (abs.(auto_jac -   FD_jac) .< ones(numStates, numStates).*1e-6) == ones(Bool, numStates, numStates)
     @test (abs.(auto_jac -   ZG_jac) .< ones(numStates, numStates).*1e-6) == ones(Bool, numStates, numStates)
     @test (abs.(auto_jac - samp_jac) .< ones(numStates, numStates).*1e-6) == ones(Bool, numStates, numStates)
+    #@info "A: $(auto_jac)"
+    #@info "S: $(samp_jac)"
 
     # Jacobians for random x0 / dx
     x0 = x0 + rand(numStates)

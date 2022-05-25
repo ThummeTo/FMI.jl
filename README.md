@@ -4,8 +4,6 @@
 ## What is FMI.jl?
 [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is a free-to-use software library for the Julia programming language which integrates FMI ([fmi-standard.org](http://fmi-standard.org/)): load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
 
-**Please notice: A detailed documentation and well formatted doc-strings are under construction and will be published soon.**
-
 [![Dev Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) 
 [![CI Testing](https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions)
 [![Coverage](https://codecov.io/gh/ThummeTo/FMI.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ThummeTo/FMI.jl)
