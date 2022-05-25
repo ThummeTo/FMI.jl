@@ -78,9 +78,9 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_l8VuEm/SpringPendulum1D`.
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_KBJT4J/SpringPendulum1D`.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/OUODz/src/FMI2_ext.jl:75
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_l8VuEm/SpringPendulum1D/resources`
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_KBJT4J/SpringPendulum1D/resources`
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/OUODz/src/FMI2_ext.jl:190
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/OUODz/src/FMI2_ext.jl:193
@@ -128,7 +128,7 @@ println(comp1)
 
     FMU:            SpringPendulum1D
     InstanceName:   [not defined]
-    Address:        Ptr{Nothing} @0x0000000004f3d7e0
+    Address:        Ptr{Nothing} @0x000000000348d080
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
@@ -173,9 +173,9 @@ println(comp2)
 
     FMU:            SpringPendulum1D
     InstanceName:   [not defined]
-    Address:        Ptr{Nothing} @0x0000000005fc7070
+    Address:        Ptr{Nothing} @0x0000000006214590
     State:          fmi2ComponentStateInstantiated
-    Logging:        false
+    Logging:        true
     FMU time:       -Inf
     FMU states:     nothing
 

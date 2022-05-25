@@ -70,9 +70,9 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_MTsDHN/IO`.
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_E6omKF/IO`.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/OUODz/src/FMI2_ext.jl:75
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_MTsDHN/IO/resources`
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_E6omKF/IO/resources`
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/OUODz/src/FMI2_ext.jl:190
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/OUODz/src/FMI2_ext.jl:193
@@ -125,7 +125,7 @@ fmiInstantiate!(myFMU; loggingOn=true)
 
     FMU:            IO
     InstanceName:   [not defined]
-    Address:        Ptr{Nothing} @0x0000000004a2eee0
+    Address:        Ptr{Nothing} @0x0000000003ae6b10
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
@@ -212,7 +212,7 @@ The previously defined function is called and the results are displayed in the c
 paramsVal = generateRandomNumbers();
 ```
 
-    Any[67.03624115735862, 35, false, "Random number 65.20982390956169!"]
+    Any[41.68976766058903, 91, false, "Random number 18.117421661942835!"]
 
 
 #### First variant
@@ -228,7 +228,7 @@ print(values)
 @assert paramsVal == values
 ```
 
-    Any[67.03624115735862, 35, 0, "Random number 65.20982390956169!"]
+    Any[41.68976766058903, 91, 0, "Random number 18.117421661942835!"]
 
 #### Second variant
 
@@ -239,7 +239,7 @@ To make sure that the functions work it is necessary to generate random numbers 
 rndReal, rndInteger, rndBoolean, rndString = generateRandomNumbers();
 ```
 
-    Any[0.8581154172081273, 79, false, "Random number 43.68305411903015!"]
+    Any[32.87773039642885, 58, false, "Random number 22.4054218867213!"]
 
 
 In the second variant, the value for each data type is set separately by the corresponding command. By this variant one has the maximum control and can be sure that also the correct data type is set. To illustrate the functionality of the parameterization with the separate functions, the corresponding get function is also called separately for each data type:
@@ -264,11 +264,11 @@ display("$rndString == $(fmiGetString(myFMU, "p_string"))")
 ```
 
 
-    "0.8581154172081273 == 0.8581154172081273"
+    "32.87773039642885 == 32.87773039642885"
 
 
 
-    "79 == 79"
+    "58 == 58"
 
 
 
@@ -276,7 +276,7 @@ display("$rndString == $(fmiGetString(myFMU, "p_string"))")
 
 
 
-    "Random number 43.68305411903015! == Random number 43.68305411903015!"
+    "Random number 22.4054218867213! == Random number 22.4054218867213!"
 
 
 After seeing that both variants set the parameters correctly, the initialization mode is terminated with the function `fmiExitInitializationMode()`.
