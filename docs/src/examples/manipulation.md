@@ -47,10 +47,6 @@ using FMICore
 using Plots
 ```
 
-    ┌ Warning: Replacing docs for `FMI.fmiPlot :: Tuple{FMU2Solution}` in module `FMI`
-    └ @ Base.Docs docs/Docs.jl:240
-
-
 ### Simulation setup
 
 Next, the start time and end time of the simulation are set.
@@ -82,12 +78,12 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_AxClYk/SpringFrictionPendulum1D`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:75
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_AxClYk/SpringFrictionPendulum1D/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:190
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_HiWCsS/SpringFrictionPendulum1D`.
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/ns5Pd/src/FMI2_ext.jl:75
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_HiWCsS/SpringFrictionPendulum1D/resources`
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/ns5Pd/src/FMI2_ext.jl:190
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/S8pFT/src/FMI2_ext.jl:193
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/ns5Pd/src/FMI2_ext.jl:193
 
 
     #################### Begin information for FMU ####################
@@ -130,7 +126,7 @@ vrs = ["mass.s"]
 simData = fmiSimulateME(myFMU, tStart, tStop; recordValues=vrs)
 ```
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:13[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:10[39m
 
 
 
@@ -206,7 +202,7 @@ originalGetReal = myFMU.cGetReal
 
 
 
-    Ptr{Nothing} @0x00007fa504ca1faf
+    Ptr{Nothing} @0x00007f52e9530faf
 
 
 
@@ -254,7 +250,7 @@ fmiSetFctGetReal(myFMU, myGetReal!)
 
 
 
-    Ptr{Nothing} @0x00007fa54dafdfc0
+    Ptr{Nothing} @0x00007f533e325fc0
 
 
 

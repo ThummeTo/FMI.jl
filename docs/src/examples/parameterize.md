@@ -70,12 +70,12 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_E6omKF/IO`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/OUODz/src/FMI2_ext.jl:75
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_E6omKF/IO/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/OUODz/src/FMI2_ext.jl:190
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 29 files at `/tmp/fmijl_sXqX3p/IO`.
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/ns5Pd/src/FMI2_ext.jl:75
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_sXqX3p/IO/resources`
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/ns5Pd/src/FMI2_ext.jl:190
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/OUODz/src/FMI2_ext.jl:193
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/ns5Pd/src/FMI2_ext.jl:193
 
 
     #################### Begin information for FMU ####################
@@ -125,9 +125,9 @@ fmiInstantiate!(myFMU; loggingOn=true)
 
     FMU:            IO
     InstanceName:   [not defined]
-    Address:        Ptr{Nothing} @0x0000000003ae6b10
+    Address:        Ptr{Nothing} @0x00000000029c12e0
     State:          fmi2ComponentStateInstantiated
-    Logging:        false
+    Logging:        true
     FMU time:       -Inf
     FMU states:     nothing
 
@@ -212,7 +212,7 @@ The previously defined function is called and the results are displayed in the c
 paramsVal = generateRandomNumbers();
 ```
 
-    Any[41.68976766058903, 91, false, "Random number 18.117421661942835!"]
+    Any[27.27027116078753, 50, true, "Random number 83.09640957659121!"]
 
 
 #### First variant
@@ -228,7 +228,7 @@ print(values)
 @assert paramsVal == values
 ```
 
-    Any[41.68976766058903, 91, 0, "Random number 18.117421661942835!"]
+    Any[27.27027116078753, 50, 1, "Random number 83.09640957659121!"]
 
 #### Second variant
 
@@ -239,7 +239,7 @@ To make sure that the functions work it is necessary to generate random numbers 
 rndReal, rndInteger, rndBoolean, rndString = generateRandomNumbers();
 ```
 
-    Any[32.87773039642885, 58, false, "Random number 22.4054218867213!"]
+    Any[54.98169316988619, 76, true, "Random number 39.54384075977397!"]
 
 
 In the second variant, the value for each data type is set separately by the corresponding command. By this variant one has the maximum control and can be sure that also the correct data type is set. To illustrate the functionality of the parameterization with the separate functions, the corresponding get function is also called separately for each data type:
@@ -264,19 +264,19 @@ display("$rndString == $(fmiGetString(myFMU, "p_string"))")
 ```
 
 
-    "32.87773039642885 == 32.87773039642885"
+    "54.98169316988619 == 54.98169316988619"
 
 
 
-    "58 == 58"
+    "76 == 76"
 
 
 
-    "false == 0"
+    "true == 1"
 
 
 
-    "Random number 22.4054218867213! == Random number 22.4054218867213!"
+    "Random number 39.54384075977397! == Random number 39.54384075977397!"
 
 
 After seeing that both variants set the parameters correctly, the initialization mode is terminated with the function `fmiExitInitializationMode()`.
