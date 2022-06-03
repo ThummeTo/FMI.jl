@@ -687,7 +687,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         fmusol.values = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...})
         fmusol.valueReferences = copy(recordValues)
 
-        savingCB = SavingCallback((u,t,integrator) -> saveValues(c, recordValues, u, t, integrator, inputFunction, inputValues), 
+        savingCB = SavingCallback((u,t,integrator) -> saveValues(c, recordValues, u, t, integrator, inputFunction, inputValueReferences), 
                                   fmusol.values, 
                                   saveat=saveat)
         push!(cbs, savingCB)
@@ -804,7 +804,7 @@ function fmi2SimulateCS(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         end
     end
 
-    c = prepareFMU(fmu, c, instantiate, terminate, reset, setup, _parameters, t_start, t_stop, tolerance; inputs=inputDict)
+    c = prepareFMU(fmu, c, instantiate, terminate, reset, setup, parameters, t_start, t_stop, tolerance; inputs=inputDict)
 
     # default setup
     if length(saveat) == 0
