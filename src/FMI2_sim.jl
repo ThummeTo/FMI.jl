@@ -81,14 +81,14 @@ function handleEvents(c::FMU2Component)
 end
 
 # Returns the event indicators for an FMU.
-function condition(c::FMU2Component, out::SubArray{<:Real}, x, t, integrator, inputFunction, inputValues::Array{fmi2ValueReference}) 
+function condition(c::FMU2Component, out::AbstractArray{<:Real}, x, t, integrator, inputFunction, inputValues::AbstractArray{fmi2ValueReference}) 
 
     @assert c.state == fmi2ComponentStateContinuousTimeMode "condition(...): Must be called in mode continuous time."
 
     fmi2SetContinuousStates(c, x)
-    fmi2SetTime(c, integrator.t)
+    fmi2SetTime(c, t)
     if inputFunction !== nothing
-        fmi2SetReal(c, inputValues, inputFunction(integrator.t))
+        fmi2SetReal(c, inputValues, inputFunction(t)) 
     end
     fmi2GetEventIndicators!(c, out)
 
@@ -97,13 +97,13 @@ end
 
 # Handles the upcoming events.
 # Sets a new state for the solver from the FMU (if needed).
-function affectFMU!(c::FMU2Component, integrator, idx, inputFunction, inputValues::Array{fmi2ValueReference}, solution::FMU2Solution)
+function affectFMU!(c::FMU2Component, integrator, idx, inputFunction, inputValues::AbstractArray{fmi2ValueReference}, solution::FMU2Solution)
 
     @assert c.state == fmi2ComponentStateContinuousTimeMode "affectFMU!(...): Must be in continuous time mode!"
 
     # there are fx-evaluations before the event is handled, reset the FMU state to the current integrator step
     fmi2SetContinuousStates(c, integrator.u)
-    fmi2SetTime(c, integrator.t) 
+    fmi2SetTime(c, integrator.t)
     if inputFunction !== nothing
         fmi2SetReal(c, inputValues, inputFunction(integrator.t))
     end
@@ -140,7 +140,7 @@ function affectFMU!(c::FMU2Component, integrator, idx, inputFunction, inputValue
 end
 
 # This callback is called every time the integrator finishes an (accpeted) integration step.
-function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, inputValues::Array{fmi2ValueReference}, progressMeter, tStart, tStop, solution::FMU2Solution)
+function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, inputValues::AbstractArray{fmi2ValueReference}, progressMeter, tStart, tStop, solution::FMU2Solution)
 
     @assert c.state == fmi2ComponentStateContinuousTimeMode "stepCompleted(...): Must be in continuous time mode."
 
@@ -158,26 +158,29 @@ function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, inputV
         affectFMU!(c, integrator, -1, inputFunction, inputValues, solution)
     else
         if inputFunction != nothing
-            fmi2SetReal(c, inputValues, inputFunction(integrator.t))
+            fmi2SetReal(c, inputValues, inputFunction(t)) 
         end
     end
 end
 
 # save FMU values 
-function saveValues(c::FMU2Component, recordValues, x, t, integrator)
+function saveValues(c::FMU2Component, recordValues, x, t, integrator, inputFunction, inputValues)
 
     @assert c.state == fmi2ComponentStateContinuousTimeMode "saveValues(...): Must be in continuous time mode."
     
     fmi2SetContinuousStates(c, x)
     fmi2SetTime(c, t) 
+    if inputFunction != nothing
+        fmi2SetReal(c, inputValues, inputFunction(t)) 
+    end
     
     return (fmiGetReal(c, recordValues)...,)
 end
 
 function fx(c::FMU2Component, 
-    dx::Array{<:Real},
-    x::Array{<:Real}, 
-    p::Array, 
+    dx::AbstractArray{<:Real},
+    x::AbstractArray{<:Real}, 
+    p::AbstractArray, 
     t::Real)
 
     if isa(t, ForwardDiff.Dual) 
@@ -200,9 +203,9 @@ end
 
 # ForwardDiff-Dispatch for fx
 function fx(comp::FMU2Component,
-            dx::Array{<:Real},
-            x::Array{<:ForwardDiff.Dual{Tx, Vx, Nx}},
-            p::Array,
+            dx::AbstractArray{<:Real},
+            x::AbstractArray{<:ForwardDiff.Dual{Tx, Vx, Nx}},
+            p::AbstractArray,
             t::Real) where {Tx, Vx, Nx}
 
     return _fx_fd(comp, dx, x, p, t)
@@ -230,7 +233,7 @@ end
 function fd_eltypes(e::ForwardDiff.Dual{T, V, N}) where {T, V, N}
     return (T, V, N)
 end
-function fd_eltypes(e::Array{<:ForwardDiff.Dual{T, V, N}}) where {T, V, N}
+function fd_eltypes(e::AbstractArray{<:ForwardDiff.Dual{T, V, N}}) where {T, V, N}
     return (T, V, N)
 end
 function _fx_fd(comp, dx, x, p, t) 
@@ -342,7 +345,7 @@ function ChainRulesCore.frule((Δself, Δcomp, Δdx, Δx, Δp, Δt),
                               ::typeof(fx), 
                               comp, #::FMU2Component,
                               dx, 
-                              x,#::Array{<:Real},
+                              x,#::AbstractArray{<:Real},
                               p,
                               t)
 
@@ -433,7 +436,7 @@ end
 #                               ::typeof(fx), 
 #                               comp, #::FMU2Component,
 #                               dx, 
-#                               x,#::Array{<:Real},
+#                               x,#::AbstractArray{<:Real},
 #                               p,
 #                               t)
 
@@ -470,7 +473,7 @@ end
 # end
 
 function prepareFMU(fmu::FMU2, c::Union{Nothing, FMU2Component}, instantiate::Union{Nothing, Bool}, terminate::Union{Nothing, Bool}, reset::Union{Nothing, Bool}, setup::Union{Nothing, Bool}, parameters::Union{Dict{<:Any, <:Any}, Nothing}, t_start, t_stop, tolerance;
-    x0::Union{Array{<:Real}, Nothing}=nothing)
+    x0::Union{AbstractArray{<:Real}, Nothing}=nothing, inputs::Union{Dict{<:Any, <:Any}, Nothing}=nothing)
 
     if instantiate === nothing 
         instantiate = fmu.executionConfig.instantiate
@@ -511,6 +514,18 @@ function prepareFMU(fmu::FMU2, c::Union{Nothing, FMU2Component}, instantiate::Un
         @assert retcode == fmi2StatusOK "fmi2Simulate(...): Reset failed with return code $(retcode)."
     end 
 
+    # parameters
+    if parameters !== nothing
+        retcodes = fmi2Set(c, collect(keys(parameters)), collect(values(parameters)) )
+        @assert all(retcodes .== fmi2StatusOK) "fmi2Simulate(...): Setting initial parameters failed with return code $(retcode)."
+    end
+
+    # inputs
+    if inputs !== nothing
+        retcodes = fmi2Set(c, collect(keys(inputs)), collect(values(inputs)) )
+        @assert all(retcodes .== fmi2StatusOK) "fmi2Simulate(...): Setting initial inputs failed with return code $(retcode)."
+    end
+
     # enter setup (hard)
     if setup
         retcode = fmi2SetupExperiment(c, t_start, t_stop; tolerance=tolerance)
@@ -520,20 +535,16 @@ function prepareFMU(fmu::FMU2, c::Union{Nothing, FMU2Component}, instantiate::Un
         @assert retcode == fmi2StatusOK "fmi2Simulate(...): Entering initialization mode failed with return code $(retcode)."
     end 
 
-    if x0 !== nothing
-        retcode = fmi2SetContinuousStates(c, x0)
-        @assert retcode == fmi2StatusOK "fmi2Simulate(...): Setting initial state failed with return code $(retcode)."
-    end
-
-    if parameters !== nothing
-        retcodes = fmi2Set(c, collect(keys(parameters)), collect(values(parameters)) )
-        @assert all(retcodes .== fmi2StatusOK) "fmi2Simulate(...): Setting initial parameters failed with return code $(retcode)."
-    end
-
     # exit setup (hard)
     if setup
         retcode = fmi2ExitInitializationMode(c)
         @assert retcode == fmi2StatusOK "fmi2Simulate(...): Exiting initialization mode failed with return code $(retcode)."
+    end
+
+    # start state
+    if x0 !== nothing
+        retcode = fmi2SetContinuousStates(c, x0)
+        @assert retcode == fmi2StatusOK "fmi2Simulate(...): Setting initial state failed with return code $(retcode)."
     end
 
     return c
@@ -584,7 +595,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
     customFx = nothing,
     recordValues::fmi2ValueReferenceFormat = nothing,
     saveat = [],
-    x0::Union{Array{<:Real}, Nothing} = nothing,
+    x0::Union{AbstractArray{<:Real}, Nothing} = nothing,
     setup::Union{Bool, Nothing} = nothing,
     reset::Union{Bool, Nothing} = nothing,
     instantiate::Union{Bool, Nothing} = nothing,
@@ -629,7 +640,18 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         dtmax = (t_stop-t_start)/100.0
     end
 
-    c = prepareFMU(fmu, c, instantiate, terminate, reset, setup, parameters, t_start, t_stop, tolerance; x0=x0)
+    # set inputs
+    inputDict = nothing 
+    if hasInputs
+        inputDict = Dict{fmi2ValueReference, Any}()
+        inputValues = inputFunction(t_start)
+        for i in 1:length(inputValueReferences)
+            vr = inputValueReferences[i]
+            inputDict[vr] = inputValues[i]
+        end
+    end
+
+    c = prepareFMU(fmu, c, instantiate, terminate, reset, setup, parameters, t_start, t_stop, tolerance; x0=x0, inputs=inputDict)
 
     # from here on, we are in event mode, if `setup=false` this is the job of the user
     @assert c.state == fmi2ComponentStateEventMode "FMU needs to be in event mode after setup."
@@ -665,7 +687,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         fmusol.values = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...})
         fmusol.valueReferences = copy(recordValues)
 
-        savingCB = SavingCallback((u,t,integrator) -> saveValues(c, recordValues, u, t, integrator), 
+        savingCB = SavingCallback((u,t,integrator) -> saveValues(c, recordValues, u, t, integrator, inputFunction, inputValues), 
                                   fmusol.values, 
                                   saveat=saveat)
         push!(cbs, savingCB)
@@ -758,6 +780,7 @@ function fmi2SimulateCS(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
 
     recordValues = prepareValueReference(fmu, recordValues)
     inputValueReferences = prepareValueReference(fmu, inputValueReferences)
+    hasInputs = (length(inputValueReferences) > 0)
     
     variableSteps = fmi2IsCoSimulation(fmu) && fmu.modelDescription.coSimulation.canHandleVariableCommunicationStepSize 
     
@@ -770,7 +793,18 @@ function fmi2SimulateCS(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
     dt = dt === nothing ? fmi2GetDefaultStepSize(fmu.modelDescription) : dt
     dt = dt === nothing ? 1e-3 : dt
 
-    c = prepareFMU(fmu, c, instantiate, terminate, reset, setup, parameters, t_start, t_stop, tolerance)
+    # set inputs
+    inputDict = nothing 
+    if hasInputs
+        inputDict = Dict{fmi2ValueReference, Any}()
+        inputValues = inputFunction(t_start)
+        for i in 1:length(inputValueReferences)
+            vr = inputValueReferences[i]
+            inputDict[vr] = inputValues[i]
+        end
+    end
+
+    c = prepareFMU(fmu, c, instantiate, terminate, reset, setup, _parameters, t_start, t_stop, tolerance; inputs=inputDict)
 
     # default setup
     if length(saveat) == 0
