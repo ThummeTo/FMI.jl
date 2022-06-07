@@ -2,7 +2,7 @@
 # FMI.jl
 
 ## What is FMI.jl?
-[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is a free-to-use software library for the Julia programming language which integrates FMI ([fmi-standard.org](http://fmi-standard.org/)): load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
+[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is a free-to-use software library for the Julia programming language which integrates the **F**unctional **M**ock-Up **I**nterface ([fmi-standard.org](http://fmi-standard.org/)): load or create, parameterize, simulate and plot FMUs seamlessly inside the Julia programming language!
 
 [![Dev Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) 
 [![CI Testing](https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions)
@@ -12,10 +12,10 @@
 
 
 ## How can I use FMI.jl?
-1. open a Julia-Command-Window, activate your preferred environment
-1. goto package manager using ```]```
-1. type ```add FMI``` or ```add "https://github.com/ThummeTo/FMI.jl"```
-1. have a look inside the ```example``` folder
+1. Open a Julia-Command-Window, activate your preferred environment.
+1. Goto package manager using ```]```.
+1. Type ```add FMI``` or ```add "https://github.com/ThummeTo/FMI.jl"```.
+1. Have a look inside the [examples folder](https://github.com/ThummeTo/FMI.jl/tree/main/example) or the [examples section](https://thummeto.github.io/FMI.jl/dev/examples/overview/) of the documentation. All examples are available as Julia-Script (*.jl*), Jupyter-Notebook (*.ipynb*) and Markdown (*.md*).
 
 ## How can I simulate a FMU and plot values?
 ```julia
@@ -77,14 +77,13 @@ To keep dependencies nice and clean, the original package [*FMI.jl*](https://git
 - [*FMIZoo.jl*](https://github.com/ThummeTo/FMIZoo.jl): A collection of testing and example FMUs
 
 ## What is further under development in FMI.jl?
-- FMI Cross Checks
-- nice documentation
-- more examples
+- FMI Cross Checks (as soon as the successor is available)
+- nice documentation & doc-strings
+- more examples/tutorials
 - ...
 
 ## What is planned for FMI.jl?
 - SSP 1.0 support
-- more examples
 - ...
 
 ## What Platforms are supported?
