@@ -125,14 +125,14 @@ fmiGetString!(fmuStruct, stringValueReferences, cacheString)
 @test fmiGetStartValue(fmuStruct, ["p_string", "p_real"]) == ["Hello World!", 0.0] 
 
 # Testing input/output derivatives
-dirs = fmiGetRealOutputDerivatives(fmuStruct, ["y_real"], ones(Int, 1))
+dirs = fmiGetRealOutputDerivatives(fmuStruct, ["y_real"], ones(FMI.fmi2Integer, 1))
 @test dirs == -Inf # at this point, derivative is undefined
-@test fmiSetRealInputDerivatives(fmuStruct, ["u_real"], ones(Int, 1), zeros(1)) == 0
+@test fmiSetRealInputDerivatives(fmuStruct, ["u_real"], ones(FMI.fmi2Integer, 1), zeros(1)) == 0
 
 @test fmiExitInitializationMode(fmuStruct) == 0
 @test fmiDoStep(fmuStruct, 0.1) == 0
 
-dirs = fmiGetRealOutputDerivatives(fmuStruct, ["y_real"], ones(Int, 1))
+dirs = fmiGetRealOutputDerivatives(fmuStruct, ["y_real"], ones(FMI.fmi2Integer, 1))
 @test dirs == 0.0
 
 ############
