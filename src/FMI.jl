@@ -62,20 +62,36 @@ include("FMI3_comp_wraps.jl")
 include("FMI2_sim.jl")
 include("FMI3_sim.jl")
 
+# from FMI2_plot.jl
 function fmiPlot(solution::FMU2Solution; kwargs...)
-    @warn "fmiPlot(...) needs `Plots` package. Please do `using Plots` or `import Plots`."
+    @warn "fmiPlot(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`."
 end
 function fmiPlot!(fig, solution::FMU2Solution; kwargs...)
-    @warn "fmiPlot!(...) needs `Plots` package. Please do `using Plots` or `import Plots`." 
+    @warn "fmiPlot!(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`." 
 end
+export fmiPlot, fmiPlot!
+
+# from FMI2_JLD2.jl
+function fmiSaveSolution(solution::FMU2Solution, filepath::AbstractString; keyword="solution") 
+    @warn "fmiSave(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
+end
+function fmiLoadSolution(path::AbstractString; keyword="solution")
+    @warn "fmiLoad(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
+end
+export fmiSaveSolution, fmiLoadSolution
+
+# Requires init
 function __init__()
     @require Plots="91a5bcdd-55d7-5caf-9e0b-520d859cae80" begin
         import .Plots
         include("FMI2_plot.jl")
         include("FMI3_plot.jl")
     end 
+    @require JLD2="033835bb-8acc-5ee8-8aae-3f567f8a3819" begin
+        import .JLD2
+        include("FMI2_JLD2.jl")
+    end 
 end
-export fmiPlot, fmiPlot!
 
 ### EXPORTING LISTS START ###
 
@@ -96,7 +112,7 @@ export fmiCanGetSetState, fmiCanSerializeFMUstate
 export fmiProvidesDirectionalDerivative
 export fmiIsCoSimulation, fmiIsModelExchange
 export fmiGetDependencies
-export fmiGetStartValue
+export fmiGetStartValue, fmiStringToValueReference
 export fmiSimulate, fmiSimulateCS, fmiSimulateME
 export fmiGet, fmiGet!, fmiSet
 export fmiGetSolutionTime, fmiGetSolutionState, fmiGetSolutionValue
@@ -127,20 +143,20 @@ end
 
 """   
 
-    fmiStringToValueReference(dataStruct::Union{FMU2, fmi2ModelDescription, FMU3, fmmi3ModelDescription}, identifier::Union{String, Array{String}})
+    fmiStringToValueReference(dataStruct::Union{FMU2, fmi2ModelDescription, FMU3, fmmi3ModelDescription}, identifier::Union{String, AbstractArray{String}})
 
 Returns the ValueReference coresponding to the variable identifier.
 
 # Arguments
 - `dataStruct::Union{FMU2, fmi2ModelDescription, FMU3, fmmi3ModelDescription}`: Model of the type FMU2/FMU3 or the Model Description of fmi2/fmi3. Same for Model of type FMU3 or the Model Description of fmi3
-- `identifier::Union{String, Array{String}}`: Variable identifier in type String or as a 1-dimensional Array containing elements of type String
+- `identifier::Union{String, AbstractArray{String}}`: Variable identifier in type String or as a 1-dimensional AbstractArray containing elements of type String
 
 See also [`fmi2StringToValueReference`](@ref), [`fmi3StringToValueReference`](@ref).
 """  
-function fmiStringToValueReference(dataStruct::Union{FMU2, fmi2ModelDescription}, identifier::Union{String, Array{String}})
+function fmiStringToValueReference(dataStruct::Union{FMU2, fmi2ModelDescription}, identifier::Union{String, AbstractArray{String}})
     fmi2StringToValueReference(dataStruct, identifier)
 end
-function fmiStringToValueReference(dataStruct::Union{FMU3, fmi3ModelDescription}, identifier::Union{String, Array{String}})
+function fmiStringToValueReference(dataStruct::Union{FMU3, fmi3ModelDescription}, identifier::Union{String, AbstractArray{String}})
     fmi3StringToValueReference(dataStruct, identifier)
 end
 
@@ -483,11 +499,11 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
 - `dt::Union{Real, Nothing} = nothing`: Real number to set the step size of the OED-solver. Defaults to an automatic choice if the method is adaptive. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
 - `solver = nothing`: Any Julia-supported OED-solver  (default is Tsit5). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/solvers/ode_solve/#ode_solve)
 - `customFx = nothing`: [deperecated] Ability to give a custom state derivative function ẋ=f(x,t)
-- `recordValues::fmi2ValueReferenceFormat = nothing`: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
+- `recordValues::fmi2ValueReferenceFormat = nothing`: AbstractArray of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
 - `saveat = []`: Time points to save values at (interpolated). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Output-Control)
 - `setup::Bool = true`: Boolean, if FMU should be setup (default: setup=true)
 - `reset::Union{Bool, Nothing} = nothing`: Boolean, if FMU should be reset before simulation (default: reset:=auto)
-- `inputValueReferences::fmi2ValueReferenceFormat = nothing`: Array of input variables (strings or variableIdentifiers) to set at every simulation step
+- `inputValueReferences::fmi2ValueReferenceFormat = nothing`: AbstractArray of input variables (strings or variableIdentifiers) to set at every simulation step
 - `inputFunction = nothing`: Function to retrieve the values to set the inputs to
 - `parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing`: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization
 - `dtmax::Union{Real, Nothing} = nothing`: Real number for setting maximum dt for adaptive timestepping for the ODE solver. The default values are package dependent. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
@@ -539,11 +555,11 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
 - `dt::Union{Real, Nothing} = nothing`: Real number to set the step size of the OED-solver. Defaults to an automatic choice if the method is adaptive. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
 - `solver = nothing`: Any Julia-supported OED-solver  (default is Tsit5). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/solvers/ode_solve/#ode_solve)
 - `customFx = nothing`: [deperecated] Ability to give a custom state derivative function ẋ=f(x,t)
-- `recordValues::fmi2ValueReferenceFormat = nothing`: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
+- `recordValues::fmi2ValueReferenceFormat = nothing`: AbstractArray of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
 - `saveat = []`: Time points to save values at (interpolated). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Output-Control)
 - `setup::Bool = true`: Boolean, if FMU should be setup (default: setup=true)
 - `reset::Union{Bool, Nothing} = nothing`: Boolean, if FMU should be reset before simulation (default: reset:=auto)
-- `inputValueReferences::fmi2ValueReferenceFormat = nothing`: Array of input variables (strings or variableIdentifiers) to set at every simulation step
+- `inputValueReferences::fmi2ValueReferenceFormat = nothing`: AbstractArray of input variables (strings or variableIdentifiers) to set at every simulation step
 - `inputFunction = nothing`: Function to retrieve the values to set the inputs to
 - `parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing`: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization
 - `dtmax::Union{Real, Nothing} = nothing`: Real number for setting maximum dt for adaptive timestepping for the ODE solver. The default values are package dependent. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
@@ -593,11 +609,11 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
 - `dt::Union{Real, Nothing} = nothing`: Real number to set the step size of the OED-solver. Defaults to an automatic choice if the method is adaptive. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
 - `solver = nothing`: Any Julia-supported OED-solver  (default is Tsit5). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/solvers/ode_solve/#ode_solve)
 - `customFx = nothing`: [deperecated] Ability to give a custom state derivative function ẋ=f(x,t)
-- `recordValues::fmi2ValueReferenceFormat = nothing`: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
+- `recordValues::fmi2ValueReferenceFormat = nothing`: AbstractArray of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
 - `saveat = []`: Time points to save values at (interpolated). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Output-Control)
 - `setup::Bool = true`: Boolean, if FMU should be setup (default: setup=true)
 - `reset::Union{Bool, Nothing} = nothing`: Boolean, if FMU should be reset before simulation (default: reset:=auto)
-- `inputValueReferences::fmi2ValueReferenceFormat = nothing`: Array of input variables (strings or variableIdentifiers) to set at every simulation step
+- `inputValueReferences::fmi2ValueReferenceFormat = nothing`: AbstractArray of input variables (strings or variableIdentifiers) to set at every simulation step
 - `inputFunction = nothing`: Function to retrieve the values to set the inputs to
 - `parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing`: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization
 - `dtmax::Union{Real, Nothing} = nothing`: Real number for setting maximum dt for adaptive timestepping for the ODE solver. The default values are package dependent. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
@@ -1034,7 +1050,7 @@ end
 
 """
 Free the memory for the allocated FMU state
-    """
+"""
 function fmiFreeFMUstate!(str::fmi2Struct, args...; kwargs...)
     fmi2FreeFMUstate!(str, args...; kwargs...)
 end

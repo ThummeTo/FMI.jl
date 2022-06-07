@@ -13,27 +13,20 @@ makedocs(sitename="FMI.jl",
          pages= Any[
             "Introduction" => "index.md"
             "Features" => "features.md"
-            "Tutorials" => [
-                "tutorials/overview.md"
-                "Load/Unload a FMU" => "tutorials/load_unload.md"
-                "Simulate a FMU" => "tutorials/simulate.md"
-            ]
             "Examples" => [
-                "examples/examples.md"
-                "examples/CS_simulation.md"
-                "examples/simulateME.md"
+                "examples/overview.md"
+                "examples/simulate.md"
                 "examples/parameterize.md"
-                "examples/multipleInstance.md"
+                "examples/multiple_instances.md"
+                "examples/modelica_conference_2021.md"
+                "examples/manipulation.md"
             ]
             "Library Functions" => Any[
-                "FMI 2 library functions" => "library/library.md",
-                "FMI version independent functions" => "library/library_ind.md",
-                "FMU 2 functions" => "library/fmu2.md",
+                "FMI version independent library functions" => "library/library.md",
                 "FMU version independent functions" => "library/fmu.md"
             ]
-            "related.md"
+            "Related Publication" => "related.md"
             "Contents" => "contents.md"
-            "Library Index" => "indices.md"
             ]
          )
 

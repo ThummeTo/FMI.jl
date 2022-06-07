@@ -4,11 +4,11 @@
 ## What is FMI.jl?
 [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is a free-to-use software library for the Julia programming language which integrates FMI ([fmi-standard.org](http://fmi-standard.org/)): load, instantiate, parameterize and simulate FMUs seamlessly inside the Julia programming language!
 
-**Please notice: A detailed documentation and well formatted doc-strings are under construction and will be published soon.**
-
 [![Dev Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) 
 [![CI Testing](https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions)
+[![CI Testing](https://github.com/ThummeTo/FMI.jl/actions/workflows/Documentation.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions)
 [![Coverage](https://codecov.io/gh/ThummeTo/FMI.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ThummeTo/FMI.jl)
+[![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
 
 
 ## How can I use FMI.jl?
@@ -28,7 +28,7 @@ myFMU = fmiLoad(pathToFMU)
 simData = fmiSimulate(myFMU, 0.0, 10.0; recordValues=["mass.s"])
 
 # plot it!
-plot(simData)
+fmiPlot(simData)
 
 # free memory
 fmiUnload(myFMU)
@@ -39,18 +39,18 @@ fmiUnload(myFMU)
 - parameterization, simulation & plotting of CS- and ME-FMUs
 - event-handling for imported discontinuous ME-FMUs
 
-|                           | **FMI2.0.3** |        | **FMI3.0 beta** |        |
-|---------------------------|--------------|--------|-----------------|--------|
-|                           | Import       | Export | Import          | Export |
-| CS                        | ✓✓           | ~~     | ~~              | ~      |
-| ME (continuous)           | ✓✓           | ✓✓     | ~~              | ~      |
-| ME (discontinuous)        | ✓✓           | ✓✓     | ~~              | ~      |
-| Explicit solvers          | ✓✓           | ~~     | ~~              | ~      |
-| Implicit solvers (autodiff=false)     | ✓✓           | ~~     | ~~              | ~      |
-| Implicit solvers (autodiff=true)     | ~~           | ~~     | ~~              | ~      |
-| get/setState              | ✓✓           | ~      | ~~              | ~      |
-| getDirectionalDerivatives | ✓✓           | ~      | ~~              | ~      |
-| getAjointDerivatives      | -            | -      | ~~              | ~      |
+|                                   | **FMI2.0.3** |        | **FMI3.0 beta** |        |
+|-----------------------------------|--------------|--------|-----------------|--------|
+|                                   | Import       | Export | Import          | Export |
+| CS                                | ✓✓           | ~~     | ~~              | ~      |
+| ME (continuous)                   | ✓✓           | ✓✓     | ~~              | ~      |
+| ME (discontinuous)                | ✓✓           | ✓✓     | ~~              | ~      |
+| Explicit solvers                  | ✓✓           | ~~     | ~~              | ~      |
+| Implicit solvers (autodiff=false) | ✓✓           | ~~     | ~~              | ~      |
+| Implicit solvers (autodiff=true)  | ~~           | ~~     | ~~              | ~      |
+| get/setState                      | ✓✓           | ~      | ~~              | ~      |
+| getDirectionalDerivatives         | ✓✓           | ~      | ~~              | ~      |
+| getAdjointDerivatives             | -            | -      | ~~              | ~      |
 
 ✓✓ supported & tested
 
