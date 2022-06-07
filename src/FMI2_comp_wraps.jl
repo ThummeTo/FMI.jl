@@ -9,33 +9,6 @@
 
 # FMI-spec
 """
-    fmi2Simulate(fmu::FMU2, args...; kwargs...)
-
-Wrapper for fmi2Simulate() in FMI/FMI2_sim.jl
-"""
-function fmi2Simulate(fmu::FMU2, args...; kwargs...)
-    return fmi2Simulate(fmu, nothing, args...; kwargs...)
-end
-
-"""
-    fmi2SimulateCS(fmu::FMU2, args...; kwargs...)
-
-Wrapper for fmi2SimulateCS() in FMI/FMI2_sim.jl
-"""
-function fmi2SimulateCS(fmu::FMU2, args...; kwargs...)
-    return fmi2SimulateCS(fmu, nothing, args...; kwargs...)
-end
-
-"""
-    fmi2SimulateME(fmu::FMU2, args...; kwargs...)
-
-Wrapper for fmi2SimulateME() in FMI/FMI2_sim.jl
-"""
-function fmi2SimulateME(fmu::FMU2, args...; kwargs...)
-    return fmi2SimulateME(fmu, nothing, args...; kwargs...)
-end
-
-"""
     fmi2FreeInstance!(fmu::FMU2)
 
 Wrapper for fmi2FreeInstance!() in FMIImport/FMI2_c.jl
@@ -566,6 +539,33 @@ function fmi2GetNominalsOfContinuousStates(fmu::FMU2)
 end
 
 # additionals
+"""
+    fmi2Simulate(fmu::FMU2, args...; kwargs...)
+
+Wrapper for fmi2Simulate() in FMI/FMI2_sim.jl
+"""
+function fmi2Simulate(fmu::FMU2, args...; kwargs...)
+    return fmi2Simulate(fmu, nothing, args...; kwargs...)
+end
+
+"""
+    fmi2SimulateCS(fmu::FMU2, args...; kwargs...)
+
+Wrapper for fmi2SimulateCS() in FMI/FMI2_sim.jl
+"""
+function fmi2SimulateCS(fmu::FMU2, args...; kwargs...)
+    return fmi2SimulateCS(fmu, nothing, args...; kwargs...)
+end
+
+"""
+    fmi2SimulateME(fmu::FMU2, args...; kwargs...)
+
+Wrapper for fmi2SimulateME() in FMI/FMI2_sim.jl
+"""
+function fmi2SimulateME(fmu::FMU2, args...; kwargs...)
+    return fmi2SimulateME(fmu, nothing, args...; kwargs...)
+end
+
 """
     fmi2GetStartValue(fmu::FMU2, args...; kwargs...)
     
