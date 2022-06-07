@@ -35,26 +35,29 @@ fmiUnload(myFMU)
 ```
 
 ## What is currently supported in FMI.jl?
-- importing the full FMI 2.0.3 command set, including optional specials like `fmi2GetState`, `fmi2SetState` and `fmi2GetDirectionalDerivatives`
+- importing the full FMI 2.0.3 and FMI 3.0.0 command set, including optional specials like `fmi2GetState`, `fmi2SetState` and `fmi2GetDirectionalDerivatives`
 - parameterization, simulation & plotting of CS- and ME-FMUs
 - event-handling for imported discontinuous ME-FMUs
 
-|                                   | **FMI2.0.3** |        | **FMI3.0 beta** |        |
+|                                   | **FMI2.0.3** |        | **FMI3.0**      |        |
 |-----------------------------------|--------------|--------|-----------------|--------|
 |                                   | Import       | Export | Import          | Export |
-| CS                                | ✓✓           | ~~     | ~~              | ~      |
-| ME (continuous)                   | ✓✓           | ✓✓     | ~~              | ~      |
-| ME (discontinuous)                | ✓✓           | ✓✓     | ~~              | ~      |
-| Explicit solvers                  | ✓✓           | ~~     | ~~              | ~      |
-| Implicit solvers (autodiff=false) | ✓✓           | ~~     | ~~              | ~      |
-| Implicit solvers (autodiff=true)  | ~~           | ~~     | ~~              | ~      |
-| get/setState                      | ✓✓           | ~      | ~~              | ~      |
-| getDirectionalDerivatives         | ✓✓           | ~      | ~~              | ~      |
-| getAdjointDerivatives             | -            | -      | ~~              | ~      |
+| CS                                | ✓✓           | ~~     | ✓               | ~      |
+| SE                 		    | -            | -      | [B]             | ~      |
+| ME (continuous)                   | ✓✓           | ✓✓     | ✓               | ~      |
+| ME (discontinuous)                | ✓✓           | ✓✓     | [B]             | ~      |
+| Explicit solvers                  | ✓✓           | ~~     | [B]             | ~      |
+| Implicit solvers (autodiff=false) | ✓✓           | ~~     | [B]             | ~      |
+| Implicit solvers (autodiff=true)  | [B]          | ~~     | ~~              | ~      |
+| get/setState                      | ✓✓           | ~      | ✓               | ~      |
+| getDirectionalDerivatives         | ✓✓           | ~      | ✓               | ~      |
+| getAdjointDerivatives             | -            | -      | ✓               | ~      |
 
 ✓✓ supported & tested
 
-✓  supported (beta)
+✓  supported
+
+[B] implemented, untested, beta
 
 ~~ work in progress
 
