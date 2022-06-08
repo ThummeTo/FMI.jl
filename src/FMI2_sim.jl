@@ -514,6 +514,12 @@ function prepareFMU(fmu::FMU2, c::Union{Nothing, FMU2Component}, instantiate::Un
         @assert retcode == fmi2StatusOK "fmi2Simulate(...): Reset failed with return code $(retcode)."
     end 
 
+    # enter setup (hard)
+    if setup
+        retcode = fmi2SetupExperiment(c, t_start, t_stop; tolerance=tolerance)
+        @assert retcode == fmi2StatusOK "fmi2Simulate(...): Setting up experiment failed with return code $(retcode)."
+    end 
+
     # parameters
     if parameters !== nothing
         retcodes = fmi2Set(c, collect(keys(parameters)), collect(values(parameters)) )
@@ -526,17 +532,11 @@ function prepareFMU(fmu::FMU2, c::Union{Nothing, FMU2Component}, instantiate::Un
         @assert all(retcodes .== fmi2StatusOK) "fmi2Simulate(...): Setting initial inputs failed with return code $(retcode)."
     end
 
-    # enter setup (hard)
-    if setup
-        retcode = fmi2SetupExperiment(c, t_start, t_stop; tolerance=tolerance)
-        @assert retcode == fmi2StatusOK "fmi2Simulate(...): Setting up experiment failed with return code $(retcode)."
-
-        retcode = fmi2EnterInitializationMode(c)
-        @assert retcode == fmi2StatusOK "fmi2Simulate(...): Entering initialization mode failed with return code $(retcode)."
-    end 
-
     # exit setup (hard)
     if setup
+        retcode = fmi2EnterInitializationMode(c)
+        @assert retcode == fmi2StatusOK "fmi2Simulate(...): Entering initialization mode failed with return code $(retcode)."
+    
         retcode = fmi2ExitInitializationMode(c)
         @assert retcode == fmi2StatusOK "fmi2Simulate(...): Exiting initialization mode failed with return code $(retcode)."
     end
