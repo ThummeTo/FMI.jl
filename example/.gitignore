@@ -3,3 +3,5 @@
 *.gif
 *.jl
 tmp/
+
+.vscode/
