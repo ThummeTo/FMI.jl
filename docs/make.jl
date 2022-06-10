@@ -20,6 +20,8 @@ makedocs(sitename="FMI.jl",
                 "examples/multiple_instances.md"
                 "examples/modelica_conference_2021.md"
                 "examples/manipulation.md"
+                "examples/multithreading.md"
+                "examples/multiprocessing.md"
             ]
             "Library Functions" => Any[
                 "FMI version independent library functions" => "library/library.md",
