@@ -1,0 +1,6 @@
+*.md
+*.jl
+
+!readme.md
+
+.vscode/
