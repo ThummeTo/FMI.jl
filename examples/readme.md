@@ -1,5 +1,5 @@
 # Examples
-In this branch various examples of applications of the FMI.jl library can be found in the folder `src`. A Julia file is accompanied to a Jupyter Notebook and a Markdown file. The Jupyter Notebook contains a detailed explanation of the individual steps from the Julia file and resembles a tutorial. The Markdown file contains the whole content of the Jupyter Notebook. This file is for documentation and users who do not have Jupyter installed. In contrast, the Julia file contains only the pure code with comments without the detailed explanations.
+In this directory various examples of applications of the FMI.jl library can be found. A Julia file is accompanied to a Jupyter Notebook and a Markdown file. The Jupyter Notebook contains a detailed explanation of the individual steps from the Julia file and resembles a tutorial. The Markdown file contains the whole content of the Jupyter Notebook. This file is for documentation and users who do not have Jupyter installed. In contrast, the Julia file contains only the pure code with comments without the detailed explanations.
 
 
 # Getting Started
