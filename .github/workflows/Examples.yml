@@ -34,6 +34,8 @@ jobs:
 
     - name: "Build package"
       uses: julia-actions/julia-buildpkg@v1
+
+    - name: "Install packages"
       run: |
         pip install jupyter==1.0.0 nbconvert==6.4.5 MarkupSafe==2.1.1 jinja2==3.1.1
         julia --project=./src/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
