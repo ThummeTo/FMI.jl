@@ -5,10 +5,10 @@ on:
   push:
     branches:
       - examples
-  workflow_run:
-    workflows: ["Run Tests"]
-    types:
-      - completed
+  # workflow_run:
+  #   workflows: ["Run Tests"]
+  #   types:
+  #     - completed
 
   
 jobs:        
