@@ -13,61 +13,63 @@ on:
   
 jobs:        
   sync-files:
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     strategy:
       fail-fast: true
       matrix:
         julia-version: ['1.6']
         julia-arch: [x64]
-        os: [ubuntu-latest]
         experimental: [false]
 
     steps:
-    - name: "Check out repository"
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ github.ref }}
+      - name: "Check out repository"
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
 
-    - name: "Set up Julia"
-      uses: julia-actions/setup-julia@v1
-      with:
-          version: ${{ matrix.julia-version }}
-          arch: ${{ matrix.julia-arch }}
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@v1
+        with:
+            version: ${{ matrix.julia-version }}
+            arch: ${{ matrix.julia-arch }}
 
-    - name: "Build package"
-      uses: julia-actions/julia-buildpkg@v1
+      - name: "Build package"
+        uses: julia-actions/julia-buildpkg@v1
 
-    - name: "Install packages"
-      run: |
-        pip install jupyter==1.0.0 nbconvert==6.4.5 MarkupSafe==2.1.1 jinja2==3.1.1
+      - name: "Install packages"
+        run: pip install jupyter==1.0.0 nbconvert==6.4.5 MarkupSafe==2.1.1 jinja2==3.1.1
 
-    - name: "Set path filter"
-      uses: dorny/paths-filter@v2
-      id: filter
-      with:
-        list-files: shell
-        filters: |
-          all:
-            - 'examples/**.ipynb'
-          changed:
-            - added|modified: 'examples/**.ipynb'
-          src:
-            - 'main/src/**.jl'
-                
-    - name: "Execute and synchronize all files"
-      if: ${{ steps.filter.outputs.src == 'true' }}
-      run: |
-        jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-1.6" --to notebook --inplace --execute ${{ steps.filter.outputs.all_files }}
-        jupyter nbconvert --to script ${{ steps.filter.outputs.all_files }}
-        jupyter nbconvert --to markdown ${{ steps.filter.outputs.all_files }}
-    
-    - name: "Execute and synchronize changed files"    
-      if: ${{ steps.filter.outputs.changed == 'true' && steps.filter.outputs.src == 'false' }}
-      run: |
-        jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-1.6" --to notebook --inplace --execute ${{ steps.filter.outputs.changed_files }}
-        jupyter nbconvert --to script ${{ steps.filter.outputs.changed_files }}
-        jupyter nbconvert --to markdown ${{ steps.filter.outputs.changed_files }}
+      - name: "Set path filter"
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          list-files: shell
+          filters: |
+            all:
+              - 'examples/**.ipynb'
+            changed:
+              - added|modified: 'examples/**.ipynb'
+            src:
+              - 'main/src/**.jl'
+                  
+      - name: "Execute and synchronize all files"
+        if: ${{ steps.filter.outputs.src == 'true' }}
+        run: |
+          jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-1.6" --to notebook --inplace --execute ${{ steps.filter.outputs.all_files }}
+          jupyter nbconvert --to script ${{ steps.filter.outputs.all_files }}
+          jupyter nbconvert --to markdown ${{ steps.filter.outputs.all_files }}
+      
+      - name: "Execute and synchronize changed files"    
+        if: ${{ steps.filter.outputs.changed == 'true' && steps.filter.outputs.src == 'false' }}
+        run: |
+          jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-1.6" --to notebook --inplace --execute ${{ steps.filter.outputs.changed_files }}
+          jupyter nbconvert --to script ${{ steps.filter.outputs.changed_files }}
+          jupyter nbconvert --to markdown ${{ steps.filter.outputs.changed_files }}
 
+  commit-files:
+    needs: sync-files
+    runs-on: ubuntu-latest
+    steps:
     - name: "Auto commit"
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
