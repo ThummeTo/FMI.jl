@@ -1,95 +1,39 @@
-name: Documentation, Examples
+name: Documentation
 
 on:
+  workflow_run:
+    workflows: ["Run Examples"]
+    types:
+      - completed
   push:
-    branches:
-      - main
-    tags:
+    branches: [main/docs]
+    tags: 
       - '*'
-  pull_request:
 
 jobs:        
-  sync-jupyter:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: true
-      matrix:
-        julia-version: ['1.6']
-        julia-arch: [x64]
-        os: [ubuntu-latest]
-        experimental: [false]
-
-    steps:
-    - name: "Check out repository"
-      uses: actions/checkout@v2
-
-    - name: "Set up Julia"
-      uses: julia-actions/setup-julia@v1
-      with:
-          version: ${{ matrix.julia-version }}
-          arch: ${{ matrix.julia-arch }}
-
-    - name: "Build package"
-      uses: julia-actions/julia-buildpkg@v1
-
-    - name: "Set path filter"
-      uses: dorny/paths-filter@v2
-      id: filter
-      with:
-        list-files: shell
-        filters: |
-          all:
-            - 'example/**.ipynb'
-          changed:
-            - added|modified: 'example/**.ipynb'
-          src:
-            - 'src/**'
-                
-    - name: "Install Packages"
-      if: ${{ steps.filter.outputs.changed == 'true' || steps.filter.outputs.src == 'true' }}
-      run: |
-        pip install jupyter==1.0.0 nbconvert==6.4.5 MarkupSafe==2.1.1 jinja2==3.1.1
-        julia --project=./example/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
-
-
-    - name: "Execute and synchronize all files"
-      if: ${{ steps.filter.outputs.src == 'true' }}
-      run: |
-        jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-1.6" --to notebook --inplace --execute ${{ steps.filter.outputs.all_files }}
-        jupyter nbconvert --to script ${{ steps.filter.outputs.all_files }}
-        jupyter nbconvert --output-dir='./docs/src/examples' --to markdown ${{ steps.filter.outputs.all_files }}
-    
-    - name: "Execute and synchronize changed files"    
-      if: ${{ steps.filter.outputs.changed == 'true' && steps.filter.outputs.src == 'false' }}
-      run: |
-        jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-1.6" --to notebook --inplace --execute ${{ steps.filter.outputs.changed_files }}
-        jupyter nbconvert --to script ${{ steps.filter.outputs.changed_files }}
-        jupyter nbconvert --output-dir='./docs/src/examples' --to markdown ${{ steps.filter.outputs.changed_files }}
-
-    - name: "Auto commit"
-      uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: Jupyter nbconvert synch - modified, paired .ipynb files
-        
   build:
     needs: sync-jupyter
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: true
-      matrix:
-        julia-version: ['1.6']
-        julia-arch: [x64]
-        os: [ubuntu-latest]
-        experimental: [false]
+    runs-on: ubuntu-latest
+
     steps:
       - name: "Check out repository"
-        uses: actions/checkout@v2
+        uses: actions/checkout@latest
+
+      - name: Copy files
+        env:
+          SRC_BRANCH: 'examples'
+          SRC_FOLDER_PATH: 'examples'
+          TARGET_BRANCH: 'main'
+        run: |
+          git fetch
+          git checkout $TARGET_BRANCH
+          git checkout ${SRC_BRANCH/} -- $SRC_FOLDER_PATH/*.md $SRC_FOLDER_PATH/**.svg
 
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
-          version: ${{ matrix.julia-version }}
-          arch: ${{ matrix.julia-arch }}
+          version: '1.6'
+          arch: x64
 
       - name: "Install dependencies"
         run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
