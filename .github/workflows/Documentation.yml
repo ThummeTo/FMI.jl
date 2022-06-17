@@ -23,11 +23,9 @@ jobs:
         env:
           SRC_BRANCH: 'examples'
           SRC_FOLDER_PATH: 'examples'
-          TARGET_BRANCH: 'main'
         run: |
           git fetch
-          git checkout $TARGET_BRANCH
-          git checkout ${SRC_BRANCH/} -- $SRC_FOLDER_PATH/*.md $SRC_FOLDER_PATH/**.svg
+          git --work-tree=/docs/src checkout ${SRC_BRANCH/} -- $SRC_FOLDER_PATH/*.md $SRC_FOLDER_PATH/**.svg
 
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
