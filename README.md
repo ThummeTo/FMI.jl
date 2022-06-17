@@ -6,6 +6,7 @@
 
 [![Dev Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) 
 [![CI Testing](https://github.com/ThummeTo/FMI.jl/actions/workflows/Test.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions)
+[![CI Testing](https://github.com/ThummeTo/FMI.jl/actions/workflows/Examples.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions)
 [![CI Testing](https://github.com/ThummeTo/FMI.jl/actions/workflows/Documentation.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions)
 [![Coverage](https://codecov.io/gh/ThummeTo/FMI.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ThummeTo/FMI.jl)
 [![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
