@@ -591,18 +591,21 @@ end
 
 """
 
-    fmiReload(fmu::FMU2)
+    fmiReload(fmu::Union{FMU2, FMU3})
 
 Reloads the FMU-binary. This is useful, if the FMU does not support a clean reset implementation.
 
 # Arguments
 - `fmu::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+- `fmu::FMU3`: Mutable struct representing an FMU in the [FMI 3.0 Standard](https://fmi-standard.org/).
 
-
-See also [`fmi2Reload`](@ref).
+See also [`fmi2Reload`](@ref), [`fmi3Reload`](@ref).
 """
 function fmiReload(fmu::FMU2, args...; kwargs...)
     fmi2Reload(fmu, args...; kwargs...)
+end
+function fmiReload(fmu::FMU3, args...; kwargs...)
+    fmi3Reload(fmu, args...; kwargs...)
 end
 
 """
@@ -771,38 +774,47 @@ end
 
 """
 
-    fmiUnload(fmu::FMU2)
+    fmiUnload(fmu::Union{FMU2, FMU3})
 
 Unloads the FMU and all its instances and frees the allocated memory.
 
 # Arguments
 - `fmu::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+- `fmu::FMU3`: Mutable struct representing a FMU and all it instantiated instances in the [FMI 3.0 Standard](https://fmi-standard.org/).
 
-See also [`fmi2Unload`](@ref).
+See also [`fmi2Unload`](@ref), [`fmi3Unload`](@ref).
 """
 function fmiUnload(fmu::FMU2)
     fmi2Unload(fmu)
 end
+function fmiUnload(fmu::FMU3)
+    fmi3Unload(fmu)
+end
 
 """
 
-    fmiGetNumberOfStates(str::fmi2Struct)
+    fmiGetNumberOfStates(str::Union{fmi2Struct, fmi3Struct})
 
 Returns the number of states of the FMU.
 
 # Arguments
-- `str::fmi2Struct`:  Representative for an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+- `str::Union{fmi2Struct, fmi3Struct}`:  Representative for an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/) or [FMI 3.0 Standard](https://fmi-standard.org/). Other notation:
 More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
  - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
  - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
+ - `str::FMU3`: Mutable struct representing an FMU in the [FMI 3.0 Standard](https://fmi-standard.org/).
+ - `str::FMU3Instance`:  Mutable struct represents a pointer to an FMU specific data structure that contains the information needed. Also in [FMI 3.0 Standard](https://fmi-standard.org/).
 
 # Returns
-- Returns the length of the `str.stateValueReferences` array, which consists of `fmi2ValueReference` constants.
+- Returns the length of the `str.stateValueReferences` array, which consists of `fmi2ValueReference` or `fmi3ValueReference` constants.
 
-See also [`fmi2GetNumberOfStates`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
+See also [`fmi2GetNumberOfStates`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref), [`fmi3GetNumberOfStates`](@ref), [`fmi3Struct`](@ref), [`FMU3`](@ref), [`FMU3Instance`](@ref).
 """
 function fmiGetNumberOfStates(str::fmi2Struct)
     fmi2GetNumberOfStates(str)
+end
+function fmiGetNumberOfStates(str::fmi3Struct)
+    fmi3GetNumberOfStates(str)
 end
 
 """
@@ -828,30 +840,36 @@ end
 
 """
 
-    fmiGetVersion(str::fmi2Struct)
+    fmiGetVersion(str::Union{fmi2Struct, fmi3Struct})
 
 Returns the version of the FMU, version independent.
 
 # Arguments
-- `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
+- `str::Union{fmi2Struct, fmi3Struct}`:  Representative for an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/) or [FMI 3.0 Standard](https://fmi-standard.org/). Other notation:
 More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
  - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
  - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
+ - `str::FMU3`: Mutable struct representing an FMU in the [FMI 3.0 Standard](https://fmi-standard.org/).
+ - `str::FMU3Instance`:  Mutable struct represents a pointer to an FMU specific data structure that contains the information needed. Also in [FMI 3.0 Standard](https://fmi-standard.org/).
 
 # Returns
-- Returns a string from the address of a C-style (NUL-terminated) string. The string represents the version of the “fmi2Functions.h” header file which was used to compile the functions of the FMU. The function returns “fmiVersion” which is defined in this header file. The standard header file as documented in this specification has version “2.0”
+- Returns a string from the address of a C-style (NUL-terminated) string. The string represents the version of the “fmiXFunctions.h” header file which was used to compile the functions of the FMU. The function returns “fmiVersion” which is defined in this header file. The standard header file as documented in this specification has version “2.0” or "3.0"
 
 # Source
  - FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
  - FMISpec2.0.2[p.22]: 2.1.4 Inquire Platform and Version Number of Header Files
  - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
+ - FMISpec3.0[p. ]: 2.2.5. Inquire Version Number of Header Files
 
-See also [`fmi2GetVersion`](@ref), [`unsafe_string`](https://docs.julialang.org/en/v1/base/strings/#Base.unsafe_string), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
+See also [`fmi2GetVersion`](@ref), [`unsafe_string`](https://docs.julialang.org/en/v1/base/strings/#Base.unsafe_string), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref), [`fmi3GetVersion`](@ref), [`fmi3Struct`](@ref), [`FMU3`](@ref), [`FMU3Instance`](@ref).
 """
 function fmiGetVersion(str::fmi2Struct)
     fmi2GetVersion(str)
 end
-
+function fmiGetVersion(str::fmi3Struct)
+    fmi3GetVersion(str)
+end
+# TODO not available so far
 """
 
     fmiInfo(str::fmi2Struct)
@@ -872,7 +890,7 @@ See also [`fmi2Info`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Compone
 function fmiInfo(str::fmi2Struct)
     fmi2Info(str)
 end
-
+# TODO how to handle different calls for CS, ME, SE in FMI3
 """
 
     fmiInstantiate!(fmu::FMU2; pushComponents::Bool = true, visible::Bool = false, loggingOn::Bool = false, externalCallbacks::Bool = false,
@@ -913,48 +931,64 @@ end
 
 """
 
-   fmiFreeInstance!(str::fmi2Struct)
+   fmiFreeInstance!(str::Union{fmi2Struct, fmi3Struct})
 
 Frees the allocated memory of the last instance of the FMU.
 
 # Arguments
-- `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
+- `str::Union{fmi2Struct, fmi3Struct}`:  Representative for an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/) or [FMI 3.0 Standard](https://fmi-standard.org/). Other notation:
 More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
  - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
  - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
+ - `str::FMU3`: Mutable struct representing an FMU in the [FMI 3.0 Standard](https://fmi-standard.org/).
+ - `str::FMU3Instance`:  Mutable struct represents a pointer to an FMU specific data structure that contains the information needed. Also in [FMI 3.0 Standard](https://fmi-standard.org/).
 
 # Returns
 - `status::fmi2Status`: returned by all functions to indicate the success of the function call
+- `status::fmi3Status`: returned by all functions to indicate the success of the function call
 
 # Source
 - FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
 - FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
+- FMISpec3.0 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec3.0[p. ]: 2.3.1. Super State: FMU State Settable
+- FMISpec3.0[p. ]: 2.2.4. Status Returned by Functions
 
-See also [fmi2FreeInstance](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
+See also [fmi2FreeInstance](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref), [fmi3FreeInstance](@ref), [`fmi3Struct`](@ref), [`FMU3`](@ref), [`FMU3Instance`](@ref).
 """
 function fmiFreeInstance!(str::fmi2Struct)
     fmi2FreeInstance!(str)
 end
+function fmiFreeInstance!(str::fmi3Struct)
+    fmi3FreeInstance!(str)
+end
 
 """
 
-    fmiSetDebugLogging(str::fmi2Struct)
+    fmiSetDebugLogging(str::Union{fmi2Struct, fmi3Struct})
 
 Control the use of the logging callback function, version independent.
 
 # Arguments
-- `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
+- `str::Union{fmi2Struct, fmi3Struct}`:  Representative for an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/) or [FMI 3.0 Standard](https://fmi-standard.org/). Other notation:
 More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
  - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
  - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
+ - `str::FMU3`: Mutable struct representing an FMU in the [FMI 3.0 Standard](https://fmi-standard.org/).
+ - `str::FMU3Instance`:  Mutable struct represents a pointer to an FMU specific data structure that contains the information needed. Also in [FMI 3.0 Standard](https://fmi-standard.org/).
 
 # Source
 - FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
 - FMISpec2.0.2[p.22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
+- FMISpec3.0 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec3.0[p. ]: 2.3.1. Super State: FMU State Settable
 """
 function fmiSetDebugLogging(str::fmi2Struct)
     fmi2SetDebugLogging(str)
+end
+function fmiSetDebugLogging(str::fmi3Struct)
+    fmi3SetDebugLogging(str)
 end
 
 """
@@ -988,7 +1022,7 @@ See also [fmi2SetupExperiment](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FM
 function fmiSetupExperiment(str::fmi2Struct, args...; kwargs...)
     fmi2SetupExperiment(str, args...; kwargs...)
 end
-
+# TODO different function call in fmi3 more arguments
 """
 
     fmiEnterInitializationMode(str::fmi2Struct)
@@ -1018,29 +1052,38 @@ end
 
 """
 
-    fmiExitInitializationMode(str::fmi2Struct)
+    fmiExitInitializationMode(str::Union{fmi2Struct, fmi3Struct})
 
 Informs the FMU to exit initialization mode, version independent.
 
 # Arguments
-- `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
+- `str::Union{fmi2Struct, fmi3Struct}`:  Representative for an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/) or [FMI 3.0 Standard](https://fmi-standard.org/). Other notation:
 More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
  - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
  - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
+ - `str::FMU3`: Mutable struct representing an FMU in the [FMI 3.0 Standard](https://fmi-standard.org/).
+ - `str::FMU3Instance`:  Mutable struct represents a pointer to an FMU specific data structure that contains the information needed. Also in [FMI 3.0 Standard](https://fmi-standard.org/).
 
 # Returns
--  Returns a warning if `str.state` is not called in `fmi2ComponentStateInitializationMode`.
+-  Returns a warning if `str.state` is not called in `fmi2ComponentStateInitializationMode` or `fmi3InstanceInitializationMode`.
 -  `status::fmi2Status`: returned by all functions to indicate the success of the function call
+-  `status::fmi3Status`: returned by all functions to indicate the success of the function call
 
 # Source
 - FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
 - FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
+- FMISpec3.0 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec3.0[p. ]: 2.3.3. State: Initialization Mode
+- FMISpec3.0[p. ]: 2.2.4. Status Returned by Functions
 
- See also [fmi2ExitInitializationMode](@ref)
+ See also [fmi2ExitInitializationMode](@ref), [fmi3ExitInitializationMode](@ref). 
 """
 function fmiExitInitializationMode(str::fmi2Struct)
     fmi2ExitInitializationMode(str)
+end
+function fmiExitInitializationMode(str::fmi3Struct)
+    fmi3ExitInitializationMode(str)
 end
 
 """
@@ -1049,12 +1092,17 @@ Informs the FMU that the simulation run is terminated, version independent.
 function fmiTerminate(str::fmi2Struct)
     fmi2Terminate(str)
 end
-
+function fmiTerminate(str::fmi3Struct)
+    fmi3Terminate(str)
+end
 """
 Resets the FMU after a simulation run, version independent.
 """
 function fmiReset(str::fmi2Struct)
     fmi2Reset(str)
+end
+function fmiReset(str::fmi3Struct)
+    fmi3Reset(str)
 end
 
 """
@@ -1063,19 +1111,26 @@ ToDo
 function fmiGet(str::fmi2Struct, args...; kwargs...)
     fmi2Get(str, args...; kwargs...)
 end
-
+function fmiGet(str::fmi3Struct, args...; kwargs...)
+    fmi3Get(str, args...; kwargs...)
+end
 """
 ToDo
 """
 function fmiGet!(str::fmi2Struct, args...; kwargs...)
     fmi2Get!(str, args...; kwargs...)
 end
-
+function fmiGet!(str::fmi3Struct, args...; kwargs...)
+    fmi3Get!(str, args...; kwargs...)
+end
 """
 ToDo
 """
 function fmiSet(str::fmi2Struct, args...; kwargs...)
     fmi2Set(str, args...; kwargs...)
+end
+function fmiSet(str::fmi3Struct, args...; kwargs...)
+    fmi3Set(str, args...; kwargs...)
 end
 
 """
@@ -1084,46 +1139,49 @@ Returns the real values of an array of variables
 function fmiGetReal(str::fmi2Struct, args...; kwargs...)
     fmi2GetReal(str, args...; kwargs...)
 end
-
+function fmiGetReal(str::fmi3Struct, args...; kwargs...)
+    fmi3GetReal(str, args...; kwargs...)
+end
+# TODO different call in fmi3 fmi3GetOuputDerivatives
 function fmiGetRealOutputDerivatives(str::fmi2Struct, args...; kwargs...)
     fmi2GetRealOutputDerivatives(str, args...; kwargs...)
 end
-
+# TODO different call in fmi3
 """
 Writes the real values of an array of variables in the given field
 """
 function fmiGetReal!(str::fmi2Struct, args...; kwargs...)
     fmi2GetReal!(str, args...; kwargs...)
 end
-
+# TODO different call in fmi3
 """
 Set the values of an array of real variables
 """
 function fmiSetReal(str::fmi2Struct, args...; kwargs...)
     fmi2SetReal(str, args...; kwargs...)
 end
-
+# TODO different call in fmi3
 """
 ToDo
 """
 function fmiSetRealInputDerivatives(str::fmi2Struct, args...; kwargs...)
     fmi2SetRealInputDerivatives(str, args...; kwargs...)
 end
-
+# TODO different call in fmi3
 """
 Returns the integer values of an array of variables
 """
 function fmiGetInteger(str::fmi2Struct,args...; kwargs...)
     fmi2GetInteger(str, args...; kwargs...)
 end
-
+# TODO different call in fmi3
 """
 Writes the integer values of an array of variables in the given field
 """
 function fmiGetInteger!(str::fmi2Struct, args...; kwargs...)
     fmi2GetInteger!(str, args...; kwargs...)
 end
-
+# TODO different call in fmi3
 """
 Set the values of an array of integer variables
 """
@@ -1137,12 +1195,18 @@ Returns the boolean values of an array of variables
 function fmiGetBoolean(str::fmi2Struct, args...; kwargs...)
     fmi2GetBoolean(str, args...; kwargs...)
 end
+function fmiGetBoolean(str::fmi3Struct, args...; kwargs...)
+    fmi3GetBoolean(str, args...; kwargs...)
+end
 
 """
 Writes the boolean values of an array of variables in the given field
 """
 function fmiGetBoolean!(str::fmi2Struct, args...; kwargs...)
     fmi2GetBoolean!(str, args...; kwargs...)
+end
+function fmiGetBoolean!(str::fmi3Struct, args...; kwargs...)
+    fmi3GetBoolean!(str, args...; kwargs...)
 end
 
 """
@@ -1151,12 +1215,18 @@ Set the values of an array of boolean variables
 function fmiSetBoolean(str::fmi2Struct, args...; kwargs...)
     fmi2SetBoolean(str, args...; kwargs...)
 end
+function fmiSetBoolean(str::fmi3Struct, args...; kwargs...)
+    fmi3SetBoolean(str, args...; kwargs...)
+end
 
 """
 Returns the string values of an array of variables
 """
 function fmiGetString(str::fmi2Struct, args...; kwargs...)
     fmi2GetString(str, args...; kwargs...)
+end
+function fmiGetString(str::fmi3Struct, args...; kwargs...)
+    fmi3GetString(str, args...; kwargs...)
 end
 
 """
@@ -1165,6 +1235,9 @@ Writes the string values of an array of variables in the given field
 function fmiGetString!(str::fmi2Struct, args...; kwargs...)
     fmi2GetString!(str, args...; kwargs...)
 end
+function fmiGetString!(str::fmi3Struct, args...; kwargs...)
+    fmi3GetString!(str, args...; kwargs...)
+end
 
 """
 Set the values of an array of string variables
@@ -1172,13 +1245,17 @@ Set the values of an array of string variables
 function fmiSetString(str::fmi2Struct, args...; kwargs...)
     fmi2SetString(str, args...; kwargs...)
 end
-
+function fmiSetString(str::fmi3Struct, args...; kwargs...)
+    fmi3SetString(str, args...; kwargs...)
+end
+# TODO different call in fmi3
 """
 Returns the FMU state of the fmu
 """
 function fmiGetFMUstate(str::fmi2Struct)
     fmi2GetFMUstate(str)
 end
+# TODO different call in fmi3
 
 """
 Sets the FMU to the given state
@@ -1186,6 +1263,7 @@ Sets the FMU to the given state
 function fmiSetFMUstate(str::fmi2Struct, args...; kwargs...)
     fmi2SetFMUstate(str, args...; kwargs...)
 end
+# TODO different call in fmi3
 
 """
 Free the memory for the allocated FMU state
@@ -1193,6 +1271,7 @@ Free the memory for the allocated FMU state
 function fmiFreeFMUstate!(str::fmi2Struct, args...; kwargs...)
     fmi2FreeFMUstate!(str, args...; kwargs...)
 end
+# TODO different call in fmi3
 
 """
 Returns the size of the byte vector the FMU can be stored in
@@ -1200,6 +1279,7 @@ Returns the size of the byte vector the FMU can be stored in
 function fmiSerializedFMUstateSize(str::fmi2Struct, args...; kwargs...)
     fmi2SerializedFMUstateSize(str, args...; kwargs...)
 end
+# TODO different call in fmi3
 
 """
 Serialize the data in the FMU state pointer
@@ -1207,6 +1287,7 @@ Serialize the data in the FMU state pointer
 function fmiSerializeFMUstate(str::fmi2Struct, args...; kwargs...)
     fmi2SerializeFMUstate(str, args...; kwargs...)
 end
+# TODO different call in fmi3
 
 """
 Deserialize the data in the FMU state pointer
@@ -1221,12 +1302,32 @@ Returns the values of the directional derivatives.
 function fmiGetDirectionalDerivative(str::fmi2Struct, args...; kwargs...)
     fmi2GetDirectionalDerivative(str, args...; kwargs...)
 end
+function fmiGetDirectionalDerivative(str::fmi3Struct, args...; kwargs...)
+    fmi3GetDirectionalDerivative(str, args...; kwargs...)
+end
 
 """
 Returns the values of the directional derivatives (in-place).
 """
 function fmiGetDirectionalDerivative!(str::fmi2Struct, args...; kwargs...)
     fmi2GetDirectionalDerivative!(str, args...; kwargs...)
+end
+function fmiGetDirectionalDerivative!(str::fmi3Struct, args...; kwargs...)
+    fmi3GetDirectionalDerivative!(str, args...; kwargs...)
+end
+
+"""
+Returns the values of the adjoint derivatives.
+"""
+function fmiGetAdjointDerivative(str::fmi3Struct, args...; kwargs...)
+    fmi3GetAdjointDerivative(str, args...; kwargs...)
+end
+
+"""
+Returns the values of the adjoint derivatives (in-place).
+"""
+function fmiGetAdjointDerivative!(str::fmi3Struct, args...; kwargs...)
+    fmi3GetAdjointDerivative!(str, args...; kwargs...)
 end
 
 """
@@ -1235,12 +1336,18 @@ Does one step in the CoSimulation FMU
 function fmiDoStep(str::fmi2Struct, args...; kwargs...)
     fmi2DoStep(str, args...; kwargs...)
 end
+function fmiDoStep(str::fmi3Struct, args...; kwargs...)
+    fmi3DoStep(str, args...; kwargs...)
+end
 
 """
 Samples the values of the directional derivatives.
 """
 function fmiSampleDirectionalDerivative(str::fmi2Struct, args...; kwargs...)
     fmi2SampleDirectionalDerivative(str, args...; kwargs...)
+end
+function fmiSampleDirectionalDerivative(str::fmi3Struct, args...; kwargs...)
+    fmi3SampleDirectionalDerivative(str, args...; kwargs...)
 end
 
 """
@@ -1249,12 +1356,18 @@ Samples the values of the directional derivatives (in-place).
 function fmiSampleDirectionalDerivative!(str::fmi2Struct, args...; kwargs...)
     fmi2SampleDirectionalDerivative!(str, args...; kwargs...)
 end
+function fmiSampleDirectionalDerivative!(str::fmi3Struct, args...; kwargs...)
+    fmi3SampleDirectionalDerivative!(str, args...; kwargs...)
+end
 
 """
 Set a time instant
 """
-function fmiSetTime(c::fmi2Struct, args...; kwargs...)
-    fmi2SetTime(c, args...; kwargs...)
+function fmiSetTime(str::fmi2Struct, args...; kwargs...)
+    fmi2SetTime(str, args...; kwargs...)
+end
+function fmiSetTime(str::fmi3Struct, args...; kwargs...)
+    fmi3SetTime(str, args...; kwargs...)
 end
 
 """
@@ -1263,14 +1376,14 @@ Set a new (continuous) state vector
 function fmiSetContinuousStates(str::fmi2Struct, args...; kwargs...)
     fmi2SetContinuousStates(str, args...; kwargs...)
 end
-
+# TODO more arguments in fmi3
 """
 The model enters Event Mode
 """
 function fmi2EnterEventMode(str::fmi2Struct)
     fmi2EnterEventMode(str)
 end
-
+# TODO different function call in fmi3
 """
 Returns the next discrete states
 """
@@ -1284,6 +1397,9 @@ The model enters Continuous-Time Mode
 function fmiEnterContinuousTimeMode(str::fmi2Struct)
     fmi2EnterContinuousTimeMode(str)
 end
+function fmiEnterContinuousTimeMode(str::fmi3Struct)
+    fmi3EnterContinuousTimeMode(str)
+end
 
 """
 This function must be called by the environment after every completed step
@@ -1291,7 +1407,10 @@ This function must be called by the environment after every completed step
 function fmiCompletedIntegratorStep(str::fmi2Struct, args...; kwargs...)
     fmi2CompletedIntegratorStep(str, args...; kwargs...)
 end
-
+function fmiCompletedIntegratorStep(str::fmi3Struct, args...; kwargs...)
+    fmi3CompletedIntegratorStep(str, args...; kwargs...)
+end
+# TODO different function call
 """
 Compute state derivatives at the current time instant and for the current states
 """
@@ -1305,6 +1424,9 @@ Returns the event indicators of the FMU
 function fmiGetEventIndicators(str::fmi2Struct)
     fmi2GetEventIndicators(str)
 end
+function fmiGetEventIndicators(str::fmi3Struct)
+    fmi3GetEventIndicators(str)
+end
 
 """
 Return the new (continuous) state vector x
@@ -1312,12 +1434,18 @@ Return the new (continuous) state vector x
 function fmiGetContinuousStates(s::fmi2Struct)
     fmi2GetContinuousStates(s)
 end
+function fmiGetContinuousStates(s::fmi3Struct)
+    fmi3GetContinuousStates(s)
+end
 
 """
 Return the new (continuous) state vector x
 """
 function fmiGetNominalsOfContinuousStates(s::fmi2Struct)
     fmi2GetNominalsOfContinuousStates(s)
+end
+function fmiGetNominalsOfContinuousStates(s::fmi3Struct)
+    fmi3GetNominalsOfContinuousStates(s)
 end
 
 """
@@ -1327,6 +1455,9 @@ TODO: Add this command in the documentation.
 """
 function fmiGetStartValue(s::fmi2Struct, vr::fmi2ValueReferenceFormat)
     fmi2GetStartValue(s, vr)
+end
+function fmiGetStartValue(s::fmi3Struct, vr::fmi3ValueReferenceFormat)
+    fmi3GetStartValue(s, vr)
 end
 
 ##### function setters
@@ -1457,7 +1588,7 @@ end
 
 ##### Multiple Dispatch fallback for FMUs with unsupported versions #####
 
-unsupportedFMUs = Union{FMU1,FMU3}
+unsupportedFMUs = FMU1
 function fmiDoStep(fmu::unsupportedFMUs, args...; kwargs...)
     error(unsupportedFMU::errorType)
 end
