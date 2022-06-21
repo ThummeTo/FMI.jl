@@ -36,6 +36,9 @@ import FMIImport: fmi2Get, fmi2Get!, fmi2Set
 import FMIImport: fmi2GetSolutionTime, fmi2GetSolutionState, fmi2GetSolutionValue
 export fmi2GetSolutionTime, fmi2GetSolutionState, fmi2GetSolutionValue
 
+import FMIImport: fmi2TypeModelExchange, fmi2TypeCoSimulation, fmi2Type
+export fmi2TypeModelExchange, fmi2TypeCoSimulation, fmi2Type
+
 using FMIExport
 using FMIExport: fmi2Create, fmi2CreateSimple
 
