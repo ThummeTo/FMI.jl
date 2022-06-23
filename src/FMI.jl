@@ -458,7 +458,6 @@ function fmiCanSerializeFMUstate(str::fmi3StructMD)
 end
 
 # TODO fmi3Call fmiProvidesDirectionalDerivatives
-# TODO how to handle AdjointDerivatives, easiest fmiProvidesAdjointDerivative
 """
 
     fmiProvidesDirectionalDerivative(str::Union{fmi2StructMD, fmi3StructMD})
@@ -484,7 +483,29 @@ function fmiProvidesDirectionalDerivative(str::fmi2StructMD)
     fmi2ProvidesDirectionalDerivative(str)
 end
 function fmiProvidesDirectionalDerivative(str::fmi3StructMD)
-    fmi3ProvidesDirectionalDerivative(str)
+    fmi3ProvidesDirectionalDerivatives(str)
+end
+
+"""
+
+    fmiProvidesAdjointDerivative(str::fmi3StructMD)
+
+Returns true, if the FMU provides adjoint derivatives
+
+# Arguments
+- `str::fmi3StructMD`:  Representative for an FMU in the [FMI 3.0 Standard](https://fmi-standard.org/). Other notation:
+More detailed: `fmi3StructMD =  Union{FMU3, FMU3Component, fmi3ModelDescription}`
+ - `str::FMU3`: Mutable struct representing an FMU in the [FMI 3.0 Standard](https://fmi-standard.org/).
+ - `str::FMU3Instance`:  Mutable struct represents a pointer to an FMU specific data structure that contains the information needed. Also in [FMI 3.0 Standard](https://fmi-standard.org/).
+ - `str::fmi3ModelDescription`: Struct witch provides the static information of ModelVariables.
+
+# Returns
+- `::Bool`: The function `fmi3ProvidesAdjointDerivatives` returns True, if the FMU provides adjoint derivatives.
+
+See also [`fmi3ProvidesAdjointDerivatves`](@ref), [`fmi3StructMD`](@ref), [`FMU3`](@ref), [`FMU3Instance`](@ref), [`fmi3ModelDescription`](@ref).
+"""
+function fmiProvidesAdjointDerivative(str::fmi3StructMD)
+    fmi3ProvidesAdjointDerivatives(str)
 end
 
 """
@@ -567,6 +588,7 @@ end
 
 # Multiple Dispatch variants for FMUs with version 2.0.X
 
+# TODO check version in MD
 """
 
    fmiLoad(pathToFMU::String; unpackPath=nothing, type=nothing)
@@ -586,7 +608,14 @@ Load FMUs independent of the FMI version, currently supporting version 2.0.X.
 See also [`fmi2Load`](@ref).
 """
 function fmiLoad(args...; kwargs...)
-    fmi2Load(args...; kwargs...)
+    version = fmiCheckVersion(pathToFMU)
+    if version == "2.0"
+        fmi2Load(args...; kwargs...)
+    else if version == "3.0"
+        fmi3Load(args...; kwargs...)
+    else
+        @warn "fmiLoad(...): Unknown FMU version"
+    end
 end
 
 """
@@ -1316,6 +1345,7 @@ function fmiGetDirectionalDerivative!(str::fmi3Struct, args...; kwargs...)
     fmi3GetDirectionalDerivative!(str, args...; kwargs...)
 end
 
+# Add unsupportedFMU for call with FMU2
 """
 Returns the values of the adjoint derivatives.
 """
@@ -1808,5 +1838,12 @@ end
 function fmiIsModelExchange(fmu::unsupportedFMUs)
     error(unsupportedFMU::errorType)
 end
+function fmiGetAdjointDerivative(str::fmi2Struct, args...; kwargs...)
+    error(unsupportedFMU::errorType)
+end
+function fmiGetAdjointDerivative!(str::fmi2Struct, args...; kwargs...)
+    error(unsupportedFMU::errorType)
+end
+
 
 end # module FMI
