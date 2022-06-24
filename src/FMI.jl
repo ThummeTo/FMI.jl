@@ -620,7 +620,7 @@ function fmiLoad(args...; kwargs...)
     version = fmiCheckVersion(pathToFMU)
     if version == "2.0"
         fmi2Load(args...; kwargs...)
-    else if version == "3.0"
+    elseif version == "3.0"
         fmi3Load(args...; kwargs...)
     else
         @warn "fmiLoad(...): Unknown FMU version"

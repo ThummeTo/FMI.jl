@@ -109,13 +109,13 @@ end
         @info "Automated testing is supported on Windows."
         for exportingTool in exportingToolsWindows
             runtestsFMI2(exportingTool)
-            runtestsFMI3(exportingTool)
+            #runtestsFMI3(exportingTool)
         end
     elseif Sys.islinux()
         @info "Automated testing is supported on Linux."
         for exportingTool in exportingToolsLinux
             runtestsFMI2(exportingTool)
-            runtestsFMI3(exportingTool)
+            #runtestsFMI3(exportingTool)
         end
     elseif Sys.isapple()
         @warn "Test-sets are currrently using Windows- and Linux-FMUs, automated testing for macOS is currently not supported."
