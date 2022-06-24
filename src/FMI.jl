@@ -38,7 +38,6 @@ import FMIImport: fmi2Get, fmi2Get!, fmi2Set
 import FMIImport: fmi2GetSolutionTime, fmi2GetSolutionState, fmi2GetSolutionValue
 export fmi2GetSolutionTime, fmi2GetSolutionState, fmi2GetSolutionValue
 
-# FMI3 imports
 import FMIImport: fmi3CallbackLogger, fmi3CallbackIntermediateUpdate, fmi3CallbackClockUpdate
 import FMIImport: fmi3InstanceState, fmi3InstanceStateInstantiated, fmi3InstanceStateInitializationMode, fmi3InstanceStateEventMode, fmi3InstanceStateContinuousTimeMode, fmi3InstanceStateTerminated, fmi3InstanceStateError, fmi3InstanceStateFatal
 import FMIImport: fmi3InstantiateModelExchange, fmi3InstantiateCoSimulation, fmi3InstantiateScheduledExecution, fmi3FreeInstance!, fmi3GetVersion
@@ -72,9 +71,10 @@ import FMIImport: fmi3Get, fmi3Get!, fmi3Set
 import FMIImport: fmi3GetSolutionTime, fmi3GetSolutionState, fmi3GetSolutionValue
 export fmi3GetSolutionTime, fmi3GetSolutionState, fmi3GetSolutionValue
 
+import FMIImport: fmi2TypeModelExchange, fmi2TypeCoSimulation, fmi2Type
+export fmi2TypeModelExchange, fmi2TypeCoSimulation, fmi2Type
 
 using FMIExport
-using FMIExport: fmi2Create, fmi2CreateSimple
 
 using FMIImport.FMICore: fmi2ValueReference, fmi3ValueReference
 using FMIImport: fmi2ValueReferenceFormat, fmi3ValueReferenceFormat, fmi2StructMD, fmi3StructMD, fmi2Struct, fmi3Struct
@@ -82,8 +82,11 @@ using FMIImport: fmi2ValueReferenceFormat, fmi3ValueReferenceFormat, fmi2StructM
 using FMIImport.FMICore: FMU2, FMU3, FMU2Component, FMU3Instance
 export FMU2, FMU3, FMU2Component, FMU3Instance
 
-using FMIImport.FMICore: FMU2ExecutionConfiguration, FMU_EXECUTION_CONFIGURATION_RESET, FMU_EXECUTION_CONFIGURATION_NO_RESET, FMU_EXECUTION_CONFIGURATION_NO_FREEING
-export FMU2ExecutionConfiguration, FMU_EXECUTION_CONFIGURATION_RESET, FMU_EXECUTION_CONFIGURATION_NO_RESET, FMU_EXECUTION_CONFIGURATION_NO_FREEING
+using FMIImport.FMICore: FMU2ExecutionConfiguration, FMU2_EXECUTION_CONFIGURATION_RESET, FMU2_EXECUTION_CONFIGURATION_NO_RESET, FMU2_EXECUTION_CONFIGURATION_NO_FREEING
+export FMU2ExecutionConfiguration, FMU2_EXECUTION_CONFIGURATION_RESET, FMU2_EXECUTION_CONFIGURATION_NO_RESET, FMU2_EXECUTION_CONFIGURATION_NO_FREEING
+
+using FMIImport.FMICore: FMU3ExecutionConfiguration, FMU3_EXECUTION_CONFIGURATION_RESET, FMU3_EXECUTION_CONFIGURATION_NO_RESET, FMU3_EXECUTION_CONFIGURATION_NO_FREEING
+export FMU3ExecutionConfiguration, FMU3_EXECUTION_CONFIGURATION_RESET, FMU3_EXECUTION_CONFIGURATION_NO_RESET, FMU3_EXECUTION_CONFIGURATION_NO_FREEING
 
 using FMIImport: prepareValue, prepareValueReference
 
