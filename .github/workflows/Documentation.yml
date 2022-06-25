@@ -12,20 +12,25 @@ on:
 
 jobs:        
   build:
-    needs: sync-jupyter
     runs-on: ubuntu-latest
 
     steps:
       - name: "Check out repository"
         uses: actions/checkout@v3
 
-      - name: Copy files
+      - name: "Copy examples"
         env:
           SRC_BRANCH: 'examples'
           SRC_FOLDER_PATH: 'examples'
         run: |
           git fetch
           git --work-tree=/docs/src checkout ${SRC_BRANCH/} -- $SRC_FOLDER_PATH/*.md $SRC_FOLDER_PATH/**.svg
+
+      - name: "Copy readme"
+        uses: canastro/copy-file-action@master
+        with:
+          source: "README.md"
+          target: "/docs/src/readme.md"
 
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
