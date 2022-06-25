@@ -13,7 +13,7 @@ This Julia Package *FMI.jl* is motivated by the use of simulation models in Juli
 This example shows how to parallelize the computation of an FMU in FMI.jl. We can compute a batch of FMU-evaluations in parallel with different initial settings.
 Parallelization can be achieved using multithreading or using multiprocessing. This example shows **multithreading**, check `multiprocessing.ipynb` for multiprocessing.
 Advantage of multithreading is a lower communication overhead as well as lower RAM usage.
-However in some cases multiprocessing can be faster as the garbage collector is not shared.
+However, in some cases multiprocessing can be faster as the garbage collector is not shared.
 
 
 The model used is a one-dimensional spring pendulum with friction. The object-orientated structure of the *SpringFrictionPendulum1D* can be seen in the following graphic.
@@ -68,7 +68,7 @@ Threads.nthreads()
 
 
 
-If the number of available threads doesn't match your expections, you can increase the number of threads available to the Julia process like described [here](https://docs.julialang.org/en/v1/manual/multi-threading/#Starting-Julia-with-multiple-threads).
+If the number of available threads doesn't match your expectations, you can increase the number of threads available to the Julia process like described [here](https://docs.julialang.org/en/v1/manual/multi-threading/#Starting-Julia-with-multiple-threads).
 
 ### Simulation setup
 
@@ -132,7 +132,7 @@ realFMUBatch = [fmiLoad("SpringPendulum1D", "Dymola", "2022x") for _ in 1:batchS
 
 
 
-We define a helper function to calculate the FMU solution and combine it into an Matrix.
+We define a helper function to calculate the FMU solution and combine it into a Matrix.
 
 
 ```julia
@@ -201,7 +201,7 @@ println("Single Threaded")
 
 
 ### Multithreaded Batch Execution
-In a multithreaded context we have to provide each thread it's own fmu, as they are not thread safe.
+In a multithreaded context we have to provide each thread its own fmu, as they are not thread safe.
 To spread the execution of a function to multiple threads, the library `Folds` can be used.
 
 

@@ -10,7 +10,7 @@ Licensed under the MIT license. See [LICENSE](https://github.com/thummeto/FMI.jl
 This Julia Package *FMI.jl* is motivated by the use of simulation models in Julia. Here the FMI specification is implemented. FMI (*Functional Mock-up Interface*) is a free standard ([fmi-standard.org](http://fmi-standard.org/)) that defines a container and an interface to exchange dynamic models using a combination of XML files, binaries and C code zipped into a single file. The user can thus use simulation models in the form of an FMU (*Functional Mock-up Units*). Besides loading the FMU, the user can also set values for parameters and states and simulate the FMU both as co-simulation and model exchange simulation.
 
 ## Introduction to the example
-This example shows how the manually parameterization of an FMU works if very specific adjustments during system initialization is needed. For this purpose, an IO-FMU model is loaded and the various commands for parameterization are shown on the basis of this model. With this example the user shall be guided how to make certain settings at an FMU. Please note, that parameterization of a simulation is possible in a much easier fashion: Using `fmiSimulate`, `fmiSimulateME` or `fmiSimulateCS` together with a parameter dictionary for the keyword `parameters`.
+This example shows how the manual parameterization of an FMU works if very specific adjustments during system initialization is needed. For this purpose, an IO-FMU model is loaded and the various commands for parameterization are shown on the basis of this model. With this example the user shall be guided how to make certain settings at an FMU. Please note, that parameterization of a simulation is possible in a much easier fashion: Using `fmiSimulate`, `fmiSimulateME` or `fmiSimulateCS` together with a parameter dictionary for the keyword `parameters`.
 
 ## Target group
 The example is primarily intended for users who work in the field of simulation exchange. The example wants to show how simple it is to use FMUs in Julia.
@@ -293,7 +293,7 @@ fmiExitInitializationMode(myFMU)
 
 
 
-From here on, you may want to simulate the FMU. Please note, that with the default `executionConfig`, it is necessary to prevent a new instantiation using the keyword `instantiate=false`. Otherwise, a new instance is allocated for the simulation-call and the parameters set for the previous instance are not transfered.
+From here on, you may want to simulate the FMU. Please note, that with the default `executionConfig`, it is necessary to prevent a new instantiation using the keyword `instantiate=false`. Otherwise, a new instance is allocated for the simulation-call and the parameters set for the previous instance are not transferred.
 
 Example:
 `fmiSimulate(...; instantiate=false, ...)`

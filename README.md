@@ -65,19 +65,19 @@ fmiUnload(myFMU)
 - parameterization, simulation & plotting of CS- and ME-FMUs
 - event-handling for imported discontinuous ME-FMUs
 
-|                                   | **FMI2.0.3** |        | **FMI3.0**      |        |
-|-----------------------------------|--------------|--------|-----------------|--------|
-|                                   | Import       | Export | Import          | Export |
-| CS                                | ✓✓           | ~~     | ✓               | ~      |
-| ME (continuous)                   | ✓✓           | ✓✓     | ✓               | ~      |
-| ME (discontinuous)                | ✓✓           | ✓✓     | ✓               | ~      |
-| SE                 		    | -            | -      | ✓               | ~      |
-| Explicit solvers                  | ✓✓           | ✓✓     | ✓               | ~      |
-| Implicit solvers (autodiff=false) | ✓✓           | ~~     | ✓               | ~      |
-| Implicit solvers (autodiff=true)  | ✓            | ~~     | ~~              | ~      |
-| get/setState                      | ✓✓           | ~      | ✓               | ~      |
-| getDirectionalDerivatives         | ✓✓           | ~      | ✓               | ~      |
-| getAdjointDerivatives             | -            | -      | ✓               | ~      |
+|                                   | **FMI2.0.3** |        | **FMI3.0** |        |
+|-----------------------------------|--------------|--------|------------|--------|
+|                                   | Import       | Export | Import     | Export |
+| CS                                | ✓✓           | ~~     | ✓          | ~      |
+| ME (continuous)                   | ✓✓           | ✓✓     | ✓          | ~      |
+| ME (discontinuous)                | ✓✓           | ✓✓     | ✓          | ~      |
+| SE                 		             | -            | -      | ✓          | ~      |
+| Explicit solvers                  | ✓✓           | ✓✓     | ✓          | ~      |
+| Implicit solvers (autodiff=false) | ✓✓           | ~~     | ✓          | ~      |
+| Implicit solvers (autodiff=true)  | ✓            | ~~     | ~~         | ~      |
+| get/setState                      | ✓✓           | ~      | ✓          | ~      |
+| getDirectionalDerivatives         | ✓✓           | ~      | ✓          | ~      |
+| getAdjointDerivatives             | -            | -      | ✓          | ~      |
 
 ✓✓ supported & tested
 

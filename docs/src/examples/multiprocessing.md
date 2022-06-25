@@ -13,7 +13,7 @@ This Julia Package *FMI.jl* is motivated by the use of simulation models in Juli
 This example shows how to parallelize the computation of an FMU in FMI.jl. We can compute a batch of FMU-evaluations in parallel with different initial settings.
 Parallelization can be achieved using multithreading or using multiprocessing. This example shows **multiprocessing**, check `multithreading.ipynb` for multithreading.
 Advantage of multithreading is a lower communication overhead as well as lower RAM usage.
-However in some cases multiprocessing can be faster as the garbage collector is not shared.
+However, in some cases multiprocessing can be faster as the garbage collector is not shared.
 
 
 The model used is a one-dimensional spring pendulum with friction. The object-orientated structure of the *SpringFrictionPendulum1D* can be seen in the following graphic.
@@ -173,7 +173,7 @@ end
     [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
 
 
-We define a helper function to calculate the FMU and combine it into an Matrix.
+We define a helper function to calculate the FMU and combine it into a Matrix.
 
 
 ```julia
@@ -228,7 +228,7 @@ println("Single Threaded")
 
 
 ### Multithreaded Batch Execution
-In a multithreaded context we have to provide each thread it's own fmu, as they are not thread safe.
+In a multithreaded context we have to provide each thread its own fmu, as they are not thread safe.
 To spread the execution of a function to multiple processes, the function `pmap` can be used.
 
 
@@ -269,4 +269,4 @@ After calculating the data, the FMU is unloaded and all unpacked data on disc is
 
 ### Summary
 
-In this tutorial it is shown how multi processing with `Distributed.jl` can be used to improve the performance for calculating a Batch of FMUs.
+In this tutorial it is shown how multiprocessing with `Distributed.jl` can be used to improve the performance for calculating a Batch of FMUs.

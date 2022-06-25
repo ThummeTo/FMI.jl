@@ -9,7 +9,7 @@ The content of the execution configuration may change in future (together with n
 Because not all users need the full potential of this configuration tool, there are three presets given: 
 - `myFMU.executionConfig = FMU2_EXECUTION_CONFIGURATION_NO_RESET` is the default operation mode for FMUs. FMUs are not reset via `fmi2Reset`, but new instantiated for every simulation run (or training step). This is not the most efficient way, but many FMUs have problems with resetting.
 - `myFMU.executionConfig = FMU2_EXECUTION_CONFIGURATION_RESET` is faster for well-implemented FMUs, but needs a fully working `fmi2Reset`-function. So if you know you have a fully working `fmi2Reset`, you may be faster with that option.
-- `myFMU.executionConfig = FMU2_EXECUTION_CONFIGURATION_NO_FREEING` should only be the very last choise. If your FMU neither supports `fmi2Reset` nor a proper `fmi2FreeInstance`, you could use this configuration as a last way out. Keep in mind, that new FMU instances are allocated but not freed, as long as your Julia instance is running (memory leak). In general, the amount of leaked memory is small, but you need to know what you are doing, if you do thousands or ten-thousands of simulation runs with such a FMU.
+- `myFMU.executionConfig = FMU2_EXECUTION_CONFIGURATION_NO_FREEING` should only be the very last choice. If your FMU neither supports `fmi2Reset` nor a proper `fmi2FreeInstance`, you could use this configuration as a last way out. Keep in mind, that new FMU instances are allocated but not freed, as long as your Julia instance is running (memory leak). In general, the amount of leaked memory is small, but you need to know what you are doing, if you do thousands or ten-thousands of simulation runs with such a FMU.
 
 ## Debugging / Logging
 ### Logging FMI-calls
@@ -22,7 +22,7 @@ You can further control which message types - like `OK`, `Warning`, `Discard`, `
 If the FMU uses a variadic callback function for messages (this is not supported by Julia at this time), you may need to activate external callbacks with the keyword `externalCallbacks=true` either ...
 - in the call `fmiInstantiate!`, for example `fmiInstantiate!(myFMU; loggingOn=true, externalCallbacks=true)` or
 - as part of the `executionConfig`, for example `myFMU.executionConfig.loggingOn=true; myFMU.executionConfig.externalCallbacks=true`
-Note, that external callbacks are currently only supported on windows.
+Note, that external callbacks are currently only supported on Windows.
 
 ## Model variable identification
 *FMI.jl* offers multiple ways to retrieve your model variables. Any function that accepts a variable identifier can handle the following argument types:
