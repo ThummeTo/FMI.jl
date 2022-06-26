@@ -16,6 +16,7 @@ include("cross_check_lib.jl")
 const TOOL_ID = "FMI_jl"
 const TOOL_VERSION = "0.9.2"
 const FMI_CROSS_CHECK_REPO_NAME = "fmi-cross-check"
+const NRMSE_THRESHHOLD = 5
 
 # Main Array that holds all information about the excecuted cross checks and results
 crossChecks = []
@@ -35,14 +36,10 @@ function parse_commandline()
         "--tempdir"
             help = "temporary directive that is used for cross checks and results"
             arg_type = String
-            default="C:\\Users\\Christof\\test"
         "--fmiversion"
             help = "FMI version that should be used for the cross checks"
             arg_type = String
             default = "2.0"
-        "--includeNonCompliant"
-            help = "Setting this flag will also try to run non compliant FMU cross checks"
-            action = :store_true
     end
     println("Arguments used for cross check:")
     for (arg,val) in parse_args(s)
@@ -87,49 +84,16 @@ function runCrossCheckFmu(checkPath::String, check::FmuCrossCheck)::FmuCrossChec
             @error "Unkown FMU Type. Only 'cs' and 'me' are valid types"
         end
         
-        # This block calculates the normalized root mean square error
-        squaredErrorSums = zeros(length(fmuRecordValueNames))
-        valueCount = zeros(length(fmuRecordValueNames))
-        minimalValues = []
-        maximalValues = []
-        for (simIndex, time) in enumerate(simData.values.t)
-            for (valIndex, value) in enumerate(fmuRefValues[1])
-                if value >= time
-                    for nameIndex = 1:length(fmuRecordValueNames)
-                        valueCount[nameIndex] += 1
-                        if (length(minimalValues) < nameIndex + 1)
-                            push!(minimalValues, fmuRefValues[nameIndex+1][valIndex])
-                        else
-                            minimalValues[nameIndex] = min(minimalValues[nameIndex], fmuRefValues[nameIndex+1][valIndex])
-                        end
-                        if (length(maximalValues) < nameIndex + 1)
-                            push!(maximalValues, fmuRefValues[nameIndex+1][valIndex])
-                        else
-                            maximalValues[nameIndex] = max(maximalValues[nameIndex], fmuRefValues[nameIndex+1][valIndex])
-                        end
-                        # println("Simulation time: $time, Simulation value: $(simData.values.saveval[simIndex][nameIndex]) Reference time: $(value) Reference Value: $(fmuRefValues[nameIndex+1][valIndex])")
-                        squaredErrorSums[nameIndex] += ((simData.values.saveval[simIndex][nameIndex] - fmuRefValues[nameIndex+1][valIndex]))^2
-                    end
-                    break;
-                end
-            end
-        end
-        errors = []
-        for recordValue = 1:length(fmuRecordValueNames)
-            valueRange = maximalValues[recordValue] - minimalValues[recordValue]
-            if (valueRange == 0)
-                valueRange = 1
-            end
-            value = (sqrt(squaredErrorSums[recordValue]/valueCount[recordValue])/(valueRange))
-            display(recordValue)
-            push!(errors, value)
-        end
-        display(errors)
-        check.result = mean(errors)
+        check.result = calucateNRMSE(fmuRecordValueNames, simData, fmuRefValues)
         check.skipped = false
-        check.success = true
+        if (check.result < NRMSE_THRESHHOLD)
+            check.success = true
+        else
+            check.success = false
+        end
         check.error = nothing
         fmiUnload(fmuToCheck)
+
     catch e
         check.result = nothing
         check.skipped = false
@@ -163,7 +127,7 @@ function main()
 
     #   Excecute FMUs
     crossChecks = getFmusToTest(fmiCrossCheckRepoPath, fmiVersion, os)
-    crossChecks = filter(c -> (c.type != CS && c.system == "CATIA"), crossChecks)
+    # crossChecks = filter(c -> (c.type != CS && c.system == "CATIA"), crossChecks)
     for (index, check) in enumerate(crossChecks)
         checkPath = joinpath(fmiCrossCheckRepoPath, "fmus", check.fmiVersion, check.type, check.os, check.system, check.systemVersion, check.fmuCheck)
         cd(checkPath)
@@ -178,17 +142,22 @@ function main()
     println("#################### Start FMI Cross check Summary ####################")
     println("\tTotal Cross checks:\t\t\t$(count(c -> (true), crossChecks))")
     println("\tSuccessfull Cross checks:\t\t\t$(count(c -> (c.success), crossChecks))")
-    println("\tFailed Cross checks:\t\t\t$(count(c -> (c.error !== nothing), crossChecks))")
+    println("\tFailed Cross checks:\t\t\t$(count(c -> (!c.success && c.error === nothing), crossChecks))")
+    println("\tCross checks with errors:\t\t\t$(count(c -> (c.error !== nothing), crossChecks))")
     println("\tSkipped Cross checks:\t\t\t$(count(c -> (c.skipped), crossChecks))")
     println("\tList of successfull Cross checks")
     for (index, success) in enumerate(filter(c -> (c.success), crossChecks))
-        println("\u001B[32m\t\t$(index):\t$(success)")
+        println("\u001B[32m\t\t$(index):\t$(success)\u001B[0m")
     end
-    println("\u001B[0m\tList of failed Cross checks")
+    println("\tList of failed Cross checks")
+    for (index, success) in enumerate(filter(c -> (!c.success && c.error === nothing && !c.skipped), crossChecks))
+        println("\u001B[31m\t\t$(index):\t$(success)\u001B[0m")
+    end
+    println("\tList of Cross checks with errors")
     for (index, error) in enumerate(filter(c -> (c.error !== nothing), crossChecks))
-        println("\u001B[31m\t\t$(index):\t$(error)")
+        println("\u001B[31m\t\t$(index):\t$(error)\u001B[0m")
     end
-    println("\u001B[0m#################### End FMI Cross check Summary ####################")
+    println("#################### End FMI Cross check Summary ####################")
 end
 
 main()

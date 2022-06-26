@@ -73,3 +73,52 @@ function getFmusToTest(repoPath::String, fmiVersion::String, os::String)::Vector
     end
     return results
 end
+
+"""
+Calculate the mean of all normalized root mean square errors for the different variables.
+It is normalized to the difference between the smallest and largest values of the respective variable
+# Arguments
+- `recordedVariables::Vector{String}`: List of all variable names that were recorded within the FMU simulation
+- `simData::FMU2Solution`: The solution data of the FMU (returned values of fmiSimulate())
+- `referenceData::Table`: Reference data that was provided with the cross check FMU that is used as basis for the error calculation
+# Returns
+- `nrmse::Float64`: the mean of the nrmse of all recorded variables
+"""
+function calucateNRMSE(recordedVariables::Vector{String}, simData::FMU2Solution, referenceData)::Float64
+    squaredErrorSums = zeros(length(recordedVariables))
+    valueCount = zeros(length(recordedVariables))
+    minimalValues = []
+    maximalValues = []
+    for (simIndex, time) in enumerate(simData.values.t)
+        for (valIndex, value) in enumerate(referenceData[1])
+            if value >= time
+                for nameIndex = 1:length(recordedVariables)
+                    valueCount[nameIndex] += 1
+                    if (length(minimalValues) < nameIndex + 1)
+                        push!(minimalValues, referenceData[nameIndex+1][valIndex])
+                    else
+                        minimalValues[nameIndex] = min(minimalValues[nameIndex], referenceData[nameIndex+1][valIndex])
+                    end
+                    if (length(maximalValues) < nameIndex + 1)
+                        push!(maximalValues, referenceData[nameIndex+1][valIndex])
+                    else
+                        maximalValues[nameIndex] = max(maximalValues[nameIndex], referenceData[nameIndex+1][valIndex])
+                    end
+                    println("Simulation time: $time, Simulation value: $(simData.values.saveval[simIndex][nameIndex]) Reference time: $(value) Reference Value: $(fmuRefValues[nameIndex+1][valIndex])")
+                    squaredErrorSums[nameIndex] += ((simData.values.saveval[simIndex][nameIndex] - referenceData[nameIndex+1][valIndex]))^2
+                end
+                break;
+            end
+        end
+    end
+    errors = []
+    for recordValue = 1:length(recordedVariables)
+        valueRange = maximalValues[recordValue] - minimalValues[recordValue]
+        if (valueRange == 0)
+            valueRange = 1
+        end
+        value = (sqrt(squaredErrorSums[recordValue]/valueCount[recordValue])/(valueRange))
+        push!(errors, value)
+    end
+    return mean(errors)
+end
