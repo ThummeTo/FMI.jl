@@ -64,8 +64,6 @@ function getFmusToTest(repoPath::String, fmiVersion::String, os::String)::Vector
                         @info "$checkPath is not compliant with latest rules"
                         compliant = false
                     end
-
-                    println("Checking $check")
                     push!(results, FmuCrossCheck(fmiVersion, type, os, system, version, check, compliant, missing, missing, missing, missing)) 
                 end
             end

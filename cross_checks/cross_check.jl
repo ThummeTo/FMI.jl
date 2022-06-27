@@ -21,6 +21,8 @@ const NRMSE_THRESHHOLD = 5
 # Main Array that holds all information about the excecuted cross checks and results
 crossChecks = []
 
+getInputValues = t -> t
+
 function parse_commandline()
     s = ArgParseSettings()
 
@@ -36,6 +38,7 @@ function parse_commandline()
         "--tempdir"
             help = "temporary directive that is used for cross checks and results"
             arg_type = String
+            default="C:\\Users\\Christof\\test"
         "--fmiversion"
             help = "FMI version that should be used for the cross checks"
             arg_type = String
@@ -54,15 +57,19 @@ function runCrossCheckFmu(checkPath::String, check::FmuCrossCheck)::FmuCrossChec
     try
         fmuToCheck = fmiLoad(pathToFMU)
         fmiInfo(fmuToCheck)
+        hasInputValues = false
 
-        ########TODO Implement input data##########
         if isfile(joinpath(checkPath, "$(check.fmuCheck)_in.csv"))
-            @warn "$pathToFMU not excecuted because inputs are not supported yet"
-            check.result = nothing
-            check.skipped = true
-            check.success = false
-            check.error = nothing
-            return check
+            inputValues = CSV.File(joinpath(checkPath, "$(check.fmuCheck)_in.csv")) |> Tables.rowtable |> Tables.columntable
+            hasInputValues = true
+            getInputValues = function(t)
+                for (valIndex, time) in enumerate(inputValues[1])
+                    if time >= t
+                        return [inputValues[2][valIndex]]
+                        break;
+                    end
+                end
+            end
         end
         
         # Read Options
@@ -75,13 +82,22 @@ function runCrossCheckFmu(checkPath::String, check::FmuCrossCheck)::FmuCrossChec
         fmuRecordValueNames = readdlm(joinpath(checkPath, "$(check.fmuCheck)_ref.csv"), ',', String)[1, 2:end]
         fmuRefValues = CSV.File(joinpath(checkPath, "$(check.fmuCheck)_ref.csv")) |> Tables.rowtable |> Tables.columntable
         
-        if check.type == CS
-            ######## TODO Fix CS excecution issues ##########
-            simData = fmiSimulateCS(fmuToCheck, tStart, tStop; tolerance=relTol, saveat=fmuRefValues[1],  recordValues=fmuRecordValueNames)
-        elseif check.type == ME
-            simData = fmiSimulateME(fmuToCheck, tStart, tStop; tolerance=relTol, saveat=fmuRefValues[1], recordValues=fmuRecordValueNames)
+        if hasInputValues
+            if check.type == CS
+                simData = fmiSimulateCS(fmuToCheck, tStart, tStop; tolerance=relTol, saveat=fmuRefValues[1], inputFunction=getInputValues, recordValues=fmuRecordValueNames)
+            elseif check.type == ME
+                simData = fmiSimulateME(fmuToCheck, tStart, tStop; reltol=relTol, saveat=fmuRefValues[1], inputFunction=getInputValues, recordValues=fmuRecordValueNames)
+            else
+                @error "Unkown FMU Type. Only 'cs' and 'me' are valid types"
+            end
         else
-            @error "Unkown FMU Type. Only 'cs' and 'me' are valid types"
+            if check.type == CS
+                simData = fmiSimulateCS(fmuToCheck, tStart, tStop; tolerance=relTol, saveat=fmuRefValues[1], recordValues=fmuRecordValueNames)
+            elseif check.type == ME
+                simData = fmiSimulateME(fmuToCheck, tStart, tStop; reltol=relTol, saveat=fmuRefValues[1], recordValues=fmuRecordValueNames)
+            else
+                @error "Unkown FMU Type. Only 'cs' and 'me' are valid types"
+            end
         end
         
         check.result = calucateNRMSE(fmuRecordValueNames, simData, fmuRefValues)
@@ -128,7 +144,7 @@ function main()
 
     #   Excecute FMUs
     crossChecks = getFmusToTest(fmiCrossCheckRepoPath, fmiVersion, os)
-    crossChecks = filter(c -> (c.system != "AMESim"), crossChecks)
+    crossChecks = filter(c -> (c.system != "AMESim" && c.system != "Test-FMUs"), crossChecks)
     for (index, check) in enumerate(crossChecks)
         checkPath = joinpath(fmiCrossCheckRepoPath, "fmus", check.fmiVersion, check.type, check.os, check.system, check.systemVersion, check.fmuCheck)
         cd(checkPath)
@@ -152,7 +168,7 @@ function main()
     end
     println("\tList of failed Cross checks")
     for (index, success) in enumerate(filter(c -> (!c.success && c.error === nothing && !c.skipped), crossChecks))
-        println("\u001B[31m\t\t$(index):\t$(success)\u001B[0m")
+        println("\u001B[33m\t\t$(index):\t$(success)\u001B[0m")
     end
     println("\tList of Cross checks with errors")
     for (index, error) in enumerate(filter(c -> (c.error !== nothing), crossChecks))
