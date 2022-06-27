@@ -3,10 +3,12 @@ name: Run Tests
 on:
   pull_request:
   push:
+    branches: 
+      - main
     paths:
-    - 'src/**'
-    - 'test/**'
-    - '.github/**'
+      - 'src/**'
+      - 'test/**'
+      - '.github/**'
 
 jobs:
   test:
