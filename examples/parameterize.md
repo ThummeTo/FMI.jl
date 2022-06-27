@@ -17,7 +17,7 @@ The example is primarily intended for users who work in the field of simulation 
 
 
 ## Other formats
-Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/main/example/CS_simulate.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/main/example/CS_simulate.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/main/docs/src/examples/CS_simulate.md) corresponding to the notebook.  
+Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/parameterize.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/parameterize.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/parameterize.md) corresponding to the notebook.  
 
 
 ## Getting started
@@ -73,9 +73,9 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_EWrZnX/IO`.
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_Moqg7c/IO`.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/4SJhD/src/FMI2_ext.jl:76
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_EWrZnX/IO/resources`
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_Moqg7c/IO/resources`
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/4SJhD/src/FMI2_ext.jl:192
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/4SJhD/src/FMI2_ext.jl:195
@@ -128,7 +128,7 @@ fmiInstantiate!(myFMU; loggingOn=true)
 
     FMU:            IO
     InstanceName:   IO
-    Address:        Ptr{Nothing} @0x0000000005166dd0
+    Address:        Ptr{Nothing} @0x0000000003d12bf0
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
@@ -247,7 +247,7 @@ paramsVal = generateRandomNumbers()
 
 
 
-    (68.4665536652687, false, 75, "Random number 72.16259118193804!")
+    (4.526746147529503, true, 50, "Random number 52.88001287861326!")
 
 
 
@@ -319,8 +319,8 @@ simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSa
     Success:
     	true
     Values [2]:
-    	0.0	(68.4665536652687, 0.0, 75.0)
-    	1.0	(68.4665536652687, 0.0, 75.0)
+    	0.0	(4.526746147529503, 1.0, 50.0)
+    	1.0	(4.526746147529503, 1.0, 50.0)
     Events [0]:
 
 
@@ -354,7 +354,7 @@ rndReal, rndBoolean, rndInteger, rndString = generateRandomNumbers()
 
 
 
-    (19.710753034556628, true, 66, "Random number 22.878599373783317!")
+    (67.73751656814306, false, 52, "Random number 29.818895035210446!")
 
 
 
@@ -416,8 +416,8 @@ simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSa
     Success:
     	true
     Values [2]:
-    	0.0	(19.710753034556628, 1.0, 66.0)
-    	1.0	(19.710753034556628, 1.0, 66.0)
+    	0.0	(67.73751656814306, 0.0, 52.0)
+    	1.0	(67.73751656814306, 0.0, 52.0)
     Events [0]:
 
 
