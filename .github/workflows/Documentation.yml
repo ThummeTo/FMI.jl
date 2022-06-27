@@ -6,7 +6,10 @@ on:
     types:
       - completed
   push:
-    branches: [main/docs]
+    branches: 
+      - main
+    paths:
+      - 'docs/**'
     tags: 
       - '*'
 
