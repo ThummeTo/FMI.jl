@@ -1,5 +1,1 @@
-*.md
-*.jl
-
-!readme.md
 .ipynb_checkpoints/
