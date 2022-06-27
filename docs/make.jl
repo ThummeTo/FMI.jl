@@ -8,7 +8,8 @@ using Documenter, FMI
 makedocs(sitename="FMI.jl",
          format = Documenter.HTML(
             collapselevel = 1,
-            sidebar_sitename = false
+            sidebar_sitename = false,
+            edit_link = nothing
          ),
          pages= Any[
             "Introduction" => "index.md"
