@@ -48,7 +48,7 @@ jobs:
               - 'examples/**.ipynb'
             changed:
               - added|modified: 'examples/**.ipynb'
-          ref: examples
+          base: examples
                         
       - name: "Execute and synchronize changed files"    
         if: ${{ steps.filter.outputs.changed == 'true' }}
