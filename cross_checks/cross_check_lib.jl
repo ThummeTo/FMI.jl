@@ -104,7 +104,7 @@ function calucateNRMSE(recordedVariables::Vector{String}, simData::FMU2Solution,
                     else
                         maximalValues[nameIndex] = max(maximalValues[nameIndex], referenceData[nameIndex+1][valIndex])
                     end
-                    println("Simulation time: $time, Simulation value: $(simData.values.saveval[simIndex][nameIndex]) Reference time: $(value) Reference Value: $(fmuRefValues[nameIndex+1][valIndex])")
+                    # println("Simulation time: $time, Simulation value: $(simData.values.saveval[simIndex][nameIndex]) Reference time: $(value) Reference Value: $(referenceData[nameIndex+1][valIndex])")
                     squaredErrorSums[nameIndex] += ((simData.values.saveval[simIndex][nameIndex] - referenceData[nameIndex+1][valIndex]))^2
                 end
                 break;

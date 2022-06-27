@@ -77,9 +77,9 @@ function runCrossCheckFmu(checkPath::String, check::FmuCrossCheck)::FmuCrossChec
         
         if check.type == CS
             ######## TODO Fix CS excecution issues ##########
-            # simData = fmiSimulate(fmuToCheck, tStart, tStop; recordValues=fmuVarNames)
+            simData = fmiSimulateCS(fmuToCheck, tStart, tStop; tolerance=relTol, saveat=fmuRefValues[1],  recordValues=fmuRecordValueNames)
         elseif check.type == ME
-            simData = fmiSimulateME(fmuToCheck, tStart, tStop; reltol=relTol, saveat=fmuRefValues.time, recordValues=fmuRecordValueNames)
+            simData = fmiSimulateME(fmuToCheck, tStart, tStop; tolerance=relTol, saveat=fmuRefValues[1], recordValues=fmuRecordValueNames)
         else
             @error "Unkown FMU Type. Only 'cs' and 'me' are valid types"
         end
@@ -95,6 +95,7 @@ function runCrossCheckFmu(checkPath::String, check::FmuCrossCheck)::FmuCrossChec
         fmiUnload(fmuToCheck)
 
     catch e
+        @warn e
         check.result = nothing
         check.skipped = false
         io = IOBuffer();
@@ -127,7 +128,7 @@ function main()
 
     #   Excecute FMUs
     crossChecks = getFmusToTest(fmiCrossCheckRepoPath, fmiVersion, os)
-    # crossChecks = filter(c -> (c.type != CS && c.system == "CATIA"), crossChecks)
+    crossChecks = filter(c -> (c.system != "AMESim"), crossChecks)
     for (index, check) in enumerate(crossChecks)
         checkPath = joinpath(fmiCrossCheckRepoPath, "fmus", check.fmiVersion, check.type, check.os, check.system, check.systemVersion, check.fmuCheck)
         cd(checkPath)
@@ -142,7 +143,7 @@ function main()
     println("#################### Start FMI Cross check Summary ####################")
     println("\tTotal Cross checks:\t\t\t$(count(c -> (true), crossChecks))")
     println("\tSuccessfull Cross checks:\t\t\t$(count(c -> (c.success), crossChecks))")
-    println("\tFailed Cross checks:\t\t\t$(count(c -> (!c.success && c.error === nothing), crossChecks))")
+    println("\tFailed Cross checks:\t\t\t$(count(c -> (!c.success && c.error === nothing && !c.skipped), crossChecks))")
     println("\tCross checks with errors:\t\t\t$(count(c -> (c.error !== nothing), crossChecks))")
     println("\tSkipped Cross checks:\t\t\t$(count(c -> (c.skipped), crossChecks))")
     println("\tList of successfull Cross checks")
