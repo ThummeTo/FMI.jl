@@ -29,7 +29,7 @@ jobs:
           SRC_FOLDER_PATH: 'examples'
         run: |
           git fetch
-          git --work-tree=/docs/src checkout ${SRC_BRANCH/} -- $SRC_FOLDER_PATH/*.md $SRC_FOLDER_PATH/**.svg
+          git --work-tree=./docs/src checkout ${SRC_BRANCH/} -- $SRC_FOLDER_PATH/*.md $SRC_FOLDER_PATH/*.svg
 
       - name: "Copy readme"
         uses: canastro/copy-file-action@master
