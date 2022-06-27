@@ -1,10 +1,11 @@
 name = "FMI"
 uuid = "14a09403-18e3-468f-ad8a-74f8dda2d9ac"
 authors = ["TT <tobias.thummerer@informatik.uni-augsburg.de>", "LM <lars.mikelsons@informatik.uni-augsburg.de>", "JK <josef.kircher@student.uni-augsburg.de>"]
-version = "0.8.3"
+version = "0.8.6"
 
 [deps]
 ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+Downloads = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 DiffEqCallbacks = "459566f4-90b8-5000-8ac3-15dfb0a30def"
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
 FMIExport = "31b88311-cab6-44ed-ba9c-fe5a9abbd67a"
@@ -19,8 +20,8 @@ SciMLBase = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
 ChainRulesCore = "^1.13.0"
 DiffEqCallbacks = "^2.21.0"
 DifferentialEquations = "7.1.0"
-FMIExport = "0.1.2"
-FMIImport = "0.8.0, 0.7"
+FMIExport = "0.1.4"
+FMIImport = "0.9.3"
 ForwardDiff = "0.10.25"
 OrdinaryDiffEq = "^6.7.0"
 ProgressMeter = "1.7.2"
