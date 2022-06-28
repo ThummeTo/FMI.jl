@@ -25,10 +25,7 @@ makedocs(sitename="FMI.jl",
                 "Multithreading" => "examples/multithreading.md"
                 "Multiprocessing" => "examples/multiprocessing.md"
             ]
-            "Library Functions" => Any[
-                "FMI version independent library functions" => "library/library.md",
-                "FMU version independent functions" => "library/fmu.md"
-            ]
+            "Library Functions" => "library.md"
             "Related Publication" => "related.md"
             "Contents" => "contents.md"
             ]
