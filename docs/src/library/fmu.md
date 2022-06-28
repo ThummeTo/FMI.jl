@@ -3,13 +3,12 @@
 ## Parsing variable names to ValueReferences
 
 ```@docs
-fmiString2ValueReference
+fmiStringToValueReference
 ```
 
 ## Opening and closing FMUs
 
 ```@docs
-fmiUnzip
 fmiLoad
 fmiUnload
 ```
