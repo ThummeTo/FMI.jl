@@ -4,11 +4,13 @@
 #
 
 using Documenter, FMI
+using Documenter: GitHubActions
 
 makedocs(sitename="FMI.jl",
          format = Documenter.HTML(
             collapselevel = 1,
-            sidebar_sitename = false
+            sidebar_sitename = false,
+            edit_link = nothing
          ),
          pages= Any[
             "Introduction" => "index.md"
@@ -32,4 +34,14 @@ makedocs(sitename="FMI.jl",
             ]
          )
 
-deploydocs(repo = "github.com/ThummeTo/FMI.jl.git", devbranch = "main")
+function deployConfig()
+    github_repository = get(ENV, "GITHUB_REPOSITORY", "")
+    github_event_name = get(ENV, "GITHUB_EVENT_NAME", "")
+    if github_event_name == "workflow_run"
+        github_event_name = "push"
+    end
+    github_ref = get(ENV, "GITHUB_REF", "")
+    return GitHubActions(github_repository, github_event_name, github_ref)
+end
+
+deploydocs(repo = "github.com/ThummeTo/FMI.jl.git", devbranch = "main", deploy_config = deployConfig())
