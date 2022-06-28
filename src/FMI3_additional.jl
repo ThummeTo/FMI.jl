@@ -16,6 +16,8 @@ using FMIImport: fmi3DependencyKindDependent, fmi3DependencyKindFixed
 using FMIImport: fmi3CallbackLogger, fmi3CallbackIntermediateUpdate, fmi3CallbackClockUpdate, fmi3Instance
 import FMIImport: fmi3VariableNamingConventionFlat, fmi3VariableNamingConventionStructured
 
+using ZipFile, EzXML
+
 """ 
 Returns how a variable depends on another variable based on the model description.
 """
@@ -222,8 +224,9 @@ function fmiCheckVersion(pathToFMU::String; unpackPath=nothing)
 
     # read version tag
 
-    doc = readxml(unzippedAbsPath)
+    doc = readxml(normpath(joinpath(unzippedAbsPath, "modelDescription.xml")))
 
+    root = doc.root
     version = root["fmiVersion"]
 
     # cleanup unzipped modelDescription
