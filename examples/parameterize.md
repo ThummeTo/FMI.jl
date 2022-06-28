@@ -73,12 +73,12 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_UPiYDD/IO`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/4SJhD/src/FMI2_ext.jl:76
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_UPiYDD/IO/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/4SJhD/src/FMI2_ext.jl:192
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_ATyziN/IO`.
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:76
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_ATyziN/IO/resources`
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:192
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/4SJhD/src/FMI2_ext.jl:195
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:195
 
 
     #################### Begin information for FMU ####################
@@ -128,9 +128,9 @@ fmiInstantiate!(myFMU; loggingOn=true)
 
     FMU:            IO
     InstanceName:   IO
-    Address:        Ptr{Nothing} @0x0000000002fd45c0
+    Address:        Ptr{Nothing} @0x00000000021bd4d0
     State:          fmi2ComponentStateInstantiated
-    Logging:        true
+    Logging:        false
     FMU time:       -Inf
     FMU states:     nothing
 
@@ -247,7 +247,7 @@ paramsVal = generateRandomNumbers()
 
 
 
-    (16.839588124492643, true, 28, "Random number 51.99380897580317!")
+    (9.362993423569854, false, 16, "Random number 69.05064750730065!")
 
 
 
@@ -319,8 +319,8 @@ simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSa
     Success:
     	true
     Values [2]:
-    	0.0	(16.839588124492643, 1.0, 28.0)
-    	1.0	(16.839588124492643, 1.0, 28.0)
+    	0.0	(9.362993423569854, 0.0, 16.0)
+    	1.0	(9.362993423569854, 0.0, 16.0)
     Events [0]:
 
 
@@ -354,7 +354,7 @@ rndReal, rndBoolean, rndInteger, rndString = generateRandomNumbers()
 
 
 
-    (30.850195555211823, false, 92, "Random number 19.23157438872083!")
+    (27.23932694162292, false, 91, "Random number 41.63570456247439!")
 
 
 
@@ -416,8 +416,8 @@ simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSa
     Success:
     	true
     Values [2]:
-    	0.0	(30.850195555211823, 0.0, 92.0)
-    	1.0	(30.850195555211823, 0.0, 92.0)
+    	0.0	(27.23932694162292, 0.0, 91.0)
+    	1.0	(27.23932694162292, 0.0, 91.0)
     Events [0]:
 
 

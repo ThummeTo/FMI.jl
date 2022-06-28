@@ -79,12 +79,12 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_wi0cOO/SpringFrictionPendulum1D`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/4SJhD/src/FMI2_ext.jl:76
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_wi0cOO/SpringFrictionPendulum1D/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/4SJhD/src/FMI2_ext.jl:192
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_QKZtS6/SpringFrictionPendulum1D`.
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:76
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_QKZtS6/SpringFrictionPendulum1D/resources`
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:192
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/4SJhD/src/FMI2_ext.jl:195
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:195
 
 
     #################### Begin information for FMU ####################
@@ -164,7 +164,7 @@ In the function `fmiSimulateME()` the FMU is simulated in model-exchange mode (M
 dataME = fmiSimulateME(myFMU, tStart, tStop; saveat=tSave)
 ```
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:13[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:11[39m
 
 
 
