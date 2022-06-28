@@ -16,14 +16,14 @@ makedocs(sitename="FMI.jl",
             "Introduction" => "index.md"
             "Features" => "features.md"
             "Examples" => [
-                "examples/overview.md"
-                "examples/simulate.md"
-                "examples/parameterize.md"
-                "examples/multiple_instances.md"
-                "examples/modelica_conference_2021.md"
-                "examples/manipulation.md"
-                "examples/multithreading.md"
-                "examples/multiprocessing.md"
+                "Overview" => "examples/overview.md"
+                "Simulate" => "examples/simulate.md"
+                "Parameterize" => "examples/parameterize.md"
+                "Multiple instances" => "examples/multiple_instances.md"
+                "Modelica conference 2021" => "examples/modelica_conference_2021.md"
+                "Manipulation" => "examples/manipulation.md"
+                "Multithreading" => "examples/multithreading.md"
+                "Multiprocessing" => "examples/multiprocessing.md"
             ]
             "Library Functions" => Any[
                 "FMI version independent library functions" => "library/library.md",
