@@ -15,6 +15,7 @@ makedocs(sitename="FMI.jl",
          pages= Any[
             "Introduction" => "index.md"
             "Features" => "features.md"
+            "FAQ" => "faq.md"
             "Examples" => [
                 "examples/overview.md"
                 "examples/simulate.md"
