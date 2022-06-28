@@ -12,12 +12,15 @@ Because not all users need the full potential of this configuration tool, there 
 - `myFMU.executionConfig = FMU2_EXECUTION_CONFIGURATION_NO_FREEING` should only be the very last choise. If your FMU neither supports `fmi2Reset` nor a proper `fmi2FreeInstance`, you could use this configuration as a last way out. Keep in mind, that new FMU instances are allocated but not freed, as long as your Julia instance is running (memory leak). In general, the amount of leaked memory is small, but you need to know what you are doing, if you do thousands or ten-thousands of simulation runs with such a FMU.
 
 ## Debugging / Logging
+### Logging FMI-calls
+To log all FMI-calls that happen (including "hidden" calls e.g. if you are using `fmiSimulate`) you can enable debugging for *FMICore.jl* using `ENV["JULIA_DEBUG"] = "FMICore"`. This will log any `fmi2xxx`-call, including the given parameters and return value.
+### Printing internal FMU messages
 Many FMUs support for printing debugging messages. To force message printing, you can use the keyword `logginOn=true` either ...
 - in the call `fmiInstantiate`, for example `fmiInstantiate(myFMU; loggingOn=true)` or
 - as part of the `executionConfig`, for example `myFMU.executionConfig.loggingOn=true`
-You can further control which message types - like `OK`, `Warning`, `Discard`, `Error`, `Fatal`, `Pending` - should be logged by using the keywords `logStatus{TYPE}=true` as part of `fmiInstantiate` or the execution configuration. By default, all are activated.
+You can further control which message types - like `OK`, `Warning`, `Discard`, `Error`, `Fatal`, `Pending` - should be logged by using the keywords `logStatus{TYPE}=true` as part of `fmiInstantiate` or (soon) the execution configuration. By default, all are activated.
 If the FMU uses a variadic callback function for messages (this is not supported by Julia at this time), you may need to activate external callbacks with the keyword `externalCallbacks=true` either ...
-- in the call `fmiInstantiate`, for example `fmiInstantiate(myFMU; loggingOn=true, externalCallbacks=true)` or
+- in the call `fmiInstantiate!`, for example `fmiInstantiate!(myFMU; loggingOn=true, externalCallbacks=true)` or
 - as part of the `executionConfig`, for example `myFMU.executionConfig.loggingOn=true; myFMU.executionConfig.externalCallbacks=true`
 Note, that external callbacks are currently only supported on windows.
 
