@@ -17,8 +17,8 @@ addprocs(n_procs; exeflags=`--project=$(Base.active_project()) --threads=auto`, 
 # @everywhere println(Base.active_project())
 # @everywhere println(gethostname())
 # @everywhere println(VERSION)
-# @everywhere println(Threads.nthreads())</code></pre><pre><code class="language-none">Hello World!
-      From worker 2:	Hello World!
+# @everywhere println(Threads.nthreads())</code></pre><pre><code class="language-none">      From worker 2:	Hello World!
+Hello World!
       From worker 4:	Hello World!
       From worker 3:	Hello World!
       From worker 5:	Hello World!</code></pre><h3 id="Simulation-setup"><a class="docs-heading-anchor" href="#Simulation-setup">Simulation setup</a><a id="Simulation-setup-1"></a><a class="docs-heading-anchor-permalink" href="#Simulation-setup" title="Permalink"></a></h3><p>Next, the batch size and input values are defined.</p><pre><code class="language-julia">
@@ -27,22 +27,22 @@ batchSize = 16
 
 # Define an array of arrays randomly
 input_values = collect(collect.(eachrow(rand(batchSize,2))))</code></pre><pre><code class="language-none">16-element Vector{Vector{Float64}}:
- [0.8243447904471213, 0.7359795068190955]
- [0.01570064876657562, 0.5827714274791667]
- [0.20100175668889464, 0.9477698196229023]
- [0.5217934063337082, 0.28298517286341407]
- [0.3498166532446434, 0.30240208200128094]
- [0.033034440452462066, 0.176440155618661]
- [0.3427939768034578, 0.7785204568389235]
- [0.5068392680008238, 0.4674702318560242]
- [0.33062120447397736, 0.5915056808930339]
- [0.15721194610075084, 0.09038646116195803]
- [0.10113427592753421, 0.8764474754340819]
- [0.14393335488933268, 0.2944084985540083]
- [0.14783012963135422, 0.9000951726806397]
- [0.8310771608208003, 0.30215742190660366]
- [0.6184206999665831, 0.7259621928479385]
- [0.219558074384695, 0.04018941168947476]</code></pre><h3 id="Shared-Module"><a class="docs-heading-anchor" href="#Shared-Module">Shared Module</a><a id="Shared-Module-1"></a><a class="docs-heading-anchor-permalink" href="#Shared-Module" title="Permalink"></a></h3><p>For Distributed we need to embed the FMU into its own <code>module</code>. This prevents Distributed from trying to serialize and send the FMU over the network, as this can cause issues. This module needs to be made available on all processes using <code>@everywhere</code>.</p><pre><code class="language-julia">@everywhere module SharedModule
+ [0.8937073015144201, 0.248872047388623]
+ [0.18605649453290285, 0.24678440686050473]
+ [0.2503397152356641, 0.008334650612469297]
+ [0.33866306832670734, 0.24401157678971463]
+ [0.5008895470407293, 0.5131027842572513]
+ [0.9830946504810372, 0.42927070608525697]
+ [0.0643606140912163, 0.08493390149798308]
+ [0.5991562327842681, 0.7345071685162139]
+ [0.22571197222904216, 0.6464434293390133]
+ [0.5445567201126928, 0.7744545445149904]
+ [0.7797332402675154, 0.6685306361560912]
+ [0.7284347291280477, 0.17200321575934785]
+ [0.13259011229138995, 0.23264554684290295]
+ [0.35214027607830345, 0.5388816889430514]
+ [0.5972910494126518, 0.961221359177423]
+ [0.9476492955547167, 0.4424298735640273]</code></pre><h3 id="Shared-Module"><a class="docs-heading-anchor" href="#Shared-Module">Shared Module</a><a id="Shared-Module-1"></a><a class="docs-heading-anchor-permalink" href="#Shared-Module" title="Permalink"></a></h3><p>For Distributed we need to embed the FMU into its own <code>module</code>. This prevents Distributed from trying to serialize and send the FMU over the network, as this can cause issues. This module needs to be made available on all processes using <code>@everywhere</code>.</p><pre><code class="language-julia">@everywhere module SharedModule
     using FMIZoo
     using FMI
 
@@ -53,34 +53,34 @@ input_values = collect(collect.(eachrow(rand(batchSize,2))))</code></pre><pre><c
     tData = collect(t_start:t_step:t_stop)
 
     model_fmu = FMIZoo.fmiLoad(&quot;SpringPendulum1D&quot;, &quot;Dymola&quot;, &quot;2022x&quot;)
-end</code></pre><pre><code class="language-none">[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_XWf5Tc/SpringPendulum1D`.
-[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU resources location is `file:////tmp/fmijl_XWf5Tc/SpringPendulum1D/resources`
-[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_tPo5pg/SpringPendulum1D`.
-┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_8IspYR/SpringPendulum1D`.
+end</code></pre><pre><code class="language-none">┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_HisAdC/SpringPendulum1D`.
 └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:76
-[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_mcK2T3/SpringPendulum1D`.
-[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU resources location is `file:////tmp/fmijl_tPo5pg/SpringPendulum1D/resources`
-[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU resources location is `file:////tmp/fmijl_mcK2T3/SpringPendulum1D/resources`
-[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_8IspYR/SpringPendulum1D/resources`
+┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_HisAdC/SpringPendulum1D/resources`
 └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:192
 ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
 └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:195
-[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_KudV2r/SpringPendulum1D`.
-[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU resources location is `file:////tmp/fmijl_KudV2r/SpringPendulum1D/resources`
+[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_EUk0fp/SpringPendulum1D`.
+[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_S603Re/SpringPendulum1D`.
+[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU resources location is `file:////tmp/fmijl_EUk0fp/SpringPendulum1D/resources`
+[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
+[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU resources location is `file:////tmp/fmijl_S603Re/SpringPendulum1D/resources`
+[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
+[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_QJSYr4/SpringPendulum1D`.
+[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_PY7YFk/SpringPendulum1D`.
+[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU resources location is `file:////tmp/fmijl_QJSYr4/SpringPendulum1D/resources`
+[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
+[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU resources location is `file:////tmp/fmijl_PY7YFk/SpringPendulum1D/resources`
 [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.</code></pre><p>We define a helper function to calculate the FMU and combine it into an Matrix.</p><pre><code class="language-julia">@everywhere function runCalcFormatted(fmu, x0, recordValues=[&quot;mass.s&quot;, &quot;mass.v&quot;])
     data = fmiSimulateME(fmu, SharedModule.t_start, SharedModule.t_stop; recordValues=recordValues, saveat=SharedModule.tData, x0=x0, showProgress=false, dtmax=1e-4)
     return reduce(hcat, data.states.u)
 end</code></pre><p>Running a single evaluation is pretty quick, therefore the speed can be better tested with BenchmarkTools.</p><pre><code class="language-julia">@benchmark data = runCalcFormatted(SharedModule.model_fmu, rand(2))</code></pre><pre><code class="language-none">BenchmarkTools.Trial: 8 samples with 1 evaluation.
- Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m658.476 ms[22m[39m … [35m697.960 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m2.93% … 2.71%
- Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m671.487 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m2.88%
- Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m673.886 ms[22m[39m ± [32m 12.096 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m3.36% ± 0.71%
+ Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m684.822 ms[22m[39m … [35m761.190 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m5.34% … 3.31%
+ Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m704.105 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m3.52%
+ Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m708.305 ms[22m[39m ± [32m 24.183 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m3.88% ± 0.92%
 
-  [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m█[39m [39m [39m [39m [39m [34m█[39m[39m█[39m [39m [39m [32m [39m[39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
-  [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[34m█[39m[39m█[39m▁[39m▁[39m▁[32m▁[39m[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-  658 ms[90m           Histogram: frequency by time[39m          698 ms [0m[1m&lt;[22m
+  [39m█[39m [39m [39m█[39m [39m [39m [39m [39m█[39m█[34m [39m[39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m█[39m [39m█[39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
+  [39m█[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m█[39m█[34m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m█[39m▁[39m█[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
+  685 ms[90m           Histogram: frequency by time[39m          761 ms [0m[1m&lt;[22m
 
  Memory estimate[90m: [39m[33m155.95 MiB[39m, allocs estimate[90m: [39m[33m3602373[39m.</code></pre><h3 id="Single-Threaded-Batch-Execution"><a class="docs-heading-anchor" href="#Single-Threaded-Batch-Execution">Single Threaded Batch Execution</a><a id="Single-Threaded-Batch-Execution-1"></a><a class="docs-heading-anchor-permalink" href="#Single-Threaded-Batch-Execution" title="Permalink"></a></h3><p>To compute a batch we can collect multiple evaluations. In a single threaded context we can use the same FMU for every call.</p><pre><code class="language-julia">println(&quot;Single Threaded&quot;)
 @benchmark collect(runCalcFormatted(SharedModule.model_fmu, i) for i in input_values)</code></pre><pre><code class="language-none">Single Threaded
@@ -90,7 +90,7 @@ end</code></pre><p>Running a single evaluation is pretty quick, therefore the sp
 
 
 BenchmarkTools.Trial: 1 sample with 1 evaluation.
- Single result which took [34m10.956 s[39m (3.74% GC) to evaluate,
+ Single result which took [34m11.282 s[39m (4.21% GC) to evaluate,
  with a memory estimate of [33m2.44 GiB[39m, over [33m57637956[39m allocations.</code></pre><h3 id="Multithreaded-Batch-Execution"><a class="docs-heading-anchor" href="#Multithreaded-Batch-Execution">Multithreaded Batch Execution</a><a id="Multithreaded-Batch-Execution-1"></a><a class="docs-heading-anchor-permalink" href="#Multithreaded-Batch-Execution" title="Permalink"></a></h3><p>In a multithreaded context we have to provide each thread it&#39;s own fmu, as they are not thread safe. To spread the execution of a function to multiple processes, the function <code>pmap</code> can be used.</p><pre><code class="language-julia">println(&quot;Multi Threaded&quot;)
 @benchmark pmap(i -&gt; runCalcFormatted(SharedModule.model_fmu, i), input_values)</code></pre><pre><code class="language-none">Multi Threaded
 
@@ -99,5 +99,5 @@ BenchmarkTools.Trial: 1 sample with 1 evaluation.
 
 
 BenchmarkTools.Trial: 1 sample with 1 evaluation.
- Single result which took [34m6.279 s[39m (0.00% GC) to evaluate,
- with a memory estimate of [33m84.27 KiB[39m, over [33m1290[39m allocations.</code></pre><p>As you can see, there is a significant speed-up in the median execution time. But: The speed-up is often much smaller than <code>n_procs</code> (or the number of physical cores of your CPU), this has different reasons. For a rule of thumb, the speed-up should be around <code>n/2</code> on a <code>n</code>-core-processor with <code>n</code> Julia processes.</p><h3 id="Unload-FMU"><a class="docs-heading-anchor" href="#Unload-FMU">Unload FMU</a><a id="Unload-FMU-1"></a><a class="docs-heading-anchor-permalink" href="#Unload-FMU" title="Permalink"></a></h3><p>After calculating the data, the FMU is unloaded and all unpacked data on disc is removed.</p><pre><code class="language-julia">@everywhere fmiUnload(SharedModule.model_fmu)</code></pre><h3 id="Summary"><a class="docs-heading-anchor" href="#Summary">Summary</a><a id="Summary-1"></a><a class="docs-heading-anchor-permalink" href="#Summary" title="Permalink"></a></h3><p>In this tutorial it is shown how multi processing with <code>Distributed.jl</code> can be used to improve the performance for calculating a Batch of FMUs.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../multithreading/">« Multithreading</a><a class="docs-footer-nextpage" href="../../library/library/">FMI version independent library functions »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 28 June 2022 14:07">Tuesday 28 June 2022</span>. Using Julia version 1.6.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ Single result which took [34m6.193 s[39m (0.00% GC) to evaluate,
+ with a memory estimate of [33m84.20 KiB[39m, over [33m1287[39m allocations.</code></pre><p>As you can see, there is a significant speed-up in the median execution time. But: The speed-up is often much smaller than <code>n_procs</code> (or the number of physical cores of your CPU), this has different reasons. For a rule of thumb, the speed-up should be around <code>n/2</code> on a <code>n</code>-core-processor with <code>n</code> Julia processes.</p><h3 id="Unload-FMU"><a class="docs-heading-anchor" href="#Unload-FMU">Unload FMU</a><a id="Unload-FMU-1"></a><a class="docs-heading-anchor-permalink" href="#Unload-FMU" title="Permalink"></a></h3><p>After calculating the data, the FMU is unloaded and all unpacked data on disc is removed.</p><pre><code class="language-julia">@everywhere fmiUnload(SharedModule.model_fmu)</code></pre><h3 id="Summary"><a class="docs-heading-anchor" href="#Summary">Summary</a><a id="Summary-1"></a><a class="docs-heading-anchor-permalink" href="#Summary" title="Permalink"></a></h3><p>In this tutorial it is shown how multi processing with <code>Distributed.jl</code> can be used to improve the performance for calculating a Batch of FMUs.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../multithreading/">« Multithreading</a><a class="docs-footer-nextpage" href="../../library/library/">FMI version independent library functions »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 28 June 2022 14:56">Tuesday 28 June 2022</span>. Using Julia version 1.6.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
