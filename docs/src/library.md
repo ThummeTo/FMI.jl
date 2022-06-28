@@ -36,18 +36,6 @@ fmiInfo
 fmiGet
 fmiGet!
 fmiSet
-fmiGetReal
-fmiGetReal!
-fmiSetReal
-fmiGetInteger
-fmiGetInteger!
-fmiSetInteger
-fmiGetBoolean
-fmiGetBoolean!
-fmiSetBoolean
-fmiGetString
-fmiGetString!
-fmiSetString
 ```
 
 ## Simulate FMU
