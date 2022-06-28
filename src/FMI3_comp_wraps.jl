@@ -740,6 +740,17 @@ function fmi3GetNumberOfContinuousStates(fmu::FMU3)
 end
 
 """
+    fmi3GetNumberOfEventIndicators(fmu::FMU3)
+
+Wrapper for fmi3GetNumberOfEventIndicators() in FMIImport/FMI3_c.jl
+"""
+function fmi3GetNumberOfEventIndicators(fmu::FMU3)
+    @assert length(fmu.instances) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+
+    fmi3GetNumberOfEventIndicators(fmu.instances[end])
+end
+
+"""
     fmi3GetNumberOfVariableDependencies(fmu::FMU3, vr::Union{fmi3ValueReference, String})
     
 Wrapper for fmi3GetNumberOfVariableDependencies() in FMIImport/FMI3_c.jl
