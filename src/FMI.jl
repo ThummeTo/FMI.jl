@@ -38,6 +38,7 @@ import FMIImport: fmi2Get, fmi2Get!, fmi2Set
 import FMIImport: fmi2GetSolutionTime, fmi2GetSolutionState, fmi2GetSolutionValue
 export fmi2GetSolutionTime, fmi2GetSolutionState, fmi2GetSolutionValue
 
+# fmi3 imports
 import FMIImport: fmi3CallbackLogger, fmi3CallbackIntermediateUpdate, fmi3CallbackClockUpdate
 import FMIImport: fmi3InstanceState, fmi3InstanceStateInstantiated, fmi3InstanceStateInitializationMode, fmi3InstanceStateEventMode, fmi3InstanceStateContinuousTimeMode, fmi3InstanceStateTerminated, fmi3InstanceStateError, fmi3InstanceStateFatal
 import FMIImport: fmi3InstantiateModelExchange, fmi3InstantiateCoSimulation, fmi3InstantiateScheduledExecution, fmi3FreeInstance!, fmi3GetVersion
@@ -50,14 +51,14 @@ import FMIImport: fmi3SetIntervalDecimal, fmi3SetIntervalFraction, fmi3GetInterv
 import FMIImport: fmi3ActivateModelPartition
 import FMIImport: fmi3GetNumberOfVariableDependencies!, fmi3GetVariableDependencies!
 import FMIImport: fmi3GetDirectionalDerivative!, fmi3GetAdjointDerivative!, fmi3GetOutputDerivatives!
-import FMIImport: fmi3DoStep
+import FMIImport: fmi3DoStep!
 import FMIImport: fmi3EnterConfigurationMode, fmi3ExitConfigurationMode, fmi3GetNumberOfContinuousStates!, fmi3GetNumberOfEventIndicators!, fmi3GetContinuousStates!, fmi3GetNominalsOfContinuousStates!
 import FMIImport: fmi3EvaluateDiscreteStates, fmi3EnterStepMode
 import FMIImport: fmi3SetTime, fmi3SetContinuousStates, fmi3EnterEventMode, fmi3UpdateDiscreteStates, fmi3EnterContinuousTimeMode, fmi3CompletedIntegratorStep!
 import FMIImport: fmi3GetContinuousStateDerivatives, fmi3GetEventIndicators, fmi3GetContinuousStates, fmi3GetNominalsOfContinuousStates
 import FMIImport: fmi3StringToValueReference, fmi3ValueReferenceToString, fmi3ModelVariablesForValueReference
 import FMIImport: fmi3GetFloat32, fmi3GetFloat64, fmi3GetInt8, fmi3GetUInt8, fmi3GetInt16, fmi3GetUInt16, fmi3GetInt32, fmi3GetUInt32, fmi3GetInt64, fmi3GetUInt64, fmi3GetBoolean, fmi3GetBinary, fmi3GetClock, fmi3GetString
-import FMIImport: fmi3GetFMUState, fmi3SerializedFMUStateSize, fmi3SerializeFMUState, fmiDeSerializeFMUState
+import FMIImport: fmi3GetFMUState, fmi3SerializedFMUStateSize, fmi3SerializeFMUState, fmi3DeSerializeFMUState
 import FMIImport: fmi3GetDirectionalDerivative, fmi3GetAdjointDerivative
 import FMIImport: fmi3GetStartValue, fmi3SampleDirectionalDerivative, fmi3CompletedIntegratorStep
 import FMIImport: fmi3Unzip, fmi3Load, loadBinary, fmi3Reload, fmi3Unload, fmi3InstantiateModelExchange!, fmi3InstantiateCoSimulation!, fmi3InstantiateScheduledExecution!
@@ -65,8 +66,8 @@ import FMIImport: fmi3SampleDirectionalDerivative!
 import FMIImport: fmi3GetJacobian, fmi3GetJacobian!, fmi3GetFullJacobian, fmi3GetFullJacobian!
 import FMIImport: fmi3LoadModelDescription
 import FMIImport: fmi3GetDefaultStartTime, fmi3GetDefaultStopTime, fmi3GetDefaultTolerance, fmi3GetDefaultStepSize
-import FMIImport: fmi3GetModelName, fmi3GetInstantiationToken, fmi3GetGenerationTool, fmi3GetGenerationDateAndTime, fmi3GetVariableNamingConvention, fmi3GetNumberOfEventIndicators, fmi3GetNumberOfStates, fmi3IsCoSimulation, fmi3IsModelExchange, fmi3IsScheduledExecution
-import FMIImport: fmi3DependenciesSupported, fmi3GetModelIdentifier, fmi3CanGetSetState, fmi3CanSerializeFMUState, fmi3ProvidesDirectionalDerivatives, fmi3ProvidesAdjointDerivatves
+import FMIImport: fmi3GetModelName, fmi3GetInstantiationToken, fmi3GetGenerationTool, fmi3GetGenerationDateAndTime, fmi3GetVariableNamingConvention, fmi3GetNumberOfEventIndicators, fmi3GetNumberOfContinuousStates, fmi3IsCoSimulation, fmi3IsModelExchange, fmi3IsScheduledExecution
+import FMIImport: fmi3DependenciesSupported, fmi3GetModelIdentifier, fmi3CanGetSetState, fmi3CanSerializeFMUState, fmi3ProvidesDirectionalDerivatives, fmi3ProvidesAdjointDerivatives
 import FMIImport: fmi3Get, fmi3Get!, fmi3Set 
 import FMIImport: fmi3GetSolutionTime, fmi3GetSolutionState, fmi3GetSolutionValue
 export fmi3GetSolutionTime, fmi3GetSolutionState, fmi3GetSolutionValue
@@ -133,9 +134,6 @@ export fmiSaveSolution, fmiLoadSolution
 # function fmiSaveSolution(solution::FMU3Solution, filepath::AbstractString; keyword="solution") 
 #     @warn "fmiSave(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
 # end
-function fmiLoadSolution(path::AbstractString; keyword="solution")
-    @warn "fmiLoad(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
-end
 
 export fmiSaveSolution, fmiLoadSolution
 
@@ -622,9 +620,9 @@ See also [`fmi2Load`](@ref), [`fmi3Load`](@ref).
 function fmiLoad(pathToFMU::AbstractString, args...; kwargs...)
     version = fmiCheckVersion(pathToFMU)
     if version == "2.0"
-        fmi2Load(args...; kwargs...)
+        fmi2Load(pathToFMU, args...; kwargs...)
     elseif version == "3.0"
-        fmi3Load(args...; kwargs...)
+        fmi3Load(pathToFMU, args...; kwargs...)
     else
         @warn "fmiLoad(...): Unknown FMU version"
     end
