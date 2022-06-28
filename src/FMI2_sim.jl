@@ -762,6 +762,12 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         push!(cbs, savingCB)
     end
 
+    # if auto_dt == true
+    #     @assert solver !== nothing "fmi2SimulateME(...): `auto_dt=true` but no solver specified, this is not allowed."
+    #     tmpIntegrator = init(problem, solver)
+    #     dt = auto_dt_reset!(tmpIntegrator)
+    # end
+
     if solver === nothing
         fmusol.states = solve(problem; callback = CallbackSet(cbs...), saveat = saveat, reltol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
     else
