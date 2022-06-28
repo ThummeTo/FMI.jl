@@ -534,6 +534,12 @@ function prepareFMU(fmu::FMU2, c::Union{Nothing, FMU2Component}, type::fmi2Type,
         @assert retcode == fmi2StatusOK "fmi2Simulate(...): Reset failed with return code $(retcode)."
     end 
 
+    # enter setup (hard)
+    if setup
+        retcode = fmi2SetupExperiment(c, t_start, t_stop; tolerance=tolerance)
+        @assert retcode == fmi2StatusOK "fmi2Simulate(...): Setting up experiment failed with return code $(retcode)."
+    end 
+
     # parameters
     if parameters !== nothing
         retcodes = fmi2Set(c, collect(keys(parameters)), collect(values(parameters)); filter=setBeforeInitialization)
