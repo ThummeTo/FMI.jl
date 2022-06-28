@@ -13,10 +13,8 @@
 
 
 ## How can I use FMI.jl?
-1. Open a Julia-Command-Window, activate your preferred environment
-1. Goto package manager using ```]```.
-1. Type ```add FMI``` or ```add "https://github.com/ThummeTo/FMI.jl"```
-1. Test the installation.
+1. Open a Julia-REPL, activate your preferred environment.
+1. Goto Package-Manager (if not already), install FMI.jl.
     ```julia
     julia> ]
 
@@ -34,12 +32,6 @@
     ```julia
     julia> ]
     (@v1.6) pkg> status FMI
-    ```
-
-    Throughout the rest of the tutorial we assume that you have installed the FMI.jl package and have typed ```using FMI``` which loads the package:
-
-    ```julia
-    julia> using FMI
     ```
 1. Have a look inside the [examples folder](https://github.com/ThummeTo/FMI.jl/tree/examples/examples) in the examples branch or the [examples section](https://thummeto.github.io/FMI.jl/dev/examples/overview/) of the documentation. All examples are available as Julia-Script (*.jl*), Jupyter-Notebook (*.ipynb*) and Markdown (*.md*).
 
