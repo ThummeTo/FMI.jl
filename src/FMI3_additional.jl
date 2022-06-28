@@ -16,6 +16,8 @@ using FMIImport: fmi3DependencyKindDependent, fmi3DependencyKindFixed
 using FMIImport: fmi3CallbackLogger, fmi3CallbackIntermediateUpdate, fmi3CallbackClockUpdate, fmi3Instance
 import FMIImport: fmi3VariableNamingConventionFlat, fmi3VariableNamingConventionStructured
 
+using ZipFile
+
 """ 
 Returns how a variable depends on another variable based on the model description.
 """

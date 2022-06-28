@@ -121,18 +121,18 @@ end
 export fmiSaveSolution, fmiLoadSolution
 
 # from FMI3_plot.jl
-function fmiPlot(solution::FMU3Solution; kwargs...)
-    @warn "fmiPlot(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`."
-end
-function fmiPlot!(fig, solution::FMU3Solution; kwargs...)
-    @warn "fmiPlot!(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`." 
-end
-export fmiPlot, fmiPlot!
+# function fmiPlot(solution::FMU3Solution; kwargs...)
+#     @warn "fmiPlot(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`."
+# end
+# function fmiPlot!(fig, solution::FMU3Solution; kwargs...)
+#     @warn "fmiPlot!(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`." 
+# end
+# export fmiPlot, fmiPlot!
 
 # from FMI3_JLD2.jl
-function fmiSaveSolution(solution::FMU3Solution, filepath::AbstractString; keyword="solution") 
-    @warn "fmiSave(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
-end
+# function fmiSaveSolution(solution::FMU3Solution, filepath::AbstractString; keyword="solution") 
+#     @warn "fmiSave(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
+# end
 function fmiLoadSolution(path::AbstractString; keyword="solution")
     @warn "fmiLoad(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
 end
@@ -149,7 +149,7 @@ function __init__()
     @require JLD2="033835bb-8acc-5ee8-8aae-3f567f8a3819" begin
         import .JLD2
         include("FMI2_JLD2.jl")
-        include("FMI3_JLD3.jl")
+        include("FMI3_JLD2.jl")
     end 
 end
 
@@ -619,7 +619,7 @@ Load FMUs independent of the FMI version, currently supporting version 2.0.X and
 
 See also [`fmi2Load`](@ref), [`fmi3Load`](@ref).
 """
-function fmiLoad(args...; kwargs...)
+function fmiLoad(pathToFMU::AbstractString, args...; kwargs...)
     version = fmiCheckVersion(pathToFMU)
     if version == "2.0"
         fmi2Load(args...; kwargs...)
