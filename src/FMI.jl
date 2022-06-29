@@ -1292,12 +1292,11 @@ More detailed: `fmi2ValueReferenceFormat = Union{Nothing, String, Array{String,1
 
 # Returns
 - `values::Array{fmi2Boolean}`: Return `values` is an array with the actual values of these variables.
-
+See also [`fmi2GetBoolean`](@ref),[`fmi2ValueReferenceFormat`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 """
 function fmiGetBoolean(str::fmi2Struct, args...; kwargs...)
     fmi2GetBoolean(str, args...; kwargs...)
 end
-See also [`fmi2GetBoolean`](@ref),[`fmi2ValueReferenceFormat`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 """
 
     fmiGetBoolean!(str::fmi2Struct, c::FMU2Component, vr::fmi2ValueReferenceFormat, values::Array{fmi2Boolean})
