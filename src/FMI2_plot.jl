@@ -3,7 +3,6 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-using OrdinaryDiffEq: ODESolution
 using FMIImport: FMU2Solution
 
 """
@@ -169,10 +168,12 @@ end
 
 """
 Extended the original plot-command by plotting FMUs.
+
+For further information seek `?fmiPlot`.
 """
-function Plots.plot(fmu::FMU2, args...; kwargs...)
-    fmiPlot(fmu, args...; kwargs...)
+function Plots.plot(solution::FMU2Solution, args...; kwargs...)
+    fmiPlot(solution, args...; kwargs...)
 end
-function Plots.plot!(fig, fmu::FMU2, args...; kwargs...)
-    fmiPlot!(fig, fmu, args...; kwargs...)
+function Plots.plot!(fig, solution::FMU2Solution, args...; kwargs...)
+    fmiPlot!(fig, solution, args...; kwargs...)
 end

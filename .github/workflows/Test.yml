@@ -1,12 +1,14 @@
-name: Run FMI.jl tests
+name: Run Tests
 
 on:
   pull_request:
   push:
+    branches: 
+      - main
     paths:
-    - 'src/**'
-    - 'test/**'
-    - '.github/**'
+      - 'src/**'
+      - 'test/**'
+      - '.github/**'
 
 jobs:
   test:
@@ -23,7 +25,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Set up Julia
       - name: "Set up Julia"
@@ -34,7 +36,7 @@ jobs:
 
      # Set up cache
       - name: "Set up cache"
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-artifacts
         with:
@@ -59,6 +61,6 @@ jobs:
 
       # Run codecov
       - name: "Run CodeCov"
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           file: lcov.info

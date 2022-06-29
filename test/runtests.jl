@@ -46,6 +46,9 @@ function runtests(exportingTool)
                 @testset "Support CS and ME simultaneously" begin
                     include("cs_me.jl")
                 end
+                @testset "Loading/Saving simulation results" begin
+                    include("load_save.jl")
+                end
             end
         end
 

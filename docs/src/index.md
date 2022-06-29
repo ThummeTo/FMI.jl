@@ -34,9 +34,8 @@ julia> using FMI
 
 ## How the documentation is structured?
 Having a high-level overview of how this documentation is structured will help you know where to look for certain things. The xxx main parts of the documentation are :
-- The __Tutorials__ section explains all the necessary steps to work with the library.
-- The __examples__ section gives insight in what is possible with this Library while using short and easily understandable code snippets
-- The __library functions__ sections contains all the documentation to the functions provided by this library
+- The __Examples__ section gives insight in what is possible with this Library while using short and easily understandable code snippets
+- The __Library Functions__ sections contains all the documentation to the functions provided by this library
 
 ## What is currently supported in FMI.jl?
 - simulation / plotting of CS- and ME-FMUs
@@ -59,3 +58,7 @@ Tobias Thummerer, Johannes Tintenherr, Lars Mikelsons 2021 **Hybrid modeling of 
 
 ## Interested in Hybrid Modeling in Julia using FMUs?
 See [FMIFlux.jl](https://github.com/ThummeTo/FMIFlux.jl).
+
+# FMI.jl Library Index
+```@index
+```
