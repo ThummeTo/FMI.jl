@@ -1517,7 +1517,6 @@ function fmiGetInteger!(str::fmi2Struct, args...; kwargs...)
 end
 # TODO different call in fmi3
 
-Set the values of an array of integer variables
 
 """
 

@@ -657,7 +657,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
     showProgress::Bool = true,
     kwargs...)
 
-    @assert fmi2IsModelExchange(fmu) "fmi2SimulateME(...): This function supports Model Excahnge FMUs only."
+    @assert fmi2IsModelExchange(fmu) "fmi2SimulateME(...): This function supports Model Exchange FMUs only."
     #@assert fmu.type == fmi2TypeModelExchange "fmi2SimulateME(...): This FMU supports Model Exchange, but was instantiated in CS mode. Use `fmiLoad(...; type=:ME)`."
 
     recordValues = prepareValueReference(fmu, recordValues)
