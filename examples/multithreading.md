@@ -94,7 +94,7 @@ input_values = collect(collect.(eachrow(rand(batchSize,2))))
 
 
     1-element Vector{Vector{Float64}}:
-     [0.24543871848994625, 0.0633327108447852]
+     [0.1646078929354826, 0.059846596821583775]
 
 
 
@@ -109,18 +109,18 @@ realFMU = fmiLoad("SpringPendulum1D", "Dymola", "2022x")
 realFMUBatch = [fmiLoad("SpringPendulum1D", "Dymola", "2022x") for _ in 1:batchSize]
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_30SiRL/SpringPendulum1D`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:76
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_30SiRL/SpringPendulum1D/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:192
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_x0KAMN/SpringPendulum1D`.
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:76
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_x0KAMN/SpringPendulum1D/resources`
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:192
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:195
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_aOFpUN/SpringPendulum1D`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:76
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_aOFpUN/SpringPendulum1D/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:192
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:195
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_ihxGYQ/SpringPendulum1D`.
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:76
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_ihxGYQ/SpringPendulum1D/resources`
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:192
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:195
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:195
 
 
 
@@ -159,14 +159,14 @@ Running a single evaluation is pretty quick, therefore the speed can be better t
 
 
 
-    BenchmarkTools.Trial: 10 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m540.214 ms[22m[39m … [35m563.321 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m4.15% … 3.88%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m549.092 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m4.13%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m548.104 ms[22m[39m ± [32m  7.456 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m4.86% ± 1.01%
+    BenchmarkTools.Trial: 9 samples with 1 evaluation.
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m605.679 ms[22m[39m … [35m630.677 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m3.86% … 3.75%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m615.023 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m3.94%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m615.024 ms[22m[39m ± [32m  8.512 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m4.52% ± 0.92%
     
-      [39m█[39m▁[39m [39m [39m▁[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[34m [39m[32m [39m[39m [39m [39m [39m [39m▁[39m▁[39m [39m [39m▁[39m [39m [39m [39m [39m▁[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m 
-      [39m█[39m█[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[34m▁[39m[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m█[39m█[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      540 ms[90m           Histogram: frequency by time[39m          563 ms [0m[1m<[22m
+      [39m█[39m [39m█[39m█[39m [39m [39m [39m [39m [39m█[34m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m█[39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
+      [39m█[39m▁[39m█[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[34m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m█[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
+      606 ms[90m           Histogram: frequency by time[39m          631 ms [0m[1m<[22m
     
      Memory estimate[90m: [39m[33m155.95 MiB[39m, allocs estimate[90m: [39m[33m3602373[39m.
 
@@ -187,14 +187,14 @@ println("Single Threaded")
 
 
 
-    BenchmarkTools.Trial: 10 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m540.657 ms[22m[39m … [35m562.954 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m4.40% … 4.19%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m544.536 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m4.41%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m548.889 ms[22m[39m ± [32m  7.868 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m4.96% ± 0.97%
+    BenchmarkTools.Trial: 9 samples with 1 evaluation.
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m604.416 ms[22m[39m … [35m625.590 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m4.27% … 4.07%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m612.405 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m4.23%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m614.618 ms[22m[39m ± [32m  7.892 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m4.89% ± 1.00%
     
-      [39m [39m [39m [39m [39m [39m [39m [34m█[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m 
-      [39m▇[39m▁[39m▁[39m▁[39m▁[39m▇[39m▁[34m█[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▇[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▇[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▇[39m▁[39m▇[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▇[39m [39m▁
-      541 ms[90m           Histogram: frequency by time[39m          563 ms [0m[1m<[22m
+      [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m█[39m [34m█[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m█[39m [39m 
+      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m█[39m▁[34m█[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m█[39m [39m▁
+      604 ms[90m           Histogram: frequency by time[39m          626 ms [0m[1m<[22m
     
      Memory estimate[90m: [39m[33m155.95 MiB[39m, allocs estimate[90m: [39m[33m3602376[39m.
 
@@ -216,14 +216,14 @@ println("Multi Threaded")
 
 
 
-    BenchmarkTools.Trial: 10 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m502.791 ms[22m[39m … [35m521.270 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m5.07% … 4.82%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m507.929 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m5.08%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m511.378 ms[22m[39m ± [32m  7.067 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m5.74% ± 1.13%
+    BenchmarkTools.Trial: 9 samples with 1 evaluation.
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m566.794 ms[22m[39m … [35m584.379 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m4.81% … 4.56%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m568.987 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m4.79%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m574.421 ms[22m[39m ± [32m  7.730 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m5.49% ± 1.11%
     
-      [39m█[39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m█[39m█[39m [34m█[39m[39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m█[39m [39m [39m [39m█[39m [39m 
-      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m█[39m█[39m▁[34m█[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      503 ms[90m           Histogram: frequency by time[39m          521 ms [0m[1m<[22m
+      [39m█[39m [39m [39m [39m [39m▁[39m▁[34m▁[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m▁[39m [39m▁[39m [39m [39m [39m [39m [39m▁[39m [39m 
+      [39m█[39m▁[39m▁[39m▁[39m▁[39m█[39m█[34m█[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m█[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
+      567 ms[90m           Histogram: frequency by time[39m          584 ms [0m[1m<[22m
     
      Memory estimate[90m: [39m[33m155.95 MiB[39m, allocs estimate[90m: [39m[33m3602380[39m.
 

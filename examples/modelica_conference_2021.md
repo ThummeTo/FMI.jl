@@ -78,12 +78,12 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_zthLCq/SpringFrictionPendulum1D`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:76
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_zthLCq/SpringFrictionPendulum1D/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:192
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_87H0SK/SpringFrictionPendulum1D`.
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:76
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_87H0SK/SpringFrictionPendulum1D/resources`
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:192
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:195
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:195
 
 
     #################### Begin information for FMU ####################
@@ -148,12 +148,12 @@ In the following type of simulation a more advanced variant is presented, which 
 myFMU = fmiLoad(pathToFMU);
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_e1SMMr/SpringFrictionPendulum1D`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:76
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_e1SMMr/SpringFrictionPendulum1D/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:192
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_wcQYpL/SpringFrictionPendulum1D`.
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:76
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_wcQYpL/SpringFrictionPendulum1D/resources`
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:192
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/oQYco/src/FMI2_ext.jl:195
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:195
 
 
 Next, it is necessary to create an instance of the FMU, this is achieved by the command `fmiInstantiate!()`.  
@@ -168,9 +168,9 @@ instanceFMU = fmiInstantiate!(myFMU)
 
     FMU:            SpringFrictionPendulum1D
     InstanceName:   SpringFrictionPendulum1D
-    Address:        Ptr{Nothing} @0x00000000064b8600
+    Address:        Ptr{Nothing} @0x00000000061f55e0
     State:          fmi2ComponentStateInstantiated
-    Logging:        true
+    Logging:        false
     FMU time:       -Inf
     FMU states:     nothing
 
