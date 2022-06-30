@@ -9,9 +9,11 @@ on:
     branches:
       - examples
   
-jobs:        
+jobs:
   sync-files:
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push'}}
+    if: |
+      ${{ (github.event.workflow_run.conclusion == 'success' && github.sha == github.event.workflow_run.head_sha) || 
+      (github.event_name == 'push' && github.event.head_commit.committer.name != 'github-actions[bot]') }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
@@ -50,16 +52,17 @@ jobs:
             changed:
               - added|modified: 'examples/**.ipynb'
           base: examples
+          ref: examples
                         
       - name: "Execute and synchronize changed files"    
-        if: ${{ steps.filter.outputs.changed == 'true' }}
+        if: ${{ github.event_name == 'push' && steps.filter.outputs.changed == 'true' }}
         run: |
           jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-1.6" --to notebook --inplace --execute ${{ steps.filter.outputs.changed_files }}
           jupyter nbconvert --to script ${{ steps.filter.outputs.changed_files }}
           jupyter nbconvert --to markdown ${{ steps.filter.outputs.changed_files }}
       
       - name: "Execute and synchronize all files"
-        if: ${{ steps.filter.outputs.all == 'true' && steps.filter.outputs.changed == 'false' }}
+        if: ${{ github.event_name == 'workflow_run' && steps.filter.outputs.all == 'true'}}
         run: |
           jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-1.6" --to notebook --inplace --execute ${{ steps.filter.outputs.all_files }}
           jupyter nbconvert --to script ${{ steps.filter.outputs.all_files }}
@@ -70,3 +73,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Jupyter nbconvert synch - modified, paired .ipynb files
+          push_options: '--force-with-lease'
