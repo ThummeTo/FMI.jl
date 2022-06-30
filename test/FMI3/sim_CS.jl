@@ -24,11 +24,11 @@ t_start = 0.0
 t_stop = 3.0
 
 # test without recording values (but why?)
-solution = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2)
-@test solution.success
+# solution = fmiSimulateCS(fmuStruct, t_start, t_stop)
+# @test solution.success
 
 # test with recording values
-solution = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2, recordValues=["mass.s", "mass.v"])
+solution = fmiSimulateCS(fmuStruct, t_start, t_stop; recordValues=["mass.h", "mass.v"])
 @test solution.success
 @test length(solution.values.saveval) == t_start:1e-2:t_stop |> length
 @test length(solution.values.saveval[1]) == 2

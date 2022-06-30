@@ -6,13 +6,13 @@
 using DifferentialEquations: Tsit5, Rosenbrock23
 
 t_start = 0.0
-t_stop = 8.0
+t_stop = 3.0
 
 # case 1: ME-FMU with state events
 
-myFMU = fmiLoad("SpringFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
+myFMU = fmiLoad("BouncingBall", "ModelicaReferenceFMUs", "0.0.16", "3.0")
 
-comp = fmiInstantiate!(myFMU; loggingOn=false)
+comp = fmi3InstantiateModelExchange!(myFMU; loggingOn=false)
 @test comp != 0
 
 # choose FMU or FMUComponent

@@ -952,30 +952,25 @@ function fmi3Simulate(fmu::FMU3, t_start::Real = 0.0, t_stop::Real = 1.0;
     fmi3Simulate(fmu.instances[end], t_start, t_stop;
                  recordValues=recordValues, saveat=saveat, setup=setup)
 end
-"""
-fmi3SimulateCS(fmu::FMU3, t_start::Real, t_stop::Real;
-recordValues::fmi3ValueReferenceFormat = nothing, saveat=[], setup=true)
 
-Wrapper for fmi3SimulateCS() in FMI/FMI3_sim.jl
 """
-function fmi3SimulateCS(fmu::FMU3, t_start::Real, t_stop::Real;
-                        recordValues::fmi3ValueReferenceFormat = nothing, saveat=[], setup=true)
-    @assert length(fmu.instances) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+    fmi3SimulateCS(fmu::FMU3, args...; kwargs...)
 
-    fmi3SimulateCS(fmu.instances[end], t_start, t_stop;
-                   recordValues=recordValues, saveat=saveat, setup=setup)
+Wrapper for fmi3SimulateCS() in FMI/FMI2_sim.jl
+"""
+function fmi3SimulateCS(fmu::FMU3, args...; kwargs...)
+    return fmi3SimulateCS(fmu, nothing, args...; kwargs...)
 end
 
 """
-    fmi3SimulateME(fmu::FMU3, t_start::Real, t_stop::Real; kwargs...)
+    fmi3SimulateME(fmu::FMU3, args...; kwargs...)
 
 Wrapper for fmi3SimulateME() in FMI/FMI3_sim.jl
 """
-function fmi3SimulateME(fmu::FMU3, t_start::Real, t_stop::Real; kwargs...)
-    @assert length(fmu.instances) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-
-    fmi3SimulateME(fmu.instances[end], t_start, t_stop; kwargs...)
+function fmi3SimulateME(fmu::FMU3, args...; kwargs...)
+    return fmi3SimulateME(fmu, nothing, args...; kwargs...)
 end
+
 
 """
     fmi3GetStartValue(fmu::FMU3, vr::fmi3ValueReferenceFormat)

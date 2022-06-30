@@ -160,6 +160,11 @@ function saveValues(c::fmi3Instance, recordValues, u, t, integrator)
     (fmi3GetFloat64(c, recordValues)...,)
 end
 
+# wrapper
+function fmi3SimulateME(c::FMU3Instance, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
+    fmi3SimulateME(c.fmu, c, t_start, t_stop; kwargs...)
+end 
+
 """
 Source: FMISpec3.0, Version D5ef1c1: 3.3. Code Example
 
@@ -169,7 +174,7 @@ State- and Time-Events are handled correctly.
 Returns a tuple of type (ODESolution, DiffEqCallbacks.SavedValues).
 If keyword `recordValues` is not set, a tuple of type (ODESolution, nothing) is returned for consitency.
 """
-function fmi3SimulateME(c::fmi3Instance, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
+function fmi3SimulateME(fmu::FMU3, c::fmi3Instance, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
     solver = nothing,
     customFx = nothing,
     recordValues::fmi3ValueReferenceFormat = nothing,
@@ -295,6 +300,11 @@ function fmi3SimulateME(c::fmi3Instance, t_start::Union{Real, Nothing} = nothing
     end
 end
 
+# wrapper
+function fmi3SimulateCS(c::FMU3Instance, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
+    fmi3SimulateCS(c.fmu, c, t_start, t_stop; kwargs...)
+end
+
 """
 Source: FMISpec3.0, Version D5ef1c1: 4.3. Code Examples
 
@@ -305,7 +315,7 @@ If keyword `recordValues` is not set, a tuple of type (success::Bool, nothing) i
 
 ToDo: Improve Documentation.
 """
-function fmi3SimulateCS(c::fmi3Instance, t_start::Real, t_stop::Real;
+function fmi3SimulateCS(fmu::FMU3, c::fmi3Instance, t_start::Real, t_stop::Real;
                         recordValues::fmi3ValueReferenceFormat = nothing,
                         saveat = [],
                         setup::Bool = true,

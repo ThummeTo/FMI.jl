@@ -127,21 +127,21 @@ end
 export fmiSaveSolution, fmiLoadSolution
 
 # from FMI3_plot.jl
-function fmiPlot(solution::FMU3Solution; kwargs...)
-    @warn "fmiPlot(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`."
-end
-function fmiPlot!(fig, solution::FMU3Solution; kwargs...)
-    @warn "fmiPlot!(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`." 
-end
-export fmiPlot, fmiPlot!
+# function fmiPlot(solution::FMU3Solution; kwargs...)
+#     @warn "fmiPlot(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`."
+# end
+# function fmiPlot!(fig, solution::FMU3Solution; kwargs...)
+#     @warn "fmiPlot!(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`." 
+# end
+# export fmiPlot, fmiPlot!
 
 # from FMI3_JLD2.jl
-function fmiSaveSolution(solution::FMU3Solution, filepath::AbstractString; keyword="solution") 
-    @warn "fmiSave(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
-end
-function fmiLoadSolution(path::AbstractString; keyword="solution")
-    @warn "fmiLoad(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
-end
+# function fmiSaveSolution(solution::FMU3Solution, filepath::AbstractString; keyword="solution") 
+#     @warn "fmiSave(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
+# end
+# function fmiLoadSolution(path::AbstractString; keyword="solution")
+#     @warn "fmiLoad(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
+# end
 
 export fmiSaveSolution, fmiLoadSolution
 
