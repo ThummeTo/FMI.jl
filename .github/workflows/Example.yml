@@ -1,0 +1,76 @@
+name: Run Examples
+
+on:
+  workflow_run:
+    workflows: ["Run Tests"]
+    types:
+      - completed
+  push:
+    branches:
+      - examples
+  
+jobs:
+  sync-files:
+    if: |
+      ${{ (github.event.workflow_run.conclusion == 'success' && github.sha == github.event.workflow_run.head_sha) || 
+      (github.event_name == 'push' && github.event.head_commit.committer.name != 'github-actions[bot]') }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        julia-version: ['1.6']
+        julia-arch: [x64]
+        os: [windows-latest, ubuntu-latest]
+        experimental: [false]
+
+    steps:
+      - name: "Check out repository"
+        uses: actions/checkout@v3
+        with:
+          ref: examples
+
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@v1
+        with:
+            version: ${{ matrix.julia-version }}
+            arch: ${{ matrix.julia-arch }}
+
+      - name: "Build package"
+        uses: julia-actions/julia-buildpkg@v1
+
+      - name: "Install packages"
+        run: pip install jupyter==1.0.0 nbconvert==6.4.5 MarkupSafe==2.1.1 jinja2==3.1.1
+
+      - name: "Set path filter"
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          list-files: shell
+          filters: |
+            all:
+              - 'examples/**.ipynb'
+            changed:
+              - added|modified: 'examples/**.ipynb'
+          base: examples
+          ref: examples
+                        
+      - name: "Execute and synchronize changed files"    
+        if: ${{ github.event_name == 'push' && steps.filter.outputs.changed == 'true' }}
+        run: |
+          jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-1.6" --to notebook --inplace --execute ${{ steps.filter.outputs.changed_files }}
+          jupyter nbconvert --to script ${{ steps.filter.outputs.changed_files }}
+          jupyter nbconvert --to markdown ${{ steps.filter.outputs.changed_files }}
+      
+      - name: "Execute and synchronize all files"
+        if: ${{ github.event_name == 'workflow_run' && steps.filter.outputs.all == 'true'}}
+        run: |
+          jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-1.6" --to notebook --inplace --execute ${{ steps.filter.outputs.all_files }}
+          jupyter nbconvert --to script ${{ steps.filter.outputs.all_files }}
+          jupyter nbconvert --to markdown ${{ steps.filter.outputs.all_files }}
+      
+      - name: "Auto commit"
+        if: ${{ matrix.os == 'ubuntu-latest'}}
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Jupyter nbconvert synch - modified, paired .ipynb files
+          push_options: '--force-with-lease'
