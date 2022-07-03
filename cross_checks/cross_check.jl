@@ -53,25 +53,20 @@ end
 
 function runCrossCheckFmu(checkPath::String, check::FmuCrossCheck)::FmuCrossCheck
     pathToFMU = joinpath(checkPath, "$(check.fmuCheck).fmu")
+
+    # if check.notCompliant
+    #     check.result = nothing
+    #     check.skipped = true
+    #     check.error = nothing
+    #     check.success = false
+    #     return check
+    # end
     
     try
         fmuToCheck = fmiLoad(pathToFMU)
         fmiInfo(fmuToCheck)
         hasInputValues = false
 
-        if isfile(joinpath(checkPath, "$(check.fmuCheck)_in.csv"))
-            inputValues = CSV.File(joinpath(checkPath, "$(check.fmuCheck)_in.csv")) |> Tables.rowtable |> Tables.columntable
-            hasInputValues = true
-            getInputValues = function(t)
-                for (valIndex, time) in enumerate(inputValues[1])
-                    if time >= t
-                        return [inputValues[2][valIndex]]
-                        break;
-                    end
-                end
-            end
-        end
-        
         # Read Options
         fmuOptions = CSV.File(joinpath(checkPath, "$(check.fmuCheck)_ref.opt"), header=false) |> Dict
         tStart = fmuOptions["StartTime"]
@@ -81,12 +76,26 @@ function runCrossCheckFmu(checkPath::String, check::FmuCrossCheck)::FmuCrossChec
         # Read Ref values
         fmuRecordValueNames = readdlm(joinpath(checkPath, "$(check.fmuCheck)_ref.csv"), ',', String)[1, 2:end]
         fmuRefValues = CSV.File(joinpath(checkPath, "$(check.fmuCheck)_ref.csv")) |> Tables.rowtable |> Tables.columntable
+
+        if isfile(joinpath(checkPath, "$(check.fmuCheck)_in.csv"))
+            inputValues = CSV.File(joinpath(checkPath, "$(check.fmuCheck)_in.csv")) |> Tables.rowtable
+            hasInputValues = true
+            getInputValues = function(t)
+                for (valIndex, val) in enumerate(inputValues)
+                    if val.time >= t
+                        a = collect(inputValues[valIndex])[2:end] 
+                        return a
+                        break;
+                    end
+                end
+            end
+        end
         
         if hasInputValues
             if check.type == CS
-                simData = fmiSimulateCS(fmuToCheck, tStart, tStop; tolerance=relTol, saveat=fmuRefValues[1], inputFunction=getInputValues, recordValues=fmuRecordValueNames)
+                simData = fmiSimulateCS(fmuToCheck, tStart, tStop; tolerance=relTol, saveat=fmuRefValues[1], inputFunction=getInputValues, inputValueReferences=:inputs, recordValues=fmuRecordValueNames)
             elseif check.type == ME
-                simData = fmiSimulateME(fmuToCheck, tStart, tStop; reltol=relTol, saveat=fmuRefValues[1], inputFunction=getInputValues, recordValues=fmuRecordValueNames)
+                simData = fmiSimulateME(fmuToCheck, tStart, tStop; reltol=relTol, saveat=fmuRefValues[1], inputFunction=getInputValues, inputValueReferences=:inputs, recordValues=fmuRecordValueNames)
             else
                 @error "Unkown FMU Type. Only 'cs' and 'me' are valid types"
             end
@@ -144,7 +153,7 @@ function main()
 
     #   Excecute FMUs
     crossChecks = getFmusToTest(fmiCrossCheckRepoPath, fmiVersion, os)
-    crossChecks = filter(c -> (c.system != "AMESim" && c.system != "Test-FMUs"), crossChecks)
+    crossChecks = filter(c -> (c.system != "AMESim" && c.system != "Test-FMUs" && c.system != "SimulationX"), crossChecks)
     for (index, check) in enumerate(crossChecks)
         checkPath = joinpath(fmiCrossCheckRepoPath, "fmus", check.fmiVersion, check.type, check.os, check.system, check.systemVersion, check.fmuCheck)
         cd(checkPath)

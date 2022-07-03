@@ -59,12 +59,12 @@ function getFmusToTest(repoPath::String, fmiVersion::String, os::String)::Vector
 
                 for check in cChecks
                     checkPath = joinpath(fmiCheckPath, system, version, check)
-                    compliant::Bool = true
+                    notCompliant::Bool = false
                     if isfile(joinpath(checkPath, "notCompliantWithLatestRules"))
                         @info "$checkPath is not compliant with latest rules"
-                        compliant = false
+                        notCompliant = true
                     end
-                    push!(results, FmuCrossCheck(fmiVersion, type, os, system, version, check, compliant, missing, missing, missing, missing)) 
+                    push!(results, FmuCrossCheck(fmiVersion, type, os, system, version, check, notCompliant, missing, missing, missing, missing)) 
                 end
             end
         end
