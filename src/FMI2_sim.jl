@@ -565,13 +565,13 @@ function prepareFMU(fmu::FMU2, c::Union{Nothing, FMU2Component}, type::fmi2Type,
 
     # parameters
     if parameters !== nothing
-        retcodes = fmi2Set(c, collect(keys(parameters)), collect(values(parameters)); filter=setInInitialization)
+        retcodes = fmi2Set(c, collect(keys(parameters)), collect(values(parameters))    )#; filter=setInInitialization)
         @assert all(retcodes .== fmi2StatusOK) "fmi2Simulate(...): Setting initial parameters failed with return code $(retcode)."
     end
 
     # inputs
     if inputs !== nothing
-        retcodes = fmi2Set(c, collect(keys(inputs)), collect(values(inputs)); filter=setInInitialization)
+        retcodes = fmi2Set(c, collect(keys(inputs)), collect(values(inputs))    )#; filter=setInInitialization)
         @assert all(retcodes .== fmi2StatusOK) "fmi2Simulate(...): Setting initial inputs failed with return code $(retcode)."
     end
 
@@ -579,7 +579,7 @@ function prepareFMU(fmu::FMU2, c::Union{Nothing, FMU2Component}, type::fmi2Type,
     if x0 !== nothing
         #retcode = fmi2SetContinuousStates(c, x0)
         #@assert retcode == fmi2StatusOK "fmi2Simulate(...): Setting initial state failed with return code $(retcode)."
-        retcodes = fmi2Set(c, fmu.modelDescription.stateValueReferences, x0; filter=setInInitialization)
+        retcodes = fmi2Set(c, fmu.modelDescription.stateValueReferences, x0    )#; filter=setInInitialization)
         @assert all(retcodes .== fmi2StatusOK) "fmi2Simulate(...): Setting initial inputs failed with return code $(retcode)."
     end
 
@@ -636,7 +636,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
     solver = nothing,
     customFx = nothing,
     recordValues::fmi2ValueReferenceFormat = nothing,
-    saveat = [],
+    saveat = nothing,
     x0::Union{AbstractArray{<:Real}, Nothing} = nothing,
     setup::Union{Bool, Nothing} = nothing,
     reset::Union{Bool, Nothing} = nothing,
@@ -670,14 +670,33 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         push!(cbs, cb)
     end
 
-    t_start = t_start === nothing ? fmi2GetDefaultStartTime(fmu.modelDescription) : t_start
-    t_start = t_start === nothing ? 0.0 : t_start
-    t_stop = t_stop === nothing ? fmi2GetDefaultStopTime(fmu.modelDescription) : t_stop
-    t_stop = t_stop === nothing ? 1.0 : t_stop
-    tolerance = tolerance === nothing ? fmi2GetDefaultTolerance(fmu.modelDescription) : tolerance
-    tolerance = tolerance === nothing ? 1e-4 : tolerance
-    dt = dt === nothing ? fmi2GetDefaultStepSize(fmu.modelDescription) : dt
-    dt = dt === nothing ? 1e-5 : dt 
+    if t_start === nothing 
+        t_start = fmi2GetDefaultStartTime(fmu.modelDescription)
+        
+        if t_start === nothing 
+            t_start = 0.0
+            @info "No `t_start` choosen, no `t_start` availabel in the FMU, auto-picked `t_start=0.0`."
+        end
+    end
+    
+    if t_stop === nothing 
+        t_stop = fmi2GetDefaultStopTime(fmu.modelDescription)
+
+        if t_stop === nothing
+            t_stop = 1.0
+            @warn "No `t_stop` choosen, no `t_stop` availabel in the FMU, auto-picked `t_stop=1.0`."
+        end
+    end
+
+    if tolerance === nothing 
+        tolerance = fmi2GetDefaultTolerance(fmu.modelDescription)
+        # if no tolerance is given, pick auto-setting from DifferentialEquations.jl 
+    end
+
+    if dt === nothing 
+        dt = fmi2GetDefaultStepSize(fmu.modelDescription)
+        # if no dt is given, pick auto-setting from DifferentialEquations.jl
+    end
 
     if dtmax === nothing
         dtmax = (t_stop-t_start)/100.0
@@ -756,9 +775,15 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         fmusol.values = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...})
         fmusol.valueReferences = copy(recordValues)
 
-        savingCB = SavingCallback((u,t,integrator) -> saveValues(c, recordValues, u, t, integrator, inputFunction, inputValueReferences), 
-                                  fmusol.values, 
-                                  saveat=saveat)
+        if saveat === nothing
+            savingCB = SavingCallback((u,t,integrator) -> saveValues(c, recordValues, u, t, integrator, inputFunction, inputValueReferences), 
+                                    fmusol.values)
+        else
+            savingCB = SavingCallback((u,t,integrator) -> saveValues(c, recordValues, u, t, integrator, inputFunction, inputValueReferences), 
+                                    fmusol.values, 
+                                    saveat=saveat)
+        end
+
         push!(cbs, savingCB)
     end
 
@@ -768,10 +793,24 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
     #     dt = auto_dt_reset!(tmpIntegrator)
     # end
 
+    solveKwargs = Dict{Symbol, Any}()
+
+    if dt !== nothing
+        solveKwargs[:dt] = dt
+    end
+
+    if tolerance !== nothing
+        solveKwargs[:reltol] = tolerance
+    end
+
+    if saveat !== nothing
+        solveKwargs[:saveat] = saveat
+    end
+
     if solver === nothing
-        fmusol.states = solve(problem; callback = CallbackSet(cbs...), saveat = saveat, reltol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
+        fmusol.states = solve(problem; callback = CallbackSet(cbs...), dtmax=dtmax, solveKwargs..., kwargs...)
     else
-        fmusol.states = solve(problem, solver; callback = CallbackSet(cbs...), saveat = saveat, reltol=tolerance, dt=dt, dtmax=dtmax, kwargs...)
+        fmusol.states = solve(problem, solver; callback = CallbackSet(cbs...), dtmax=dtmax, solveKwargs..., kwargs...)
     end
 
     fmusol.success = (fmusol.states.retcode == :Success)
