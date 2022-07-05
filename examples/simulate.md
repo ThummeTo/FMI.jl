@@ -79,12 +79,12 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_jzBK6N/SpringFrictionPendulum1D`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:76
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_jzBK6N/SpringFrictionPendulum1D/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:192
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_JwPakO/SpringFrictionPendulum1D`.
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/snZaf/src/FMI2_ext.jl:76
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_JwPakO/SpringFrictionPendulum1D/resources`
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/snZaf/src/FMI2_ext.jl:192
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:195
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/snZaf/src/FMI2_ext.jl:195
 
 
     #################### Begin information for FMU ####################
@@ -164,7 +164,7 @@ In the function `fmiSimulateME()` the FMU is simulated in model-exchange mode (M
 dataME = fmiSimulateME(myFMU, tStart, tStop; saveat=tSave)
 ```
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:09[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:10[39m
 
 
 
@@ -176,23 +176,23 @@ dataME = fmiSimulateME(myFMU, tStart, tStop; saveat=tSave)
     	true
     States [801]:
     	0.0	[0.5, 0.0]
-    	0.01	[0.5002131418344649, 0.042689450666241]
-    	0.02	[0.5008548874805565, 0.08570846215523381]
-    	0.03	[0.5019281653120716, 0.12898389312495082]
-    	0.04	[0.5034351805057593, 0.17244393475170294]
-    	0.05	[0.5053774287967188, 0.2160182432854046]
-    	0.06	[0.5077556967622916, 0.25963796675862466]
-    	0.07	[0.5105701003205937, 0.3032358690888718]
-    	0.08	[0.5138201049458624, 0.34674641820324037]
+    	0.01	[0.5002131418271644, 0.04268945072841344]
+    	0.02	[0.500854887495059, 0.08570846016824428]
+    	0.03	[0.5019281657516876, 0.1289839014807958]
+    	0.04	[0.5034351795370763, 0.17244393614729067]
+    	0.05	[0.50537742474533, 0.21601821086566914]
+    	0.06	[0.5077556992635467, 0.25963791323182245]
+    	0.07	[0.5105701152466664, 0.30323585206399106]
+    	0.08	[0.5138201143130452, 0.34674645493266393]
     	...
-    	8.0	[1.0668213438183276, -1.0000099359121942e-10]
+    	8.0	[1.0668392065868253, -1.0000121313794676e-10]
     Events [6]:
     	State-Event #11 @ 0.0s
-    	State-Event #11 @ 0.9939s
-    	State-Event #19 @ 1.9881s
-    	State-Event #11 @ 2.9829s
-    	State-Event #19 @ 3.9787s
-    	State-Event #11 @ 4.9768s
+    	State-Event #11 @ 0.994s
+    	State-Event #19 @ 1.9883s
+    	State-Event #11 @ 2.983s
+    	State-Event #19 @ 3.9788s
+    	State-Event #11 @ 4.977s
 
 
 

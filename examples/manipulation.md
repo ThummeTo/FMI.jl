@@ -78,12 +78,12 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_LnLWMu/SpringFrictionPendulum1D`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:76
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_LnLWMu/SpringFrictionPendulum1D/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:192
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_E0GexQ/SpringFrictionPendulum1D`.
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/snZaf/src/FMI2_ext.jl:76
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_E0GexQ/SpringFrictionPendulum1D/resources`
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/snZaf/src/FMI2_ext.jl:192
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/g4GUl/src/FMI2_ext.jl:195
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/snZaf/src/FMI2_ext.jl:195
 
 
     #################### Begin information for FMU ####################
@@ -126,7 +126,7 @@ vrs = ["mass.s"]
 simData = fmiSimulateME(myFMU, tStart, tStop; recordValues=vrs)
 ```
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:11[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:10[39m
 
 
 
@@ -136,37 +136,37 @@ simData = fmiSimulateME(myFMU, tStart, tStop; recordValues=vrs)
     	SpringFrictionPendulum1D
     Success:
     	true
-    States [110]:
+    States [108]:
     	0.0	[0.5, 0.0]
-    	2.3529411764719727e-11	[0.5, 1.0e-10]
-    	1.0000023529411766e-5	[0.5000000002125017, 4.250030186348503e-5]
-    	0.00011000002352941177	[0.5000000257134062, 0.0004675245102952289]
-    	0.0011100000235294118	[0.5000026191281834, 0.004719970360497647]
-    	0.011110000023529413	[0.5002631686645611, 0.047449647283752144]
-    	0.03982466736770743	[0.5034050123596227, 0.17168075110950387]
-    	0.09972054285078226	[0.5215006197560228, 0.43204954153497455]
-    	0.16481836271111422	[0.5585747156842935, 0.703758265932321]
+    	2.352941176471972e-11	[0.5, 1.0e-10]
+    	0.002306805098500577	[0.50001131604032, 0.009814511243574901]
+    	0.017671223740348286	[0.5006669891786611, 0.07566472543814211]
+    	0.05336453143679057	[0.5061289100741069, 0.23069249960269952]
+    	0.1184474067147955	[0.5303427360215145, 0.5120833994161043]
+    	0.18484539042135573	[0.5734637065822751, 0.7826807485295294]
+    	0.26484539042135574	[0.6477775947325276, 1.0656550745038857]
+    	0.34484539042135576	[0.7421945365288517, 1.2822970458377356]
     	...
-    	8.0	[1.0668213438183276, -1.0000099359121942e-10]
-    Values [110]:
+    	8.0	[1.0668392065868253, -1.0000121313794676e-10]
+    Values [108]:
     	0.0	(0.5,)
-    	2.3529411764719727e-11	(0.5,)
-    	1.0000023529411766e-5	(0.5000000002125017,)
-    	0.00011000002352941177	(0.5000000257134062,)
-    	0.0011100000235294118	(0.5000026191281834,)
-    	0.011110000023529413	(0.5002631686645611,)
-    	0.03982466736770743	(0.5034050123596227,)
-    	0.09972054285078226	(0.5215006197560228,)
-    	0.16481836271111422	(0.5585747156842935,)
+    	2.352941176471972e-11	(0.5,)
+    	0.002306805098500577	(0.50001131604032,)
+    	0.017671223740348286	(0.5006669891786611,)
+    	0.05336453143679057	(0.5061289100741069,)
+    	0.1184474067147955	(0.5303427360215145,)
+    	0.18484539042135573	(0.5734637065822751,)
+    	0.26484539042135574	(0.6477775947325276,)
+    	0.34484539042135576	(0.7421945365288517,)
     	...
-    	8.0	(1.0668213438183276,)
+    	8.0	(1.0668392065868253,)
     Events [6]:
     	State-Event #11 @ 0.0s
-    	State-Event #11 @ 0.9939s
-    	State-Event #19 @ 1.9881s
-    	State-Event #11 @ 2.9829s
-    	State-Event #19 @ 3.9787s
-    	State-Event #11 @ 4.9768s
+    	State-Event #11 @ 0.994s
+    	State-Event #19 @ 1.9883s
+    	State-Event #11 @ 2.983s
+    	State-Event #19 @ 3.9788s
+    	State-Event #11 @ 4.977s
 
 
 
@@ -202,7 +202,7 @@ originalGetReal = myFMU.cGetReal
 
 
 
-    Ptr{Nothing} @0x00007f9373e28faf
+    Ptr{Nothing} @0x00007f83686f6faf
 
 
 
@@ -250,7 +250,7 @@ fmiSetFctGetReal(myFMU, myGetReal!)
 
 
 
-    Ptr{Nothing} @0x00007f93b892efc0
+    Ptr{Nothing} @0x00007f83b92f7fc0
 
 
 
