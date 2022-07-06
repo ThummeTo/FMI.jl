@@ -920,18 +920,18 @@ function fmi3EnterEventMode(fmu::FMU3, stepEvent::Bool, stateEvent::Bool, rootsF
 end
 
 """
-    fmi3DoStep(fmu::FMU3, currentCommunicationPoint::Real, communicationStepSize::Real, noSetFMUStatePriorToCurrentPoint::Bool, eventEncountered::fmi3Boolean, terminateSimulation::fmi3Boolean, earlyReturn::fmi3Boolean, lastSuccessfulTime::fmi3Float64)
+    fmi3DoStep!(fmu::FMU3, currentCommunicationPoint::Real, communicationStepSize::Real, noSetFMUStatePriorToCurrentPoint::Bool, eventEncountered::fmi3Boolean, terminateSimulation::fmi3Boolean, earlyReturn::fmi3Boolean, lastSuccessfulTime::fmi3Float64)
 
-Wrapper for fmi3DoStep() in FMIImport/FMI3_c.jl
+Wrapper for fmi3DoStep!() in FMIImport/FMI3_c.jl
 """
-function fmi3DoStep(fmu::FMU3, currentCommunicationPoint::Real, communicationStepSize::Real, noSetFMUStatePriorToCurrentPoint::Bool, eventEncountered::fmi3Boolean, terminateSimulation::fmi3Boolean, earlyReturn::fmi3Boolean, lastSuccessfulTime::fmi3Float64)
+function fmi3DoStep!(fmu::FMU3, currentCommunicationPoint::Real, communicationStepSize::Real, noSetFMUStatePriorToCurrentPoint::fmi3Boolean, eventEncountered::fmi3Boolean, terminateSimulation::fmi3Boolean, earlyReturn::fmi3Boolean, lastSuccessfulTime::fmi3Float64)
     @assert length(fmu.instances) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
 
     refeventEncountered = Ref(eventEncountered)
     refterminateSimulation = Ref(terminateSimulation)
     refearlyReturn = Ref(earlyReturn)
     reflastSuccessfulTime = Ref(lastSuccessfulTime)
-    fmi3DoStep(fmu.instances[end], fmi3Float64(currentCommunicationPoint), fmi3Float64(communicationStepSize), fmi3Boolean(noSetFMUStatePriorToCurrentPoint), refeventEncountered, refterminateSimulation, refearlyReturn, reflastSuccessfulTime)
+    fmi3DoStep!(fmu.instances[end], fmi3Float64(currentCommunicationPoint), fmi3Float64(communicationStepSize), fmi3Boolean(noSetFMUStatePriorToCurrentPoint), refeventEncountered, refterminateSimulation, refearlyReturn, reflastSuccessfulTime)
     eventEncountered = refeventEncountered[]
     terminateSimulation = refterminateSimulation[]
     earlyReturn = refearlyReturn[]

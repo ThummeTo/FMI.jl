@@ -28,14 +28,15 @@ t_stop = 3.0
 # @test solution.success
 
 # test with recording values
-solution = fmiSimulateCS(fmuStruct, t_start, t_stop; recordValues=["mass.h", "mass.v"])
-@test solution.success
-@test length(solution.values.saveval) == t_start:1e-2:t_stop |> length
-@test length(solution.values.saveval[1]) == 2
+success,savedValues = fmiSimulateCS(fmuStruct, t_start, t_stop; recordValues=["h", "v"])
+@test success
+@test length(savedValues.t) == 100
+#@test length(savedValues.t) == t_start:1e-2:t_stop |> length
+@test length(savedValues.saveval[1]) == 2
 
-t = solution.values.t
-s = collect(d[1] for d in solution.values.saveval)
-v = collect(d[2] for d in solution.values.saveval)
+t = savedValues.t
+s = collect(d[1] for d in savedValues.saveval)
+v = collect(d[2] for d in savedValues.saveval)
 @test t[1] == t_start
 @test t[end] == t_stop
 

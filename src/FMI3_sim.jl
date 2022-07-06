@@ -315,7 +315,7 @@ If keyword `recordValues` is not set, a tuple of type (success::Bool, nothing) i
 
 ToDo: Improve Documentation.
 """
-function fmi3SimulateCS(fmu::FMU3, c::fmi3Instance, t_start::Real, t_stop::Real;
+function fmi3SimulateCS(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
                         recordValues::fmi3ValueReferenceFormat = nothing,
                         saveat = [],
                         setup::Bool = true,
@@ -323,9 +323,9 @@ function fmi3SimulateCS(fmu::FMU3, c::fmi3Instance, t_start::Real, t_stop::Real;
                         inputValues::fmi3ValueReferenceFormat = nothing,
                         inputFunction = nothing)
 
-    recordValues = prepareValueReference(c, recordValues)
-    inputValues = prepareValueReference(c, inputValues)
-    variableSteps = c.fmu.modelDescription.CScanHandleVariableCommunicationStepSize 
+    recordValues = prepareValueReference(fmu, recordValues)
+    inputValues = prepareValueReference(fmu, inputValues)
+    variableSteps = fmu.modelDescription.coSimulation.canHandleVariableCommunicationStepSize 
 
     success = false
     savedValues = nothing
@@ -351,12 +351,12 @@ function fmi3SimulateCS(fmu::FMU3, c::fmi3Instance, t_start::Real, t_stop::Real;
 
 
     if reset
-        fmi3Reset(c)
+        fmi3Reset(fmu)
     end
 
     if setup
-        fmi3EnterInitializationMode(c, t_start, t_stop)
-        fmi3ExitInitializationMode(c)
+        fmi3EnterInitializationMode(fmu, t_start, t_stop)
+        fmi3ExitInitializationMode(fmu)
     end
 
     t = t_start
@@ -375,7 +375,7 @@ function fmi3SimulateCS(fmu::FMU3, c::fmi3Instance, t_start::Real, t_stop::Real;
 
         i = 1
 
-        values = (fmi3GetFloat64(c, recordValues)...,)
+        values = (fmi3GetFloat64(fmu, recordValues)...,)
         DiffEqCallbacks.copyat_or_push!(savedValues.t, i, t)
         DiffEqCallbacks.copyat_or_push!(savedValues.saveval, i, values, Val{false})
 
@@ -389,10 +389,10 @@ function fmi3SimulateCS(fmu::FMU3, c::fmi3Instance, t_start::Real, t_stop::Real;
             end
 
             if inputFunction !== nothing
-                fmi3SetFloat64(c, inputValues, inputFunction(t))
+                fmi3SetFloat64(fmu, inputValues, inputFunction(t))
             end
 
-            fmi3DoStep(c, t, dt, fmi3True, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
+            fmi3DoStep!(fmu, t, dt, fmi3True, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
             if eventEncountered == fmi3True
                 @warn "Event handling"
             end
@@ -405,7 +405,7 @@ function fmi3SimulateCS(fmu::FMU3, c::fmi3Instance, t_start::Real, t_stop::Real;
             t = t + dt #round(t + dt, digits=numDigits)
             i += 1
 
-            values = (fmi3GetFloat64(c, recordValues)...,)
+            values = (fmi3GetFloat64(fmu, recordValues)...,)
             DiffEqCallbacks.copyat_or_push!(savedValues.t, i, t)
             DiffEqCallbacks.copyat_or_push!(savedValues.saveval, i, values, Val{false})
         end
@@ -424,10 +424,10 @@ function fmi3SimulateCS(fmu::FMU3, c::fmi3Instance, t_start::Real, t_stop::Real;
             end
 
             if inputFunction !== nothing
-                fmi3SetFloat64(c, inputValues, inputFunction(t))
+                fmi3SetFloat64(fmu, inputValues, inputFunction(t))
             end
 
-            fmi3DoStep(c, t, dt, fmi3True, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
+            fmi3DoStep!(fmu, t, dt, fmi3True, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
             if eventEncountered == fmi3True
                 @warn "Event handling"
             end
