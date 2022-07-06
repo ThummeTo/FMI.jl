@@ -30,25 +30,25 @@ end
 ###########################
 
 if fmiCanGetSetState(myFMU) && fmiCanSerializeFMUstate(myFMU)
-    @test fmi3GetFloat64(fmuStruct, "s") == 0.5
+    @test fmi3GetFloat64(fmuStruct, "h") == 1.0
     FMUstate = fmiGetFMUstate(fmuStruct)
-    @test typeof(FMUstate) == FMI.fmi3FMUstate
+    @test typeof(FMUstate) == FMI.fmi3FMUState
     len = fmiSerializedFMUstateSize(fmuStruct, FMUstate)
     @test len > 0
     serial = fmiSerializeFMUstate(fmuStruct, FMUstate)
     @test length(serial) == len
-    @test typeof(serial) == Array{Char,1}
+    @test typeof(serial) == Array{UInt8,1}
 
-    fmi3SetFloat64(fmuStruct, "mass.s", 10.0)
+    fmi3SetFloat64(fmuStruct, "h", 10.0)
     FMUstate = fmiGetFMUstate(fmuStruct)
-    @test fmi3GetFloat64(fmuStruct, "mass.s") == 10.0
+    @test fmi3GetFloat64(fmuStruct, "h") == 10.0
 
     FMUstate2 = fmiDeSerializeFMUstate(fmuStruct, serial)
-    @test typeof(FMUstate2) == FMI.fmi2FMUstate
+    @test typeof(FMUstate2) == FMI.fmi3FMUState
     fmiSetFMUstate(fmuStruct, FMUstate2)
-    @test fmi3GetFloat64(fmuStruct, "mass.s") == 0.5
+    @test fmi3GetFloat64(fmuStruct, "h") == 1.0
     fmiSetFMUstate(fmuStruct, FMUstate)
-    @test fmi3GetFloat64(fmuStruct, "mass.s") == 10.0
+    @test fmi3GetFloat64(fmuStruct, "h") == 10.0
     fmiFreeFMUstate!(fmuStruct, FMUstate)
     fmiFreeFMUstate!(fmuStruct, FMUstate2)
 else

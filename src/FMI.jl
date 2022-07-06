@@ -59,6 +59,7 @@ import FMIImport: fmi3SetTime, fmi3SetContinuousStates, fmi3EnterEventMode, fmi3
 import FMIImport: fmi3GetContinuousStateDerivatives, fmi3GetEventIndicators, fmi3GetContinuousStates, fmi3GetNominalsOfContinuousStates
 import FMIImport: fmi3StringToValueReference, fmi3ValueReferenceToString, fmi3ModelVariablesForValueReference
 import FMIImport: fmi3GetFloat32, fmi3GetFloat64, fmi3GetInt8, fmi3GetUInt8, fmi3GetInt16, fmi3GetUInt16, fmi3GetInt32, fmi3GetUInt32, fmi3GetInt64, fmi3GetUInt64, fmi3GetBoolean, fmi3GetBinary, fmi3GetClock, fmi3GetString
+import FMIImport: fmi3SetFloat32, fmi3SetFloat64, fmi3SetInt8, fmi3SetUInt8, fmi3SetInt16, fmi3SetUInt16, fmi3SetInt32, fmi3SetUInt32, fmi3SetInt64, fmi3SetUInt64, fmi3SetBoolean, fmi3SetBinary, fmi3SetClock, fmi3SetString
 import FMIImport: fmi3GetFMUState, fmi3SerializedFMUStateSize, fmi3SerializeFMUState, fmi3DeSerializeFMUState
 import FMIImport: fmi3GetDirectionalDerivative, fmi3GetAdjointDerivative
 import FMIImport: fmi3GetStartValue, fmi3SampleDirectionalDerivative, fmi3CompletedIntegratorStep
@@ -73,6 +74,9 @@ import FMIImport: fmi3Get, fmi3Get!, fmi3Set
 import FMIImport: fmi3GetSolutionTime, fmi3GetSolutionState, fmi3GetSolutionValue
 export fmi3GetSolutionTime, fmi3GetSolutionState, fmi3GetSolutionValue
 export fmi3InstantiateCoSimulation!, fmi3InstantiateModelExchange!, fmi3InstantiateScheduledExecution!
+export fmi3EnterInitializationMode, fmi3ExitInitializationMode
+export fmi3GetFloat32, fmi3GetFloat64, fmi3GetInt8, fmi3GetUInt8, fmi3GetInt16, fmi3GetUInt16, fmi3GetInt32, fmi3GetUInt32, fmi3GetInt64, fmi3GetUInt64, fmi3GetBoolean, fmi3GetBinary, fmi3GetClock, fmi3GetString
+export fmi3SetFloat64
 
 import FMIImport: fmi2TypeModelExchange, fmi2TypeCoSimulation, fmi2Type
 export fmi2TypeModelExchange, fmi2TypeCoSimulation, fmi2Type
@@ -468,7 +472,7 @@ function fmiCanSerializeFMUstate(str::fmi2StructMD)
     fmi2CanSerializeFMUstate(str)
 end
 function fmiCanSerializeFMUstate(str::fmi3StructMD)
-    fmi3CanSerializeFMUstate(str)
+    fmi3CanSerializeFMUState(str)
 end
 
 # TODO fmi3Call fmiProvidesDirectionalDerivatives
@@ -1819,7 +1823,7 @@ function fmiGetFMUstate(str::fmi2Struct)
     fmi2GetFMUstate(str)
 end
 function fmiGetFMUstate(str::fmi3Struct)
-    fmi3GetFMUstate(str)
+    fmi3GetFMUState(str)
 end
 # TODO different call in fmi3
 
@@ -1859,7 +1863,7 @@ function fmiSetFMUstate(str::fmi2Struct, args...; kwargs...)
     fmi2SetFMUstate(str, args...; kwargs...)
 end
 function fmiSetFMUstate(str::fmi3Struct, args...; kwargs...)
-    fmi3SetFMUstate(str, args...; kwargs...)
+    fmi3SetFMUState(str, args...; kwargs...)
 end
 # TODO different call in fmi3
 
@@ -1902,7 +1906,7 @@ function fmiFreeFMUstate!(str::fmi2Struct, args...; kwargs...)
     fmi2FreeFMUstate!(str, args...; kwargs...)
 end
 function fmiFreeFMUstate!(str::fmi3Struct, args...; kwargs...)
-    fmi3FreeFMUstate!(str, args...; kwargs...)
+    fmi3FreeFMUState!(str, args...; kwargs...)
 end
 # TODO different call in fmi3
 
@@ -1936,7 +1940,7 @@ function fmiSerializedFMUstateSize(str::fmi2Struct, args...; kwargs...)
     fmi2SerializedFMUstateSize(str, args...; kwargs...)
 end
 function fmiSerializedFMUstateSize(str::fmi3Struct, args...; kwargs...)
-    fmi3SerializedFMUstateSize(str, args...; kwargs...)
+    fmi3SerializedFMUStateSize(str, args...; kwargs...)
 end
 # TODO different call in fmi3
 
@@ -1968,7 +1972,7 @@ function fmiSerializeFMUstate(str::fmi2Struct, args...; kwargs...)
     fmi2SerializeFMUstate(str, args...; kwargs...)
 end
 function fmiSerializeFMUstate(str::fmi3Struct, args...; kwargs...)
-    fmi3SerializeFMUstate(str, args...; kwargs...)
+    fmi3SerializeFMUState(str, args...; kwargs...)
 end
 # TODO different call in fmi3
 
@@ -2000,7 +2004,7 @@ function fmiDeSerializeFMUstate(str::fmi2Struct, args...; kwargs...)
     fmi2DeSerializeFMUstate(str, args...; kwargs...)
 end
 function fmiDeSerializeFMUstate(str::fmi3Struct, args...; kwargs...)
-    fmi3DeSerializeFMUstate(str, args...; kwargs...)
+    fmi3DeSerializeFMUState(str, args...; kwargs...)
 end
 
 """
@@ -2090,20 +2094,6 @@ function fmiGetDirectionalDerivative!(str::fmi2Struct, args...; kwargs...)
 end
 function fmiGetDirectionalDerivative!(str::fmi3Struct, args...; kwargs...)
     fmi3GetDirectionalDerivative!(str, args...; kwargs...)
-end
-
-"""
-Returns the values of the adjoint derivatives.
-"""
-function fmiGetAdjointDerivative(str::fmi3Struct, args...; kwargs...)
-    fmi3GetAdjointDerivative(str, args...; kwargs...)
-end
-
-"""
-Returns the values of the adjoint derivatives (in-place).
-"""
-function fmiGetAdjointDerivative!(str::fmi3Struct, args...; kwargs...)
-    fmi3GetAdjointDerivative!(str, args...; kwargs...)
 end
 
 """

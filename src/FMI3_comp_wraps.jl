@@ -564,14 +564,14 @@ function fmi3SetFMUState(fmu::FMU3, state::fmi3FMUState)
 end
 
 """
-    fmi3FreeFMUState(fmu::FMU3, state::fmi3FMUState)
+    fmi3FreeFMUState!(fmu::FMU3, state::fmi3FMUState)
 
-Wrapper for fmi3FreeFMUState() in FMIImport/FMI3_int.jl
+Wrapper for fmi3FreeFMUState!() in FMIImport/FMI3_int.jl
 """
-function fmi3FreeFMUState(fmu::FMU3, state::fmi3FMUState)
+function fmi3FreeFMUState!(fmu::FMU3, state::fmi3FMUState)
     @assert length(fmu.instances) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
 
-    fmi3FreeFMUState(fmu.instances[end], state)
+    fmi3FreeFMUState!(fmu.instances[end], state)
 end
 
 """
