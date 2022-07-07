@@ -73,12 +73,12 @@ function fmiPlot(solution::FMU2Solution; kwargs...)
     @warn "fmiPlot(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`."
 end
 function fmiPlot!(fig, solution::FMU2Solution; kwargs...)
-    @warn "fmiPlot!(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`." 
+    @warn "fmiPlot!(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`."
 end
 export fmiPlot, fmiPlot!
 
 # from FMI2_JLD2.jl
-function fmiSaveSolution(solution::FMU2Solution, filepath::AbstractString; keyword="solution") 
+function fmiSaveSolution(solution::FMU2Solution, filepath::AbstractString; keyword="solution")
     @warn "fmiSave(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
 end
 function fmiLoadSolution(path::AbstractString; keyword="solution")
@@ -92,11 +92,11 @@ function __init__()
         import .Plots
         include("FMI2_plot.jl")
         include("FMI3_plot.jl")
-    end 
+    end
     @require JLD2="033835bb-8acc-5ee8-8aae-3f567f8a3819" begin
         import .JLD2
         include("FMI2_JLD2.jl")
-    end 
+    end
 end
 
 ### EXPORTING LISTS START ###
@@ -1059,6 +1059,34 @@ function fmiGetReal(str::fmi2Struct, args...; kwargs...)
     fmi2GetReal(str, args...; kwargs...)
 end
 
+"""
+
+   fmi2GetRealOutputDerivatives(c::FMU2Component, vr::fmi2ValueReferenceFormat, order::AbstractArray{fmi2Integer})
+
+
+Sets the n-th time derivative of real input variables.
+
+# Arguments
+- `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
+More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
+ - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
+ - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
+- `vr::Array{fmi2ValueReference}`: Argument `vr` is an array of `nvr` value handels called "ValueReference" that t define the variables whose derivatives shall be set.
+- `order::Array{fmi2Integer}`: Argument `order` is an array of fmi2Integer values witch specifys the corresponding order of derivative of the real input variable.
+-
+
+# Returns
+- `value::AbstactArray{fmi2Integer}`: Return `value` is an array which represents a vector with the values of the derivatives.
+
+# Source
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
+- FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
+- FMISpec2.0.2[p.104]: 4.2.1 Transfer of Input / Output Values and Parameters
+
+See also [`fmi2SetRealInputDerivatives!`](@ref).
+"""
+
 function fmiGetRealOutputDerivatives(str::fmi2Struct, args...; kwargs...)
     fmi2GetRealOutputDerivatives(str, args...; kwargs...)
 end
@@ -1707,22 +1735,43 @@ end
 """
 
     fmiGetDirectionalDerivative(str::fmi2Struct, c::FMU2Component,
-                                      vUnknown_ref::Array{fmi2ValueReference},
-                                      vKnown_ref::Array{fmi2ValueReference},
-                                      dvKnown::Union{Array{fmi2Real}, Nothing} = nothing)
+                                      vUnknown_ref::AbstractArray{fmi2ValueReference},
+                                      vKnown_ref::AbstractArray{fmi2ValueReference},
+                                      dvKnown::Union{AbstractArray{fmi2Real}, Nothing} = nothing)
 
-Returns the values of the directional derivatives.
+    fmi2GetDirectionalDerivative(str::fmi2Struct, c::FMU2Component,
+                                        vUnknown_ref::fmi2ValueReference,
+                                        vKnown_ref::fmi2ValueReference,
+                                        dvKnown::fmi2Real = 1.0)
 
- ΔvUnknown = (∂h / ∂vKnown) ⋅ ΔvKnown
+The Wrapper Function and the Direct function call to compute the partial derivative with respect to `vKnown_ref`.
+
+Computes the directional derivatives of an FMU. An FMU has different Modes and in every Mode an FMU might be described by different equations and different unknowns.The precise definitions are given in the mathematical descriptions of Model Exchange (section 3.1) and Co-Simulation (section 4.1). In every Mode, the general form of the FMU equations are:
+𝐯_unknown = 𝐡(𝐯_known, 𝐯_rest)
+
+- `v_unknown`: vector of unknown Real variables computed in the actual Mode:
+    - Initialization Mode: unkowns kisted under `<ModelStructure><InitialUnknowns>` that have type Real.
+    - Continuous-Time Mode (ModelExchange): The continuous-time outputs and state derivatives. (= the variables listed under `<ModelStructure><Outputs>` with type Real and variability = `continuous` and the variables listed as state derivatives under `<ModelStructure><Derivatives>)`.
+    - Event Mode (ModelExchange): The same variables as in the Continuous-Time Mode and additionally variables under `<ModelStructure><Outputs>` with type Real and variability = `discrete`.
+    - Step Mode (CoSimulation):  The variables listed under `<ModelStructure><Outputs>` with type Real and variability = `continuous` or `discrete`. If `<ModelStructure><Derivatives>` is present, also the variables listed here as state derivatives.
+- `v_known`: Real input variables of function h that changes its value in the actual Mode.
+- `v_rest`:Set of input variables of function h that either changes its value in the actual Mode but are non-Real variables, or do not change their values in this Mode, but change their values in other Modes
+
+Computes a linear combination of the partial derivatives of h with respect to the selected input variables 𝐯_known:
+
+    Δv_unknown = (δh / δv_known) Δv_known
 
 # Arguments
 - `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
 More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
  - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
  - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
-- `vUnknown_ref::Array{fmi2ValueReference}`: Argument `vUnknown_ref` contains values of type`fmi2ValueReference` which are identifiers of a variable value of the model. `vUnknown_ref` is the Array of the vector values of unknown variables computed in the actual Mode.
-- `vKnown_ref::Array{fmi2ValueReference}`: Argument `vKnown_ref` contains values of type `fmi2ValueReference` which are identifiers of a variable value of the model.`vKnown_ref` is the Array of the vector values of Real input variables of function h that changes its value in the actual Mode.
-- `dvKnown::Union{Array{fmi2Real}, Nothing} = nothing`: Argument `dvKnown` contains values of type `fmi2Real` or one value of type `Nothing`, if no argument is passed the default value `nothing` is used. `dvKnown` represents the seed vector.
+- `vUnknown_ref::AbstractArray{fmi2ValueReference}`: Argument `vUnknown_ref` contains values of type`fmi2ValueReference` which are identifiers of a variable value of the model. `vUnknown_ref` can be equated with `v_unknown`(variable described above).
+ - `vUnknown_ref::fmi2ValueReference`: Argument `vUnknown_ref` contains a value of type`fmi2ValueReference` which is an identifier of a variable value of the model. `vUnknown_ref` can be equated with `v_unknown`(variable described above).
+- `vKnown_ref::AbstractArray{fmi2ValueReference}`: Argument `vKnown_ref` contains values of type `fmi2ValueReference` which are identifiers of a variable value of the model.`vKnown_ref` can be equated with `v_known`(variable described above).
+- `vKnown_ref::fmi2ValueReference`: Argument `vKnown_ref` contains a value of type`fmi2ValueReference` which is an identifier of a variable value of the model. `vKnown_ref` can be equated with `v_known`(variable described above).
+- `dvKnown::Union{AbstractArray{fmi2Real}, Nothing} = nothing`: If no seed vector is passed the value `nothing` is used. The vector values Compute the partial derivative with respect to the given entries in vector `vKnown_ref` with the matching evaluate of `dvKnown`.
+- `dvKnown::Fmi2Real = 1.0`: If no seed value is passed the value `dvKnown = 1.0` is used. Compute the partial derivative with respect to `vKnown_ref` with the value `dvKnown = 1.0`.  # gehört das zu den v_rest values
 
 # Returns
 - `dvUnknown::Array{fmi2Real}`: Return `dvUnknown` contains the directional derivative vector values.
@@ -1741,37 +1790,49 @@ end
 """
 TODO -> Arguments
     fmiGetDirectionalDerivative!(str::fmi2Struct, c::FMU2Component,
-                                      vUnknown_ref::Array{fmi2ValueReference},
-                                      vKnown_ref::Array{fmi2ValueReference},
+                                      vUnknown_ref::AbstractArray{fmi2ValueReference},
+                                      vKnown_ref::AbstractArray{fmi2ValueReference},
                                       dvUnknown::AbstractArray,
                                       dvKnown::Union{Array{fmi2Real}, Nothing} = nothing)
 
     fmiGetDirectionalDerivative!(str::fmi2Struct, c::FMU2Component,
-                                       vUnknown_ref::Array{fmi2ValueReference},
+                                       vUnknown_ref::AbstractArray{fmi2ValueReference},
                                        nUnknown::Csize_t,
-                                       vKnown_ref::Array{fmi2ValueReference},
+                                       vKnown_ref::AbstractArray{fmi2ValueReference},
                                        nKnown::Csize_t,
-                                       dvKnown::Array{fmi2Real},
+                                       dvKnown::AbstractArray{fmi2Real},
                                        dvUnknown::AbstractArray)
 
 
-Returns the values of the directional derivatives (in-place).
+Wrapper Function call to compute the partial derivative with respect to the variables `vKnown_ref`.
 
-ΔvUnknown = (∂h / ∂vKnown) ⋅ ΔvKnown
+Computes the directional derivatives of an FMU. An FMU has different Modes and in every Mode an FMU might be described by different equations and different unknowns.The precise definitions are given in the mathematical descriptions of Model Exchange (section 3.1) and Co-Simulation (section 4.1). In every Mode, the general form of the FMU equations are:
+𝐯_unknown = 𝐡(𝐯_known, 𝐯_rest)
+
+- `v_unknown`: vector of unknown Real variables computed in the actual Mode:
+   - Initialization Mode: unkowns kisted under `<ModelStructure><InitialUnknowns>` that have type Real.
+   - Continuous-Time Mode (ModelExchange): The continuous-time outputs and state derivatives. (= the variables listed under `<ModelStructure><Outputs>` with type Real and variability = `continuous` and the variables listed as state derivatives under `<ModelStructure><Derivatives>)`.
+   - Event Mode (ModelExchange): The same variables as in the Continuous-Time Mode and additionally variables under `<ModelStructure><Outputs>` with type Real and variability = `discrete`.
+   - Step Mode (CoSimulation):  The variables listed under `<ModelStructure><Outputs>` with type Real and variability = `continuous` or `discrete`. If `<ModelStructure><Derivatives>` is present, also the variables listed here as state derivatives.
+- `v_known`: Real input variables of function h that changes its value in the actual Mode.
+- `v_rest`:Set of input variables of function h that either changes its value in the actual Mode but are non-Real variables, or do not change their values in this Mode, but change their values in other Modes
+
+Computes a linear combination of the partial derivatives of h with respect to the selected input variables 𝐯_known:
+
+   Δv_unknown = (δh / δv_known) Δv_known
 
 # Arguments
 - `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
 More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
  - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
  - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
-- `vUnknown_ref::Array{fmi2ValueReference}`: Argument `vUnknown_ref` contains values of type`fmi2ValueReference` which are identifiers of a variable value of the model. `vUnknown_ref` is the Array of the vector values of unknown variables computed in the actual Mode.
-- `vKnown_ref::Array{fmi2ValueReference}`: Argument `vKnown_ref` contains values of type `fmi2ValueReference` which are identifiers of a variable value of the model.`vKnown_ref` is the Array of the vector values of Real input variables of function h that changes its value in the actual Mode.
-- `dvUnknown::AbstractArray`:
-- `dvKnown::Union{Array{fmi2Real}, Nothing} = nothing`: Argument `dvKnown` contains values of type `fmi2Real` or one value of type `Nothing`, if no argument is passed the default value `nothing` is used. `dvKnown` represents the seed vector.
-- `nUnknown::Csize_t`: Argument `nUnknown` defines
-- `nKnown::Csize_t`: Argument `nKnown` defines the
-- `dvKnown::Array{fmi2Real}`:Argument `dvKnown` contains `fmi2Real` objects. `dvKnown` represents the seed vector.
-
+- `vUnknown_ref::AbstracArray{fmi2ValueReference}`: Argument `vUnknown_ref` contains values of type`fmi2ValueReference` which are identifiers of a variable value of the model. `vUnknown_ref` can be equated with `v_unknown`(variable described above).
+- `vKnown_ref::AbstractArray{fmi2ValueReference}`: Argument `vKnown_ref` contains values of type `fmi2ValueReference` which are identifiers of a variable value of the model.`vKnown_ref` can be equated with `v_known`(variable described above).
+- `dvUnknown::AbstractArray`: Stores the directional derivative vector values.
+- `dvKnown::Union{Array{fmi2Real}, Nothing} = nothing`: If no seed vector is passed the value `nothing` is used. The vector values Compute the partial derivative with respect to the given entries in vector `vKnown_ref` with the matching evaluate of `dvKnown`.
+- `dvKnown::AbstractArray{fmi2Real}`:The vector values Compute the partial derivative with respect to the given entries in vector `vKnown_ref` with the matching evaluate of `dvKnown`.
+- `nUnknown::Csize_t`:
+- `nKnown::Csize_t`:
 
 # Returns
 - `status::fmi2Status`: Return `status` is an enumeration of type `fmi2Status` and indicates the success of the function call.
@@ -1782,6 +1843,13 @@ More detailed:
   - `fmi2Error`: the communication step could not be carried out at all
   - `fmi2Fatal`: if an error occurred which corrupted the FMU irreparably
   - `fmi2Pending`: this status is returned if the slave executes the function asynchronously
+
+# Source
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
+- FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
+- FMISpec2.0.2[p.25]: 2.1.9 Getting Partial Derivatives
+See also [`fmi2GetDirectionalDerivative`](@ref).
 """
 function fmiGetDirectionalDerivative!(str::fmi2Struct, args...; kwargs...)
     fmi2GetDirectionalDerivative!(str, args...; kwargs...)
@@ -1936,7 +2004,14 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
 - `nx::Csize_t`: Argument `nx` defines the length of vector `x` and is provided for checking purposes
 
 # Returns
-
+- `status::fmi2Status`: Return `status` is an enumeration of type `fmi2Status` and indicates the success of the function call.
+More detailed:
+  - `fmi2OK`: all well
+  - `fmi2Warning`: things are not quite right, but the computation can continue
+  - `fmi2Discard`: if the slave computed successfully only a subinterval of the communication step
+  - `fmi2Error`: the communication step could not be carried out at all
+  - `fmi2Fatal`: if an error occurred which corrupted the FMU irreparably
+  - `fmi2Pending`: this status is returned if the slave executes the function asynchronously
 # Source
 - FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
