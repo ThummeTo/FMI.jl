@@ -56,7 +56,7 @@ import FMIImport: fmi3DoStep!
 import FMIImport: fmi3EnterConfigurationMode, fmi3ExitConfigurationMode, fmi3GetNumberOfContinuousStates!, fmi3GetNumberOfEventIndicators!, fmi3GetContinuousStates!, fmi3GetNominalsOfContinuousStates!
 import FMIImport: fmi3EvaluateDiscreteStates, fmi3EnterStepMode
 import FMIImport: fmi3SetTime, fmi3SetContinuousStates, fmi3EnterEventMode, fmi3UpdateDiscreteStates, fmi3EnterContinuousTimeMode, fmi3CompletedIntegratorStep!
-import FMIImport: fmi3GetContinuousStateDerivatives, fmi3GetEventIndicators, fmi3GetContinuousStates, fmi3GetNominalsOfContinuousStates
+import FMIImport: fmi3GetContinuousStateDerivatives, fmi3GetContinuousStateDerivatives!, fmi3GetEventIndicators, fmi3GetContinuousStates, fmi3GetNominalsOfContinuousStates
 import FMIImport: fmi3StringToValueReference, fmi3ValueReferenceToString, fmi3ModelVariablesForValueReference
 import FMIImport: fmi3GetFloat32, fmi3GetFloat64, fmi3GetInt8, fmi3GetUInt8, fmi3GetInt16, fmi3GetUInt16, fmi3GetInt32, fmi3GetUInt32, fmi3GetInt64, fmi3GetUInt64, fmi3GetBoolean, fmi3GetBinary, fmi3GetClock, fmi3GetString
 import FMIImport: fmi3SetFloat32, fmi3SetFloat64, fmi3SetInt8, fmi3SetUInt8, fmi3SetInt16, fmi3SetUInt16, fmi3SetInt32, fmi3SetUInt32, fmi3SetInt64, fmi3SetUInt64, fmi3SetBoolean, fmi3SetBinary, fmi3SetClock, fmi3SetString
@@ -77,6 +77,7 @@ export fmi3InstantiateCoSimulation!, fmi3InstantiateModelExchange!, fmi3Instanti
 export fmi3EnterInitializationMode, fmi3ExitInitializationMode
 export fmi3GetFloat32, fmi3GetFloat64, fmi3GetInt8, fmi3GetUInt8, fmi3GetInt16, fmi3GetUInt16, fmi3GetInt32, fmi3GetUInt32, fmi3GetInt64, fmi3GetUInt64, fmi3GetBoolean, fmi3GetBinary, fmi3GetClock, fmi3GetString
 export fmi3SetFloat64
+export fmi3UpdateDiscreteStates, fmi3GetContinuousStateDerivatives!
 
 import FMIImport: fmi2TypeModelExchange, fmi2TypeCoSimulation, fmi2Type
 export fmi2TypeModelExchange, fmi2TypeCoSimulation, fmi2Type

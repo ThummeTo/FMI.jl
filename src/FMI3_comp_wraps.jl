@@ -4,8 +4,8 @@
 #
 
 # What is included in the file `FMI3_comp_wraps.jl` (FMU instance wrappers)?
-# - wrappers to call fmi3InstanceFunctions from FMUs (FMI-functions,        last instantiated component is used) [exported]
-# - wrappers to call fmi3InstanceFunctions from FMUs (additional functions, last instantiated component is used) [exported]
+# - wrappers to call fmi3InstanceFunctions from FMUs (FMI-functions,        last instantiated instance is used) [exported]
+# - wrappers to call fmi3InstanceFunctions from FMUs (additional functions, last instantiated instance is used) [exported]
 
 
 using FMIImport: FMU3, fmi3ModelDescription
@@ -968,7 +968,7 @@ end
 Wrapper for fmi3SimulateME() in FMI/FMI3_sim.jl
 """
 function fmi3SimulateME(fmu::FMU3, args...; kwargs...)
-    return fmi3SimulateME(fmu, nothing, args...; kwargs...)
+    return fmi3SimulateME(fmu.instances[end], args...; kwargs...)
 end
 
 

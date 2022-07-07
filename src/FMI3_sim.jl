@@ -5,12 +5,12 @@
 
 using DifferentialEquations, DiffEqCallbacks
 
-using FMIImport: fmi3Instance
+using FMIImport: FMU3Instance
 
 ############ Model-Exchange ############
 
 # Read next time event from FMU and provide it to the integrator 
-function time_choice(c::fmi3Instance, integrator) 
+function time_choice(c::FMU3Instance, integrator) 
     @debug "time_choice(_, _): Time event @ t=$(integrator.t)"
 
     discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime = fmi3UpdateDiscreteStates(c)
@@ -24,17 +24,19 @@ function time_choice(c::fmi3Instance, integrator)
 end
 
 # Handles events and returns the values and nominals of the changed continuous states.
-function handleEvents(c::fmi3Instance, enterEventMode::Bool, exitInContinuousMode::Bool)
+function handleEvents(c::FMU3Instance, enterEventMode::Bool, exitInContinuousMode::Bool)
     nominalsChanged = fmi3False
     valuesChanged = fmi3False
+    println(enterEventMode)
     if enterEventMode
 
         fmi3EnterEventMode(c, c.stepEvent, c.stateEvent, c.rootsFound, Csize_t(c.fmu.modelDescription.numberOfEventIndicators), c.timeEvent)
         # TODO inputEvent handling
-        
+        println("before loop")
+        println("---------------------")
         discreteStatesNeedUpdate = fmi3True
         while discreteStatesNeedUpdate == fmi3True
-
+            println(discreteStatesNeedUpdate)
             # update discrete states
             discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime = fmi3UpdateDiscreteStates(c)
           
@@ -52,17 +54,19 @@ function handleEvents(c::fmi3Instance, enterEventMode::Bool, exitInContinuousMod
         end
     end
     
-
+    println("afterLoop")
     if exitInContinuousMode
+        println("enterinContTimeMode")
         fmi3EnterContinuousTimeMode(c)
     end
+    println("after if")
     @debug "handleEvents(_, $(enterEventMode), $(exitInContinuousMode)): rootsFound: $(c.rootsFound)   valuesChanged: $(valuesChanged)   continuousStates: $(fmi3GetContinuousStates(c))", 
     return valuesChanged, nominalsChanged
 
 end
 
 # Returns the event indicators for an FMU.
-function condition(c::fmi3Instance, out, x, t, integrator, inputFunction, inputValues::Array{fmi3ValueReference}) # Event when event_f(u,t) == 0
+function condition(c::FMU3Instance, out, x, t, integrator, inputFunction, inputValues::Array{fmi3ValueReference}) # Event when event_f(u,t) == 0
     if inputFunction !== nothing
         fmi3SetFloat64(c, inputValues, inputFunction(integrator.t))
     end
@@ -89,26 +93,32 @@ function condition(c::fmi3Instance, out, x, t, integrator, inputFunction, inputV
 end
 
 # Handles the upcoming events.
-function affectFMU!(c::fmi3Instance, integrator, idx, inputFunction, inputValues::Array{fmi3ValueReference}, force=false)
+function affectFMU!(c::FMU3Instance, integrator, idx, inputFunction, inputValues::Array{fmi3ValueReference}, force=false)
     # Event found - handle it
-
+    # println(c)
+    # println(integrator)
+    # println(idx)
+    # println(inputFunction)
+    # println(inputValues)
+    # println("-------------------")
+    # println()
     @debug "affectFMU!(_, _, $(idx), _, _): x:$(integrator.u)   [before handle events]"
-    
+    println("beforeSetContState")
     fmi3SetContinuousStates(c, integrator.u)
-
+    println("beforeHandleEvents")
     continuousStatesChanged, nominalsChanged = handleEvents(c, true, Bool(sign(idx)))
 
     @debug "affectFMU!(_, _, $(idx), _, _): continuousStatesChanged=$(continuousStatesChanged)   x_int:$(integrator.u)   x_fmu:$(fmi3GetContinuousStates(c))   [after handle events]"
-
+    println("beforeSetINputs")
     if inputFunction !== nothing
         fmi3SetFloat64(c, inputValues, inputFunction(integrator.t))
     end
-
+    println("beforeSetNewStates")
     if continuousStatesChanged == fmi3True
         integrator.u = fmi3GetContinuousStates(c)
         @debug "affectFMU!(_, _, $(idx), _, _): Set new state $(integrator.u)"
     end
-
+    println("beforeSetNomsOfContState")
     if nominalsChanged == fmi3True
         x_nom = fmi3GetNominalsOfContinuousStates(c)
     end
@@ -116,12 +126,12 @@ function affectFMU!(c::fmi3Instance, integrator, idx, inputFunction, inputValues
 end
 
 # Does one step in the simulation.
-function stepCompleted(c::fmi3Instance, x, t, integrator, inputFunction, inputValues::Array{fmi3ValueReference})
+function stepCompleted(c::FMU3Instance, x, t, integrator, inputFunction, inputValues::Array{fmi3ValueReference})
 
     fmi3SetContinuousStates(c, x)
     
     indicators = fmi3GetEventIndicators(c)
-        if length(indicators) > 0
+    if length(indicators) > 0
         c.stateEvent = fmi3False
     
         for i in 1:length(indicators)
@@ -144,7 +154,7 @@ function stepCompleted(c::fmi3Instance, x, t, integrator, inputFunction, inputVa
 end
 
 # Returns the state derivatives of the FMU.
-function fx(c::fmi3Instance, x, p, t)
+function fx(c::FMU3Instance, x, p, t)
     @debug "fx($(x), _, $(t))"
     fmi3SetTime(c, t) 
     fmi3SetContinuousStates(c, x)
@@ -152,7 +162,7 @@ function fx(c::fmi3Instance, x, p, t)
 end
 
 # save FMU values 
-function saveValues(c::fmi3Instance, recordValues, u, t, integrator)
+function saveValues(c::FMU3Instance, recordValues, u, t, integrator)
     fmi3SetTime(c, t) 
     x = integrator.sol(t)
     fmi3SetContinuousStates(c, x)
@@ -161,20 +171,18 @@ function saveValues(c::fmi3Instance, recordValues, u, t, integrator)
 end
 
 # wrapper
-function fmi3SimulateME(c::FMU3Instance, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
-    fmi3SimulateME(c.fmu, c, t_start, t_stop; kwargs...)
-end 
+# function fmi3SimulateME(c::FMU3Instance, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
+#     fmi3SimulateME(c.fmu.instances[end], t_start, t_stop; kwargs...)
+# end 
 
 """
 Source: FMISpec3.0, Version D5ef1c1: 3.3. Code Example
-
 Simulates a FMU instance for the given simulation time interval.
 State- and Time-Events are handled correctly.
-
 Returns a tuple of type (ODESolution, DiffEqCallbacks.SavedValues).
 If keyword `recordValues` is not set, a tuple of type (ODESolution, nothing) is returned for consitency.
 """
-function fmi3SimulateME(fmu::FMU3, c::fmi3Instance, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
+function fmi3SimulateME(c::FMU3Instance, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
     solver = nothing,
     customFx = nothing,
     recordValues::fmi3ValueReferenceFormat = nothing,
@@ -203,7 +211,12 @@ function fmi3SimulateME(fmu::FMU3, c::fmi3Instance, t_start::Union{Real, Nothing
 
     savingValues = (length(recordValues) > 0)
     hasInputs = (length(inputValues) > 0)
-
+    # println(t_start)
+    # println(t_stop)
+    # println(recordValues)
+    # println(inputValues)
+    # println(savingValues)
+    # println(hasInputs)
     if savingValues
         savedValues = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...})
 
@@ -212,7 +225,7 @@ function fmi3SimulateME(fmu::FMU3, c::fmi3Instance, t_start::Union{Real, Nothing
                                   saveat=saveat)
         push!(callbacks, savingCB)
     end
-
+    # println(c.fmu.instances[end].state)
     # auto correct reset if only setup is given
     if reset === nothing 
         reset = setup
@@ -223,13 +236,16 @@ function fmi3SimulateME(fmu::FMU3, c::fmi3Instance, t_start::Union{Real, Nothing
     if reset
         fmi3Reset(c)
     end
-
+    # println(c.fmu.instances[end].state)
+    # println(fmi3IsModelExchange(c.fmu))
     if setup
         fmi3EnterInitializationMode(c, t_start, t_stop)
         fmi3ExitInitializationMode(c)
     end
+    println(c.state)
 
     eventHandling = c.fmu.modelDescription.numberOfEventIndicators > 0 
+    # println(eventHandling)
     timeEventHandling = false
     
     if eventHandling
@@ -246,15 +262,16 @@ function fmi3SimulateME(fmu::FMU3, c::fmi3Instance, t_start::Union{Real, Nothing
     end
 
     fmi3EnterContinuousTimeMode(c)
+    # println(c.state)
 
     if eventHandling
         c.z_prev = fmi3GetEventIndicators(c)
     end
-
+    # println(c.z_prev)
     # First evaluation of the FMU
     x0 = fmi3GetContinuousStates(c)
     x0_nom = fmi3GetNominalsOfContinuousStates(c)
-
+    # println(x0)
     p = []
     problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
     
