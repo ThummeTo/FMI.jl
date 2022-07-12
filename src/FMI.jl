@@ -1521,8 +1521,8 @@ function fmiGetInteger!(str::fmi2Struct, args...; kwargs...)
 end
 # TODO different call in fmi3
 
-
 """
+Set the values of an array of integer variables
 
     fmiSetInteger(str::fmi2Struct, c::FMU2Component, vr::fmi2ValueReferenceFormat, values::Union{Array{<:Integer}, <:Integer})
 
@@ -2095,6 +2095,20 @@ function fmiGetDirectionalDerivative!(str::fmi2Struct, args...; kwargs...)
 end
 function fmiGetDirectionalDerivative!(str::fmi3Struct, args...; kwargs...)
     fmi3GetDirectionalDerivative!(str, args...; kwargs...)
+end
+
+"""
+Returns the values of the adjoint derivatives.
+"""
+function fmiGetAdjointDerivative(str::fmi3Struct, args...; kwargs...)
+    fmi3GetAdjointDerivative(str, args...; kwargs...)
+end
+
+"""
+Returns the values of the adjoint derivatives (in-place).
+"""
+function fmiGetAdjointDerivative!(str::fmi3Struct, args...; kwargs...)
+    fmi3GetAdjointDerivative!(str, args...; kwargs...)
 end
 
 """
