@@ -72,12 +72,12 @@ import FMIImport: fmi3GetModelName, fmi3GetInstantiationToken, fmi3GetGeneration
 import FMIImport: fmi3DependenciesSupported, fmi3GetModelIdentifier, fmi3CanGetSetState, fmi3CanSerializeFMUState, fmi3ProvidesDirectionalDerivatives, fmi3ProvidesAdjointDerivatives
 import FMIImport: fmi3Get, fmi3Get!, fmi3Set 
 import FMIImport: fmi3GetSolutionTime, fmi3GetSolutionState, fmi3GetSolutionValue
-export fmi3GetSolutionTime, fmi3GetSolutionState, fmi3GetSolutionValue
-export fmi3InstantiateCoSimulation!, fmi3InstantiateModelExchange!, fmi3InstantiateScheduledExecution!
-export fmi3EnterInitializationMode, fmi3ExitInitializationMode
-export fmi3GetFloat32, fmi3GetFloat64, fmi3GetInt8, fmi3GetUInt8, fmi3GetInt16, fmi3GetUInt16, fmi3GetInt32, fmi3GetUInt32, fmi3GetInt64, fmi3GetUInt64, fmi3GetBoolean, fmi3GetBinary, fmi3GetClock, fmi3GetString
-export fmi3SetFloat64
-export fmi3UpdateDiscreteStates, fmi3GetContinuousStateDerivatives!
+# export fmi3GetSolutionTime, fmi3GetSolutionState, fmi3GetSolutionValue
+# export fmi3InstantiateCoSimulation!, fmi3InstantiateModelExchange!, fmi3InstantiateScheduledExecution!
+# export fmi3EnterInitializationMode, fmi3ExitInitializationMode
+# export fmi3GetFloat32, fmi3GetFloat64, fmi3GetInt8, fmi3GetUInt8, fmi3GetInt16, fmi3GetUInt16, fmi3GetInt32, fmi3GetUInt32, fmi3GetInt64, fmi3GetUInt64, fmi3GetBoolean, fmi3GetBinary, fmi3GetClock, fmi3GetString
+# export fmi3SetFloat64
+# export fmi3UpdateDiscreteStates, fmi3GetContinuousStateDerivatives!
 
 import FMIImport: fmi2TypeModelExchange, fmi2TypeCoSimulation, fmi2Type
 export fmi2TypeModelExchange, fmi2TypeCoSimulation, fmi2Type

@@ -5,7 +5,8 @@
 
 using DifferentialEquations, DiffEqCallbacks
 
-using FMIImport: FMU3Instance
+
+using FMIImport
 
 ############ Model-Exchange ############
 
@@ -95,13 +96,13 @@ end
 # Handles the upcoming events.
 function affectFMU!(c::FMU3Instance, integrator, idx, inputFunction, inputValues::Array{fmi3ValueReference}, force=false)
     # Event found - handle it
-    # println(c)
-    # println(integrator)
-    # println(idx)
-    # println(inputFunction)
-    # println(inputValues)
-    # println("-------------------")
-    # println()
+    println(c)
+    println(integrator)
+    println(idx)
+    println(inputFunction)
+    println(inputValues)
+    println("-------------------")
+    println()
     @debug "affectFMU!(_, _, $(idx), _, _): x:$(integrator.u)   [before handle events]"
     println("beforeSetContState")
     fmi3SetContinuousStates(c, integrator.u)
