@@ -13,28 +13,31 @@
 
 
 ## How can I use FMI.jl?
-1. Open a Julia-REPL, activate your preferred environment.
-1. Goto Package-Manager, activate your preferred environment (if not already) and install [*FMI.jl*](https://github.com/ThummeTo/FMI.jl):
-    ```julia
-    julia> ]
 
-    (@v1.6) pkg> add FMI
-    ```
+1\. Open a Julia-REPL, activate your preferred environment.
 
-    If you want to check that everything works correctly, you can run the tests bundled with [*FMI.jl*](https://github.com/ThummeTo/FMI.jl):
-    ```julia
-    julia> ]
+2\. Goto Package-Manager, activate your preferred environment (if not already) and install [*FMI.jl*](https://github.com/ThummeTo/FMI.jl):
+```julia-repl
+julia> ]
 
-    (@v1.6) pkg> test FMI
-    ```
+(@v1.6) pkg> add FMI
+```
 
-    Additionally, you can check the version of [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) that you have installed with the ```status``` command.
-    ```julia
-    julia> ]
+(3)\. If you want to check that everything works correctly, you can run the tests bundled with [*FMI.jl*](https://github.com/ThummeTo/FMI.jl):
+```julia-repl
+julia> ]
 
-    (@v1.6) pkg> status FMI
-    ```
-1. Have a look inside the [examples folder](https://github.com/ThummeTo/FMI.jl/tree/examples/examples) in the examples branch or the [examples section](https://thummeto.github.io/FMI.jl/dev/examples/overview/) of the documentation. All examples are available as Julia-Script (*.jl*), Jupyter-Notebook (*.ipynb*) and Markdown (*.md*).
+(@v1.6) pkg> test FMI
+```
+
+(4)\. Additionally, you can check the version of [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) that you have installed with the ```status``` command.
+```julia-repl
+julia> ]
+
+(@v1.6) pkg> status FMI
+```
+
+5\. Have a look inside the [examples folder](https://github.com/ThummeTo/FMI.jl/tree/examples/examples) in the examples branch or the [examples section](https://thummeto.github.io/FMI.jl/dev/examples/overview/) of the documentation. All examples are available as Julia-Script (*.jl*), Jupyter-Notebook (*.ipynb*) and Markdown (*.md*).
 
 ## How can I simulate a FMU and plot values?
 ```julia
