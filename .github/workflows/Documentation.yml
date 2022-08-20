@@ -10,14 +10,43 @@ on:
       - main
     paths:
       - 'docs/**'
+      - 'README.md'
     tags: 
       - '*'
 
 jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Check out repository"
+        uses: actions/checkout@v3
+
+      - name: "Set path filter"
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          list-files: shell
+          filters: |
+            test_workflow:
+              - 'src/**'
+              - 'test/**'
+              - '.github/**'
+      
+      # Avoid multiple execution of the workflow 
+      - name: "Exit workflow" 
+        if:  steps.filter.outputs.test_workflow == 'true' && github.event_name == 'push'
+        run: exit 1
+
+      - name: "Cancel workflow"
+        uses: vishnudxb/cancel-workflow@v1.2
+        if: failure()
+        with:
+          repo: stoljarjo/FMIFlux.jl   # TODO change to thummeto
+          workflow_id: ${{ github.run_id }}
+          access_token: ${{ github.token }}
+
   build:
-    if: |
-      ${{ (github.event.workflow_run.conclusion == 'success' && github.sha == github.event.workflow_run.head_sha) || 
-      github.event_name == 'push' }}
+    needs: trigger
     runs-on: ubuntu-latest
 
     steps:
