@@ -17,6 +17,8 @@ on:
 jobs:
   trigger:
     runs-on: ubuntu-latest
+    outputs:
+      flag_filter: ${{ steps.filter.outputs.test_workflow }}
     steps:
       - name: "Check out repository"
         uses: actions/checkout@v3
@@ -31,24 +33,11 @@ jobs:
               - 'src/**'
               - 'test/**'
               - '.github/**'
-      
-      # Avoid multiple execution of the workflow 
-      - name: "Exit workflow" 
-        if:  steps.filter.outputs.test_workflow == 'true' && github.event_name == 'push'
-        run: exit 1
-
-      - name: "Cancel workflow"
-        uses: vishnudxb/cancel-workflow@v1.2
-        if: failure()
-        with:
-          repo: stoljarjo/FMIFlux.jl   # TODO change to thummeto
-          workflow_id: ${{ github.run_id }}
-          access_token: ${{ github.token }}
 
   build:
     needs: trigger
     runs-on: ubuntu-latest
-
+    if: ${{ !(needs.trigger.outputs.flag_filter == 'true' && github.event_name == 'push') }}
     steps:
       - name: "Check out repository"
         uses: actions/checkout@v3
