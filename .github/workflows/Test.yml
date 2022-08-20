@@ -14,16 +14,15 @@ jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
-      # Don't cancel in-progress jobs if any matrix job fails
       fail-fast: false
       matrix:
-        julia-version: ['1.6', '1'] # "1" automatically expands to the latest stable 1.x release of Julia
+        julia-version: ['1.6', '1']
         julia-arch: [x64]
         os: [ubuntu-latest, windows-latest]
         experimental: [false]
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # Checks-out your repository
       - name: Check out repository
         uses: actions/checkout@v3
 
@@ -47,7 +46,7 @@ jobs:
             ${{ runner.os }}-test-
             ${{ runner.os }}-
 
-      # Build FMI.jl package
+      # Build package
       - name: "Build package"
         uses: julia-actions/julia-buildpkg@v1
 
