@@ -28,6 +28,7 @@ jobs:
         id: filter
         with:
           list-files: shell
+          base: 'main'
           filters: |
             test_workflow:
               - 'src/**'
@@ -37,7 +38,7 @@ jobs:
   build:
     needs: trigger
     runs-on: ubuntu-latest
-    if: ${{ !(needs.trigger.outputs.flag_filter == 'true' && github.event_name == 'push') }}
+    if: ${{ !(needs.trigger.outputs.flag_filter == 'true' && github.event_name == 'push')  && github.event.workflow_run.conclusion == 'success'}}
     steps:
       - name: "Check out repository"
         uses: actions/checkout@v3

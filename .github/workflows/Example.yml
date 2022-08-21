@@ -51,8 +51,8 @@ jobs:
               - 'examples/**.ipynb'
             changed:
               - added|modified: 'examples/**.ipynb'
-          base: examples
-          ref: examples
+          base: 'examples'
+          ref: 'examples'
                         
       - name: "Execute and synchronize changed files"    
         if: ${{ github.event_name == 'push' && steps.filter.outputs.changed == 'true' }}
