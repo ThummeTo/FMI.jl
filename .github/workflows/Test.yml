@@ -9,12 +9,13 @@ on:
       - 'src/**'
       - 'test/**'
       - '.github/**'
+      - 'Project.toml'
 
 jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         julia-version: ['1.6', '1']
         julia-arch: [x64]

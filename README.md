@@ -16,7 +16,7 @@
 
 1\. Open a Julia-REPL, activate your preferred environment.
 
-2\. Goto Package-Manager, activate your preferred environment (if not already) and install [*FMI.jl*](https://github.com/ThummeTo/FMI.jl):
+2\. Go to Package-Manager (if not already) and install [*FMI.jl*](https://github.com/ThummeTo/FMI.jl):
 ```julia-repl
 julia> ]
 
