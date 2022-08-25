@@ -39,7 +39,7 @@ jobs:
         uses: julia-actions/julia-buildpkg@v1
 
       - name: "Install packages"
-        run: pip install jupyter nbclient==0.5.13 nbconvert==6.4.5
+        run: pip install jupyter jupyter-core==4.10.0 nbclient==0.5.13 nbconvert==6.4.5
 
       - name: "Set path filter"
         uses: dorny/paths-filter@v2
