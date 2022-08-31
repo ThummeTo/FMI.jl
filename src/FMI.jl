@@ -136,18 +136,18 @@ export fmiSetFctGetDerivatives, fmiSetFctGetEventIndicators, fmiSetFctGetContinu
 
     fmiGetDependencies(fmu::FMU2)
 
-Building dependency matrix `dim x dim` for fast look-ups on variable dependencies (`dim` is number of states).    
+Building dependency matrix `dim x dim` for fast look-ups on variable dependencies (`dim` is number of states).
 
 #Arguments
 - `fmu::FMU2`: Mutable Struct representing a FMU in [FMI Standard Version 2.0.2](https://fmi-standard.org/).
 
-See also [`fmi2GetDependencies`](@ref), [`FMU2`](@ref).  
+See also [`fmi2GetDependencies`](@ref), [`FMU2`](@ref).
 """
 function fmiGetDependencies(fmu::FMU2)
     fmi2GetDependencies(fmu)
 end
 
-"""   
+"""
 
     fmiStringToValueReference(dataStruct::Union{FMU2, fmi2ModelDescription, FMU3, fmmi3ModelDescription}, identifier::Union{String, AbstractArray{String}})
 
@@ -158,7 +158,7 @@ Returns the ValueReference coresponding to the variable identifier.
 - `identifier::Union{String, AbstractArray{String}}`: Variable identifier in type String or as a 1-dimensional AbstractArray containing elements of type String
 
 See also [`fmi2StringToValueReference`](@ref), [`fmi3StringToValueReference`](@ref).
-"""  
+"""
 function fmiStringToValueReference(dataStruct::Union{FMU2, fmi2ModelDescription}, identifier::Union{String, AbstractArray{String}})
     fmi2StringToValueReference(dataStruct, identifier)
 end
@@ -167,9 +167,9 @@ function fmiStringToValueReference(dataStruct::Union{FMU3, fmi3ModelDescription}
 end
 
 # Wrapping modelDescription Functions
-"""  
+"""
 
-    fmiGetModelName(str::Union{fmi2StructMD, fmi3StructMD})  
+    fmiGetModelName(str::Union{fmi2StructMD, fmi3StructMD})
 
 Returns the tag 'modelName' from the model description.
 
@@ -192,7 +192,7 @@ function fmiGetModelName(str::fmi3StructMD)
     fmi3GetModelName(str)
 end
 
-"""  
+"""
 
     fmiGetGUID(str::fmi2StructMD)
 
@@ -204,13 +204,13 @@ Returns the tag 'guid' from the model description.
  - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
  - `str::fmi2ModelDescription`: Struct wich provides the static information of ModelVariables.
 
-See also [`fmi2GetGUID`](@ref), [`fmi2StructMD`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref), [`fmi2ModelDescription`](@ref).  
+See also [`fmi2GetGUID`](@ref), [`fmi2StructMD`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref), [`fmi2ModelDescription`](@ref).
 """
 function fmiGetGUID(str::fmi2StructMD)
     fmi2GetGUID(str)
 end
 
-"""  
+"""
 
     fmiGetGenerationTool(str::fmi2StructMD)
 
@@ -226,7 +226,7 @@ Returns the tag 'generationtool' from the model description.
 # Returns
 - `str.generationtool`: The function `fmi2GetGenerationTool` returns the tag 'generationtool' from the struct, representing a FMU (`str`).
 
-See also [`fmi2GetGenerationTool`](@ref), [`fmi2StructMD`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref), [`fmi2ModelDescription`](@ref).  
+See also [`fmi2GetGenerationTool`](@ref), [`fmi2StructMD`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref), [`fmi2ModelDescription`](@ref).
 
 """
 function fmiGetGenerationTool(str::fmi2StructMD)
@@ -249,7 +249,7 @@ Returns the tag 'generationdateandtime' from the model description.
 # Returns
 - `str.generationDateAndTime`: The function `fmi2GetGenerationDateAndTime` returns the tag 'generationDateAndTime' from the struct, representing a FMU (`str`).
 
-See also [`fmi2GetGenerationDateAndTime`](@ref), [`fmi2StructMD`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref), [`fmi2ModelDescription`](@ref).  
+See also [`fmi2GetGenerationDateAndTime`](@ref), [`fmi2StructMD`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref), [`fmi2ModelDescription`](@ref).
 
 """
 function fmiGetGenerationDateAndTime(str::fmi2StructMD)
@@ -279,7 +279,7 @@ function fmiGetVariableNamingConvention(str::fmi2StructMD)
     fmi2GetVariableNamingConvention(str)
 end
 
-"""  
+"""
 
     fmiGetNumberOfEventIndicators(str::fmi2StructMD)
 
@@ -302,7 +302,7 @@ function fmiGetNumberOfEventIndicators(str::fmi2StructMD)
     fmi2GetNumberOfEventIndicators(str)
 end
 
-"""  
+"""
 
     fmiGetModelIdentifier(fmu::FMU2)
 
@@ -515,13 +515,13 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
 - `dtmax::Union{Real, Nothing} = nothing`: Real number for setting maximum dt for adaptive timestepping for the ODE solver. The default values are package dependent. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
 - `kwargs...`: Further parameters of already defined functions `solve(args..., kwargs...)` from the library [DifferentialEquations.jl](https://diffeq.sciml.ai/stable/#DifferentialEquations.jl:-Scientific-Machine-Learning-(SciML)-Enabled-Simulation-and-Estimation)
 
-# Returns   
-- `success::Bool` for CS-FMUs  
-- `ODESolution` for ME-FMUs  
-- if keyword `recordValues` is set, a tuple of type (success::Bool, DiffEqCallbacks.SavedValues) for CS-FMUs  
-- if keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues) for ME-FMUs  
+# Returns
+- `success::Bool` for CS-FMUs
+- `ODESolution` for ME-FMUs
+- if keyword `recordValues` is set, a tuple of type (success::Bool, DiffEqCallbacks.SavedValues) for CS-FMUs
+- if keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues) for ME-FMUs
 
-See also [`fmi2Simulate`](@ref), [`fmi2SimulateME`](@ref), [`fmi2SimulateCS`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).   
+See also [`fmi2Simulate`](@ref), [`fmi2SimulateME`](@ref), [`fmi2SimulateCS`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 
 """
 function fmiSimulate(str::fmi2Struct, args...; kwargs...)
@@ -571,13 +571,13 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
 - `dtmax::Union{Real, Nothing} = nothing`: Real number for setting maximum dt for adaptive timestepping for the ODE solver. The default values are package dependent. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
 - `kwargs...`: Further parameters of already defined functions `solve(args..., kwargs...)` from the library [DifferentialEquations.jl](https://diffeq.sciml.ai/stable/#DifferentialEquations.jl:-Scientific-Machine-Learning-(SciML)-Enabled-Simulation-and-Estimation)
 
-# Returns   
+# Returns
 - If keyword `recordValues` is not set, a boolean `success` is returned (simulation success).
-- If keyword `recordValues` is set, a tuple of type (true, DiffEqCallbacks.SavedValues) or (false, nothing).  
+- If keyword `recordValues` is set, a tuple of type (true, DiffEqCallbacks.SavedValues) or (false, nothing).
 
 See also [`fmi2SimulateCS`](@ref), [`fmi2Simulate`](@ref), [`fmi2SimulateME`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 
-"""  
+"""
 function fmiSimulateCS(str::fmi2Struct, args...; kwargs...)
     fmi2SimulateCS(str, args...; kwargs...)
 end
@@ -625,11 +625,11 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
 - `dtmax::Union{Real, Nothing} = nothing`: Real number for setting maximum dt for adaptive timestepping for the ODE solver. The default values are package dependent. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
 - `kwargs...`: Further parameters of already defined functions `solve(args..., kwargs...)` from the library [DifferentialEquations.jl](https://diffeq.sciml.ai/stable/#DifferentialEquations.jl:-Scientific-Machine-Learning-(SciML)-Enabled-Simulation-and-Estimation)
 
-# Returns   
+# Returns
 - If keyword `recordValues` is not set, a struct of type `ODESolution`.
 - If keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues).
 
-See also [`fmi2SimulateME`](@ref) [`fmi2SimulateCS`](@ref), [`fmi2Simulate`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).  
+See also [`fmi2SimulateME`](@ref) [`fmi2SimulateCS`](@ref), [`fmi2Simulate`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 
 """
 function fmiSimulateME(str::fmi2Struct, args...; kwargs...)
@@ -664,7 +664,7 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
  - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
 
 # Returns
-- Returns the length of the `str.stateValueReferences` array, which consists of `fmi2ValueReference` constants.
+- Returns the length of the `md.valueReferences::Array{fmi2ValueReference}` corresponding to the number of states of the FMU.
 
 See also [`fmi2GetNumberOfStates`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 """
@@ -685,7 +685,12 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
  - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
 
 # Returns
--
+- Returns the string to uniquely identify the “fmi2TypesPlatform.h” header file used for compilation of the functions of the FMU.
+
+# Source
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec2.0.2[p.22]: 2.1.4 Inquire Platform and Version Number of Header Files
+- FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
 
 See also [`fmi2GetVersion`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 """
@@ -821,9 +826,23 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
  - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
  - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
 
+# Returns
+- `status::fmi2Status`: Return `status` is an enumeration of type `fmi2Status` and indicates the success of the function call.
+More detailed:
+ - `fmi2OK`: all well
+ - `fmi2Warning`: things are not quite right, but the computation can continue
+ - `fmi2Discard`: if the slave computed successfully only a subinterval of the communication step
+ - `fmi2Error`: the communication step could not be carried out at all
+ - `fmi2Fatal`: if an error occurred which corrupted the FMU irreparably
+ - `fmi2Pending`: this status is returned if the slave executes the function asynchronously
+
+
 # Source
 - FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec2.0.2[p.22]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
+- FMISpec2.0.2[p.22]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
+See also [`fmi2SetDebugLogging`](@ref).
 """
 function fmiSetDebugLogging(str::fmi2Struct)
     fmi2SetDebugLogging(str)
@@ -1010,21 +1029,89 @@ end
 
 """
 
-    fmiGet(str::fmi2Struct, args...; kwargs...)
+    fmiGet(str::fmi2Struct, comp::FMU2Component, vrs::fmi2ValueReferenceFormat)
+
+Returns the specific value of `fmi2ScalarVariable` containing the modelVariables with the identical fmi2ValueReference in an array.
+
+# Arguments
+- `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
+More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
+ - `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
+ - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
+ - `vrs::fmi2ValueReferenceFormat`: wildcards for how a user can pass a fmi[X]ValueReference
+More detailed: `fmi2ValueReferenceFormat = Union{Nothing, String, Array{String,1}, fmi2ValueReference, Array{fmi2ValueReference,1}, Int64, Array{Int64,1}, Symbol}`
+
+# Returns
+- `dstArray::Array{Any,1}(undef, length(vrs))`: Stores the specific value of `fmi2ScalarVariable` containing the modelVariables with the identical fmi2ValueReference to the input variable vr (vr = vrs[i]). `dstArray` is a 1-Dimensional Array that has the same length as `vrs`.
+
+# Source
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
+- FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
+
 """
 function fmiGet(str::fmi2Struct, args...; kwargs...)
     fmi2Get(str, args...; kwargs...)
 end
 
 """
-ToDo
+   fmiGet!(str::fmi2Struct, comp::FMU2Component, vrs::fmi2ValueReferenceFormat, dstArray::AbstractArray)
+
+# Arguments
+- `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
+More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
+- `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
+- `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
+- `dstArray::AbstractArray`: Stores the specific value of `fmi2ScalarVariable` containing the modelVariables with the identical fmi2ValueReference to the input variable vr (vr = vrs[i]). `dstArray` has the same length as `vrs`.
+
+# Returns
+- `retcodes::Array{fmi2Status}`: Returns an array of length length(vrs) with Type `fmi2Status`. Type `fmi2Status` is an enumeration and indicates the success of the function call.
+More detailed:
+  - `fmi2OK`: all well
+  - `fmi2Warning`: things are not quite right, but the computation can continue
+  - `fmi2Discard`: if the slave computed successfully only a subinterval of the communication step
+  - `fmi2Error`: the communication step could not be carried out at all
+  - `fmi2Fatal`: if an error occurred which corrupted the FMU irreparably
+  - `fmi2Pending`: this status is returned if the slave executes the function asynchronously
+
+# Source
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
+- FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
+
 """
 function fmiGet!(str::fmi2Struct, args...; kwargs...)
     fmi2Get!(str, args...; kwargs...)
 end
 
 """
-ToDo
+
+   fmiSet(str::fmi2Struct, comp::FMU2Component, vrs::fmi2ValueReferenceFormat, srcArray::AbstractArray; filter=nothing)
+
+# Arguments
+- `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
+More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
+- `str::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
+- `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
+- `srcArray::AbstractArray`: Stores the specific value of `fmi2ScalarVariable` containing the modelVariables with the identical fmi2ValueReference to the input variable vr (vr = vrs[i]). `srcArray` has the same length as `vrs`.
+
+# Keywords
+- `filter=nothing`:
+
+# Returns
+- `retcodes::Array{fmi2Status}`: Returns an array of length length(vrs) with Type `fmi2Status`. Type `fmi2Status` is an enumeration and indicates the success of the function call.
+More detailed:
+  - `fmi2OK`: all well
+  - `fmi2Warning`: things are not quite right, but the computation can continue
+  - `fmi2Discard`: if the slave computed successfully only a subinterval of the communication step
+  - `fmi2Error`: the communication step could not be carried out at all
+  - `fmi2Fatal`: if an error occurred which corrupted the FMU irreparably
+  - `fmi2Pending`: this status is returned if the slave executes the function asynchronously
+
+# Source
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
+- FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 """
 function fmiSet(str::fmi2Struct, args...; kwargs...)
     fmi2Set(str, args...; kwargs...)
