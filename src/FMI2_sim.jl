@@ -21,6 +21,8 @@ import ProgressMeter
 # Read next time event from fmu and provide it to the integrator 
 function time_choice(c::FMU2Component, integrator, tStart, tStop)
 
+    #@info "TC"
+
     if c.eventInfo.nextEventTimeDefined == fmi2True
 
         if c.eventInfo.nextEventTime >= tStart && c.eventInfo.nextEventTime <= tStop
@@ -124,6 +126,9 @@ function affectFMU!(c::FMU2Component, integrator, idx, inputFunction, inputValue
         right_x = fmi2GetContinuousStates(c)
         @debug "affectFMU!(...): Handled event at t=$(integrator.t), new state is $(new_u)"
         integrator.u = right_x
+
+        u_modified!(integrator, true)
+        #set_proposed_dt!(integrator, 1e-10)
     else 
         @debug "affectFMU!(...): Handled event at t=$(integrator.t), no new state."
     end
@@ -146,7 +151,7 @@ end
 function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, inputValues::AbstractArray{fmi2ValueReference}, progressMeter, tStart, tStop, solution::FMU2Solution)
 
     @assert c.state == fmi2ComponentStateContinuousTimeMode "stepCompleted(...): Must be in continuous time mode."
-
+    #@info "Step completed"
     if progressMeter !== nothing 
         ProgressMeter.update!(progressMeter, floor(Integer, 1000.0*(t-tStart)/(tStop-tStart)) )
     end
@@ -592,12 +597,136 @@ function prepareFMU(fmu::FMU2, c::Union{Nothing, FMU2Component}, type::fmi2Type,
         @assert retcode == fmi2StatusOK "fmi2Simulate(...): Exiting initialization mode failed with return code $(retcode)."
     end
 
-    return c
+    if type == fmi2TypeModelExchange
+        if x0 == nothing
+            x0 = fmi2GetContinuousStates(c)
+        end
+    end
+
+    return c, x0
 end
 
-function finishFMU(fmu::FMU2, c::FMU2Component, freeInstance::Union{Nothing, Bool})
+function prepareFMU(fmu::Vector{FMU2}, c::Vector{Union{Nothing, FMU2Component}}, type::Vector{fmi2Type}, instantiate::Union{Nothing, Bool}, freeInstance::Union{Nothing, Bool}, terminate::Union{Nothing, Bool}, reset::Union{Nothing, Bool}, setup::Union{Nothing, Bool}, parameters::Union{Vector{Union{Dict{<:Any, <:Any}, Nothing}}, Nothing}, t_start, t_stop, tolerance;
+    x0::Union{Vector{Union{Array{<:Real}, Nothing}}, Nothing}=nothing, initFct=nothing)
+
+    ignore_derivatives() do
+        for i in 1:length(fmu)
+
+            if instantiate === nothing
+                instantiate = fmu[i].executionConfig.instantiate
+            end
+
+            if freeInstance === nothing 
+                freeInstance = fmu[i].executionConfig.freeInstance
+            end
+
+            if terminate === nothing 
+                terminate = fmu[i].executionConfig.terminate
+            end
+
+            if reset === nothing
+                reset = fmu[i].executionConfig.reset
+            end
+
+            if setup === nothing
+                setup = fmu[i].executionConfig.setup
+            end
+
+            # instantiate (hard)
+            if instantiate
+                # remove old one if we missed it (callback)
+                if c[i] != nothing
+                    if freeInstance
+                        fmi2FreeInstance!(c[i])
+                        @debug "[AUTO-RELEASE INST]"
+                    end
+                end
+
+                c[i] = fmi2Instantiate!(fmu[i]; type=type[i])
+                @debug "[NEW INST]"
+            else
+                if c[i] === nothing
+                    c[i] = fmu[i].components[end]
+                end
+            end
+
+            # soft terminate (if necessary)
+            if terminate
+                retcode = fmi2Terminate(c[i]; soft=true)
+                @assert retcode == fmi2StatusOK "fmi2Simulate(...): Termination failed with return code $(retcode)."
+            end
+
+            # soft reset (if necessary)
+            if reset
+                retcode = fmi2Reset(c[i]; soft=true)
+                @assert retcode == fmi2StatusOK "fmi2Simulate(...): Reset failed with return code $(retcode)."
+            end
+
+            # enter setup (hard)
+            if setup
+                retcode = fmi2SetupExperiment(c[i], t_start, t_stop; tolerance=tolerance)
+                @assert retcode == fmi2StatusOK "fmi2Simulate(...): Setting up experiment failed with return code $(retcode)."
+
+                retcode = fmi2EnterInitializationMode(c[i])
+                @assert retcode == fmi2StatusOK "fmi2Simulate(...): Entering initialization mode failed with return code $(retcode)."
+            end
+
+            if x0 !== nothing
+                if x0[i] !== nothing
+                    retcode = fmi2SetContinuousStates(c[i], x0[i])
+                    @assert retcode == fmi2StatusOK "fmi2Simulate(...): Setting initial state failed with return code $(retcode)."
+                end
+            end
+
+            if parameters !== nothing
+                if parameters[i] !== nothing
+                    retcodes = fmi2Set(c[i], collect(keys(parameters[i])), collect(values(parameters[i])) )
+                    @assert all(retcodes .== fmi2StatusOK) "fmi2Simulate(...): Setting initial parameters failed with return code $(retcode)."
+                end
+            end
+
+            if initFct !== nothing
+                initFct()
+            end
+
+            # exit setup (hard)
+            if setup
+                retcode = fmi2ExitInitializationMode(c[i])
+                @assert retcode == fmi2StatusOK "fmi2Simulate(...): Exiting initialization mode failed with return code $(retcode)."
+            end
+
+            if type == fmi2TypeModelExchange
+                if x0 === nothing
+                    if x0[i] === nothing
+                        x0[i] = fmi2GetContinuousStates(c[i])
+                    end
+                end
+            end
+        end
+
+    end # ignore_derivatives
+
+    return c, x0
+end
+
+function finishFMU(fmu::FMU2, c::FMU2Component, terminate::Union{Nothing, Bool}, freeInstance::Union{Nothing, Bool})
+
+    if c == nothing 
+        return 
+    end
+
+    if terminate === nothing 
+        terminate = fmu.executionConfig.terminate
+    end
+
     if freeInstance === nothing 
         freeInstance = fmu.executionConfig.freeInstance
+    end
+
+    # soft terminate (if necessary)
+    if terminate
+        retcode = fmi2Terminate(c; soft=true)
+        @assert retcode == fmi2StatusOK "fmi2Simulate(...): Termination failed with return code $(retcode)."
     end
 
     # freeInstance (hard)
@@ -716,15 +845,15 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         end
     end
 
-    c = prepareFMU(fmu, c, fmi2TypeModelExchange, instantiate, terminate, reset, setup, parameters, t_start, t_stop, tolerance; x0=x0, inputs=inputDict)
+    c, x0 = prepareFMU(fmu, c, fmi2TypeModelExchange, instantiate, terminate, reset, setup, parameters, t_start, t_stop, tolerance; x0=x0, inputs=inputDict)
 
     # from here on, we are in event mode, if `setup=false` this is the job of the user
-    @assert c.state == fmi2ComponentStateEventMode "FMU needs to be in event mode after setup."
+    #@assert c.state == fmi2ComponentStateEventMode "FMU needs to be in event mode after setup."
 
-    if x0 === nothing
-        x0 = fmi2GetContinuousStates(c)
-        x0_nom = fmi2GetNominalsOfContinuousStates(c)
-    end
+    # if x0 === nothing
+    #     x0 = fmi2GetContinuousStates(c)
+    #     x0_nom = fmi2GetNominalsOfContinuousStates(c)
+    # end
 
     # initial event handling
     handleEvents(c) 
@@ -823,7 +952,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         ProgressMeter.finish!(progressMeter)
     end
 
-    finishFMU(fmu, c, freeInstance)
+    finishFMU(fmu, c, terminate, freeInstance)
 
     return fmusol
 end
@@ -898,7 +1027,7 @@ function fmi2SimulateCS(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         end
     end
 
-    c = prepareFMU(fmu, c, fmi2TypeCoSimulation, instantiate, terminate, reset, setup, parameters, t_start, t_stop, tolerance; inputs=inputDict)
+    c, _ = prepareFMU(fmu, c, fmi2TypeCoSimulation, instantiate, terminate, reset, setup, parameters, t_start, t_stop, tolerance; inputs=inputDict)
 
     # default setup
     if length(saveat) == 0
@@ -995,7 +1124,7 @@ function fmi2SimulateCS(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         fmusol.success = true
     end
 
-    finishFMU(fmu, c, freeInstance)
+    finishFMU(fmu, c, terminate, freeInstance)
 
     return fmusol
 end

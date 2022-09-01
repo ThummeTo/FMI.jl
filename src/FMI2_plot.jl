@@ -4,6 +4,7 @@
 #
 
 using FMIImport: FMU2Solution
+import ForwardDiff
 
 """
 Plots data from a ME-FMU.
@@ -89,7 +90,7 @@ function fmiPlot!(fig, solution::FMU2Solution;
 
     # plot states
     if states 
-        t = solution.states.t
+        t = collect(ForwardDiff.value(e) for e in solution.states.t)
         numValues = length(solution.states.u[1])
 
         for v in 1:numValues
@@ -98,7 +99,7 @@ function fmiPlot!(fig, solution::FMU2Solution;
                 vrNames = fmi2ValueReferenceToString(solution.fmu, vr)
                 vrName = vrNames[1]
     
-                vals = collect(data[v] for data in solution.states.u)
+                vals = collect(ForwardDiff.value(data[v]) for data in solution.states.u)
 
                 plot_min = min(plot_min, vals...)
                 plot_max = max(plot_max, vals...)
@@ -117,7 +118,7 @@ function fmiPlot!(fig, solution::FMU2Solution;
 
     # plot recorded values
     if values
-        t = solution.values.t
+        t = collect(ForwardDiff.value(e) for e in solution.values.t)
         numValues = length(solution.values.saveval[1])
 
         for v in 1:numValues
@@ -126,7 +127,7 @@ function fmiPlot!(fig, solution::FMU2Solution;
                 vrNames = fmi2ValueReferenceToString(solution.fmu, vr)
                 vrName = vrNames[1]
     
-                vals = collect(data[v] for data in solution.values.saveval)
+                vals = collect(ForwardDiff.value(data[v]) for data in solution.values.saveval)
 
                 plot_min = min(plot_min, vals...)
                 plot_max = max(plot_max, vals...)
