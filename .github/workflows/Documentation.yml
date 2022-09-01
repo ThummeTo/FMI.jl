@@ -13,8 +13,11 @@ on:
     tags: 
       - '*'
 
-jobs:        
+jobs:
   build:
+    if: |
+      ${{ (github.event.workflow_run.conclusion == 'success' && github.sha == github.event.workflow_run.head_sha) || 
+      github.event_name == 'push' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -45,5 +48,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication with GitHub Actions token
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} # For authentication with SSH deploy key
-          GITHUB_EVENT_NAME: 'push'
         run: julia --project=docs/ docs/make.jl
