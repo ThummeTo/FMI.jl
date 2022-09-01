@@ -16,10 +16,11 @@ using FMIImport: fmi2DependencyKindDependent, fmi2DependencyKindFixed
 using FMIImport: fmi2CallbackFunctions, fmi2Component
 import FMIImport: fmi2VariableNamingConventionFlat, fmi2VariableNamingConventionStructured
 
-""" 
-Returns how a variable depends on another variable based on the model description.
 """
-function fmi2VariableDependsOnVariable(fmu::FMU2, vr1::fmi2ValueReference, vr2::fmi2ValueReference) 
+Returns how a variable depends on another variable based on the model description.
+
+"""
+function fmi2VariableDependsOnVariable(fmu::FMU2, vr1::fmi2ValueReference, vr2::fmi2ValueReference)
     i1 = fmu.modelDescription.valueReferenceIndicies[vr1]
     i2 = fmu.modelDescription.valueReferenceIndicies[vr2]
     return fmi2GetDependencies(fmu)[i1, i2]
@@ -40,32 +41,32 @@ function fmi2GetDependencies(fmu::FMU2)
 
             for i in 1:dim
                 modelVariable = fmi2ModelVariablesForValueReference(fmu.modelDescription, fmu.modelDescription.valueReferences[i])[1]
-    
+
                 if modelVariable.dependencies !== nothing
                     indicies = collect(fmu.modelDescription.valueReferenceIndicies[fmu.modelDescription.modelVariables[dependency].valueReference] for dependency in modelVariable.dependencies)
                     dependenciesKind = modelVariable.dependenciesKind
 
                     k = 1
-                    for j in 1:dim 
+                    for j in 1:dim
                         if j in indicies
                             if dependenciesKind[k] == "fixed"
                                 fmu.dependencies[i,j] = fmi2DependencyKindFixed
                             elseif dependenciesKind[k] == "dependent"
                                 fmu.dependencies[i,j] = fmi2DependencyKindDependent
-                            else 
+                            else
                                 @warn "Unknown dependency kind for index ($i, $j) = `$(dependenciesKind[k])`."
                             end
                             k += 1
                         end
                     end
                 end
-            end 
-        else 
+            end
+        else
             fmu.dependencies = fill(nothing, dim, dim)
         end
 
         @info "fmi2GetDependencies: Building dependency matrix $(dim) x $(dim) finished."
-    end 
+    end
 
     fmu.dependencies
 end
@@ -78,7 +79,7 @@ function fmi2PrintDependencies(fmu::FMU2)
         str = ""
         for j in 1:nj
             str = "$(str) $(Integer(dep[i,j]))"
-        end 
+        end
         println(str)
     end
 end
@@ -99,7 +100,7 @@ function fmi2Info(fmu::FMU2)
         println("flat")
     elseif fmi2GetVariableNamingConvention(fmu) == fmi2VariableNamingConventionStructured
         println("structured")
-    else 
+    else
         println("[unknown]")
     end
     println("\tEvent indicators:\t\t$(fmi2GetNumberOfEventIndicators(fmu))")

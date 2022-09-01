@@ -13,27 +13,20 @@
 
 
 ## How can I use FMI.jl?
+1\. Open a Julia-REPL, switch to package mode using `]`, activate your preferred environment.
 
-1\. Open a Julia-REPL, activate your preferred environment.
-
-2\. Go to Package-Manager (if not already) and install [*FMI.jl*](https://github.com/ThummeTo/FMI.jl):
+2\. Install [*FMI.jl*](https://github.com/ThummeTo/FMI.jl):
 ```julia-repl
-julia> ]
-
 (@v1.6) pkg> add FMI
 ```
 
 (3)\. If you want to check that everything works correctly, you can run the tests bundled with [*FMI.jl*](https://github.com/ThummeTo/FMI.jl):
 ```julia-repl
-julia> ]
-
 (@v1.6) pkg> test FMI
 ```
 
 (4)\. Additionally, you can check the version of [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) that you have installed with the ```status``` command.
 ```julia-repl
-julia> ]
-
 (@v1.6) pkg> status FMI
 ```
 
@@ -67,7 +60,7 @@ fmiUnload(myFMU)
 | CS                                | ✓✓           | ~~     | ✓          | ~      |
 | ME (continuous)                   | ✓✓           | ✓✓     | ✓          | ~      |
 | ME (discontinuous)                | ✓✓           | ✓✓     | ✓          | ~      |
-| SE                 		             | -            | -      | ✓          | ~      |
+| SE                 		    | -            | -      | ✓          | ~      |
 | Explicit solvers                  | ✓✓           | ✓✓     | ✓          | ~      |
 | Implicit solvers (autodiff=false) | ✓✓           | ~~     | ✓          | ~      |
 | Implicit solvers (autodiff=true)  | ✓            | ~~     | ~~         | ~      |
