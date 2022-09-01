@@ -2344,9 +2344,20 @@ function fmiGetNominalsOfContinuousStates(s::fmi2Struct)
 end
 
 """
+
+   fmiGetStartValue(s::fmi2Struct, vr::fmi2ValueReferenceFormat)
+
 Returns the start/default value for a given value reference.
 
-TODO: Add this command in the documentation.
+
+# Arguments
+- `md::fmi2ModelDescription`: Struct which provides the static information of ModelVariables.
+- `vrs::fmi2ValueReferenceFormat = md.valueReferences`: wildcards for how a user can pass a fmi[X]ValueReference (default = md.valueReferences)
+More detailed: `fmi2ValueReferenceFormat = Union{Nothing, String, Array{String,1}, fmi2ValueReference, Array{fmi2ValueReference,1}, Int64, Array{Int64,1}, Symbol}`
+
+# Returns
+- `starts::Array{fmi2ValueReferenceFormat}`: start/default value for a given value reference
+
 """
 function fmiGetStartValue(s::fmi2Struct, vr::fmi2ValueReferenceFormat)
     fmi2GetStartValue(s, vr)
