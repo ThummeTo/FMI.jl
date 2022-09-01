@@ -52,9 +52,17 @@ fmiUnload(myFMU)
 
 # case 2: CS-FMU with input signal
 
-function extForce(t)
+function extForce_t(t)
     [sin(t)]
 end 
+
+function extForce_cxt(c::FMU2Component, x::Union{AbstractArray{fmi2Real}, Nothing}, t::fmi2Real)
+    x1 = 0.0
+    if x != nothing 
+        x1 = x[1] 
+    end
+    [sin(t) * x1]
+end  
 
 myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 
@@ -71,13 +79,17 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct !== nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-solution = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2, recordValues=["mass.s", "mass.v"], inputValueReferences=["extForce"], inputFunction=extForce)
-@test solution.success
-@test length(solution.values.saveval) > 0
-@test length(solution.values.t) > 0
+for inpfct in [extForce_cxt, extForce_t]
+    global solution
 
-@test t[1] == t_start
-@test t[end] == t_stop
+    solution = fmiSimulateCS(fmuStruct, t_start, t_stop; dt=1e-2, recordValues=["mass.s", "mass.v"], inputValueReferences=["extForce"], inputFunction=extForce_t)
+    @test solution.success
+    @test length(solution.values.saveval) > 0
+    @test length(solution.values.t) > 0
+
+    @test t[1] == t_start
+    @test t[end] == t_stop
+end
 
 # reference values from Simulation in Dymola2020x (Dassl)
 @test [solution.values.saveval[1]...] == [0.5, 0.0]
