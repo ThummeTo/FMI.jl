@@ -175,7 +175,6 @@ export fmiProvidesDirectionalDerivative
 export fmiIsCoSimulation, fmiIsModelExchange
 export fmiGetDependencies
 export fmiGetStartValue, fmiStringToValueReference
-export fmiSimulate, fmiSimulateCS, fmiSimulateME
 export fmiGet, fmiGet!, fmiSet
 export fmiGetSolutionTime, fmiGetSolutionState, fmiGetSolutionValue
 
