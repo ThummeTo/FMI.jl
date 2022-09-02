@@ -25,12 +25,7 @@
 (@v1.6) pkg> test FMI
 ```
 
-(4)\. Additionally, you can check the version of [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) that you have installed with the ```status``` command.
-```julia-repl
-(@v1.6) pkg> status FMI
-```
-
-5\. Have a look inside the [examples folder](https://github.com/ThummeTo/FMI.jl/tree/examples/examples) in the examples branch or the [examples section](https://thummeto.github.io/FMI.jl/dev/examples/overview/) of the documentation. All examples are available as Julia-Script (*.jl*), Jupyter-Notebook (*.ipynb*) and Markdown (*.md*).
+4\. Have a look inside the [examples folder](https://github.com/ThummeTo/FMI.jl/tree/examples/examples) in the examples branch or the [examples section](https://thummeto.github.io/FMI.jl/dev/examples/overview/) of the documentation. All examples are available as Julia-Script (*.jl*), Jupyter-Notebook (*.ipynb*) and Markdown (*.md*).
 
 ## How can I simulate a FMU and plot values?
 ```julia
