@@ -111,8 +111,16 @@ fmiUnload(myFMU)
 
 # case 3a: ME-FMU without events, but with input signal (explicit solver: Tsit5)
 
-function extForce(t)
+function extForce_t(t)
     [sin(t)]
+end 
+
+function extForce_cxt(c::FMU2Component, x::Union{AbstractArray{fmi2Real}, Nothing}, t::fmi2Real)
+    x1 = 0.0
+    if x != nothing 
+        x1 = x[1] 
+    end
+    [sin(t) * x1]
 end 
 
 myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
@@ -130,14 +138,18 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-solution = fmiSimulateME(fmuStruct, t_start, t_stop; inputValueReferences=["extForce"], inputFunction=extForce, solver=Tsit5(), dtmax=0.001) # dtmax to force resolution
-@test length(solution.states.u) > 0
-@test length(solution.states.t) > 0
+for inpfct in [extForce_cxt, extForce_t]
+    global solution
 
-@test solution.states.t[1] == t_start 
-@test solution.states.t[end] == t_stop 
+    solution = fmiSimulateME(fmuStruct, t_start, t_stop; inputValueReferences=["extForce"], inputFunction=inpfct, solver=Tsit5(), dtmax=0.001) # dtmax to force resolution
+    @test length(solution.states.u) > 0
+    @test length(solution.states.t) > 0
 
-# reference values from Simulation in Dymola2020x (Dassl)
+    @test solution.states.t[1] == t_start 
+    @test solution.states.t[end] == t_stop
+end 
+
+# reference values `extForce_t` from Simulation in Dymola2020x (Dassl)
 @test solution.states.u[1] == [0.5, 0.0]
 @test sum(abs.(solution.states.u[end] - [0.613371, 0.188633])) < 0.012
 fmiUnload(myFMU)
@@ -189,7 +201,7 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-solution = fmiSimulateME(fmuStruct, t_start, t_stop; inputValueReferences=["extForce"], inputFunction=extForce, solver=Rosenbrock23(autodiff=false), dtmax=0.001) # dtmax to force resolution
+solution = fmiSimulateME(fmuStruct, t_start, t_stop; inputValueReferences=["extForce"], inputFunction=extForce_t, solver=Rosenbrock23(autodiff=false), dtmax=0.001) # dtmax to force resolution
 @test length(solution.states.u) > 0
 @test length(solution.states.t) > 0
 
