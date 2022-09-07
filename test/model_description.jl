@@ -5,7 +5,7 @@
 
 using FMI: fmi2VariableNamingConventionStructured, fmi2DependencyKindDependent, fmi2DependencyKindFixed
 
-myFMU = fmiLoad("SpringDFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
+myFMU = fmiLoad("SpringFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 
 @test fmiGetVersion(myFMU) == "2.0"
 @test fmiGetTypesPlatform(myFMU) == "default"
@@ -15,21 +15,21 @@ myFMU = fmiLoad("SpringDFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTIN
 @test fmiIsCoSimulation(myFMU) == true
 @test fmiIsModelExchange(myFMU) == true
 
-@test fmiGetGUID(myFMU) == "{df491d8d-0598-4495-913e-5b025e54d7f2}"
+@test fmiGetGUID(myFMU) == "{2e178ad3-5e9b-48ec-a7b2-baa5669efc0c}"
 @test fmiGetGenerationTool(myFMU) == "Dymola Version 2022x (64-bit), 2021-10-08"
-@test fmiGetGenerationDateAndTime(myFMU) == "2022-03-03T15:09:18Z"
+@test fmiGetGenerationDateAndTime(myFMU) == "2022-05-19T06:54:12Z"
 @test fmiGetNumberOfEventIndicators(myFMU) == 24
 @test fmiCanGetSetState(myFMU) == true
 @test fmiCanSerializeFMUstate(myFMU) == true
 @test fmiProvidesDirectionalDerivative(myFMU) == true
 
-depMtx = fmi2GetDependencies(myFMU)
-@test fmi2DependencyKindFixed in depMtx
-@test fmi2DependencyKindDependent in depMtx
+# depMtx = fmi2GetDependencies(myFMU)
+# @test fmi2DependencyKindFixed in depMtx
+# @test fmi2DependencyKindDependent in depMtx
 
-@test fmi2GetDefaultStartTime(myFMU.modelDescription) ≈ 0.0
-@test fmi2GetDefaultStopTime(myFMU.modelDescription) ≈ 1.0
-@test fmi2GetDefaultTolerance(myFMU.modelDescription) ≈ 1e-4
-@test fmi2GetDefaultStepSize(myFMU.modelDescription) === nothing
+# @test fmi2GetDefaultStartTime(myFMU.modelDescription) ≈ 0.0
+# @test fmi2GetDefaultStopTime(myFMU.modelDescription) ≈ 1.0
+# @test fmi2GetDefaultTolerance(myFMU.modelDescription) ≈ 1e-4
+# @test fmi2GetDefaultStepSize(myFMU.modelDescription) === nothing
 
 fmiUnload(myFMU)
