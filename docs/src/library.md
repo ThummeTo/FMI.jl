@@ -54,7 +54,9 @@ fmiSimulateCS
 fmiSimulateME
 ```
 ### Getting and Setting Variable Values
-TODO Ref FMIImport
+FMI2 and FMI3 contain different functions for this paragraph, therefore reference to the specific function in the FMIImport documentation.
+- [FMI2]()
+- [FMI3]() TODo Link
 All variable values of an FMU are identified with a variable handle called “value reference”. The handle is
 defined in the modelDescription.xml file (as attribute “valueReference” in element
 “ScalarVariable”). Element “valueReference” might not be unique for all variables. If two or more
@@ -82,7 +84,11 @@ fmiSetString
 
 
 ### Getting and Setting the Complete FMU State
-TODO Ref FMIImport -> unterschiedliche Funktionen in FMI2 und FMI3
+FMI2 and FMI3 contain different functions for this paragraph, therefore reference to the specific function in the FMIImport documentation.
+- [FMI2]()
+- [FMI3]() TODo Link
+
+TODO Ref FMIImport -> unterschiedliche Funktionen in FMI2 und FMI3 [FMIImport](https://thummeto.github.io/FMIImport.jl/dev/library/#library)
 The FMU has an internal state consisting of all values that are needed to continue a simulation. This internal state consists especially of the values of the continuous-time states, iteration variables, parameter values, input values, delay buffers, file identifiers, and FMU internal status information. With the functionsof this section, the internal FMU state can be copied and the pointer to this copy is returned to the environment. The FMU state copy can be set as actual FMU state, in order to continue the simulationfrom it.
 
 ```@docs
@@ -95,7 +101,9 @@ fmiDeSerializeFMUstate
 ```
 
 ### Getting Partial Dervatives
-TODO Ref FMIImport
+FMI2 and FMI3 contain different functions for this paragraph, therefore reference to the specific function in the FMIImport documentation.
+- [FMI2]()
+- [FMI3]() TODo Link
 It is optionally possible to provide evaluation of partial derivatives for an FMU. For Model Exchange, this
 means computing the partial derivatives at a particular time instant. For Co-Simulation, this means to
 compute the partial derivatives at a particular communication point. One function is provided to compute
@@ -111,13 +119,18 @@ fmiSampleDirectionalDerivative!
 
 
 ## FMI for Model Exchange
-TODO Ref FMIImport
+FMI2 and FMI3 contain different functions for this paragraph, therefore reference to the specific function in the FMIImport documentation.
+- [FMI2]()
+- [FMI3]() TODo Link
 
 This chapter contains the interface description to access the equations of a dynamic system from a C
 program.
 
 ###  Providing Independent Variables and Re-initialization of Caching
-TODO Ref FMIImport
+FMI2 and FMI3 contain different functions for this paragraph, therefore reference to the specific function in the FMIImport documentation.
+- [FMI2]()
+- [FMI3]() TODo Link
+
 ```@docs
 fmiSetTime
 fmiSetContinuousStates
@@ -128,7 +141,10 @@ fmiSetString
 ```
 
 ### Evaluation of Model Equations
-TODO Ref FMIImport
+FMI2 and FMI3 contain different functions for this paragraph, therefore reference to the specific function in the FMIImport documentation.
+- [FMI2]()
+- [FMI3]() TODo Link
+
 This section contains the core functions to evaluate the model equations
 
 ```@docs
@@ -143,7 +159,10 @@ fmiGetNominalsOfContinuousStates
 ```
 
 ## FMI for CO-Simulation
-TODO Ref FMIImport
+FMI2 and FMI3 contain different functions for this paragraph, therefore reference to the specific function in the FMIImport documentation.
+- [FMI2]()
+- [FMI3]() TODo Link
+
 This chapter defines the Functional Mock-up Interface (FMI) for the coupling of two or more simulation
 models in a co-simulation environment (FMI for Co-Simulation). Co-simulation is a rather general
 approach to the simulation of coupled technical systems and coupled physical phenomena in
@@ -151,7 +170,10 @@ engineering with focus on instationary (time-dependent) problems.
 
 
 ### Transfer of Input / Output Values and Parameters
-TODO Ref FMIImport
+FMI2 and FMI3 contain different functions for this paragraph, therefore reference to the specific function in the FMIImport documentation.
+- [FMI2]()
+- [FMI3]() TODo Link
+
 In order to enable the slave to interpolate the continuous real inputs between communication steps, the
 derivatives of the inputs with respect to time can be provided. Also, higher derivatives can be set to allow
 higher order interpolation.
@@ -162,7 +184,10 @@ fmiGetRealOutputDerivatives
 ```
 
 ### Computation
-TODO Ref FMIImport
+FMI2 and FMI3 contain different functions for this paragraph, therefore reference to the specific function in the FMIImport documentation.
+- [FMI2]()
+- [FMI3]() TODo Link
+
 The computation of time steps is controlled by the following function.
 
 ```@docs
@@ -171,7 +196,10 @@ fmiCancelStep
 ```
 
 ### Retrieving Status Information from the Slave
-TODO Ref FMIImport
+FMI2 and FMI3 contain different functions for this paragraph, therefore reference to the specific function in the FMIImport documentation.
+- [FMI2]()
+- [FMI3]() TODo Link
+
 Status information is retrieved from the slave by the following functions:
 
 ```@docs
