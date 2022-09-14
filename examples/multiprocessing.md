@@ -91,10 +91,10 @@ workers()
 ```
 
     Hello World!
-          From worker 4:	Hello World!
+          From worker 5:	Hello World!
           From worker 2:	Hello World!
           From worker 3:	Hello World!
-          From worker 5:	Hello World!
+          From worker 4:	Hello World!
 
 
 ### Simulation setup
@@ -115,22 +115,22 @@ input_values = collect(collect.(eachrow(rand(batchSize,2))))
 
 
     16-element Vector{Vector{Float64}}:
-     [0.9750901502532641, 0.2491187028301607]
-     [0.5176307981432797, 0.11447059659499592]
-     [0.94970057687528, 0.5637944723830817]
-     [0.233649339971282, 0.17737251556118094]
-     [0.5418514773584537, 0.12136327200803576]
-     [0.4530646582639284, 0.6611025979057199]
-     [0.13538629376424716, 0.14190169482501003]
-     [0.030257098510102276, 0.8056493653196082]
-     [0.09510149379259403, 0.08684110727883776]
-     [0.803080182952203, 0.41836293857735685]
-     [0.41619876055584015, 0.0967560339189033]
-     [0.6650548584719158, 0.18717093995179512]
-     [0.7627201249979099, 0.8064367268373667]
-     [0.712569048052494, 0.822428294120509]
-     [0.05180795562563789, 0.07338104928213696]
-     [0.4979897488588476, 0.6335543502495364]
+     [0.1153055839363124, 0.2323622455497547]
+     [0.09785831784064358, 0.7096245067081477]
+     [0.7830241386533903, 0.9535080864755718]
+     [0.8799540025605981, 0.06774969719159007]
+     [0.08077167696571075, 0.3877671045537274]
+     [0.9550818418400644, 0.6228181087972167]
+     [0.3443454205671792, 0.46478386037206665]
+     [0.1037226734922605, 0.6158344794561585]
+     [0.5827996150153976, 0.7858941168739013]
+     [0.506821918502389, 0.2817295277013998]
+     [0.15245211593839514, 0.025734799472653558]
+     [0.5083108930986209, 0.8166884064033195]
+     [0.04204404885709523, 0.8231119938282019]
+     [0.14081251088082314, 0.11782767860735244]
+     [0.324341476394691, 0.39900626404408346]
+     [0.8174484270698388, 0.2253202962110823]
 
 
 
@@ -153,23 +153,23 @@ For Distributed we need to embed the FMU into its own `module`. This prevents Di
 end
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_qiHO4g/SpringPendulum1D`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/snZaf/src/FMI2_ext.jl:76
-    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_cnB3Ho/SpringPendulum1D`.
-    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_vz55Uu/SpringPendulum1D`.
-    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_0ajUtD/SpringPendulum1D`.
-    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_iOHhQz/SpringPendulum1D`.
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_qiHO4g/SpringPendulum1D/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/snZaf/src/FMI2_ext.jl:192
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_qAu2Rh/SpringPendulum1D`.
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:90
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_SN1K4p/SpringPendulum1D`.
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_IGQXPz/SpringPendulum1D`.
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_2vEB7u/SpringPendulum1D`.
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_qAu2Rh/SpringPendulum1D/resources`
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:221
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/snZaf/src/FMI2_ext.jl:195
-    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU resources location is `file:////tmp/fmijl_cnB3Ho/SpringPendulum1D/resources`
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:224
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_YO284i/SpringPendulum1D`.
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU resources location is `file:////tmp/fmijl_SN1K4p/SpringPendulum1D/resources`
     [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU resources location is `file:////tmp/fmijl_vz55Uu/SpringPendulum1D/resources`
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU resources location is `file:////tmp/fmijl_2vEB7u/SpringPendulum1D/resources`
     [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU resources location is `file:////tmp/fmijl_0ajUtD/SpringPendulum1D/resources`
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU resources location is `file:////tmp/fmijl_IGQXPz/SpringPendulum1D/resources`
     [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU resources location is `file:////tmp/fmijl_iOHhQz/SpringPendulum1D/resources`
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU resources location is `file:////tmp/fmijl_YO284i/SpringPendulum1D/resources`
     [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
 
 
@@ -193,16 +193,16 @@ Running a single evaluation is pretty quick, therefore the speed can be better t
 
 
 
-    BenchmarkTools.Trial: 8 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m660.333 ms[22m[39m … [35m704.935 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m2.79% … 2.67%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m668.403 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m2.86%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m674.469 ms[22m[39m ± [32m 14.618 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m3.30% ± 0.75%
+    BenchmarkTools.Trial: 13 samples with 1 evaluation.
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m405.099 ms[22m[39m … [35m426.962 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m2.40% … 2.27%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m414.142 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m4.72%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m415.635 ms[22m[39m ± [32m  5.698 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m4.38% ± 1.12%
     
-      [39m█[39m [39m [39m [39m [39m [39m█[39m [39m [39m█[39m█[34m█[39m[39m [39m [39m [39m [39m [39m [39m█[32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
-      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m█[39m█[34m█[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      660 ms[90m           Histogram: frequency by time[39m          705 ms [0m[1m<[22m
+      [39m▁[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m [39m [39m▁[39m▁[39m▁[39m [39m [39m [39m [34m█[39m[39m [39m [39m [32m [39m[39m [39m▁[39m [39m [39m▁[39m [39m [39m [39m [39m [39m▁[39m [39m▁[39m [39m [39m [39m▁[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m 
+      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m█[39m█[39m█[39m▁[39m▁[39m▁[39m▁[34m█[39m[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m█[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m█[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
+      405 ms[90m           Histogram: frequency by time[39m          427 ms [0m[1m<[22m
     
-     Memory estimate[90m: [39m[33m155.96 MiB[39m, allocs estimate[90m: [39m[33m3602405[39m.
+     Memory estimate[90m: [39m[33m128.48 MiB[39m, allocs estimate[90m: [39m[33m1802000[39m.
 
 
 
@@ -222,8 +222,8 @@ println("Single Threaded")
 
 
     BenchmarkTools.Trial: 1 sample with 1 evaluation.
-     Single result which took [34m10.870 s[39m (3.64% GC) to evaluate,
-     with a memory estimate of [33m2.44 GiB[39m, over [33m57638468[39m allocations.
+     Single result which took [34m6.666 s[39m (5.00% GC) to evaluate,
+     with a memory estimate of [33m2.01 GiB[39m, over [33m28831988[39m allocations.
 
 
 
@@ -243,9 +243,16 @@ println("Multi Threaded")
 
 
 
-    BenchmarkTools.Trial: 1 sample with 1 evaluation.
-     Single result which took [34m6.468 s[39m (0.00% GC) to evaluate,
-     with a memory estimate of [33m84.39 KiB[39m, over [33m1296[39m allocations.
+    BenchmarkTools.Trial: 2 samples with 1 evaluation.
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m3.910 s[22m[39m … [35m  3.935 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m0.00% … 0.00%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m3.922 s              [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m0.00%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m3.922 s[22m[39m ± [32m17.579 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m0.00% ± 0.00%
+    
+      [34m█[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
+      [34m█[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
+      3.91 s[90m         Histogram: frequency by time[39m        3.93 s [0m[1m<[22m
+    
+     Memory estimate[90m: [39m[33m82.14 KiB[39m, allocs estimate[90m: [39m[33m1217[39m.
 
 
 
