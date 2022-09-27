@@ -77,9 +77,9 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_Ko3HaV/IO`.
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_1sdveA/IO`.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:90
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_Ko3HaV/IO/resources`
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_1sdveA/IO/resources`
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:221
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:224
@@ -132,7 +132,7 @@ fmiInstantiate!(myFMU; loggingOn=true)
 
     FMU:            IO
     InstanceName:   IO
-    Address:        Ptr{Nothing} @0x0000000003f70af0
+    Address:        Ptr{Nothing} @0x00000000056f4c70
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
@@ -251,7 +251,7 @@ paramsVal = generateRandomNumbers()
 
 
 
-    (99.43765245102428, false, 93, "Random number 37.88196032071545!")
+    (91.81462914730926, false, 41, "Random number 98.36961971048!")
 
 
 
@@ -323,8 +323,8 @@ simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSa
     Success:
     	true
     Values [2]:
-    	0.0	(99.43765245102428, 0.0, 93.0)
-    	1.0	(99.43765245102428, 0.0, 93.0)
+    	0.0	(91.81462914730926, 0.0, 41.0)
+    	1.0	(91.81462914730926, 0.0, 41.0)
     Events [0]:
 
 
@@ -358,7 +358,7 @@ rndReal, rndBoolean, rndInteger, rndString = generateRandomNumbers()
 
 
 
-    (20.96122965002216, false, 58, "Random number 14.21162320267646!")
+    (2.932815426796931, true, 21, "Random number 89.74878711547427!")
 
 
 
@@ -420,8 +420,8 @@ simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSa
     Success:
     	true
     Values [2]:
-    	0.0	(20.96122965002216, 0.0, 58.0)
-    	1.0	(20.96122965002216, 0.0, 58.0)
+    	0.0	(2.932815426796931, 1.0, 21.0)
+    	1.0	(2.932815426796931, 1.0, 21.0)
     Events [0]:
 
 
