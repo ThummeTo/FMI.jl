@@ -2,9 +2,13 @@
 Tutorial by Johannes Stoljar, Tobias Thummerer
 
 ## License
-Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher, Johannes Stoljar
 
-Licensed under the MIT license. See [LICENSE](https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.
+
+```julia
+# Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher, Johannes Stoljar
+# Licensed under the MIT license. 
+# See LICENSE (https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.
+```
 
 ## Motivation
 This Julia Package *FMI.jl* is motivated by the use of simulation models in Julia. Here the FMI specification is implemented. FMI (*Functional Mock-up Interface*) is a free standard ([fmi-standard.org](http://fmi-standard.org/)) that defines a container and an interface to exchange dynamic models using a combination of XML files, binaries and C code zipped into a single file. The user can thus use simulation models in the form of an FMU (*Functional Mock-up Units*). Besides loading the FMU, the user can also set values for parameters and states and simulate the FMU both as co-simulation and model exchange simulation.
@@ -73,12 +77,12 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_4Gfn79/IO`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/snZaf/src/FMI2_ext.jl:76
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_4Gfn79/IO/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/snZaf/src/FMI2_ext.jl:192
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_Ko3HaV/IO`.
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:90
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_Ko3HaV/IO/resources`
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:221
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/snZaf/src/FMI2_ext.jl:195
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:224
 
 
     #################### Begin information for FMU ####################
@@ -128,7 +132,7 @@ fmiInstantiate!(myFMU; loggingOn=true)
 
     FMU:            IO
     InstanceName:   IO
-    Address:        Ptr{Nothing} @0x0000000004e77560
+    Address:        Ptr{Nothing} @0x0000000003f70af0
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
@@ -247,7 +251,7 @@ paramsVal = generateRandomNumbers()
 
 
 
-    (70.72053218403963, true, 35, "Random number 13.374899771257143!")
+    (99.43765245102428, false, 93, "Random number 37.88196032071545!")
 
 
 
@@ -319,8 +323,8 @@ simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSa
     Success:
     	true
     Values [2]:
-    	0.0	(70.72053218403963, 1.0, 35.0)
-    	1.0	(70.72053218403963, 1.0, 35.0)
+    	0.0	(99.43765245102428, 0.0, 93.0)
+    	1.0	(99.43765245102428, 0.0, 93.0)
     Events [0]:
 
 
@@ -354,7 +358,7 @@ rndReal, rndBoolean, rndInteger, rndString = generateRandomNumbers()
 
 
 
-    (82.64626435161875, true, 22, "Random number 93.89028244441924!")
+    (20.96122965002216, false, 58, "Random number 14.21162320267646!")
 
 
 
@@ -416,8 +420,8 @@ simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSa
     Success:
     	true
     Values [2]:
-    	0.0	(82.64626435161875, 1.0, 22.0)
-    	1.0	(82.64626435161875, 1.0, 22.0)
+    	0.0	(20.96122965002216, 0.0, 58.0)
+    	1.0	(20.96122965002216, 0.0, 58.0)
     Events [0]:
 
 
