@@ -22,6 +22,10 @@ function runtestsFMI2(exportingTool)
             include("FMI2/sens.jl")
         end
 
+        @testset "Model Description" begin
+            include("model_description.jl")
+        end
+
         for str in fmuStructs
             @testset "Functions for $str" begin
                 ENV["FMUSTRUCT"] = str
