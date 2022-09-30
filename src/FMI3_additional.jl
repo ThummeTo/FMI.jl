@@ -18,6 +18,7 @@ import FMIImport: fmi3VariableNamingConventionFlat, fmi3VariableNamingConvention
 
 using ZipFile, EzXML
 
+
 """ 
 Returns how a variable depends on another variable based on the model description.
 """

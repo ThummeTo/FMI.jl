@@ -28,7 +28,7 @@ end
 function handleEvents(c::FMU3Instance, enterEventMode::Bool, exitInContinuousMode::Bool)
     nominalsChanged = fmi3False
     valuesChanged = fmi3False
-    println(enterEventMode)
+    # println(enterEventMode)
     if enterEventMode
 
         fmi3EnterEventMode(c, c.stepEvent, c.stateEvent, c.rootsFound, Csize_t(c.fmu.modelDescription.numberOfEventIndicators), c.timeEvent)
@@ -60,7 +60,9 @@ function handleEvents(c::FMU3Instance, enterEventMode::Bool, exitInContinuousMod
         println("enterinContTimeMode")
         fmi3EnterContinuousTimeMode(c)
     end
-    println("after if")
+    # println(valuesChanged)
+    # println(nominalsChanged)
+    println(c)
     @debug "handleEvents(_, $(enterEventMode), $(exitInContinuousMode)): rootsFound: $(c.rootsFound)   valuesChanged: $(valuesChanged)   continuousStates: $(fmi3GetContinuousStates(c))", 
     return valuesChanged, nominalsChanged
 
@@ -69,6 +71,7 @@ end
 # Returns the event indicators for an FMU.
 function condition(c::FMU3Instance, out, x, t, integrator, inputFunction, inputValues::Array{fmi3ValueReference}) # Event when event_f(u,t) == 0
     if inputFunction !== nothing
+        println("try to work with nothing1")
         fmi3SetFloat64(c, inputValues, inputFunction(integrator.t))
     end
 
@@ -89,6 +92,8 @@ function condition(c::FMU3Instance, out, x, t, integrator, inputFunction, inputV
             # c.z_prev[i] = indicators[i]
         end
     end
+    # print("condition: out: ")
+    # println(indicators)
     @debug "condition(_, _, $(x), $(t), _, _, _): eventIndicators $indicators   rootsFound $(c.rootsFound)   stateEvent $(c.stateEvent)"
     copy!(out, indicators)
 end
@@ -110,8 +115,9 @@ function affectFMU!(c::FMU3Instance, integrator, idx, inputFunction, inputValues
     continuousStatesChanged, nominalsChanged = handleEvents(c, true, Bool(sign(idx)))
 
     @debug "affectFMU!(_, _, $(idx), _, _): continuousStatesChanged=$(continuousStatesChanged)   x_int:$(integrator.u)   x_fmu:$(fmi3GetContinuousStates(c))   [after handle events]"
-    println("beforeSetINputs")
+    println("beforeSetInputs")
     if inputFunction !== nothing
+        println("try to work with nothing2")
         fmi3SetFloat64(c, inputValues, inputFunction(integrator.t))
     end
     println("beforeSetNewStates")
@@ -289,11 +295,10 @@ function fmi3SimulateME(c::FMU3Instance, t_start::Union{Real, Nothing} = nothing
     if eventHandling
 
         eventCb = VectorContinuousCallback((out, x, t, integrator) -> condition(c, out, x, t, integrator, inputFunction, inputValues),
-                                           (integrator, idx) -> affectFMU!(c, integrator, idx, inputFunction, inputValues, true),
+                                           (integrator, idx) -> affectFMU!(c, integrator, idx, inputFunction, inputValues),
                                            Int64(c.fmu.modelDescription.numberOfEventIndicators);
                                            rootfind = RightRootFind,
-                                           save_positions=(saveAtEvent,saveAtEvent),
-                                           interp_points=rootSearchInterpolationPoints)#,abstol=1e-16, reltol=1e-12, repeat_nudge=1//100)
+                                           save_positions=(saveAtEvent,saveAtEvent))#, interp_points=rootSearchInterpolationPoints,abstol=1e-16, reltol=1e-12, repeat_nudge=1//100)
         push!(callbacks, eventCb)
 
         if timeEventHandling
