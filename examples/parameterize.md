@@ -2,13 +2,9 @@
 Tutorial by Johannes Stoljar, Tobias Thummerer
 
 ## License
+Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher, Johannes Stoljar
 
-
-```julia
-# Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher, Johannes Stoljar
-# Licensed under the MIT license. 
-# See LICENSE (https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.
-```
+Licensed under the MIT license. See [LICENSE](https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.
 
 ## Motivation
 This Julia Package *FMI.jl* is motivated by the use of simulation models in Julia. Here the FMI specification is implemented. FMI (*Functional Mock-up Interface*) is a free standard ([fmi-standard.org](http://fmi-standard.org/)) that defines a container and an interface to exchange dynamic models using a combination of XML files, binaries and C code zipped into a single file. The user can thus use simulation models in the form of an FMU (*Functional Mock-up Units*). Besides loading the FMU, the user can also set values for parameters and states and simulate the FMU both as co-simulation and model exchange simulation.
@@ -77,9 +73,9 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_1sdveA/IO`.
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_l11s8N/IO`.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:90
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_1sdveA/IO/resources`
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_l11s8N/IO/resources`
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:221
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:224
@@ -132,7 +128,7 @@ fmiInstantiate!(myFMU; loggingOn=true)
 
     FMU:            IO
     InstanceName:   IO
-    Address:        Ptr{Nothing} @0x00000000056f4c70
+    Address:        Ptr{Nothing} @0x0000000003c82fd0
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
@@ -251,7 +247,7 @@ paramsVal = generateRandomNumbers()
 
 
 
-    (91.81462914730926, false, 41, "Random number 98.36961971048!")
+    (96.1218694381857, false, 82, "Random number 71.87446935363997!")
 
 
 
@@ -323,8 +319,8 @@ simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSa
     Success:
     	true
     Values [2]:
-    	0.0	(91.81462914730926, 0.0, 41.0)
-    	1.0	(91.81462914730926, 0.0, 41.0)
+    	0.0	(96.1218694381857, 0.0, 82.0)
+    	1.0	(96.1218694381857, 0.0, 82.0)
     Events [0]:
 
 
@@ -358,7 +354,7 @@ rndReal, rndBoolean, rndInteger, rndString = generateRandomNumbers()
 
 
 
-    (2.932815426796931, true, 21, "Random number 89.74878711547427!")
+    (62.611211039347545, true, 47, "Random number 79.40250650868683!")
 
 
 
@@ -420,8 +416,8 @@ simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSa
     Success:
     	true
     Values [2]:
-    	0.0	(2.932815426796931, 1.0, 21.0)
-    	1.0	(2.932815426796931, 1.0, 21.0)
+    	0.0	(62.611211039347545, 1.0, 47.0)
+    	1.0	(62.611211039347545, 1.0, 47.0)
     Events [0]:
 
 
