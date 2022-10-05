@@ -130,6 +130,7 @@ function affectFMU!(c::FMU2Component, integrator, idx, inputFunction, inputValue
         u_modified!(integrator, true)
         #set_proposed_dt!(integrator, 1e-10)
     else 
+        u_modified!(integrator, false)
         @debug "affectFMU!(...): Handled event at t=$(integrator.t), no new state."
     end
 
@@ -152,8 +153,12 @@ function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, inputV
 
     @assert c.state == fmi2ComponentStateContinuousTimeMode "stepCompleted(...): Must be in continuous time mode."
     #@info "Step completed"
-    if progressMeter !== nothing 
-        ProgressMeter.update!(progressMeter, floor(Integer, 1000.0*(t-tStart)/(tStop-tStart)) )
+    if progressMeter !== nothing
+        stat = 1000.0*(t-tStart)/(tStop-tStart)
+        if !isnan(stat)
+            stat = floor(Integer, stat)
+            ProgressMeter.update!(progressMeter, stat)
+        end
     end
 
     (status, enterEventMode, terminateSimulation) = fmi2CompletedIntegratorStep(c, fmi2True)
