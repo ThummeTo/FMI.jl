@@ -1,5 +1,9 @@
+# Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher, Johannes Stoljar, Jonas Wilfert
+# Licensed under the MIT license. 
+# See LICENSE (https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.
+
 using Distributed
-n_procs = 4
+n_procs = 2
 addprocs(n_procs; exeflags=`--project=$(Base.active_project()) --threads=auto`, restrict=false)
 
 # imports
