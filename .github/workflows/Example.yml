@@ -7,7 +7,7 @@ on:
       - completed
   push:
     branches:
-      - examples
+      - 'examples'
   
 jobs:
   sync-files:
@@ -39,7 +39,7 @@ jobs:
         uses: julia-actions/julia-buildpkg@v1
 
       - name: "Install packages"
-        run: pip install jupyter==1.0.0 nbconvert==6.4.5 MarkupSafe==2.1.1 jinja2==3.1.1
+        run: pip install jupyter nbconvert
 
       - name: "Set path filter"
         uses: dorny/paths-filter@v2
@@ -51,8 +51,8 @@ jobs:
               - 'examples/**.ipynb'
             changed:
               - added|modified: 'examples/**.ipynb'
-          base: examples
-          ref: examples
+          base: 'examples'
+          ref: 'examples'
                         
       - name: "Execute and synchronize changed files"    
         if: ${{ github.event_name == 'push' && steps.filter.outputs.changed == 'true' }}
