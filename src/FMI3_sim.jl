@@ -1,3 +1,7 @@
+# STATUS: simulation of ME is not working, needs fixing,
+# other TODOs include adding simulation for SE
+
+
 #
 # Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher
 # Licensed under the MIT license. See LICENSE file in the project root for details.
@@ -490,13 +494,18 @@ Returns:
     
 ToDo: Improve Documentation.
 """
-function fmi3Simulate(c::fmi3Instance, t_start::Real = 0.0, t_stop::Real = 1.0;kwargs...)
+function fmi3Simulate(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
 
-    if fmi3IsCoSimulation(c.fmu)
-        return fmi3SimulateCS(c, t_start, t_stop; kwargs...)
-    elseif fmi3IsModelExchange(c.fmu)
-        return fmi3SimulateME(c, t_start, t_stop; kwargs...)
+    if fmu.type == fmi3TypeCoSimulation
+        return fmi3SimulateCS(fmu, c, t_start, t_stop; kwargs...)
+    elseif fmu.type == fmi3TypeModelExchange
+        return fmi3SimulateME(fmu, c, t_start, t_stop; kwargs...)
     else
         error(unknownFMUType)
     end
 end
+
+
+function fmi3Simulate(c::FMU3Instance, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
+    fmi3Simulate(c.fmu, c, t_start, t_stop; kwargs...)
+end 
