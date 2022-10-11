@@ -2268,20 +2268,6 @@ function fmiGetAdjointDerivative!(str::fmi3Struct, args...; kwargs...)
 end
 
 """
-Returns the values of the adjoint derivatives.
-"""
-function fmiGetAdjointDerivative(str::fmi3Struct, args...; kwargs...)
-    fmi3GetAdjointDerivative(str, args...; kwargs...)
-end
-
-"""
-Returns the values of the adjoint derivatives (in-place).
-"""
-function fmiGetAdjointDerivative!(str::fmi3Struct, args...; kwargs...)
-    fmi3GetAdjointDerivative!(str, args...; kwargs...)
-end
-
-"""
 
     fmiDoStep(str::fmi2Struct, c::FMU2Component, communicationStepSize::Union{Real, Nothing} = nothing; currentCommunicationPoint::Union{Real, Nothing} = nothing, noSetFMUStatePriorToCurrentPoint::Bool = true)
 
