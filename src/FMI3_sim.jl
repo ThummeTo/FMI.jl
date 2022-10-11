@@ -419,7 +419,7 @@ function fmi3SimulateCS(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_st
                 fmi3SetFloat64(fmu, inputValues, inputFunction(t))
             end
 
-            fmi3DoStep!(fmu, t, dt, fmi3True, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
+            fmi3DoStep!(fmu, t, dt, true, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
             if eventEncountered == fmi3True
                 @warn "Event handling"
             end
@@ -454,7 +454,7 @@ function fmi3SimulateCS(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_st
                 fmi3SetFloat64(fmu, inputValues, inputFunction(t))
             end
 
-            fmi3DoStep!(fmu, t, dt, fmi3True, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
+            fmi3DoStep!(fmu, t, dt, true, eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime)
             if eventEncountered == fmi3True
                 @warn "Event handling"
             end
