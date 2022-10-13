@@ -171,17 +171,17 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-# ToDo: autodiff=true not working currently!
-# solution = fmiSimulateME(fmuStruct, t_start, t_stop; inputValueReferences=["extForce"], inputFunction=extForce, solver=Rosenbrock23(autodiff=true), dtmax=0.001) # dtmax to force resolution
-# @test length(solution.states.u) > 0
-# @test length(solution.states.t) > 0
+# ToDo: test `autodiff=true`
+solution = fmiSimulateME(fmuStruct, t_start, t_stop; solver=Rosenbrock23(autodiff=false), dtmax=0.001) # dtmax to force resolution
+@test length(solution.states.u) > 0
+@test length(solution.states.t) > 0
 
-# @test solution.states.t[1] == t_start 
-# @test solution.states.t[end] == t_stop 
+@test solution.states.t[1] == t_start 
+@test solution.states.t[end] == t_stop 
 
-# # reference values from Simulation in Dymola2020x (Dassl)
-# @test solution.states.u[1] == [0.5, 0.0]
-# @test sum(abs.(solution.states.u[end] - [0.613371, 0.188633])) < 0.01
+# reference values (no force) from Simulation in Dymola2020x (Dassl)
+@test solution.states.u[1] == [0.5, 0.0]
+@test sum(abs.(solution.states.u[end] - [0.509219, 0.314074])) < 0.01
 fmiUnload(myFMU)
 
 # case 3c: ME-FMU without events, but with input signal (implicit solver: Rosenbrock23, no autodiff)
