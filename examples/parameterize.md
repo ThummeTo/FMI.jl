@@ -77,9 +77,9 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_Rey9mY/IO`.
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_gh6Pj4/IO`.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:90
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_Rey9mY/IO/resources`
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_gh6Pj4/IO/resources`
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:221
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:224
@@ -132,9 +132,9 @@ fmiInstantiate!(myFMU; loggingOn=true)
 
     FMU:            IO
     InstanceName:   IO
-    Address:        Ptr{Nothing} @0x000000000140d760
+    Address:        Ptr{Nothing} @0x0000000004eb2a50
     State:          fmi2ComponentStateInstantiated
-    Logging:        false
+    Logging:        true
     FMU time:       -Inf
     FMU states:     nothing
 
@@ -251,7 +251,7 @@ paramsVal = generateRandomNumbers()
 
 
 
-    (84.18240836403652, true, 42, "Random number 4.083060029614893!")
+    (86.17223052765594, true, 51, "Random number 89.14134154307798!")
 
 
 
@@ -323,8 +323,8 @@ simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSa
     Success:
     	true
     Values [2]:
-    	0.0	(84.18240836403652, 1.0, 42.0)
-    	1.0	(84.18240836403652, 1.0, 42.0)
+    	0.0	(86.17223052765594, 1.0, 51.0)
+    	1.0	(86.17223052765594, 1.0, 51.0)
     Events [0]:
 
 
@@ -358,7 +358,7 @@ rndReal, rndBoolean, rndInteger, rndString = generateRandomNumbers()
 
 
 
-    (41.867172078729034, false, 72, "Random number 32.07978546283468!")
+    (12.217948588839667, false, 47, "Random number 38.61724297228339!")
 
 
 
@@ -420,8 +420,8 @@ simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSa
     Success:
     	true
     Values [2]:
-    	0.0	(41.867172078729034, 0.0, 72.0)
-    	1.0	(41.867172078729034, 0.0, 72.0)
+    	0.0	(12.217948588839667, 0.0, 47.0)
+    	1.0	(12.217948588839667, 0.0, 47.0)
     Events [0]:
 
 
