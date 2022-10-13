@@ -202,34 +202,36 @@ function fx(c::FMU2Component,
     p::AbstractArray, 
     t::Real)
 
-    if isa(t, ForwardDiff.Dual) 
-        t = ForwardDiff.value(t)
-    end 
+    # if isa(t, ForwardDiff.Dual) 
+    #     t = ForwardDiff.value(t)
+    # end 
 
-    fmi2SetContinuousStates(c, x)
-    fmi2SetTime(c, t)
+    # fmi2SetContinuousStates(c, x)
+    # fmi2SetTime(c, t)
 
-    if all(isa.(dx, ForwardDiff.Dual))
-        dx_tmp = collect(ForwardDiff.value(e) for e in dx)
-        fmi2GetDerivatives!(c, dx_tmp)
-        T, V, N = fd_eltypes(dx)
-        dx[:] = collect(ForwardDiff.Dual{T, V, N}(dx_tmp[i], ForwardDiff.partials(dx[i])    ) for i in 1:length(dx))
-    else 
-        fmi2GetDerivatives!(c, dx)
-    end
+    # if all(isa.(dx, ForwardDiff.Dual))
+    #     dx_tmp = collect(ForwardDiff.value(e) for e in dx)
+    #     fmi2GetDerivatives!(c, dx_tmp)
+    #     T, V, N = fd_eltypes(dx)
+    #     dx[:] = collect(ForwardDiff.Dual{T, V, N}(dx_tmp[i], ForwardDiff.partials(dx[i])    ) for i in 1:length(dx))
+    # else 
+    #     fmi2GetDerivatives!(c, dx)
+    # end
+
+    y, dx = FMIImport.eval!(c, dx, nothing, nothing, x, nothing, nothing, t)
 
     return dx
 end
 
 # ForwardDiff-Dispatch for fx
-function fx(comp::FMU2Component,
-            dx::AbstractArray{<:Real},
-            x::AbstractArray{<:ForwardDiff.Dual{Tx, Vx, Nx}},
-            p::AbstractArray,
-            t::Real) where {Tx, Vx, Nx}
+# function fx(comp::FMU2Component,
+#             dx::AbstractArray{<:Real},
+#             x::AbstractArray{<:ForwardDiff.Dual{Tx, Vx, Nx}},
+#             p::AbstractArray,
+#             t::Real) where {Tx, Vx, Nx}
 
-    return _fx_fd(comp, dx, x, p, t)
-end
+#     return _fx_fd(comp, dx, x, p, t)
+# end
 
 # function _fx_fd(TVNx, comp, dx, x, p, t) 
   
@@ -763,6 +765,18 @@ function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothin
     fmi2SimulateME(c.fmu, c, t_start, t_stop; kwargs...)
 end 
 
+# sets up the ODEProblem for simulating a ME-FMU
+function setupODEProblem(c::FMU2Component, x0::AbstractArray{fmi2Real}, t_start::fmi2Real, t_stop::fmi2Real; p=[], customFx=nothing)
+    if customFx === nothing
+        customFx = (dx, x, p, t) -> fx(c, dx, x, p, t)
+    end
+
+    p = []
+    c.problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
+
+    return c.problem
+end
+
 """
 Simulates a FMU instance for the given simulation time interval.
 State- and Time-Events are handled correctly.
@@ -874,7 +888,9 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         dtmax = (t_stop-t_start)/100.0
     end
 
-    c, x0 = prepareFMU(fmu, c, fmi2TypeModelExchange, instantiate, terminate, reset, setup, parameters, t_start, t_stop, tolerance; x0=x0, inputFunction=_inputFunction, inputValueReferences=inputValueReferences)
+    # argument `tolerance=nothing` here, because ME-FMUs doesn't support tolerance control (no solver included)
+    # tolerance for the solver is set-up later in this function
+    c, x0 = prepareFMU(fmu, c, fmi2TypeModelExchange, instantiate, terminate, reset, setup, parameters, t_start, t_stop, nothing; x0=x0, inputFunction=_inputFunction, inputValueReferences=inputValueReferences)
 
     # from here on, we are in event mode, if `setup=false` this is the job of the user
     #@assert c.state == fmi2ComponentStateEventMode "FMU needs to be in event mode after setup."
@@ -891,12 +907,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
     c.fmu.hasStateEvents = (c.fmu.modelDescription.numberOfEventIndicators > 0)
     c.fmu.hasTimeEvents = (c.eventInfo.nextEventTimeDefined == fmi2True)
     
-    if customFx === nothing
-        customFx = (dx, x, p, t) -> fx(c, dx, x, p, t)
-    end
-
-    p = []
-    problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
+    setupODEProblem(c, x0, t_start, t_stop; customFx=customFx)
 
     progressMeter = nothing
     if showProgress 
@@ -950,7 +961,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
 
     # if auto_dt == true
     #     @assert solver !== nothing "fmi2SimulateME(...): `auto_dt=true` but no solver specified, this is not allowed."
-    #     tmpIntegrator = init(problem, solver)
+    #     tmpIntegrator = init(c.problem, solver)
     #     dt = auto_dt_reset!(tmpIntegrator)
     # end
 
@@ -969,9 +980,9 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
     end
 
     if solver === nothing
-        fmusol.states = solve(problem; callback = CallbackSet(cbs...), dtmax=dtmax, solveKwargs..., kwargs...)
+        fmusol.states = solve(c.problem; callback = CallbackSet(cbs...), dtmax=dtmax, solveKwargs..., kwargs...)
     else
-        fmusol.states = solve(problem, solver; callback = CallbackSet(cbs...), dtmax=dtmax, solveKwargs..., kwargs...)
+        fmusol.states = solve(c.problem, solver; callback = CallbackSet(cbs...), dtmax=dtmax, solveKwargs..., kwargs...)
     end
 
     fmusol.success = (fmusol.states.retcode == :Success)
