@@ -58,7 +58,7 @@ fmiUnload(myFMU)
 | SE                 		    | -            | -      | ✓          | ~      |
 | Explicit solvers                  | ✓✓           | ✓✓     | ✓          | ~      |
 | Implicit solvers (autodiff=false) | ✓✓           | ~~     | ✓          | ~      |
-| Implicit solvers (autodiff=true)  | ✓✓           | ~~     | ~~         | ~      |
+| Implicit solvers (autodiff=true)  | ✓            | ~~     | ~~         | ~      |
 | get/setState                      | ✓✓           | ~      | ✓          | ~      |
 | getDirectionalDerivatives         | ✓✓           | ~      | ✓          | ~      |
 | getAdjointDerivatives             | -            | -      | ✓          | ~      |

@@ -171,7 +171,8 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-solution = fmiSimulateME(fmuStruct, t_start, t_stop; solver=Rosenbrock23(autodiff=true), dtmax=0.001) # dtmax to force resolution
+# ToDo: test `autodiff=true`
+solution = fmiSimulateME(fmuStruct, t_start, t_stop; solver=Rosenbrock23(autodiff=false), dtmax=0.001) # dtmax to force resolution
 @test length(solution.states.u) > 0
 @test length(solution.states.t) > 0
 
