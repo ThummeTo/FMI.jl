@@ -82,9 +82,9 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_7nGwvE/SpringFrictionPendulum1D`.
+    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_t9Bal7/SpringFrictionPendulum1D`.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:90
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_7nGwvE/SpringFrictionPendulum1D/resources`
+    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_t9Bal7/SpringFrictionPendulum1D/resources`
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:221
     ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
     └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:224
@@ -130,7 +130,7 @@ vrs = ["mass.s"]
 simData = fmiSimulateME(myFMU, tStart, tStop; recordValues=vrs)
 ```
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:13[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:11[39m
 
 
 
@@ -206,7 +206,7 @@ originalGetReal = myFMU.cGetReal
 
 
 
-    Ptr{Nothing} @0x00007f59405adfaf
+    Ptr{Nothing} @0x00007ff0855eefaf
 
 
 
@@ -254,7 +254,7 @@ fmiSetFctGetReal(myFMU, myGetReal!)
 
 
 
-    Ptr{Nothing} @0x00007f59903f2fc0
+    Ptr{Nothing} @0x00007ff0d5448fc0
 
 
 
