@@ -13,15 +13,7 @@ pathToFMU = get_model_filename(&quot;SpringFrictionPendulum1D&quot;, &quot;Dymol
 myFMU = fmiLoad(pathToFMU)
 # fmiLoad(&quot;path/to/myFMU.fmu&quot;; unpackPath = &quot;path/to/unpacked/fmu/&quot;)
 
-fmiInfo(myFMU)</code></pre><pre><code class="language-none">┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_t1qvde/SpringFrictionPendulum1D`.
-└ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:90
-┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_t1qvde/SpringFrictionPendulum1D/resources`
-└ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:221
-┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-└ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:224
-
-
-#################### Begin information for FMU ####################
+fmiInfo(myFMU)</code></pre><pre><code class="language-none">#################### Begin information for FMU ####################
 	Model name:			SpringFrictionPendulum1D
 	FMI-Version:			2.0
 	GUID:				{2e178ad3-5e9b-48ec-a7b2-baa5669efc0c}
@@ -65,7 +57,7 @@ Values [801]:
 	0.08	(0.5138351439717114, 0.3464184707972189)
 	...
 	8.0	(1.071367253976742, -1.000814138594347e-10)
-Events [0]:</code></pre><h4 id="Simulate-as-Model-Exchange"><a class="docs-heading-anchor" href="#Simulate-as-Model-Exchange">Simulate as Model-Exchange</a><a id="Simulate-as-Model-Exchange-1"></a><a class="docs-heading-anchor-permalink" href="#Simulate-as-Model-Exchange" title="Permalink"></a></h4><p>In the function <code>fmiSimulateME()</code> the FMU is simulated in model-exchange mode (ME) with an adaptive step size but with fixed save points <code>tSave</code>. In addition, the start and end time are specified. In contrast to the co-simulation, the values to be stored are not specified here, since the states and events of the FMU are always output as well. The identifiers given above just correspond to the states of the FMU.</p><pre><code class="language-julia">dataME = fmiSimulateME(myFMU, tStart, tStop; saveat=tSave)</code></pre><pre><code class="language-none">[34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:11[39m
+Events [0]:</code></pre><h4 id="Simulate-as-Model-Exchange"><a class="docs-heading-anchor" href="#Simulate-as-Model-Exchange">Simulate as Model-Exchange</a><a id="Simulate-as-Model-Exchange-1"></a><a class="docs-heading-anchor-permalink" href="#Simulate-as-Model-Exchange" title="Permalink"></a></h4><p>In the function <code>fmiSimulateME()</code> the FMU is simulated in model-exchange mode (ME) with an adaptive step size but with fixed save points <code>tSave</code>. In addition, the start and end time are specified. In contrast to the co-simulation, the values to be stored are not specified here, since the states and events of the FMU are always output as well. The identifiers given above just correspond to the states of the FMU.</p><pre><code class="language-julia">dataME = fmiSimulateME(myFMU, tStart, tStop; saveat=tSave)</code></pre><pre><code class="language-none">[34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:09[39m
 
 
 
@@ -77,20 +69,20 @@ Success:
 	true
 States [801]:
 	0.0	[0.5, 0.0]
-	0.01	[0.5002131418271644, 0.04268945072841344]
-	0.02	[0.500854887495059, 0.08570846016824428]
-	0.03	[0.5019281657516876, 0.1289839014807958]
-	0.04	[0.5034351795370763, 0.17244393614729067]
-	0.05	[0.50537742474533, 0.21601821086566914]
-	0.06	[0.5077556992635467, 0.25963791323182245]
-	0.07	[0.5105701152466664, 0.30323585206399106]
-	0.08	[0.5138201143130452, 0.34674645493266393]
+	0.01	[0.5002131418270838, 0.0426894507334239]
+	0.02	[0.5008548874900925, 0.08570846009092]
+	0.03	[0.5019281657668404, 0.12898390160770948]
+	0.04	[0.5034351795297135, 0.17244393632491634]
+	0.05	[0.5053774247131723, 0.21601821081124567]
+	0.06	[0.5077556991013391, 0.2596379123127895]
+	0.07	[0.5105701153011483, 0.3032358504004232]
+	0.08	[0.5138201146588821, 0.34674645322442477]
 	...
-	8.0	[1.0668392065868253, -1.0000121313794676e-10]
+	8.0	[1.0666323055577207, -7.603992128337398e-5]
 Events [6]:
 	State-Event #11 @ 0.0s
 	State-Event #11 @ 0.994s
 	State-Event #19 @ 1.9883s
-	State-Event #11 @ 2.983s
-	State-Event #19 @ 3.9788s
-	State-Event #11 @ 4.977s</code></pre><h3 id="Plotting-FMU"><a class="docs-heading-anchor" href="#Plotting-FMU">Plotting FMU</a><a id="Plotting-FMU-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting-FMU" title="Permalink"></a></h3><p>After the simulation is finished the results of the FMU for the co-simulation and model-exchange mode can be plotted. In the plot for the FMU it can be seen that the oscillation continues to decrease due to the effect of the friction. If you simulate long enough, the oscillation comes to a standstill in a certain time.</p><pre><code class="language-julia">fmiPlot(dataCS)</code></pre><p><img src="../simulate_files/simulate_14_0.svg" alt="svg"/></p><pre><code class="language-julia">fmiPlot(dataME)</code></pre><p><img src="../simulate_files/simulate_15_0.svg" alt="svg"/></p><p>From both graphs it can be seen that the simulation calculates exactly the same results.</p><h3 id="Unload-FMU"><a class="docs-heading-anchor" href="#Unload-FMU">Unload FMU</a><a id="Unload-FMU-1"></a><a class="docs-heading-anchor-permalink" href="#Unload-FMU" title="Permalink"></a></h3><p>After plotting the data, the FMU is unloaded and all unpacked data on disc is removed.</p><pre><code class="language-julia">fmiUnload(myFMU)</code></pre><h3 id="Summary"><a class="docs-heading-anchor" href="#Summary">Summary</a><a id="Summary-1"></a><a class="docs-heading-anchor-permalink" href="#Summary" title="Permalink"></a></h3><p>Based on this tutorial it can be seen that simulating in the different mode is very easy, and it only takes a few commands to simulate the FMU. </p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../overview/">« Overview</a><a class="docs-footer-nextpage" href="../parameterize/">Parameterize »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 14 October 2022 06:18">Friday 14 October 2022</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+	State-Event #11 @ 2.9831s
+	State-Event #19 @ 3.9789s
+	State-Event #11 @ 4.977s</code></pre><h3 id="Plotting-FMU"><a class="docs-heading-anchor" href="#Plotting-FMU">Plotting FMU</a><a id="Plotting-FMU-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting-FMU" title="Permalink"></a></h3><p>After the simulation is finished the results of the FMU for the co-simulation and model-exchange mode can be plotted. In the plot for the FMU it can be seen that the oscillation continues to decrease due to the effect of the friction. If you simulate long enough, the oscillation comes to a standstill in a certain time.</p><pre><code class="language-julia">fmiPlot(dataCS)</code></pre><p><img src="../simulate_files/simulate_14_0.svg" alt="svg"/></p><pre><code class="language-julia">fmiPlot(dataME)</code></pre><p><img src="../simulate_files/simulate_15_0.svg" alt="svg"/></p><p>From both graphs it can be seen that the simulation calculates exactly the same results.</p><h3 id="Unload-FMU"><a class="docs-heading-anchor" href="#Unload-FMU">Unload FMU</a><a id="Unload-FMU-1"></a><a class="docs-heading-anchor-permalink" href="#Unload-FMU" title="Permalink"></a></h3><p>After plotting the data, the FMU is unloaded and all unpacked data on disc is removed.</p><pre><code class="language-julia">fmiUnload(myFMU)</code></pre><h3 id="Summary"><a class="docs-heading-anchor" href="#Summary">Summary</a><a id="Summary-1"></a><a class="docs-heading-anchor-permalink" href="#Summary" title="Permalink"></a></h3><p>Based on this tutorial it can be seen that simulating in the different mode is very easy, and it only takes a few commands to simulate the FMU. </p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../overview/">« Overview</a><a class="docs-footer-nextpage" href="../parameterize/">Parameterize »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 14 October 2022 14:30">Friday 14 October 2022</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
