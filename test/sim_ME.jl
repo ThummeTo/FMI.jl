@@ -10,7 +10,10 @@ t_stop = 8.0
 
 # case 1: ME-FMU with state events
 
-myFMU = fmiLoad("SpringFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"]; type=:ME)
+myFMU = fmiLoad("SpringFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
+
+comp = fmiInstantiate!(myFMU; loggingOn=false)
+@test comp != 0
 
 # choose FMU or FMUComponent
 fmuStruct = nothing
@@ -36,7 +39,7 @@ fmiUnload(myFMU)
 
 # case 2: ME-FMU with state and time events
 
-myFMU = fmiLoad("SpringTimeFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"]; type=:ME)
+myFMU = fmiLoad("SpringTimeFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 
 comp = fmiInstantiate!(myFMU; loggingOn=false)
 @test comp != 0
@@ -120,7 +123,7 @@ function extForce_cxt(c::FMU2Component, x::Union{AbstractArray{fmi2Real}, Nothin
     [sin(t) * x1]
 end 
 
-myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"]; type=:ME)
+myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 
 comp = fmiInstantiate!(myFMU; loggingOn=false)
 @test comp != 0
@@ -153,7 +156,7 @@ fmiUnload(myFMU)
 
 # case 3b: ME-FMU without events, but with input signal (implicit solver: Rosenbrock23, autodiff)
 
-myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"]; type=:ME)
+myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 
 comp = fmiInstantiate!(myFMU; loggingOn=false)
 @test comp != 0
@@ -183,7 +186,7 @@ fmiUnload(myFMU)
 
 # case 3c: ME-FMU without events, but with input signal (implicit solver: Rosenbrock23, no autodiff)
 
-myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"]; type=:ME)
+myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 
 comp = fmiInstantiate!(myFMU; loggingOn=false)
 @test comp != 0
@@ -212,7 +215,7 @@ fmiUnload(myFMU)
 
 # case 4: ME-FMU without events, but saving value interpolation
 
-myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"]; type=:ME)
+myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 
 comp = fmiInstantiate!(myFMU; loggingOn=false)
 @test comp != 0
@@ -243,7 +246,7 @@ fmiUnload(myFMU)
 
 # case 5: ME-FMU with different (random) start state
 
-myFMU = fmiLoad("SpringFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"]; type=:ME)
+myFMU = fmiLoad("SpringFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 
 comp = fmiInstantiate!(myFMU; loggingOn=false)
 @test comp != 0

@@ -17,7 +17,7 @@ t_stop = 5.0
 tData = t_start:t_step:t_stop
 
 for FMUPath in FMUPaths
-    myFMU = fmiLoad(FMUPath)
+    myFMU = fmiLoad(FMUPath; type=:ME)
     comp = fmiInstantiate!(myFMU; loggingOn=false)
 
     fmiSetupExperiment(comp, t_start, t_stop)
@@ -28,7 +28,7 @@ for FMUPath in FMUPaths
     numStates = length(x0)
 
     dx = zeros(numStates)
-    t = 0.0
+    t = -1.0
     p = []
 
     # Jacobians for x0
