@@ -8,16 +8,7 @@ t_stop = 1.0
 myFMU = fmiLoad("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 @test fmiIsCoSimulation(myFMU)
 @test fmiIsModelExchange(myFMU)
-comp = fmiInstantiate!(myFMU; loggingOn=false)
-@test comp != 0
-# choose FMU or FMUComponent
-fmuStruct = nothing
-envFMUSTRUCT = ENV["FMUSTRUCT"]
-if envFMUSTRUCT == "FMU"
-    fmuStruct = myFMU
-elseif envFMUSTRUCT == "FMUCOMPONENT"
-    fmuStruct = comp
-end
+
 sol = fmiSimulateCS(fmuStruct, t_start, t_stop)
 @test sol.success 
 sol = fmiSimulateME(fmuStruct, t_start, t_stop)

@@ -7,7 +7,7 @@
 # Prepare FMU #
 ###############
 
-myFMU = fmiLoad("IO", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
+myFMU = fmiLoad("IO", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"]; type=:ME)
 comp = fmiInstantiate!(myFMU; loggingOn=false)
 @test comp != 0
 
