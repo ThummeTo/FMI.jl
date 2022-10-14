@@ -82,14 +82,6 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_lN8ra3/SpringFrictionPendulum1D`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:90
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_lN8ra3/SpringFrictionPendulum1D/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:221
-    ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:224
-
-
     #################### Begin information for FMU ####################
     	Model name:			SpringFrictionPendulum1D
     	FMI-Version:			2.0
@@ -152,14 +144,6 @@ In the following type of simulation a more advanced variant is presented, which 
 myFMU = fmiLoad(pathToFMU);
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_z5rGc1/SpringFrictionPendulum1D`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:90
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_z5rGc1/SpringFrictionPendulum1D/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:221
-    ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:224
-
-
 Next, it is necessary to create an instance of the FMU, this is achieved by the command `fmiInstantiate!()`.  
 
 
@@ -172,7 +156,7 @@ instanceFMU = fmiInstantiate!(myFMU)
 
     FMU:            SpringFrictionPendulum1D
     InstanceName:   SpringFrictionPendulum1D
-    Address:        Ptr{Nothing} @0x000000000751e510
+    Address:        Ptr{Nothing} @0x0000000007f654e0
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
@@ -211,6 +195,9 @@ for t in tSave
 end
 ```
 
+    [[33mWarning[0m][][SpringFrictionPendulum1D]: : trying to compute past tStop = 8.000000, to 8.0999999999999872,  at t = 8.000000
+
+
 The instantiated FMU must be terminated and then the memory area for the instance can also be deallocated. The last step is to unload the FMU to remove all unpacked data on disc. 
 
 
@@ -219,6 +206,22 @@ fmiTerminate(instanceFMU)
 fmiFreeInstance!(instanceFMU)
 fmiUnload(myFMU)
 ```
+
+    [[32mOK[0m][CvodeStatistics][SpringFrictionPendulum1D]: Sundials CVode Statistics
+        Stop time                                : 8.00 s
+        Simulation time                          : 0.28 s
+        Number of external steps                 : 80
+        Number of internal steps                 : 191
+        Number of non-linear iterations          : 263
+        Number of non-linear convergence failures: 0
+        Number of f function evaluations         : 291
+        Number of g function evaluations         : 339
+        Number of Jacobian-evaluations (direct)  : 7
+        Maximum integration order                : 5
+        Suggested tolerance scale factor         : 1.0
+        Grouping used                            : no
+    
+
 
 ### Summary
 

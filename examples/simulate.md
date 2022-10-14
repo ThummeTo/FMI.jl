@@ -83,14 +83,6 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    ┌ Info: fmi2Unzip(...): Successfully unzipped 153 files at `/tmp/fmijl_t1qvde/SpringFrictionPendulum1D`.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:90
-    ┌ Info: fmi2Load(...): FMU resources location is `file:////tmp/fmijl_t1qvde/SpringFrictionPendulum1D/resources`
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:221
-    ┌ Info: fmi2Load(...): FMU supports both CS and ME, using CS as default if nothing specified.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1Yngw/src/FMI2_ext.jl:224
-
-
     #################### Begin information for FMU ####################
     	Model name:			SpringFrictionPendulum1D
     	FMI-Version:			2.0
@@ -168,7 +160,7 @@ In the function `fmiSimulateME()` the FMU is simulated in model-exchange mode (M
 dataME = fmiSimulateME(myFMU, tStart, tStop; saveat=tSave)
 ```
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:11[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:09[39m
 
 
 
@@ -180,22 +172,22 @@ dataME = fmiSimulateME(myFMU, tStart, tStop; saveat=tSave)
     	true
     States [801]:
     	0.0	[0.5, 0.0]
-    	0.01	[0.5002131418271644, 0.04268945072841344]
-    	0.02	[0.500854887495059, 0.08570846016824428]
-    	0.03	[0.5019281657516876, 0.1289839014807958]
-    	0.04	[0.5034351795370763, 0.17244393614729067]
-    	0.05	[0.50537742474533, 0.21601821086566914]
-    	0.06	[0.5077556992635467, 0.25963791323182245]
-    	0.07	[0.5105701152466664, 0.30323585206399106]
-    	0.08	[0.5138201143130452, 0.34674645493266393]
+    	0.01	[0.5002131418270838, 0.0426894507334239]
+    	0.02	[0.5008548874900925, 0.08570846009092]
+    	0.03	[0.5019281657668404, 0.12898390160770948]
+    	0.04	[0.5034351795297135, 0.17244393632491634]
+    	0.05	[0.5053774247131723, 0.21601821081124567]
+    	0.06	[0.5077556991013391, 0.2596379123127895]
+    	0.07	[0.5105701153011483, 0.3032358504004232]
+    	0.08	[0.5138201146588821, 0.34674645322442477]
     	...
-    	8.0	[1.0668392065868253, -1.0000121313794676e-10]
+    	8.0	[1.0666323055577207, -7.603992128337398e-5]
     Events [6]:
     	State-Event #11 @ 0.0s
     	State-Event #11 @ 0.994s
     	State-Event #19 @ 1.9883s
-    	State-Event #11 @ 2.983s
-    	State-Event #19 @ 3.9788s
+    	State-Event #11 @ 2.9831s
+    	State-Event #19 @ 3.9789s
     	State-Event #11 @ 4.977s
 
 
