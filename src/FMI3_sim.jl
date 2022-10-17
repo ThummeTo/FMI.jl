@@ -8,9 +8,17 @@
 #
 
 using DifferentialEquations, DiffEqCallbacks
+import SciMLBase: RightRootFind
 
+using FMIImport: fmi3EnterInitializationMode, fmi3ExitInitializationMode, fmi3UpdateDiscreteStates, fmi3GetContinuousStates, fmi3GetNominalsOfContinuousStates, fmi3SetContinuousStates, fmi3GetContinuousStateDerivatives!
+using FMIImport.FMICore: fmi3StatusOK, fmi3TypeCoSimulation, fmi3TypeModelExchange
+using FMIImport.FMICore: fmi3InstanceState, fmi3InstanceStateInstantiated, fmi3InstanceStateInitializationMode, fmiInstanceStateEventMode, fmi3InstanceStateContinuousTimeMode, fmi3InstanceStateTerminated, fmi3InstanceStateError, fmi3InstanceStateFatal
+using FMIImport: FMU3Solution, FMU3Event
 
-using FMIImport
+using ChainRulesCore
+import ForwardDiff
+
+import ProgressMeter
 
 ############ Model-Exchange ############
 

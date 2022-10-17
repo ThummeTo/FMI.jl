@@ -6,7 +6,7 @@
 import ForwardDiff
 import Zygote
 
-using FMI.FMIImport: fmi2SampleDirectionalDerivative, fmi2GetJacobian, fmi2SetContinuousStates
+using FMI.FMIImport: fmi3SampleDirectionalDerivative, fmi3GetJacobian, fmi3SetContinuousStates
 
 FMUPaths = [get_model_filename("SpringFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"]),
             get_model_filename("BouncingBall1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])]
@@ -35,8 +35,8 @@ for FMUPath in FMUPaths
     FD_jac = ForwardDiff.jacobian(x -> FMI.fx(comp, dx, x, p, t), x0)
     ZG_jac = Zygote.jacobian(FMI.fx, comp, dx, x0, p, t)[3]
     fmiSetContinuousStates(comp, x0)
-    samp_jac = fmi2SampleDirectionalDerivative(comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
-    auto_jac = fmi2GetJacobian(comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
+    samp_jac = fmi3SampleDirectionalDerivative(comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
+    auto_jac = fmi3GetJacobian(comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
 
     @test (abs.(auto_jac -   FD_jac) .< ones(numStates, numStates).*1e-6) == ones(Bool, numStates, numStates)
     @test (abs.(auto_jac -   ZG_jac) .< ones(numStates, numStates).*1e-6) == ones(Bool, numStates, numStates)
@@ -50,8 +50,8 @@ for FMUPath in FMUPaths
     FD_jac = ForwardDiff.jacobian(x -> FMI.fx(comp, dx, x, p, t), x0)
     ZG_jac = Zygote.jacobian(FMI.fx, comp, dx, x0, p, t)[3]
     fmi2SetContinuousStates(comp, x0)
-    samp_jac = fmi2SampleDirectionalDerivative(comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
-    auto_jac = fmi2GetJacobian(comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
+    samp_jac = fmi3SampleDirectionalDerivative(comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
+    auto_jac = fmi3GetJacobian(comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
 
     @test (abs.(auto_jac -   FD_jac) .< ones(numStates, numStates).*1e-6) == ones(Bool, numStates, numStates)
     @test (abs.(auto_jac -   ZG_jac) .< ones(numStates, numStates).*1e-6) == ones(Bool, numStates, numStates)

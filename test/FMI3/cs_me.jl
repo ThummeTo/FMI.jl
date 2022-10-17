@@ -27,18 +27,18 @@ myFMU = fmiLoad("BouncingBall", "ModelicaReferenceFMUs", "0.0.16", "3.0")
 
 
 # myFMU = fmiLoad("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"]; type=:ME)
-@test myFMU.type == FMI.fmi3TypeModelExchange
-inst = fmi3InstantiateModelExchange!(myFMU; loggingOn=false)
-fmuStruct = nothing
-envFMUSTRUCT = ENV["FMUSTRUCT"]
-if envFMUSTRUCT == "FMU"
-    fmuStruct = myFMU
-elseif envFMUSTRUCT == "FMUCOMPONENT"
-    fmuStruct = inst
-end
-sol = fmiSimulate(fmuStruct, t_start, t_stop)
-@test sol.success
-fmiUnload(myFMU)
+# @test myFMU.type == FMI.fmi3TypeModelExchange
+# inst = fmi3InstantiateModelExchange!(myFMU; loggingOn=false)
+# fmuStruct = nothing
+# envFMUSTRUCT = ENV["FMUSTRUCT"]
+# if envFMUSTRUCT == "FMU"
+#     fmuStruct = myFMU
+# elseif envFMUSTRUCT == "FMUCOMPONENT"
+#     fmuStruct = inst
+# end
+# sol = fmiSimulate(fmuStruct, t_start, t_stop)
+# @test sol.success
+# fmiUnload(myFMU)
 
 
 
