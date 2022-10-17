@@ -12,7 +12,13 @@ exportingToolsWindows = [("Dymola", "2022x")]
 exportingToolsLinux = [("Dymola", "2022x")]
 fmuStructs = ["FMU", "FMUCOMPONENT"]
 
-function runtestsFMI2(exportingTool)
+# enable assertions for warnings/errors for all default execution configurations 
+for exec in [FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGURATION_NO_RESET, FMU2_EXECUTION_CONFIGURATION_RESET]
+    exec.assertOnError = true
+    exec.assertOnWarning = true
+end
+
+function runtests(exportingTool)
     ENV["EXPORTINGTOOL"] = exportingTool[1]
     ENV["EXPORTINGVERSION"] = exportingTool[2]
 
