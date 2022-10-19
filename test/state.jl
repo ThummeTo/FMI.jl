@@ -22,10 +22,9 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-@test fmiEnterInitializationMode(fmuStruct) == 0
-@test fmiExitInitializationMode(fmuStruct) == 0
-
-@test fmiSetupExperiment(fmuStruct, 0.0) == 0
+@test fmiSetupExperiment(fmuStruct, 0.0) == fmi2StatusOK
+@test fmiEnterInitializationMode(fmuStruct) == fmi2StatusOK
+@test fmiExitInitializationMode(fmuStruct) == fmi2StatusOK
 
 ###########################
 # Testing state functions #
