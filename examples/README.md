@@ -1,0 +1,3 @@
+![FMI.jl Logo](https://github.com/ThummeTo/FMI.jl/blob/main/logo/dark/fmijl_logo_640_320.png?raw=true "FMI.jl Logo")
+
+Examples can be found in the [examples folder in the examples branch](https://github.com/ThummeTo/FMI.jl/tree/examples/examples) or the [examples section of the documentation](https://thummeto.github.io/FMI.jl/dev/examples/overview/). All examples are available as Julia-Script (*.jl*), Jupyter-Notebook (*.ipynb*) and Markdown (*.md*).
