@@ -38,11 +38,23 @@ function parse_commandline()
         "--tempdir"
             help = "temporary directive that is used for cross checks and results"
             arg_type = String
-            default="C:\\Users\\Christof\\test"
         "--fmiversion"
             help = "FMI version that should be used for the cross checks"
             arg_type = String
             default = "2.0"
+        "--includefatals"
+            help = "Include FMUs that have caused the cross check runner to fail and exit"
+            action = :store_true
+        "--skipnotcompliant"
+            help = "Reject officially not compliant FMUs and don't excecute them"
+            action = :store_true
+        "--commitrejected"
+            help = "Also commit the result file for FMUs that hasn't been excecuted (e.g. officially not compliant FMUs if they are not skipped)"
+            action = :store_true
+        "--commitfailed"
+            help = "Also commit the result file for failed FMUs"
+            action = :store_true
+
     end
     println("Arguments used for cross check:")
     for (arg,val) in parse_args(s)
@@ -51,7 +63,7 @@ function parse_commandline()
     return parse_args(s)
 end
 
-function runCrossCheckFmu(checkPath::String, check::FmuCrossCheck)::FmuCrossCheck
+function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCrossCheck, skipnotcompliant::Bool, commitrejected::Bool, commitfailed::Bool)::FmuCrossCheck
     pathToFMU = joinpath(checkPath, "$(check.fmuCheck).fmu")
 
     # if check.notCompliant
@@ -61,60 +73,81 @@ function runCrossCheckFmu(checkPath::String, check::FmuCrossCheck)::FmuCrossChec
     #     check.success = false
     #     return check
     # end
-    
     try
-        fmuToCheck = fmiLoad(pathToFMU)
-        fmiInfo(fmuToCheck)
-        hasInputValues = false
+        if !(check.notCompliant && skipnotcompliant)
+            fmuToCheck = fmiLoad(pathToFMU)
+            fmiInfo(fmuToCheck)
+            hasInputValues = false
 
-        # Read Options
-        fmuOptions = CSV.File(joinpath(checkPath, "$(check.fmuCheck)_ref.opt"), header=false) |> Dict
-        tStart = fmuOptions["StartTime"]
-        tStop = fmuOptions["StopTime"]
-        relTol = fmuOptions["RelTol"]
+            # Read Options
+            fmuOptions = CSV.File(joinpath(checkPath, "$(check.fmuCheck)_ref.opt"), header=false) |> Dict
+            tStart = fmuOptions["StartTime"]
+            tStop = fmuOptions["StopTime"]
+            relTol = fmuOptions["RelTol"]
 
-        # Read Ref values
-        fmuRecordValueNames = readdlm(joinpath(checkPath, "$(check.fmuCheck)_ref.csv"), ',', String)[1, 2:end]
-        fmuRefValues = CSV.File(joinpath(checkPath, "$(check.fmuCheck)_ref.csv")) |> Tables.rowtable |> Tables.columntable
+            # Read Ref values
+            fmuRecordValueNames = readdlm(joinpath(checkPath, "$(check.fmuCheck)_ref.csv"), ',', String)[1, 2:end]
+            fmuRefValues = CSV.File(joinpath(checkPath, "$(check.fmuCheck)_ref.csv")) |> Tables.rowtable |> Tables.columntable
 
-        if isfile(joinpath(checkPath, "$(check.fmuCheck)_in.csv"))
-            inputValues = CSV.File(joinpath(checkPath, "$(check.fmuCheck)_in.csv")) |> Tables.rowtable
-            hasInputValues = true
-            getInputValues = function(t)
-                for (valIndex, val) in enumerate(inputValues)
-                    if val.time >= t
-                        a = collect(inputValues[valIndex])[2:end] 
-                        return a
-                        break;
+            if isfile(joinpath(checkPath, "$(check.fmuCheck)_in.csv"))
+                inputValues = CSV.File(joinpath(checkPath, "$(check.fmuCheck)_in.csv")) |> Tables.rowtable
+                hasInputValues = true
+                getInputValues = function(t)
+                    for (valIndex, val) in enumerate(inputValues)
+                        if val.time >= t
+                            a = collect(inputValues[valIndex])[2:end] 
+                            return a
+                            break;
+                        end
                     end
                 end
             end
-        end
-        
-        if hasInputValues
-            if check.type == CS
-                simData = fmiSimulateCS(fmuToCheck, tStart, tStop; tolerance=relTol, saveat=fmuRefValues[1], inputFunction=getInputValues, inputValueReferences=:inputs, recordValues=fmuRecordValueNames)
-            elseif check.type == ME
-                simData = fmiSimulateME(fmuToCheck, tStart, tStop; reltol=relTol, saveat=fmuRefValues[1], inputFunction=getInputValues, inputValueReferences=:inputs, recordValues=fmuRecordValueNames)
+            
+            if hasInputValues
+                if check.type == CS
+                    simData = fmiSimulateCS(fmuToCheck, tStart, tStop; tolerance=relTol, saveat=fmuRefValues[1], inputFunction=getInputValues, inputValueReferences=:inputs, recordValues=fmuRecordValueNames)
+                elseif check.type == ME
+                    simData = fmiSimulateME(fmuToCheck, tStart, tStop; reltol=relTol, saveat=fmuRefValues[1], inputFunction=getInputValues, inputValueReferences=:inputs, recordValues=fmuRecordValueNames)
+                else
+                    @error "Unkown FMU Type. Only 'cs' and 'me' are valid types"
+                end
             else
-                @error "Unkown FMU Type. Only 'cs' and 'me' are valid types"
+                if check.type == CS
+                    simData = fmiSimulateCS(fmuToCheck, tStart, tStop; tolerance=relTol, saveat=fmuRefValues[1], recordValues=fmuRecordValueNames)
+                elseif check.type == ME
+                    simData = fmiSimulateME(fmuToCheck, tStart, tStop; reltol=relTol, saveat=fmuRefValues[1], recordValues=fmuRecordValueNames)
+                else
+                    @error "Unkown FMU Type. Only 'cs' and 'me' are valid types"
+                end
+            end
+            
+            check.result = calucateNRMSE(fmuRecordValueNames, simData, fmuRefValues)
+            check.skipped = false
+        
+            if (check.result < NRMSE_THRESHHOLD)
+                check.success = true
+                mkpath(resultPath)
+                cd(resultPath)
+                touch("passed")
+                touch("README.md")
+                file = open("README.md", "w")
+                write(file, "test content")
+                close(file)
+            else
+                check.success = false
+                if commitfailed
+                    mkpath(resultPath)
+                    cd(resultPath)
+                    touch("failed")
+                end
             end
         else
-            if check.type == CS
-                simData = fmiSimulateCS(fmuToCheck, tStart, tStop; tolerance=relTol, saveat=fmuRefValues[1], recordValues=fmuRecordValueNames)
-            elseif check.type == ME
-                simData = fmiSimulateME(fmuToCheck, tStart, tStop; reltol=relTol, saveat=fmuRefValues[1], recordValues=fmuRecordValueNames)
-            else
-                @error "Unkown FMU Type. Only 'cs' and 'me' are valid types"
+            check.skipped = true
+            if commitrejected
+                mkpath(resultPath)
+                cd(resultPath)
+                touch("rejected")
             end
-        end
-        
-        check.result = calucateNRMSE(fmuRecordValueNames, simData, fmuRefValues)
-        check.skipped = false
-        if (check.result < NRMSE_THRESHHOLD)
-            check.success = true
-        else
-            check.success = false
         end
         check.error = nothing
         fmiUnload(fmuToCheck)
@@ -127,6 +160,11 @@ function runCrossCheckFmu(checkPath::String, check::FmuCrossCheck)::FmuCrossChec
         showerror(io, e)
         check.error = String(take!(io))
         check.success = false
+        if commitfailed
+            mkpath(resultPath)
+            cd(resultPath)
+            touch("failed")
+        end
     end
 
     return check
@@ -141,6 +179,10 @@ function main()
     fmiVersion = parsed_args["fmiversion"]
     crossCheckRepo = parsed_args["ccrepo"]
     os = parsed_args["os"]
+    includeFatals = parsed_args["includefatals"]
+    skipnotcompliant = parsed_args["skipnotcompliant"]
+    commitrejected = parsed_args["commitrejected"]
+    commitfailed = parsed_args["commitfailed"]
 
     # checking of inputs
     # TODO: Might work better as assert
@@ -153,13 +195,17 @@ function main()
 
     #   Excecute FMUs
     crossChecks = getFmusToTest(fmiCrossCheckRepoPath, fmiVersion, os)
-    crossChecks = filter(c -> (c.system != "AMESim" && c.system != "Test-FMUs" && c.system != "SimulationX"), crossChecks)
+    if !includeFatals
+        crossChecks = filter(c -> (c.system != "AMESim" && c.system != "Test-FMUs" && c.system != "SimulationX"), crossChecks)
+    end
+    
     for (index, check) in enumerate(crossChecks)
         checkPath = joinpath(fmiCrossCheckRepoPath, "fmus", check.fmiVersion, check.type, check.os, check.system, check.systemVersion, check.fmuCheck)
+        resultPath = joinpath(fmiCrossCheckRepoPath, "results", check.fmiVersion, check.type, check.os, TOOL_ID, TOOL_VERSION, check.system, check.systemVersion, check.fmuCheck)
         cd(checkPath)
-        println("Checking $check")
+        println("Checking $check for $checkPath and expecting $resultPath")
 
-        check = runCrossCheckFmu(checkPath, check)
+        check = runCrossCheckFmu(checkPath, resultPath, check, skipnotcompliant, commitrejected, commitfailed)
         crossChecks[index] = check
     end
     println("#################### End FMI Cross checks Run ####################")
