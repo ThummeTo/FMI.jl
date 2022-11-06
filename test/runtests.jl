@@ -85,7 +85,7 @@ function runtestsFMI3(exportingTool)
                     # include("FMI3/getter_setter.jl")
                 end
                 @testset "State Manipulation" begin
-                    include("FMI3/state.jl")
+                    # include("FMI3/state.jl")
                 end
                 @testset "Directional derivatives" begin
                     # include("FMI3/dir_ders.jl")
