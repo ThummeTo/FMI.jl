@@ -27,9 +27,23 @@ function fmi2VariableDependsOnVariable(fmu::FMU2, vr1::fmi2ValueReference, vr2::
 end
 
 """
-Returns the FMU's dependency-matrix for fast look-ups on dependencies between value references.
 
-Entries are from type fmi2DependencyKind.
+    fmiGetDependencies(fmu::FMU2)
+
+Building dependency matrix `dim x dim` for fast look-ups on variable dependencies (`dim` is number of states).
+
+# Arguments
+- `fmu::FMU2`: Mutable Struct representing a FMU.
+
+# Retruns
+- `fmu.dependencies::Matrix{Union{fmi2DependencyKind, Nothing}}`: Returns the FMU's dependency-matrix for fast look-ups on dependencies between value references. Entries are from type fmi2DependencyKind.
+
+# Source
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec2.0.2[p.22]: 2.1.4 Inquire Platform and Version Number of Header Files
+- FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
+
+See also [`fmi2GetDependencies`](@ref).
 """
 function fmi2GetDependencies(fmu::FMU2)
     if !isdefined(fmu, :dependencies)
@@ -85,7 +99,21 @@ function fmi2PrintDependencies(fmu::FMU2)
 end
 
 """
+
+     fmi2Info(fmu::FMU2)
+
 Prints FMU related information.
+
+# Arguments
+- `fmu::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
+
+# Returns
+- Prints FMU related information.
+
+# Source
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec2.0.2[p.22]: 2.1.4 Inquire Platform and Version Number of Header Files
+- FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
 """
 function fmi2Info(fmu::FMU2)
     println("#################### Begin information for FMU ####################")
