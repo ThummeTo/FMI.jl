@@ -28,7 +28,7 @@ end
 
 """
 
-    fmiGetDependencies(fmu::FMU2)
+    fmi2GetDependencies(fmu::FMU2)
 
 Building dependency matrix `dim x dim` for fast look-ups on variable dependencies (`dim` is number of states).
 
