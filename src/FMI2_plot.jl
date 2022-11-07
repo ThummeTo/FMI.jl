@@ -7,24 +7,48 @@ using FMIImport: FMU2Solution
 import ForwardDiff
 
 """
+
+    fmiPlot(solution::FMU2Solution; states::Union{Bool, Nothing}=nothing,
+    values::Union{Bool, Nothing}=nothing,
+    stateEvents::Union{Bool, Nothing}=nothing,
+    timeEvents::Union{Bool, Nothing}=nothing,
+    stateIndices=nothing,
+    valueIndices=nothing,
+    maxLabelLength=64,
+    plotkwargs...)
+
 Plots data from a ME-FMU.
 
 Optional `t_in_solution` controls if the first state in the solution is interpreted as t(ime).
-Optional keyword argument `maxLabelLength` controls the maximum length for legend labels (too long labels are cut from front).
+
+# Arguments
+- `solution::FMU2Solution`:  Struct contains information about the solution `value`, `success`, `state` and  `events` of a specific FMU.
+
+# Keywords
+- `states::Union{Bool, Nothing}`: controls if states should be ploted (default = nothing)
+- `values::Union{Bool, Nothing}`: controls if values should be ploted (default = nothing)
+- `timeEvents::Union{Bool, Nothing}=nothing`: controls if timeEvents should be ploted (default = noting )
+- `stateIndices=nothing`: controls the number of ploted states
+- `valueIndices=nothing`: controls the number of ploted values
+- `maxLabelLength=64`: controls the maximum length for legend labels (too long labels are cut from front)
+
+# Returns
+- `fig `: Returns a figure containing the plotted data from a ME-FMU.
+
 """
 function fmiPlot(solution::FMU2Solution; kwargs...)
     fig = Plots.plot(; xlabel="t [s]")
     fmiPlot!(fig, solution; kwargs...)
     return fig
 end
-function fmiPlot!(fig, solution::FMU2Solution; 
-    states::Union{Bool, Nothing}=nothing, 
-    values::Union{Bool, Nothing}=nothing, 
-    stateEvents::Union{Bool, Nothing}=nothing, 
-    timeEvents::Union{Bool, Nothing}=nothing, 
-    stateIndices=nothing, 
-    valueIndices=nothing, 
-    maxLabelLength=64, 
+function fmiPlot!(fig, solution::FMU2Solution;
+    states::Union{Bool, Nothing}=nothing,
+    values::Union{Bool, Nothing}=nothing,
+    stateEvents::Union{Bool, Nothing}=nothing,
+    timeEvents::Union{Bool, Nothing}=nothing,
+    stateIndices=nothing,
+    valueIndices=nothing,
+    maxLabelLength=64,
     plotkwargs...)
 
     numStateEvents = 0
@@ -36,50 +60,50 @@ function fmiPlot!(fig, solution::FMU2Solution;
             numTimeEvents += 1
         end
     end
-  
-    if states === nothing 
+
+    if states === nothing
         states = (solution.states !== nothing)
     end
 
-    if values === nothing 
+    if values === nothing
         values = (solution.values !== nothing)
     end
 
-    if stateEvents === nothing 
+    if stateEvents === nothing
         stateEvents = false
-        for e in solution.events 
+        for e in solution.events
             if e.indicator > 0
-                stateEvents = true 
-                break 
-            end 
-        end 
+                stateEvents = true
+                break
+            end
+        end
 
         if numStateEvents > 100
             @info "fmiPlot(...): Number of state events ($(numStateEvents)) exceeding 100, disabling automatic plotting of state events (can be forced with keyword `stateEvents=true`)."
-            stateEvents = false 
+            stateEvents = false
         end
     end
 
-    if timeEvents === nothing 
+    if timeEvents === nothing
         timeEvents = false
-        for e in solution.events 
+        for e in solution.events
             if e.indicator == 0
-                timeEvents = true 
-                break 
-            end 
-        end 
+                timeEvents = true
+                break
+            end
+        end
 
         if numTimeEvents > 100
             @info "fmiPlot(...): Number of time events ($(numTimeEvents)) exceeding 100, disabling automatic plotting of time events (can be forced with keyword `timeEvents=true`)."
-            timeEvents = false 
+            timeEvents = false
         end
     end
 
-    if stateIndices === nothing 
+    if stateIndices === nothing
         stateIndices = 1:length(solution.fmu.modelDescription.stateValueReferences)
     end
 
-    if valueIndices === nothing 
+    if valueIndices === nothing
         if solution.values !== nothing
             valueIndices = 1:length(solution.values.saveval[1])
         end
@@ -89,7 +113,7 @@ function fmiPlot!(fig, solution::FMU2Solution;
     plot_max = -Inf
 
     # plot states
-    if states 
+    if states
         t = collect(ForwardDiff.value(e) for e in solution.states.t)
         numValues = length(solution.states.u[1])
 
@@ -98,23 +122,23 @@ function fmiPlot!(fig, solution::FMU2Solution;
                 vr = solution.fmu.modelDescription.stateValueReferences[v]
                 vrNames = fmi2ValueReferenceToString(solution.fmu, vr)
                 vrName = vrNames[1]
-    
+
                 vals = collect(ForwardDiff.value(data[v]) for data in solution.states.u)
 
                 plot_min = min(plot_min, vals...)
                 plot_max = max(plot_max, vals...)
-    
+
                 # prevent legend labels from getting too long
                 label = "$vrName ($vr)"
                 labelLength = length(label)
                 if labelLength > maxLabelLength
                     label = "..." * label[labelLength-maxLabelLength:end]
                 end
-    
+
                 Plots.plot!(fig, t, vals; label=label, plotkwargs...)
-            end 
+            end
         end
-    end 
+    end
 
     # plot recorded values
     if values
@@ -126,21 +150,21 @@ function fmiPlot!(fig, solution::FMU2Solution;
                 vr = solution.valueReferences[v]
                 vrNames = fmi2ValueReferenceToString(solution.fmu, vr)
                 vrName = vrNames[1]
-    
+
                 vals = collect(ForwardDiff.value(data[v]) for data in solution.values.saveval)
 
                 plot_min = min(plot_min, vals...)
                 plot_max = max(plot_max, vals...)
-    
+
                 # prevent legend labels from getting too long
                 label = "$vrName ($vr)"
                 labelLength = length(label)
                 if labelLength > maxLabelLength
                     label = "..." * label[labelLength-maxLabelLength:end]
                 end
-    
+
                 Plots.plot!(fig, t, vals; label=label, plotkwargs...)
-            end 
+            end
         end
     end
 
@@ -163,7 +187,7 @@ function fmiPlot!(fig, solution::FMU2Solution;
             end
         end
     end
-    
+
     return fig
 end
 
