@@ -60,11 +60,8 @@ function handleEvents(c::FMU3Instance)
           
         fmi3EnterEventMode(c, c.stepEvent, c.stateEvent, c.rootsFound, Csize_t(c.fmu.modelDescription.numberOfEventIndicators), c.timeEvent)
         # TODO inputEvent handling
-        println("before loop")
-        println("---------------------")
         discreteStatesNeedUpdate = fmi3True
         while discreteStatesNeedUpdate == fmi3True
-            println(discreteStatesNeedUpdate)
             # update discrete states
             discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime = fmi3UpdateDiscreteStates(c)
           
@@ -82,11 +79,7 @@ function handleEvents(c::FMU3Instance)
         end
     end
     
-    println("afterLoop")
     fmi3EnterContinuousTimeMode(c)
-    # println(valuesChanged)
-    # println(nominalsChanged)
-    println(c)
     @debug "handleEvents(_, $(enterEventMode), $(exitInContinuousMode)): rootsFound: $(c.rootsFound)   valuesChanged: $(valuesChanged)   continuousStates: $(fmi3GetContinuousStates(c))", 
     return valuesChanged, nominalsChanged
 
@@ -938,7 +931,7 @@ function fmi3SimulateME(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_st
 
     c.fmu.hasStateEvents = (c.fmu.modelDescription.numberOfEventIndicators > 0)
     # c.fmu.hasTimeEvents = (c.eventInfo.nextEventTimeDefined == fmi2True)
-    c.fmu.hasTimeEvents = fmi3True
+    c.fmu.hasTimeEvents = fmi3False
     
     setupODEProblem(c, x0, t_start, t_stop; customFx=customFx)
 
