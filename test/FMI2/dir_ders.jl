@@ -5,7 +5,7 @@
 
 using FMI.FMIImport.FMICore: fmi2Real
 
-myFMU = fmiLoad("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
+myFMU = fmiLoad("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"]; type=:ME)
 comp = fmiInstantiate!(myFMU; loggingOn=false)
 @test comp != 0
 

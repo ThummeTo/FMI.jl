@@ -218,7 +218,7 @@ function fx(c::FMU2Component,
     #     fmi2GetDerivatives!(c, dx)
     # end
 
-    y, dx = FMIImport.eval!(c, dx, nothing, nothing, x, nothing, nothing, t)
+    y, dx = c(;dx=dx, x=x, t=t)
 
     return dx
 end
