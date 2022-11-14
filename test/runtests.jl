@@ -20,7 +20,7 @@ for exec in [FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGURATI
     exec.assertOnWarning = true
 end
 
-function runtests(exportingTool)
+function runtestsFMI2(exportingTool)
     ENV["EXPORTINGTOOL"] = exportingTool[1]
     ENV["EXPORTINGVERSION"] = exportingTool[2]
 
@@ -33,7 +33,7 @@ function runtests(exportingTool)
 
         @info "Model Description (model_description.jl)"
         @testset "Model Description" begin
-            include("model_description.jl")
+            include("FMI2/model_description.jl")
         end
 
         for str in fmuStructs
@@ -103,10 +103,10 @@ function runtestsFMI3(exportingTool)
             @testset "Functions for $str" begin
                 ENV["FMUSTRUCT"] = str
                 @testset "Variable Getters / Setters" begin
-                    # include("FMI3/getter_setter.jl")
+                    include("FMI3/getter_setter.jl")
                 end
                 @testset "State Manipulation" begin
-                    # include("FMI3/state.jl")
+                    include("FMI3/state.jl")
                 end
                 @testset "Directional derivatives" begin
                     # include("FMI3/dir_ders.jl")
@@ -118,7 +118,7 @@ function runtestsFMI3(exportingTool)
                     include("FMI3/sim_CS.jl")
                 end
                 @testset "ME Simulation" begin
-                    # include("FMI3/sim_ME.jl")
+                    include("FMI3/sim_ME.jl")
                 end
                 @testset "Support CS and ME simultaneously" begin
                     # include("FMI3/cs_me.jl")
@@ -139,13 +139,13 @@ end
     if Sys.iswindows()
         @info "Automated testing is supported on Windows."
         for exportingTool in exportingToolsWindows
-            # runtestsFMI2(exportingTool)
+            runtestsFMI2(exportingTool)
             runtestsFMI3(exportingTool)
         end
     elseif Sys.islinux()
         @info "Automated testing is supported on Linux."
         for exportingTool in exportingToolsLinux
-            # runtestsFMI2(exportingTool)
+            runtestsFMI2(exportingTool)
             runtestsFMI3(exportingTool)
         end
     elseif Sys.isapple()
