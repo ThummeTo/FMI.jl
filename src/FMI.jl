@@ -120,7 +120,7 @@ export fmiIsCoSimulation, fmiIsModelExchange
 export fmiGetDependencies
 export fmiGetStartValue, fmiStringToValueReference
 export fmiGet, fmiGet!, fmiSet
-export fmiGetSolutionTime, fmiGetSolutionState, fmiGetSolutionValue
+export fmiGetSolutionTime, fmiGetSolutionState, fmiGetSolutionDerivative, fmiGetSolutionValue
 
 export fmiSetFctGetTypesPlatform, fmiSetFctGetVersion
 export fmiSetFctInstantiate, fmiSetFctFreeInstance, fmiSetFctSetDebugLogging, fmiSetFctSetupExperiment, fmiSetEnterInitializationMode, fmiSetFctExitInitializationMode
@@ -2483,6 +2483,10 @@ end
 
 function fmiGetSolutionState(solution::FMU2Solution, args...; kwargs...)
     fmi2GetSolutionState(solution, args...; kwargs...)
+end
+
+function fmiGetSolutionDerivative(solution::FMU2Solution, args...; kwargs...)
+    fmi2GetSolutionDerivative(solution, args...; kwargs...)
 end
 
 function fmiGetSolutionValue(solution::FMU2Solution, args...; kwargs...)

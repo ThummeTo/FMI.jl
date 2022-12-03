@@ -18,13 +18,9 @@ tData = t_start:t_step:t_stop
 
 for FMUPath in FMUPaths
     myFMU = fmiLoad(FMUPath; type=:ME)
-    comp = fmiInstantiate!(myFMU; loggingOn=false)
+    
+    c, x0 = FMIImport.prepareSolveFMU(fmu, nothing, fmu.type, nothing, nothing, nothing, nothing, nothing, nothing, 0.0, 0.0, nothing; handleEvents=FMI.handleEvents)
 
-    fmiSetupExperiment(comp, t_start, t_stop)
-    fmiEnterInitializationMode(comp)
-    fmiExitInitializationMode(comp)
-
-    x0 = fmiGetContinuousStates(comp)
     numStates = length(x0)
 
     dx = zeros(numStates)
