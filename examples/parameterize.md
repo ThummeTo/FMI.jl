@@ -124,7 +124,7 @@ fmiInstantiate!(myFMU; loggingOn=true)
 
     FMU:            IO
     InstanceName:   IO
-    Address:        Ptr{Nothing} @0x000000000618c390
+    Address:        Ptr{Nothing} @0x00000000056e8e80
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
@@ -243,7 +243,7 @@ paramsVal = generateRandomNumbers()
 
 
 
-    (59.430257649352434, false, 1, "Random number 3.9875880040243894!")
+    (76.27924103424854, false, 11, "Random number 31.465386562245932!")
 
 
 
@@ -260,7 +260,7 @@ fmiSetupExperiment(myFMU, tStart, tStop)
 
     [[32mOK[0m][CvodeStatistics][IO]: Sundials CVode Statistics
         Stop time                                : 0.00 s
-        Simulation time                          : 2.80 s
+        Simulation time                          : 2.76 s
         Number of external steps                 : 0
         Number of internal steps                 : 0
         Number of non-linear iterations          : 0
@@ -337,8 +337,8 @@ simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSa
     Success:
     	true
     Values [2]:
-    	0.0	(59.430257649352434, 0.0, 1.0)
-    	1.0	(59.430257649352434, 0.0, 1.0)
+    	0.0	(76.27924103424854, 0.0, 11.0)
+    	1.0	(76.27924103424854, 0.0, 11.0)
     Events [0]:
 
 
@@ -357,7 +357,7 @@ fmiSetupExperiment(myFMU, tStart, tStop)
 
     [[32mOK[0m][CvodeStatistics][IO]: Sundials CVode Statistics
         Stop time                                : 1.00 s
-        Simulation time                          : 6.36 s
+        Simulation time                          : 6.43 s
         Number of external steps                 : 1
         Number of internal steps                 : 3
         Number of non-linear iterations          : 3
@@ -394,7 +394,7 @@ rndReal, rndBoolean, rndInteger, rndString = generateRandomNumbers()
 
 
 
-    (79.33637243596665, true, 6, "Random number 50.33556093447178!")
+    (81.23828945311105, true, 20, "Random number 60.735914188131716!")
 
 
 
@@ -456,8 +456,8 @@ simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSa
     Success:
     	true
     Values [2]:
-    	0.0	(79.33637243596665, 1.0, 6.0)
-    	1.0	(79.33637243596665, 1.0, 6.0)
+    	0.0	(81.23828945311105, 1.0, 20.0)
+    	1.0	(81.23828945311105, 1.0, 20.0)
     Events [0]:
 
 

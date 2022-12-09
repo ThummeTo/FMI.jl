@@ -122,7 +122,7 @@ vrs = ["mass.s"]
 simData = fmiSimulateME(myFMU, tStart, tStop; recordValues=vrs)
 ```
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:09[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:08[39m
 
 
 
@@ -198,7 +198,7 @@ originalGetReal = myFMU.cGetReal
 
 
 
-    Ptr{Nothing} @0x00007f72a3d67faf
+    Ptr{Nothing} @0x00007fc745567faf
 
 
 
@@ -246,7 +246,7 @@ fmiSetFctGetReal(myFMU, myGetReal!)
 
 
 
-    Ptr{Nothing} @0x00007f73389eefc0
+    Ptr{Nothing} @0x00007fc7dac1efc0
 
 
 
