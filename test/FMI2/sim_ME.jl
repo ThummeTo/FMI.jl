@@ -11,6 +11,7 @@ abstol = 0.0001 / 10.0
 solver = FBDF(autodiff=false)
 solver_ad = FBDF(autodiff=true)
 dtmax_inputs = 0.01
+dtmin = 1e-64
 
 # case 1: ME-FMU with state events
 
@@ -29,7 +30,7 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-solution = fmiSimulateME(fmuStruct, (t_start, t_stop); abstol=abstol, solver=solver)
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop); abstol=abstol, solver=solver, dtmin=dtmin)
 @test length(solution.states.u) > 0
 @test length(solution.states.t) > 0
 
@@ -60,7 +61,7 @@ end
 
 ### test without recording values
 
-solution = fmiSimulateME(fmuStruct, (t_start, t_stop); abstol=abstol, solver=solver) 
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop); abstol=abstol, solver=solver, dtmin=dtmin) 
 @test length(solution.states.u) > 0
 @test length(solution.states.t) > 0
 
@@ -73,7 +74,7 @@ solution = fmiSimulateME(fmuStruct, (t_start, t_stop); abstol=abstol, solver=sol
 
 ### test with recording values (variable step record values)
 
-solution = fmiSimulateME(fmuStruct, (t_start, t_stop); recordValues="mass.f", abstol=abstol, solver=solver) 
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop); recordValues="mass.f", abstol=abstol, solver=solver, dtmin=dtmin) 
 dataLength = length(solution.states.u)
 @test dataLength > 0
 @test length(solution.states.t) == dataLength
@@ -94,7 +95,7 @@ dataLength = length(solution.states.u)
 ### test with recording values (fixed step record values)
 
 tData = t_start:0.1:t_stop
-solution = fmiSimulateME(fmuStruct, (t_start, t_stop); recordValues="mass.f", saveat=tData, abstol=abstol, solver=solver) 
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop); recordValues="mass.f", saveat=tData, abstol=abstol, solver=solver, dtmin=dtmin) 
 @test length(solution.states.u) == length(tData)
 @test length(solution.states.t) == length(tData)
 @test length(solution.values.saveval) == length(tData)
@@ -145,7 +146,7 @@ end
 for inpfct in [extForce_cxt, extForce_t]
     global solution
 
-    solution = fmiSimulateME(fmuStruct, (t_start, t_stop); inputValueReferences=["extForce"], inputFunction=inpfct, abstol=abstol, solver=solver, dtmax=dtmax_inputs) # dtmax to force resolution
+    solution = fmiSimulateME(fmuStruct, (t_start, t_stop); inputValueReferences=["extForce"], inputFunction=inpfct, abstol=abstol, solver=solver, dtmin=dtmin, dtmax=dtmax_inputs) # dtmax to force resolution
     @test length(solution.states.u) > 0
     @test length(solution.states.t) > 0
 
@@ -175,7 +176,7 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-solution = fmiSimulateME(fmuStruct, (t_start, t_stop);  abstol=abstol, solver=solver_ad, dtmax=dtmax_inputs) # dtmax to force resolution
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop);  abstol=abstol, solver=solver_ad, dtmin=dtmin, dtmax=dtmax_inputs) # dtmax to force resolution
 @test length(solution.states.u) > 0
 @test length(solution.states.t) > 0
 
@@ -204,7 +205,7 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-solution = fmiSimulateME(fmuStruct, (t_start, t_stop); inputValueReferences=["extForce"], inputFunction=extForce_t,  abstol=abstol, solver=solver, dtmax=dtmax_inputs) # dtmax to force resolution
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop); inputValueReferences=["extForce"], inputFunction=extForce_t,  abstol=abstol, solver=solver, dtmin=dtmin, dtmax=dtmax_inputs) # dtmax to force resolution
 @test length(solution.states.u) > 0
 @test length(solution.states.t) > 0
 
@@ -233,7 +234,7 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-solution = fmiSimulateME(fmuStruct, (t_start, t_stop); saveat=tData, recordValues=:states, abstol=abstol, solver=solver)
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop); saveat=tData, recordValues=:states, abstol=abstol, solver=solver, dtmin=dtmin)
 @test length(solution.states.u) == length(tData)
 @test length(solution.states.t) == length(tData)
 @test length(solution.values.saveval) == length(tData)
@@ -265,7 +266,7 @@ end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
 rand_x0 = rand(2)
-solution = fmiSimulateME(fmuStruct, (t_start, t_stop); x0=rand_x0, abstol=abstol, solver=solver)
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop); x0=rand_x0, abstol=abstol, solver=solver, dtmin=dtmin)
 @test length(solution.states.u) > 0
 @test length(solution.states.t) > 0
 
