@@ -44,24 +44,6 @@ cacheInteger = 0
 cacheBoolean = false
 cacheString = ""
 
-@test fmiSetReal(fmuStruct, realValueReferences[1], rndReal) == 0
-@test fmiGetReal(fmuStruct, realValueReferences[1]) == rndReal
-@test fmiSetReal(fmuStruct, realValueReferences[1], -rndReal) == 0
-@test fmiGetReal(fmuStruct, realValueReferences[1]) == -rndReal
-
-@test fmiSetInteger(fmuStruct, integerValueReferences[1], rndInteger) == 0
-@test fmiGetInteger(fmuStruct, integerValueReferences[1]) == rndInteger
-@test fmiSetInteger(fmuStruct, integerValueReferences[1], -rndInteger) == 0
-@test fmiGetInteger(fmuStruct, integerValueReferences[1]) == -rndInteger
-
-@test fmiSetBoolean(fmuStruct, booleanValueReferences[1], rndBoolean) == 0
-@test fmiGetBoolean(fmuStruct, booleanValueReferences[1]) == rndBoolean
-@test fmiSetBoolean(fmuStruct, booleanValueReferences[1], !rndBoolean) == 0
-@test fmiGetBoolean(fmuStruct, booleanValueReferences[1]) == !rndBoolean
-
-@test fmiSetString(fmuStruct, stringValueReferences[1], rndString) == 0
-@test fmiGetString(fmuStruct, stringValueReferences[1]) == rndString
-
 fmiSet(fmuStruct, 
         [realValueReferences[1], integerValueReferences[1], booleanValueReferences[1], stringValueReferences[1]], 
         [rndReal,                rndInteger,                rndBoolean,                rndString])
@@ -88,52 +70,20 @@ cacheInteger =  [FMI.fmi2Integer(0), FMI.fmi2Integer(0)]
 cacheBoolean = [FMI.fmi2Boolean(false), FMI.fmi2Boolean(false)]
 cacheString = [pointer(""), pointer("")]
 
-@test fmiSetReal(fmuStruct, realValueReferences, rndReal) == 0
-@test fmiGetReal(fmuStruct, realValueReferences) == rndReal
-fmiGetReal!(fmuStruct, realValueReferences, cacheReal)
-@test cacheReal == rndReal
-@test fmiSetReal(fmuStruct, realValueReferences, -rndReal) == 0
-@test fmiGetReal(fmuStruct, realValueReferences) == -rndReal
-fmiGetReal!(fmuStruct, realValueReferences, cacheReal)
-@test cacheReal == -rndReal
-
-@test fmiSetInteger(fmuStruct, integerValueReferences, rndInteger) == 0
-@test fmiGetInteger(fmuStruct, integerValueReferences) == rndInteger
-fmiGetInteger!(fmuStruct, integerValueReferences, cacheInteger)
-@test cacheInteger == rndInteger
-@test fmiSetInteger(fmuStruct, integerValueReferences, -rndInteger) == 0
-@test fmiGetInteger(fmuStruct, integerValueReferences) == -rndInteger
-fmiGetInteger!(fmuStruct, integerValueReferences, cacheInteger)
-@test cacheInteger == -rndInteger
-
-@test fmiSetBoolean(fmuStruct, booleanValueReferences, rndBoolean) == 0
-@test fmiGetBoolean(fmuStruct, booleanValueReferences) == rndBoolean
-fmiGetBoolean!(fmuStruct, booleanValueReferences, cacheBoolean)
-@test cacheBoolean == rndBoolean
-not_rndBoolean = collect(!b for b in rndBoolean)
-@test fmiSetBoolean(fmuStruct, booleanValueReferences, not_rndBoolean) == 0
-@test fmiGetBoolean(fmuStruct, booleanValueReferences) == not_rndBoolean
-fmiGetBoolean!(fmuStruct, booleanValueReferences, cacheBoolean)
-@test cacheBoolean == not_rndBoolean
-
-@test fmiSetString(fmuStruct, stringValueReferences, rndString) == 0
-@test fmiGetString(fmuStruct, stringValueReferences) == rndString
-fmiGetString!(fmuStruct, stringValueReferences, cacheString)
-@test unsafe_string.(cacheString) == rndString
-
 #@test fmiGetStartValue(fmuStruct, ["p_enumeration", "p_string", "p_real"]) == ["myEnumeration1", "Hello World!", 0.0] 
 @test fmiGetStartValue(fmuStruct, ["p_string", "p_real"]) == ["Hello World!", 0.0] 
 
-# Testing input/output derivatives
-dirs = fmiGetRealOutputDerivatives(fmuStruct, ["y_real"], ones(FMI.fmi2Integer, 1))
-@test dirs == -Inf # at this point, derivative is undefined
+####################################
+# Testing input/output derivatives #
+####################################
+
 @test fmiSetRealInputDerivatives(fmuStruct, ["u_real"], ones(FMI.fmi2Integer, 1), zeros(1)) == 0
 
 @test fmiExitInitializationMode(fmuStruct) == 0
 @test fmiDoStep(fmuStruct, 0.1) == 0
 
 dirs = fmiGetRealOutputDerivatives(fmuStruct, ["y_real"], ones(FMI.fmi2Integer, 1))
-@test dirs == 0.0
+@test dirs == 0.0 # ToDo: Force a `dirs != 0.0`
 
 ############
 # Clean up #

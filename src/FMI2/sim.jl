@@ -166,18 +166,18 @@ function fx(c::FMU2Component,
 end
 
 # wrapper
-function fmi2SimulateME(c::FMU2Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
-    fmi2SimulateME(c.fmu, c, t_start, t_stop; kwargs...)
+function fmi2SimulateME(c::FMU2Component, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...)
+    fmi2SimulateME(c.fmu, c, tspan; kwargs...)
 end 
 
 # sets up the ODEProblem for simulating a ME-FMU
-function setupODEProblem(c::FMU2Component, x0::AbstractArray{fmi2Real}, t_start::fmi2Real, t_stop::fmi2Real; p=[], customFx=nothing)
+function setupODEProblem(c::FMU2Component, x0::AbstractArray{fmi2Real}, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; p=[], customFx=nothing)
     if customFx === nothing
         customFx = (dx, x, p, t) -> fx(c, dx, x, p, t)
     end
 
     p = []
-    c.problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
+    c.problem = ODEProblem(customFx, x0, tspan, p)
 
     return c.problem
 end
@@ -206,7 +206,7 @@ Returns:
     - If keyword `recordValues` is not set, a struct of type `ODESolution`.
     - If keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues).
 """
-function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
+function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing;
     tolerance::Union{Real, Nothing} = nothing,
     dt::Union{Real, Nothing} = nothing,
     solver = nothing,
@@ -255,6 +255,8 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
     hasParameters = (parameters !== nothing)
     hasStartState = (x0 !== nothing)
 
+    t_start, t_stop = (tspan == nothing ? (nothing, nothing) : tspan)
+
     cbs = []
 
     for cb in callbacks
@@ -298,7 +300,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
     inputs = nothing
     if hasInputs
         inputValueReferences
-        inputValues = _inputFunction(t_start)
+        inputValues = _inputFunction(nothing, nothing, t_start)
         inputs = Dict(inputValueReferences .=> inputValues)
     end
 
@@ -320,7 +322,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
     c.fmu.hasStateEvents = (c.fmu.modelDescription.numberOfEventIndicators > 0)
     c.fmu.hasTimeEvents = (c.eventInfo.nextEventTimeDefined == fmi2True)
     
-    setupODEProblem(c, x0, t_start, t_stop; customFx=customFx)
+    setupODEProblem(c, x0, (t_start, t_stop); customFx=customFx)
 
     progressMeter = nothing
     if showProgress 
@@ -412,8 +414,8 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
 end
 
 # wrapper
-function fmi2SimulateCS(c::FMU2Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
-    fmi2SimulateCS(c.fmu, c, t_start, t_stop; kwargs...)
+function fmi2SimulateCS(c::FMU2Component, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...)
+    fmi2SimulateCS(c.fmu, c, tspan; kwargs...)
 end 
 
 ############ Co-Simulation ############
@@ -435,7 +437,7 @@ Returns:
     - If keyword `recordValues` is not set, a boolean `success` is returned (simulation success).
     - If keyword `recordValues` is set, a tuple of type (true, DiffEqCallbacks.SavedValues) or (false, nothing).
 """
-function fmi2SimulateCS(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
+function fmi2SimulateCS(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing;
                         tolerance::Union{Real, Nothing} = nothing,
                         dt::Union{Real, Nothing} = nothing,
                         recordValues::fmi2ValueReferenceFormat = nothing,
@@ -467,6 +469,8 @@ function fmi2SimulateCS(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
     recordValues = prepareValueReference(fmu, recordValues)
     inputValueReferences = prepareValueReference(fmu, inputValueReferences)
     hasInputs = (length(inputValueReferences) > 0)
+
+    t_start, t_stop = (tspan == nothing ? (nothing, nothing) : tspan)
     
     variableSteps = fmi2IsCoSimulation(fmu) && fmu.modelDescription.coSimulation.canHandleVariableCommunicationStepSize 
     
@@ -591,8 +595,8 @@ end
 ##### CS & ME #####
 
 # wrapper
-function fmi2Simulate(c::FMU2Component, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
-    fmi2Simulate(c.fmu, c, t_start, t_stop; kwargs...)
+function fmi2Simulate(c::FMU2Component, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...)
+    fmi2Simulate(c.fmu, c, tspan; kwargs...)
 end 
 
 """
@@ -614,12 +618,12 @@ Returns:
     - if keyword `recordValues` is set, a tuple of type (success::Bool, DiffEqCallbacks.SavedValues) for CS-FMUs
     - if keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues) for ME-FMUs
 """
-function fmi2Simulate(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
+function fmi2Simulate(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...)
 
     if fmu.type == fmi2TypeCoSimulation
-        return fmi2SimulateCS(fmu, c, t_start, t_stop; kwargs...)
+        return fmi2SimulateCS(fmu, c, tspan; kwargs...)
     elseif fmu.type == fmi2TypeModelExchange
-        return fmi2SimulateME(fmu, c, t_start, t_stop; kwargs...)
+        return fmi2SimulateME(fmu, c, tspan; kwargs...)
     else
         error(unknownFMUType)
     end
