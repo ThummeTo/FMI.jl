@@ -3,10 +3,14 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-using DifferentialEquations: Tsit5, Rosenbrock23
+using DifferentialEquations: Tsit5, Rosenbrock23, FBDF
 
 t_start = 0.0
 t_stop = 8.0
+abstol = 0.0001 / 10.0
+solver = FBDF(autodiff=false)
+solver_ad = FBDF(autodiff=true)
+dtmax_inputs = 0.01
 
 # case 1: ME-FMU with state events
 
@@ -25,7 +29,7 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-solution = fmiSimulateME(fmuStruct, t_start, t_stop)
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop); abstol=abstol, solver=solver)
 @test length(solution.states.u) > 0
 @test length(solution.states.t) > 0
 
@@ -56,7 +60,7 @@ end
 
 ### test without recording values
 
-solution = fmiSimulateME(fmuStruct, t_start, t_stop; dtmax=0.001) # dtmax to force resolution
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop); abstol=abstol, solver=solver) 
 @test length(solution.states.u) > 0
 @test length(solution.states.t) > 0
 
@@ -69,7 +73,7 @@ solution = fmiSimulateME(fmuStruct, t_start, t_stop; dtmax=0.001) # dtmax to for
 
 ### test with recording values (variable step record values)
 
-solution= fmiSimulateME(fmuStruct, t_start, t_stop; recordValues="mass.f", dtmax=0.001) # dtmax to force resolution
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop); recordValues="mass.f", abstol=abstol, solver=solver) 
 dataLength = length(solution.states.u)
 @test dataLength > 0
 @test length(solution.states.t) == dataLength
@@ -90,7 +94,7 @@ dataLength = length(solution.states.u)
 ### test with recording values (fixed step record values)
 
 tData = t_start:0.1:t_stop
-solution = fmiSimulateME(fmuStruct, t_start, t_stop; recordValues="mass.f", saveat=tData, dtmax=0.001) # dtmax to force resolution
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop); recordValues="mass.f", saveat=tData, abstol=abstol, solver=solver) 
 @test length(solution.states.u) == length(tData)
 @test length(solution.states.t) == length(tData)
 @test length(solution.values.saveval) == length(tData)
@@ -115,7 +119,7 @@ function extForce_t(t)
     [sin(t)]
 end 
 
-function extForce_cxt(c::FMU2Component, x::Union{AbstractArray{fmi2Real}, Nothing}, t::fmi2Real)
+function extForce_cxt(c::Union{FMU2Component, Nothing}, x::Union{AbstractArray{fmi2Real}, Nothing}, t::fmi2Real)
     x1 = 0.0
     if x != nothing 
         x1 = x[1] 
@@ -141,7 +145,7 @@ end
 for inpfct in [extForce_cxt, extForce_t]
     global solution
 
-    solution = fmiSimulateME(fmuStruct, t_start, t_stop; inputValueReferences=["extForce"], inputFunction=inpfct, solver=Tsit5(), dtmax=0.001) # dtmax to force resolution
+    solution = fmiSimulateME(fmuStruct, (t_start, t_stop); inputValueReferences=["extForce"], inputFunction=inpfct, abstol=abstol, solver=solver, dtmax=dtmax_inputs) # dtmax to force resolution
     @test length(solution.states.u) > 0
     @test length(solution.states.t) > 0
 
@@ -171,8 +175,7 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-# ToDo: test `autodiff=true`
-solution = fmiSimulateME(fmuStruct, t_start, t_stop; solver=Rosenbrock23(autodiff=false), dtmax=0.001) # dtmax to force resolution
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop);  abstol=abstol, solver=solver_ad, dtmax=dtmax_inputs) # dtmax to force resolution
 @test length(solution.states.u) > 0
 @test length(solution.states.t) > 0
 
@@ -201,7 +204,7 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-solution = fmiSimulateME(fmuStruct, t_start, t_stop; inputValueReferences=["extForce"], inputFunction=extForce_t, solver=Rosenbrock23(autodiff=false), dtmax=0.001) # dtmax to force resolution
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop); inputValueReferences=["extForce"], inputFunction=extForce_t,  abstol=abstol, solver=solver, dtmax=dtmax_inputs) # dtmax to force resolution
 @test length(solution.states.u) > 0
 @test length(solution.states.t) > 0
 
@@ -230,7 +233,7 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-solution = fmiSimulateME(fmuStruct, t_start, t_stop; saveat=tData, recordValues=myFMU.modelDescription.stateValueReferences)
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop); saveat=tData, recordValues=:states, abstol=abstol, solver=solver)
 @test length(solution.states.u) == length(tData)
 @test length(solution.states.t) == length(tData)
 @test length(solution.values.saveval) == length(tData)
@@ -262,7 +265,7 @@ end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
 rand_x0 = rand(2)
-solution = fmiSimulateME(fmuStruct, t_start, t_stop; x0=rand_x0)
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop); x0=rand_x0, abstol=abstol, solver=solver)
 @test length(solution.states.u) > 0
 @test length(solution.states.t) > 0
 

@@ -76,7 +76,7 @@ function fmiPlot!(fig, solution::FMU2Solution;
     end
 
     if stateIndices === nothing 
-        stateIndices = 1:length(solution.fmu.modelDescription.stateValueReferences)
+        stateIndices = 1:length(solution.component.fmu.modelDescription.stateValueReferences)
     end
 
     if valueIndices === nothing 
@@ -95,8 +95,8 @@ function fmiPlot!(fig, solution::FMU2Solution;
 
         for v in 1:numValues
             if v ∈ stateIndices
-                vr = solution.fmu.modelDescription.stateValueReferences[v]
-                vrNames = fmi2ValueReferenceToString(solution.fmu, vr)
+                vr = solution.component.fmu.modelDescription.stateValueReferences[v]
+                vrNames = fmi2ValueReferenceToString(solution.component.fmu, vr)
                 vrName = vrNames[1]
     
                 vals = collect(ForwardDiff.value(data[v]) for data in solution.states.u)
@@ -123,9 +123,13 @@ function fmiPlot!(fig, solution::FMU2Solution;
 
         for v in 1:numValues
             if v ∈ valueIndices
-                vr = solution.valueReferences[v]
-                vrNames = fmi2ValueReferenceToString(solution.fmu, vr)
-                vrName = vrNames[1]
+                vr = "[unknown]"
+                vrName = "[unknown]"
+                if solution.valueReferences != nothing && v <= length(solution.valueReferences)
+                    vr = solution.valueReferences[v]
+                    vrNames = fmi2ValueReferenceToString(solution.component.fmu, vr)
+                    vrName = vrNames[1]
+                end
     
                 vals = collect(ForwardDiff.value(data[v]) for data in solution.values.saveval)
 
