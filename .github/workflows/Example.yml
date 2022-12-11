@@ -40,12 +40,10 @@ jobs:
         run: pip install jupyter nbconvert
                         
       - name: "Execute and synchronize all files"
-        env:
-          EXAMPLES_PATH: 'examples/src/*.ipynb'
         run: |
-          jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-1.6" --to notebook --inplace --execute $EXAMPLES_PATH
-          jupyter nbconvert --to script $EXAMPLES_PATH
-          jupyter nbconvert --to markdown $EXAMPLES_PATH
+          jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-1.6" --to notebook --inplace --execute examples/src/*.ipynb
+          jupyter nbconvert --to script examples/src/*.ipynb
+          jupyter nbconvert --to markdown examples/src/*.ipynb
 
       - name: "Auto commit"
         if: ${{ matrix.os == 'ubuntu-latest'}}
