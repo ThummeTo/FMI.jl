@@ -24,7 +24,7 @@ The example is primarily intended for users who work in the field of simulations
 
 
 ## Other formats
-Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/simulate.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/simulate.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/simulate.md) corresponding to the notebook.  
+Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/simulate.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/simulate.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/simulate.md) corresponding to the notebook.  
 
 
 ## Getting started
@@ -124,7 +124,7 @@ In the next steps the recorded values are defined. The first state is the positi
 ```julia
 vrs = ["mass.s", "mass.v"]
 
-dataCS = fmiSimulateCS(myFMU, tStart, tStop; recordValues=vrs, saveat=tSave)
+dataCS = fmiSimulateCS(myFMU, (tStart, tStop); recordValues=vrs, saveat=tSave)
 ```
 
 
@@ -134,6 +134,14 @@ dataCS = fmiSimulateCS(myFMU, tStart, tStop; recordValues=vrs, saveat=tSave)
     	SpringFrictionPendulum1D
     Success:
     	true
+    Jacobian-Evaluations:
+    	∂ẋ_∂x: 0
+    	∂ẋ_∂u: 0
+    	∂y_∂x: 0
+    	∂y_∂u: 0
+    Gradient-Evaluations:
+    	∂ẋ_∂t: 0
+    	∂y_∂t: 0
     Values [801]:
     	0.0	(0.5, 0.0)
     	0.01	(0.5002235448486548, 0.042692491939260585)
@@ -157,7 +165,7 @@ In the function `fmiSimulateME()` the FMU is simulated in model-exchange mode (M
 
 
 ```julia
-dataME = fmiSimulateME(myFMU, tStart, tStop; saveat=tSave)
+dataME = fmiSimulateME(myFMU, (tStart, tStop); saveat=tSave)
 ```
 
     [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:08[39m
@@ -170,25 +178,34 @@ dataME = fmiSimulateME(myFMU, tStart, tStop; saveat=tSave)
     	SpringFrictionPendulum1D
     Success:
     	true
+    Jacobian-Evaluations:
+    	∂ẋ_∂x: 0
+    	∂ẋ_∂u: 0
+    	∂y_∂x: 0
+    	∂y_∂u: 0
+    Gradient-Evaluations:
+    	∂ẋ_∂t: 0
+    	∂y_∂t: 0
     States [801]:
     	0.0	[0.5, 0.0]
-    	0.01	[0.5002131418270838, 0.0426894507334239]
-    	0.02	[0.5008548874900925, 0.08570846009092]
-    	0.03	[0.5019281657668404, 0.12898390160770948]
-    	0.04	[0.5034351795297135, 0.17244393632491634]
-    	0.05	[0.5053774247131723, 0.21601821081124567]
-    	0.06	[0.5077556991013391, 0.2596379123127895]
-    	0.07	[0.5105701153011483, 0.3032358504004232]
-    	0.08	[0.5138201146588821, 0.34674645322442477]
+    	0.01	[0.5001830153167193, 0.04266457014880354]
+    	0.02	[0.5007774466309036, 0.08565568319352253]
+    	0.03	[0.5017832967639473, 0.12890583707336797]
+    	0.04	[0.5032064311200306, 0.17235301799895314]
+    	0.05	[0.5050743095189983, 0.21593738573908525]
+    	0.06	[0.507319614085227, 0.25958361265849966]
+    	0.07	[0.5100465544159197, 0.30323530202356946]
+    	0.08	[0.5131797325801483, 0.3468296870055038]
     	...
-    	8.0	[1.0666323055577207, -7.603992128337398e-5]
-    Events [6]:
+    	8.0	[0.9297092601154026, 7.232852961706624e-5]
+    Events [7]:
     	State-Event #11 @ 0.0s
-    	State-Event #11 @ 0.994s
-    	State-Event #19 @ 1.9883s
-    	State-Event #11 @ 2.9831s
-    	State-Event #19 @ 3.9789s
-    	State-Event #11 @ 4.977s
+    	State-Event #11 @ 0.9952s
+    	State-Event #19 @ 1.9908s
+    	State-Event #11 @ 2.9869s
+    	State-Event #19 @ 3.9839s
+    	State-Event #11 @ 4.9823s
+    	State-Event #19 @ 5.9837s
 
 
 

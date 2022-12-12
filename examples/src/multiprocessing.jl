@@ -43,7 +43,7 @@ input_values = collect(collect.(eachrow(rand(batchSize,2))))
 end
 
 @everywhere function runCalcFormatted(fmu, x0, recordValues=["mass.s", "mass.v"])
-    data = fmiSimulateME(fmu, SharedModule.t_start, SharedModule.t_stop; recordValues=recordValues, saveat=SharedModule.tData, x0=x0, showProgress=false, dtmax=1e-4)
+    data = fmiSimulateME(fmu, SharedModule.tspan; recordValues=recordValues, saveat=SharedModule.tData, x0=x0, showProgress=false, dtmax=1e-4)
     return reduce(hcat, data.states.u)
 end
 

@@ -23,7 +23,7 @@ comp1Address= comp1.compAddr
 println(comp1)
 
 param1 = Dict("spring.c"=>10.0, "mass_s0"=>1.0)
-data1 = fmiSimulate(comp1, tStart, tStop; parameters=param1, recordValues=vrs, instantiate=false, freeInstance=false)
+data1 = fmiSimulate(comp1, (tStart, tStop); parameters=param1, recordValues=vrs, instantiate=false, freeInstance=false)
 fig = fmiPlot(data1)
 
 @assert comp1.compAddr === comp1Address
@@ -35,7 +35,7 @@ println(comp2)
 @assert comp1Address !== comp2Address
 
 param2 = Dict("spring.c"=>1.0, "mass.s"=>2.0)
-data2 = fmiSimulateCS(comp2, tStart, tStop;  parameters=param2, recordValues=vrs, instantiate=false, freeInstance=false)
+data2 = fmiSimulateCS(comp2, (tStart, tStop);  parameters=param2, recordValues=vrs, instantiate=false, freeInstance=false)
 fmiPlot!(fig, data2)
 
 @assert comp2.compAddr === comp2Address

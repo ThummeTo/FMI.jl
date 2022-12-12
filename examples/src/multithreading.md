@@ -30,7 +30,7 @@ The example is primarily intended for users who work in the field of simulations
 
 
 ## Other formats
-Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/multithreading.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/multithreading.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/multithreading.md) corresponding to the notebook.  
+Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/multithreading.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/multithreading.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/multithreading.md) corresponding to the notebook.  
 
 
 ## Getting started
@@ -98,7 +98,7 @@ input_values = collect(collect.(eachrow(rand(batchSize,2))))
 
 
     1-element Vector{Vector{Float64}}:
-     [0.30901161658170495, 0.029589236251069462]
+     [0.7542409589990176, 0.4918217565217682]
 
 
 
@@ -127,7 +127,7 @@ We define a helper function to calculate the FMU solution and combine it into an
 
 ```julia
 function runCalcFormatted(fmu::FMU2, x0::Vector{Float64}, recordValues::Vector{String}=["mass.s", "mass.v"])
-    data = fmiSimulateME(fmu, t_start, t_stop; recordValues=recordValues, saveat=tData, x0=x0, showProgress=false, dtmax=1e-4)
+    data = fmiSimulateME(fmu, tspan; recordValues=recordValues, saveat=tData, x0=x0, showProgress=false, dtmax=1e-4)
     return reduce(hcat, data.states.u)
 end
 ```
@@ -150,15 +150,15 @@ Running a single evaluation is pretty quick, therefore the speed can be better t
 
 
     BenchmarkTools.Trial: 7 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m728.044 ms[22m[39m … [35m749.875 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m2.36% … 2.30%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m729.350 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m2.36%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m732.420 ms[22m[39m ± [32m  7.767 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m2.35% ± 0.02%
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m766.771 ms[22m[39m … [35m798.473 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m2.93% … 2.81%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m772.958 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m2.94%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m777.993 ms[22m[39m ± [32m 11.203 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m3.32% ± 0.69%
     
-      [39m▁[39m [39m▁[34m█[39m[39m [39m [39m [39m▁[39m▁[39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m 
-      [39m█[39m▁[39m█[34m█[39m[39m▁[39m▁[39m▁[39m█[39m█[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      728 ms[90m           Histogram: frequency by time[39m          750 ms [0m[1m<[22m
+      [39m█[39m [39m [39m [39m [39m█[39m [39m [39m [34m█[39m[39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
+      [39m█[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[34m█[39m[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
+      767 ms[90m           Histogram: frequency by time[39m          798 ms [0m[1m<[22m
     
-     Memory estimate[90m: [39m[33m183.41 MiB[39m, allocs estimate[90m: [39m[33m7802092[39m.
+     Memory estimate[90m: [39m[33m201.72 MiB[39m, allocs estimate[90m: [39m[33m8002110[39m.
 
 
 
@@ -178,15 +178,15 @@ println("Single Threaded")
 
 
     BenchmarkTools.Trial: 7 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m732.427 ms[22m[39m … [35m754.980 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m2.51% … 2.43%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m733.877 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m2.51%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m737.005 ms[22m[39m ± [32m  8.024 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m2.50% ± 0.03%
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m765.691 ms[22m[39m … [35m804.337 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m3.09% … 2.95%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m774.307 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m3.07%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m779.788 ms[22m[39m ± [32m 13.057 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m3.47% ± 0.72%
     
-      [39m█[39m [39m [39m█[34m [39m[39m [39m [39m [39m█[39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m 
-      [39m█[39m▁[39m▁[39m█[34m▁[39m[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      732 ms[90m           Histogram: frequency by time[39m          755 ms [0m[1m<[22m
+      [39m▁[39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m [39m [39m [39m█[34m [39m[39m [39m [39m [39m [39m [39m [39m [32m [39m[39m▁[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m 
+      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m█[34m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
+      766 ms[90m           Histogram: frequency by time[39m          804 ms [0m[1m<[22m
     
-     Memory estimate[90m: [39m[33m183.41 MiB[39m, allocs estimate[90m: [39m[33m7802095[39m.
+     Memory estimate[90m: [39m[33m201.72 MiB[39m, allocs estimate[90m: [39m[33m8002114[39m.
 
 
 
@@ -207,15 +207,15 @@ println("Multi Threaded")
 
 
     BenchmarkTools.Trial: 7 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m710.093 ms[22m[39m … [35m737.490 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m2.69% … 2.62%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m714.155 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m2.68%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m716.957 ms[22m[39m ± [32m  9.338 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m2.67% ± 0.03%
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m750.962 ms[22m[39m … [35m781.852 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m3.24% … 3.09%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m758.217 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m3.21%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m761.480 ms[22m[39m ± [32m 10.775 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m3.65% ± 0.76%
     
-      [39m▁[39m [39m [39m [39m▁[39m [39m▁[34m [39m[39m [39m█[39m [39m [39m [39m [39m [32m [39m[39m▁[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m 
-      [39m█[39m▁[39m▁[39m▁[39m█[39m▁[39m█[34m▁[39m[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      710 ms[90m           Histogram: frequency by time[39m          737 ms [0m[1m<[22m
+      [39m▁[39m [39m [39m [39m [39m█[34m [39m[39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m▁[39m [39m [39m [39m▁[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m 
+      [39m█[39m▁[39m▁[39m▁[39m▁[39m█[34m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
+      751 ms[90m           Histogram: frequency by time[39m          782 ms [0m[1m<[22m
     
-     Memory estimate[90m: [39m[33m183.41 MiB[39m, allocs estimate[90m: [39m[33m7802099[39m.
+     Memory estimate[90m: [39m[33m201.72 MiB[39m, allocs estimate[90m: [39m[33m8002118[39m.
 
 
 

@@ -22,9 +22,9 @@ fmiInfo(myFMU)
 
 vrs = ["mass.s", "mass.v"]
 
-dataCS = fmiSimulateCS(myFMU, tStart, tStop; recordValues=vrs, saveat=tSave)
+dataCS = fmiSimulateCS(myFMU, (tStart, tStop); recordValues=vrs, saveat=tSave)
 
-dataME = fmiSimulateME(myFMU, tStart, tStop; saveat=tSave)
+dataME = fmiSimulateME(myFMU, (tStart, tStop); saveat=tSave)
 
 fmiPlot(dataCS)
 

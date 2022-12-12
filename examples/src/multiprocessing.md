@@ -30,7 +30,7 @@ The example is primarily intended for users who work in the field of simulations
 
 
 ## Other formats
-Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/multiprocessing.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/multiprocessing.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/multiprocessing.md) corresponding to the notebook.  
+Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/multiprocessing.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/multiprocessing.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/multiprocessing.md) corresponding to the notebook.  
 
 
 ## Getting started
@@ -115,22 +115,22 @@ input_values = collect(collect.(eachrow(rand(batchSize,2))))
 
 
     16-element Vector{Vector{Float64}}:
-     [0.831744132581449, 0.2589767409192083]
-     [0.6510467906737931, 0.21708344827894366]
-     [0.9042721754119238, 0.5543142020931655]
-     [0.26473515518266044, 0.40520385200679776]
-     [0.9094405416243854, 0.7465225916082012]
-     [0.800560167945678, 0.20776289520391833]
-     [0.18294575592758533, 0.9989439178901101]
-     [0.824662303332488, 0.6659686719952527]
-     [0.9748041950333182, 0.30803280751048834]
-     [0.9236894327815939, 0.8461495343695076]
-     [0.8698448282335083, 0.8526102016737802]
-     [0.6885495337012268, 0.7420053001149389]
-     [0.497034488252331, 0.5379983180569607]
-     [0.9706738750825188, 0.3621339524833671]
-     [0.6736192662502511, 0.3550578136010232]
-     [0.746938643598271, 0.5208505329088249]
+     [0.973463693745406, 0.9332822532429528]
+     [0.19779492178662395, 0.7773348627375489]
+     [0.8334794177946323, 0.18875123282185946]
+     [0.4039216046495817, 0.2627317697373486]
+     [0.41740189612644363, 0.8374904716548626]
+     [0.09123557822874329, 0.8970867605505353]
+     [0.3232329209374114, 0.43924207925947245]
+     [0.730818632813838, 0.16917947398234912]
+     [0.3822715534293488, 0.8392129679506357]
+     [0.7791470439982826, 0.9825151133312853]
+     [0.4942012334556267, 0.9292212397938979]
+     [0.5908664424072521, 0.07631675492726675]
+     [0.16917663609675881, 0.6887079955505064]
+     [0.09938223399041801, 0.6773101441538616]
+     [0.5366832084405855, 0.6072691374126407]
+     [0.524700950645951, 0.16709614009415308]
 
 
 
@@ -158,7 +158,7 @@ We define a helper function to calculate the FMU and combine it into an Matrix.
 
 ```julia
 @everywhere function runCalcFormatted(fmu, x0, recordValues=["mass.s", "mass.v"])
-    data = fmiSimulateME(fmu, SharedModule.t_start, SharedModule.t_stop; recordValues=recordValues, saveat=SharedModule.tData, x0=x0, showProgress=false, dtmax=1e-4)
+    data = fmiSimulateME(fmu, SharedModule.tspan; recordValues=recordValues, saveat=SharedModule.tData, x0=x0, showProgress=false, dtmax=1e-4)
     return reduce(hcat, data.states.u)
 end
 ```
@@ -174,15 +174,15 @@ Running a single evaluation is pretty quick, therefore the speed can be better t
 
 
     BenchmarkTools.Trial: 7 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m714.751 ms[22m[39m … [35m734.416 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m2.66% … 2.56%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m715.350 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m2.64%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m719.318 ms[22m[39m ± [32m  7.433 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m2.82% ± 0.49%
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m811.958 ms[22m[39m … [35m840.038 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m2.72% … 2.65%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m815.897 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m2.72%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m821.236 ms[22m[39m ± [32m  9.764 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m3.08% ± 0.64%
     
-      [39m█[34m█[39m[39m [39m [39m [39m▁[39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m 
-      [39m█[34m█[39m[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      715 ms[90m           Histogram: frequency by time[39m          734 ms [0m[1m<[22m
+      [39m█[39m [39m [39m [39m [39m [39m█[39m█[34m█[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
+      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m█[34m█[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
+      812 ms[90m           Histogram: frequency by time[39m          840 ms [0m[1m<[22m
     
-     Memory estimate[90m: [39m[33m183.41 MiB[39m, allocs estimate[90m: [39m[33m7802092[39m.
+     Memory estimate[90m: [39m[33m201.72 MiB[39m, allocs estimate[90m: [39m[33m8002110[39m.
 
 
 
@@ -202,8 +202,8 @@ println("Single Threaded")
 
 
     BenchmarkTools.Trial: 1 sample with 1 evaluation.
-     Single result which took [34m11.514 s[39m (3.00% GC) to evaluate,
-     with a memory estimate of [33m2.87 GiB[39m, over [33m124833460[39m allocations.
+     Single result which took [34m13.026 s[39m (3.34% GC) to evaluate,
+     with a memory estimate of [33m3.15 GiB[39m, over [33m128033760[39m allocations.
 
 
 
@@ -224,8 +224,8 @@ println("Multi Threaded")
 
 
     BenchmarkTools.Trial: 1 sample with 1 evaluation.
-     Single result which took [34m6.399 s[39m (0.00% GC) to evaluate,
-     with a memory estimate of [33m83.55 KiB[39m, over [33m1282[39m allocations.
+     Single result which took [34m6.799 s[39m (0.00% GC) to evaluate,
+     with a memory estimate of [33m84.16 KiB[39m, over [33m1296[39m allocations.
 
 
 

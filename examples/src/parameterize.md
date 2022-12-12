@@ -21,7 +21,7 @@ The example is primarily intended for users who work in the field of simulation 
 
 
 ## Other formats
-Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/parameterize.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/parameterize.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/parameterize.md) corresponding to the notebook.  
+Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/parameterize.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/parameterize.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/parameterize.md) corresponding to the notebook.  
 
 
 ## Getting started
@@ -124,7 +124,7 @@ fmiInstantiate!(myFMU; loggingOn=true)
 
     FMU:            IO
     InstanceName:   IO
-    Address:        Ptr{Nothing} @0x00000000056e8e80
+    Address:        Ptr{Nothing} @0x0000000005e5f450
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
@@ -243,7 +243,7 @@ paramsVal = generateRandomNumbers()
 
 
 
-    (76.27924103424854, false, 11, "Random number 31.465386562245932!")
+    (82.24154463937907, false, 13, "Random number 64.3077486401373!")
 
 
 
@@ -260,7 +260,7 @@ fmiSetupExperiment(myFMU, tStart, tStop)
 
     [[32mOK[0m][CvodeStatistics][IO]: Sundials CVode Statistics
         Stop time                                : 0.00 s
-        Simulation time                          : 2.76 s
+        Simulation time                          : 2.90 s
         Number of external steps                 : 0
         Number of internal steps                 : 0
         Number of non-linear iterations          : 0
@@ -325,7 +325,7 @@ Now the FMU has been initialized correctly, the FMU can be simulated. The `fmiSi
 
 
 ```julia
-simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSave, 
+simData = fmiSimulate(myFMU, (tStart, tStop); recordValues=params[1:3], saveat=tSave, 
                         instantiate=false, setup=false, freeInstance=false, terminate=false, reset=false)
 ```
 
@@ -336,9 +336,17 @@ simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSa
     	IO
     Success:
     	true
+    Jacobian-Evaluations:
+    	∂ẋ_∂x: 0
+    	∂ẋ_∂u: 0
+    	∂y_∂x: 0
+    	∂y_∂u: 0
+    Gradient-Evaluations:
+    	∂ẋ_∂t: 0
+    	∂y_∂t: 0
     Values [2]:
-    	0.0	(76.27924103424854, 0.0, 11.0)
-    	1.0	(76.27924103424854, 0.0, 11.0)
+    	0.0	(82.24154463937907, 0.0, 13.0)
+    	1.0	(82.24154463937907, 0.0, 13.0)
     Events [0]:
 
 
@@ -357,7 +365,7 @@ fmiSetupExperiment(myFMU, tStart, tStop)
 
     [[32mOK[0m][CvodeStatistics][IO]: Sundials CVode Statistics
         Stop time                                : 1.00 s
-        Simulation time                          : 6.43 s
+        Simulation time                          : 5.46 s
         Number of external steps                 : 1
         Number of internal steps                 : 3
         Number of non-linear iterations          : 3
@@ -394,7 +402,7 @@ rndReal, rndBoolean, rndInteger, rndString = generateRandomNumbers()
 
 
 
-    (81.23828945311105, true, 20, "Random number 60.735914188131716!")
+    (20.514956652342796, false, 32, "Random number 63.21303838134453!")
 
 
 
@@ -444,7 +452,7 @@ From here on, you may want to simulate the FMU. Please note, that with the defau
 
 
 ```julia
-simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSave, 
+simData = fmiSimulate(myFMU, (tStart, tStop); recordValues=params[1:3], saveat=tSave, 
                         instantiate=false, setup=false)
 ```
 
@@ -455,9 +463,17 @@ simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSa
     	IO
     Success:
     	true
+    Jacobian-Evaluations:
+    	∂ẋ_∂x: 0
+    	∂ẋ_∂u: 0
+    	∂y_∂x: 0
+    	∂y_∂u: 0
+    Gradient-Evaluations:
+    	∂ẋ_∂t: 0
+    	∂y_∂t: 0
     Values [2]:
-    	0.0	(81.23828945311105, 1.0, 20.0)
-    	1.0	(81.23828945311105, 1.0, 20.0)
+    	0.0	(20.514956652342796, 0.0, 32.0)
+    	1.0	(20.514956652342796, 0.0, 32.0)
     Events [0]:
 
 

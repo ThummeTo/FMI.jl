@@ -24,7 +24,7 @@ The example is primarily intended for users who work in the field of simulations
 
 
 ## Other formats
-Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/multiple_instances.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/multiple_instances.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/multiple_instances.md) corresponding to the notebook.  
+Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/multiple_instances.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/multiple_instances.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/multiple_instances.md) corresponding to the notebook.  
 
 
 ## Getting started
@@ -124,7 +124,7 @@ println(comp1)
 
     FMU:            SpringPendulum1D
     InstanceName:   SpringPendulum1D
-    Address:        Ptr{Nothing} @0x0000000005c039b0
+    Address:        Ptr{Nothing} @0x000000000658bbc0
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
@@ -136,15 +136,19 @@ Next, a dictionary for the parameters is created. With this dictionary you can s
 
 ```julia
 param1 = Dict("spring.c"=>10.0, "mass_s0"=>1.0)
-data1 = fmiSimulate(comp1, tStart, tStop; parameters=param1, recordValues=vrs, instantiate=false, freeInstance=false)
+data1 = fmiSimulate(comp1, (tStart, tStop); parameters=param1, recordValues=vrs, instantiate=false, freeInstance=false)
 fig = fmiPlot(data1)
 ```
+
+    ┌ Warning: Found no FMU instance, but executionConfig doesn't force allocation. Allocating one. Use `fmi2Instantiate(fmu)` to prevent this message.
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1gDoz/src/FMI2/prep.jl:65
+
 
 
 
 
     
-![svg](multiple_instances_files/multiple_instances_12_0.svg)
+![svg](multiple_instances_files/multiple_instances_12_1.svg)
     
 
 
@@ -169,7 +173,7 @@ println(comp2)
 
     FMU:            SpringPendulum1D
     InstanceName:   SpringPendulum1D
-    Address:        Ptr{Nothing} @0x000000000701e300
+    Address:        Ptr{Nothing} @0x0000000006fd67e0
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
@@ -188,15 +192,19 @@ Again, a dictionary for the parameters is created. With this dictionary you can 
 
 ```julia
 param2 = Dict("spring.c"=>1.0, "mass.s"=>2.0)
-data2 = fmiSimulateCS(comp2, tStart, tStop;  parameters=param2, recordValues=vrs, instantiate=false, freeInstance=false)
+data2 = fmiSimulateCS(comp2, (tStart, tStop);  parameters=param2, recordValues=vrs, instantiate=false, freeInstance=false)
 fmiPlot!(fig, data2)
 ```
+
+    ┌ Warning: Found no FMU instance, but executionConfig doesn't force allocation. Allocating one. Use `fmi2Instantiate(fmu)` to prevent this message.
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1gDoz/src/FMI2/prep.jl:65
+
 
 
 
 
     
-![svg](multiple_instances_files/multiple_instances_20_0.svg)
+![svg](multiple_instances_files/multiple_instances_20_1.svg)
     
 
 

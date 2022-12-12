@@ -24,7 +24,7 @@ The example is primarily intended for users who work in the field of simulations
 
 
 ## Other formats
-Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/modelica_conference_2021.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/modelica_conference_2021.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/modelica_conference_2021.md) corresponding to the notebook.  
+Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/modelica_conference_2021.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/modelica_conference_2021.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/modelica_conference_2021.md) corresponding to the notebook.  
 
 
 ## Getting started
@@ -115,7 +115,7 @@ In the next commands the FMU is simulated, for which the start and end time and 
 
 
 ```julia
-simData = fmiSimulate(myFMU, tStart, tStop; recordValues=["mass.s"], saveat=tSave)
+simData = fmiSimulate(myFMU, (tStart, tStop); recordValues=["mass.s"], saveat=tSave)
 fmiPlot(simData)
 ```
 
@@ -156,7 +156,7 @@ instanceFMU = fmiInstantiate!(myFMU)
 
     FMU:            SpringFrictionPendulum1D
     InstanceName:   SpringFrictionPendulum1D
-    Address:        Ptr{Nothing} @0x0000000006742480
+    Address:        Ptr{Nothing} @0x0000000006ea3410
     State:          fmi2ComponentStateInstantiated
     Logging:        false
     FMU time:       -Inf
@@ -209,7 +209,7 @@ fmiUnload(myFMU)
 
     [[32mOK[0m][CvodeStatistics][SpringFrictionPendulum1D]: Sundials CVode Statistics
         Stop time                                : 8.00 s
-        Simulation time                          : 0.27 s
+        Simulation time                          : 0.33 s
         Number of external steps                 : 80
         Number of internal steps                 : 191
         Number of non-linear iterations          : 263

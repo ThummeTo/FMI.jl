@@ -4,6 +4,7 @@
 
 # imports
 using FMI
+using FMI: fmiSetFctGetReal
 using FMIZoo
 using FMICore
 using Plots
@@ -20,7 +21,7 @@ fmiInfo(myFMU)
 
 vrs = ["mass.s"]
 
-simData = fmiSimulateME(myFMU, tStart, tStop; recordValues=vrs)
+simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
 
 fig = fmiPlot(simData, states=false)
 
@@ -49,7 +50,7 @@ end
 # no we overwrite the original function
 fmiSetFctGetReal(myFMU, myGetReal!)
 
-simData = fmiSimulateME(myFMU, tStart, tStop; recordValues=vrs)
+simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
 fmiPlot!(fig, simData; states=false, style=:dash)
 
 fmiUnload(myFMU)

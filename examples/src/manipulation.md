@@ -24,7 +24,7 @@ The example is primarily intended for users who work in the field of simulations
 
 
 ## Other formats
-Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/manipulation.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/manipulation.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/manipulation.md) corresponding to the notebook.  
+Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/manipulation.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/manipulation.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/manipulation.md) corresponding to the notebook.  
 
 
 ## Getting started
@@ -46,6 +46,7 @@ To run the example, the previously installed packages must be included.
 ```julia
 # imports
 using FMI
+using FMI: fmiSetFctGetReal
 using FMIZoo
 using FMICore
 using Plots
@@ -119,10 +120,10 @@ In the next steps the recorded value is defined. The recorded value is the posit
 ```julia
 vrs = ["mass.s"]
 
-simData = fmiSimulateME(myFMU, tStart, tStop; recordValues=vrs)
+simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
 ```
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:08[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:09[39m
 
 
 
@@ -132,37 +133,46 @@ simData = fmiSimulateME(myFMU, tStart, tStop; recordValues=vrs)
     	SpringFrictionPendulum1D
     Success:
     	true
-    States [131]:
+    Jacobian-Evaluations:
+    	∂ẋ_∂x: 0
+    	∂ẋ_∂u: 0
+    	∂y_∂x: 0
+    	∂y_∂u: 0
+    Gradient-Evaluations:
+    	∂ẋ_∂t: 0
+    	∂y_∂t: 0
+    States [576]:
     	0.0	[0.5, 0.0]
-    	2.352941176471972e-11	[0.5, 1.0e-10]
-    	0.002306805098500577	[0.50001131604032, 0.009814511243552598]
-    	0.01777270416443653	[0.5006746898591579, 0.07610209623820656]
-    	0.05358198828807212	[0.506179178874527, 0.2316410453658537]
-    	0.11852692044602456	[0.5303834670269423, 0.5124206380884914]
-    	0.1848828124352921	[0.5734929986755488, 0.7828256306325594]
-    	0.2648828124352921	[0.6478174757579945, 1.0657733053856748]
-    	0.3448828124352921	[0.7422425240500841, 1.2823803179707145]
+    	2.3529411764755826e-11	[0.5, 1.0e-10]
+    	0.002306805098500577	[0.5000032899071831, 0.009807041893014795]
+    	0.004237904441591903	[0.500024538795221, 0.018034051416693304]
+    	0.006454577400292192	[0.5000675640714004, 0.02749428781089441]
+    	0.008870225892891909	[0.500137609265491, 0.03782347842716074]
+    	0.01153429135233168	[0.5002427955727999, 0.04923758047702276]
+    	0.014472992795231013	[0.5003928820441327, 0.06185447839263737]
+    	0.017720905540819967	[0.5006003803463298, 0.07582881067741973]
     	...
-    	8.0	[1.0666323055577207, -7.603992128337398e-5]
-    Values [131]:
+    	8.0	[0.9297092601154026, 7.232852961706624e-5]
+    Values [576]:
     	0.0	(0.5,)
-    	2.352941176471972e-11	(0.5,)
-    	0.002306805098500577	(0.50001131604032,)
-    	0.01777270416443653	(0.5006746898591579,)
-    	0.05358198828807212	(0.506179178874527,)
-    	0.11852692044602456	(0.5303834670269423,)
-    	0.1848828124352921	(0.5734929986755488,)
-    	0.2648828124352921	(0.6478174757579945,)
-    	0.3448828124352921	(0.7422425240500841,)
+    	2.3529411764755826e-11	(0.5,)
+    	0.002306805098500577	(0.5000032899071831,)
+    	0.004237904441591903	(0.500024538795221,)
+    	0.006454577400292192	(0.5000675640714004,)
+    	0.008870225892891909	(0.500137609265491,)
+    	0.01153429135233168	(0.5002427955727999,)
+    	0.014472992795231013	(0.5003928820441327,)
+    	0.017720905540819967	(0.5006003803463298,)
     	...
-    	8.0	(1.0666323055577207,)
-    Events [6]:
+    	8.0	(0.9297092601154026,)
+    Events [7]:
     	State-Event #11 @ 0.0s
-    	State-Event #11 @ 0.994s
-    	State-Event #19 @ 1.9883s
-    	State-Event #11 @ 2.9831s
-    	State-Event #19 @ 3.9789s
-    	State-Event #11 @ 4.977s
+    	State-Event #11 @ 0.9952s
+    	State-Event #19 @ 1.9908s
+    	State-Event #11 @ 2.9869s
+    	State-Event #19 @ 3.9839s
+    	State-Event #11 @ 4.9823s
+    	State-Event #19 @ 5.9837s
 
 
 
@@ -198,7 +208,7 @@ originalGetReal = myFMU.cGetReal
 
 
 
-    Ptr{Nothing} @0x00007fc745567faf
+    Ptr{Nothing} @0x00007f5998567faf
 
 
 
@@ -246,7 +256,7 @@ fmiSetFctGetReal(myFMU, myGetReal!)
 
 
 
-    Ptr{Nothing} @0x00007fc7dac1efc0
+    Ptr{Nothing} @0x00007f5a3dc42fc0
 
 
 
@@ -256,7 +266,7 @@ As before, the identical command is called here for simulation. This is also a m
 
 
 ```julia
-simData = fmiSimulateME(myFMU, tStart, tStop; recordValues=vrs)
+simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
 fmiPlot!(fig, simData; states=false, style=:dash)
 ```
 

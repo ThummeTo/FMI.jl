@@ -49,7 +49,7 @@ fmiEnterInitializationMode(myFMU)
 # fmiGet(myFMU, params)
 fmiExitInitializationMode(myFMU)
 
-simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSave, 
+simData = fmiSimulate(myFMU, (tStart, tStop); recordValues=params[1:3], saveat=tSave, 
                         instantiate=false, setup=false, freeInstance=false, terminate=false, reset=false)
 
 fmiTerminate(myFMU)
@@ -70,7 +70,7 @@ fmiEnterInitializationMode(myFMU)
 # fmiGetString(myFMU, "p_string")
 fmiExitInitializationMode(myFMU)
 
-simData = fmiSimulate(myFMU, tStart, tStop; recordValues=params[1:3], saveat=tSave, 
+simData = fmiSimulate(myFMU, (tStart, tStop); recordValues=params[1:3], saveat=tSave, 
                         instantiate=false, setup=false)
 
 fmiUnload(myFMU)

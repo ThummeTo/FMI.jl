@@ -18,7 +18,7 @@ pathToFMU = get_model_filename("SpringFrictionPendulum1D", "Dymola", "2022x")
 myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 
-simData = fmiSimulate(myFMU, tStart, tStop; recordValues=["mass.s"], saveat=tSave)
+simData = fmiSimulate(myFMU, (tStart, tStop); recordValues=["mass.s"], saveat=tSave)
 fmiPlot(simData)
 
 fmiUnload(myFMU)
