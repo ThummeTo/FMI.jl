@@ -9,14 +9,14 @@ on:
     paths:
       - 'src/**'
       - 'test/**'
-      - '.github/**'
+      - '.github/workflows/Test.yml'
       - 'Project.toml'
 
 jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         julia-version: ['1.6', '1']
         julia-arch: [x64]
