@@ -49,9 +49,6 @@ jobs:
       - name: "Build package"
         uses: julia-actions/julia-buildpkg@v1
 
-      - name: Pkg.add("FMI")
-        run: julia -e 'using Pkg; Pkg.add("FMI")'
-
       # Run the tests
       - name: "Run FMU Cross checks"
         run: julia ./cross_checks/cross_check.jl

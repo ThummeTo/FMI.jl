@@ -1,3 +1,16 @@
+using Pkg; 
+
+Pkg.add("FMI")
+Pkg.add("FMIZoo")
+Pkg.add("FMICore")
+Pkg.add("Plots")
+Pkg.add("ArgParse")
+Pkg.add("Git")
+Pkg.add("CSV")
+Pkg.add("DelimitedFiles")
+Pkg.add("Tables")
+Pkg.add("Statistics")
+
 using FMI
 using FMIZoo
 using FMICore
