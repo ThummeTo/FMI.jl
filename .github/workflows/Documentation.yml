@@ -27,6 +27,12 @@ jobs:
         with:
           ref: main
 
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: '1.6'
+          arch: x64
+
       - name: "Copy examples, readme"
         env:
           WORK_TREE: './docs/src/examples'
@@ -39,12 +45,6 @@ jobs:
           mv $WORK_TREE/src/* $WORK_TREE 
           rm -r $WORK_TREE/src
           cp ./README.md ./docs/src/index.md
-
-      - name: "Set up Julia"
-        uses: julia-actions/setup-julia@v1
-        with:
-          version: '1.6'
-          arch: x64
 
       - name: "Install dependencies"
         run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
