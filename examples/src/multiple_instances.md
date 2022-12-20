@@ -124,8 +124,8 @@ println(comp1)
 
     FMU:            SpringPendulum1D
     InstanceName:   SpringPendulum1D
-    Address:        Ptr{Nothing} @0x0000000006a4f550
-    State:          fmi2ComponentStateInstantiated
+    Address:        Ptr{Nothing} @0x0000000005360d90
+    State:          0
     Logging:        false
     FMU time:       -Inf
     FMU states:     nothing
@@ -141,7 +141,7 @@ fig = fmiPlot(data1)
 ```
 
     ┌ Warning: Found no FMU instance, but executionConfig doesn't force allocation. Allocating one. Use `fmi2Instantiate(fmu)` to prevent this message.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1gDoz/src/FMI2/prep.jl:65
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/MhCuf/src/FMI2/prep.jl:65
 
 
 
@@ -173,8 +173,8 @@ println(comp2)
 
     FMU:            SpringPendulum1D
     InstanceName:   SpringPendulum1D
-    Address:        Ptr{Nothing} @0x0000000007e08860
-    State:          fmi2ComponentStateInstantiated
+    Address:        Ptr{Nothing} @0x00000000061f5fc0
+    State:          0
     Logging:        false
     FMU time:       -Inf
     FMU states:     nothing
@@ -197,7 +197,7 @@ fmiPlot!(fig, data2)
 ```
 
     ┌ Warning: Found no FMU instance, but executionConfig doesn't force allocation. Allocating one. Use `fmi2Instantiate(fmu)` to prevent this message.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/1gDoz/src/FMI2/prep.jl:65
+    └ @ FMIImport /home/runner/.julia/packages/FMIImport/MhCuf/src/FMI2/prep.jl:65
 
 
 
