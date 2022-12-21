@@ -124,7 +124,7 @@ fmiInstantiate!(myFMU; loggingOn=true)
 
     FMU:            IO
     InstanceName:   IO
-    Address:        Ptr{Nothing} @0x000000000592d570
+    Address:        Ptr{Nothing} @0x0000000004b69680
     State:          0
     Logging:        false
     FMU time:       -Inf
@@ -243,7 +243,7 @@ paramsVal = generateRandomNumbers()
 
 
 
-    (73.0992927506392, false, 32, "Random number 0.929214965678582!")
+    (36.57788862808048, true, 18, "Random number 23.494541660802692!")
 
 
 
@@ -260,14 +260,14 @@ fmiSetupExperiment(myFMU, tStart, tStop)
 
     [[32mOK[0m][CvodeStatistics][IO]: Sundials CVode Statistics
         Stop time                                : 0.00 s
-        Simulation time                          : 1.94 s
+        Simulation time                          : 1.88 s
         Number of external steps                 : 0
         Number of internal steps                 : 0
         Number of non-linear iterations          : 0
         Number of non-linear convergence failures: 0
         Number of f function evaluations         : 0
         Number of g function evaluations         : 0
-        Number of Jacobian-evaluations (direct)  : 82394304
+        Number of Jacobian-evaluations (direct)  : 83275904
         Maximum integration order                : 0
         Suggested tolerance scale factor         : 1.0
         Grouping used                            : no
@@ -345,8 +345,8 @@ simData = fmiSimulate(myFMU, (tStart, tStop); recordValues=params[1:3], saveat=t
     	∂ẋ_∂t: 0
     	∂y_∂t: 0
     Values [2]:
-    	0.0	(73.0992927506392, 0.0, 32.0)
-    	1.0	(73.0992927506392, 0.0, 32.0)
+    	0.0	(36.57788862808048, 1.0, 18.0)
+    	1.0	(36.57788862808048, 1.0, 18.0)
     Events [0]:
 
 
@@ -365,7 +365,7 @@ fmiSetupExperiment(myFMU, tStart, tStop)
 
     [[32mOK[0m][CvodeStatistics][IO]: Sundials CVode Statistics
         Stop time                                : 1.00 s
-        Simulation time                          : 4.49 s
+        Simulation time                          : 4.27 s
         Number of external steps                 : 1
         Number of internal steps                 : 3
         Number of non-linear iterations          : 3
@@ -402,7 +402,7 @@ rndReal, rndBoolean, rndInteger, rndString = generateRandomNumbers()
 
 
 
-    (4.7838237015333185, false, 22, "Random number 84.89716214089505!")
+    (39.629981455563076, false, 11, "Random number 83.90723453564333!")
 
 
 
@@ -472,8 +472,8 @@ simData = fmiSimulate(myFMU, (tStart, tStop); recordValues=params[1:3], saveat=t
     	∂ẋ_∂t: 0
     	∂y_∂t: 0
     Values [2]:
-    	0.0	(4.7838237015333185, 0.0, 22.0)
-    	1.0	(4.7838237015333185, 0.0, 22.0)
+    	0.0	(39.629981455563076, 0.0, 11.0)
+    	1.0	(39.629981455563076, 0.0, 11.0)
     Events [0]:
 
 
