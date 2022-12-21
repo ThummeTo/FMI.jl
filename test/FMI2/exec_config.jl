@@ -10,7 +10,7 @@ t_stop = 1.0
 
 myFMU = fmiLoad("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 
-comp = fmiInstantiate!(myFMU; loggingOn=false)
+comp = fmiInstantiate!(myFMU; loggingOn=false, type=fmi2TypeCoSimulation)
 @test comp != 0
 # choose FMU or FMUComponent
 fmuStruct = nothing
@@ -22,8 +22,9 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct !== nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-for execConf in (FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGURATION_RESET, FMU2_EXECUTION_CONFIGURATION_NO_RESET, FMU2_EXECUTION_CONFIGURATION_NOTHING)
+for execConf in (FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGURATION_RESET, FMU2_EXECUTION_CONFIGURATION_NO_RESET) # ToDo: Add `FMU2_EXECUTION_CONFIGURATION_NOTHING`
     for mode in (:CS, :ME) 
+        global fmuStruct
         @info "\t$(mode) | $(execConf)"
 
         myFMU.executionConfig = execConf
@@ -49,10 +50,20 @@ for execConf in (FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGU
         @test length(myFMU.components) == numInst
 
         # prepare next run start
-        if !execConf.freeInstance
-            fmi2FreeInstance!(myFMU.components[end])
+        if envFMUSTRUCT == "FMU"
+            if !execConf.freeInstance
+                fmi2FreeInstance!(myFMU)
+            end
+            fmi2Instantiate!(myFMU; type=(mode==:CS ? fmi2TypeModelExchange : fmi2TypeCoSimulation))
+
+        elseif envFMUSTRUCT == "FMUCOMPONENT"
+            if !execConf.freeInstance
+                fmi2FreeInstance!(fmuStruct)
+            end
+            fmuStruct = fmi2Instantiate!(myFMU; type=(mode==:CS ? fmi2TypeModelExchange : fmi2TypeCoSimulation))
+
         end
-        fmi2Instantiate!(myFMU; type=(mode==:CS ? fmi2TypeModelExchange : fmi2TypeCoSimulation))
+        
         # prepare next run end
 
     end
