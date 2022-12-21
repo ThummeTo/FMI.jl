@@ -124,7 +124,7 @@ println(comp1)
 
     FMU:            SpringPendulum1D
     InstanceName:   SpringPendulum1D
-    Address:        Ptr{Nothing} @0x0000000005360d90
+    Address:        Ptr{Nothing} @0x0000000004760950
     State:          0
     Logging:        false
     FMU time:       -Inf
@@ -140,15 +140,11 @@ data1 = fmiSimulate(comp1, (tStart, tStop); parameters=param1, recordValues=vrs,
 fig = fmiPlot(data1)
 ```
 
-    ┌ Warning: Found no FMU instance, but executionConfig doesn't force allocation. Allocating one. Use `fmi2Instantiate(fmu)` to prevent this message.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/MhCuf/src/FMI2/prep.jl:65
-
-
 
 
 
     
-![svg](multiple_instances_files/multiple_instances_12_1.svg)
+![svg](multiple_instances_files/multiple_instances_12_0.svg)
     
 
 
@@ -173,7 +169,7 @@ println(comp2)
 
     FMU:            SpringPendulum1D
     InstanceName:   SpringPendulum1D
-    Address:        Ptr{Nothing} @0x00000000061f5fc0
+    Address:        Ptr{Nothing} @0x00000000087b6f50
     State:          0
     Logging:        false
     FMU time:       -Inf
@@ -196,15 +192,11 @@ data2 = fmiSimulateCS(comp2, (tStart, tStop);  parameters=param2, recordValues=v
 fmiPlot!(fig, data2)
 ```
 
-    ┌ Warning: Found no FMU instance, but executionConfig doesn't force allocation. Allocating one. Use `fmi2Instantiate(fmu)` to prevent this message.
-    └ @ FMIImport /home/runner/.julia/packages/FMIImport/MhCuf/src/FMI2/prep.jl:65
-
-
 
 
 
     
-![svg](multiple_instances_files/multiple_instances_20_1.svg)
+![svg](multiple_instances_files/multiple_instances_20_0.svg)
     
 
 
