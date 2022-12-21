@@ -408,7 +408,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
         ProgressMeter.finish!(progressMeter)
     end
 
-    finishSolveFMU(fmu, c, terminate, freeInstance)
+    finishSolveFMU(fmu, c, freeInstance, terminate)
 
     return fmusol
 end
@@ -587,7 +587,7 @@ function fmi2SimulateCS(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
         fmusol.success = true
     end
 
-    finishSolveFMU(fmu, c, terminate, freeInstance)
+    finishSolveFMU(fmu, c, freeInstance, terminate)
 
     return fmusol
 end

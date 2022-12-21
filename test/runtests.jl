@@ -8,14 +8,15 @@ using FMIZoo
 using Test
 import Random
 
-import FMI.FMIImport.FMICore: fmi2StatusOK
+import FMI.FMIImport.FMICore: fmi2StatusOK, fmi2ComponentStateTerminated, fmi2ComponentStateInstantiated
+import FMI.FMIImport.FMICore: FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGURATION_NO_RESET, FMU2_EXECUTION_CONFIGURATION_RESET, FMU2_EXECUTION_CONFIGURATION_NOTHING
 
 exportingToolsWindows = [("Dymola", "2022x")]
 exportingToolsLinux = [("Dymola", "2022x")]
 fmuStructs = ["FMU", "FMUCOMPONENT"]
 
 # enable assertions for warnings/errors for all default execution configurations 
-for exec in [FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGURATION_NO_RESET, FMU2_EXECUTION_CONFIGURATION_RESET]
+for exec in [FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGURATION_NO_RESET, FMU2_EXECUTION_CONFIGURATION_RESET, FMU2_EXECUTION_CONFIGURATION_NOTHING]
     exec.assertOnError = true
     exec.assertOnWarning = true
 end
@@ -33,6 +34,11 @@ function runtests(exportingTool)
                 @info "Variable Getters / Setters (getter_setter.jl)"
                 @testset "Variable Getters / Setters" begin
                     include("FMI2/getter_setter.jl")
+                end
+
+                @info "Execution Configurations (exec_config.jl)"
+                @testset "Execution Configurations" begin
+                    include("FMI2/exec_config.jl")
                 end
 
                 @info "State Manipulation (state.jl)"

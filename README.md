@@ -97,7 +97,7 @@ To keep dependencies nice and clean, the original package [*FMI.jl*](https://git
 - ...
 
 ## What Platforms are supported?
-[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is tested (and testing) under Julia Versions *1.6 LTS* (64-bit) and *latest* (64-bit) on Windows *latest* (64-bit) and Ubuntu *latest* (64-bit). Mac and Julia (32-bit) should work, but untested.
+[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is tested (and testing) under Julia Versions *1.6 LTS* (64-bit) and *latest* (64-bit) on Windows *latest* (64-bit) and Ubuntu *latest* (64-bit). Mac and Julia (32-bit) should work, but untested. For the best performance, we recommend using Julia >= 1.7.
 
 ## How to cite?
 Tobias Thummerer, Lars Mikelsons and Josef Kircher. 2021. **NeuralFMU: towards structural integration of FMUs into neural networks.** Martin Sjölund, Lena Buffoni, Adrian Pop and Lennart Ochel (Ed.). Proceedings of 14th Modelica Conference 2021, Linköping, Sweden, September 20-24, 2021. Linköping University Electronic Press, Linköping (Linköping Electronic Conference Proceedings ; 181), 297-306. [DOI: 10.3384/ecp21181297](https://doi.org/10.3384/ecp21181297)
