@@ -176,16 +176,22 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-solution = fmiSimulateME(fmuStruct, (t_start, t_stop);  abstol=abstol, solver=solver_ad, dtmin=dtmin, dtmax=dtmax_inputs) # dtmax to force resolution
-@test length(solution.states.u) > 0
-@test length(solution.states.t) > 0
+# there are issues with AD in Julia < 1.7.0
+# ToDo: Fix Linux FMU
+if VERSION >= v"1.7.0" && !Sys.islinux()
+    solution = fmiSimulateME(fmuStruct, (t_start, t_stop);  abstol=abstol, solver=solver_ad, dtmin=dtmin, dtmax=dtmax_inputs) # dtmax to force resolution
 
-@test solution.states.t[1] == t_start 
-@test solution.states.t[end] == t_stop 
+    @test length(solution.states.u) > 0
+    @test length(solution.states.t) > 0
 
-# reference values (no force) from Simulation in Dymola2020x (Dassl)
-@test solution.states.u[1] == [0.5, 0.0]
-@test sum(abs.(solution.states.u[end] - [0.509219, 0.314074])) < 0.01
+    @test solution.states.t[1] == t_start 
+    @test solution.states.t[end] == t_stop 
+
+    # reference values (no force) from Simulation in Dymola2020x (Dassl)
+    @test solution.states.u[1] == [0.5, 0.0]
+    @test sum(abs.(solution.states.u[end] - [0.509219, 0.314074])) < 0.01
+end
+
 fmiUnload(myFMU)
 
 # case 3c: ME-FMU without events, but with input signal (implicit solver: Rosenbrock23, no autodiff)
