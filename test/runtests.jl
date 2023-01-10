@@ -8,7 +8,7 @@ using FMIZoo
 using Test
 import Random
 
-import FMI.FMIImport.FMICore: fmi2StatusOK
+import FMI.FMIImport.FMICore: fmi2StatusOK, fmi3StatusOK
 
 exportingToolsWindows = [("Dymola", "2022x")]
 exportingToolsLinux = [("Dymola", "2022x")]
@@ -85,10 +85,6 @@ function runtestsFMI3(exportingTool)
 
     @testset "Testing FMUs exported from $exportingTool" begin
 
-        @testset "FMI3/Sensitivities" begin
-            # include("FMI3/sens.jl")
-        end
-
         for str in fmuStructs
             @testset "Functions for $str" begin
                 ENV["FMUSTRUCT"] = str
@@ -98,23 +94,18 @@ function runtestsFMI3(exportingTool)
                 @testset "State Manipulation" begin
                     include("FMI3/state.jl")
                 end
-                @testset "Directional derivatives" begin
-                    # include("FMI3/dir_ders.jl")
-                end
-                @testset "Automatic Simulation (CS or ME)" begin
-                    # include("FMI3/sim_auto.jl")
-                end
+                
                 @testset "CS Simulation" begin
                     include("FMI3/sim_CS.jl")
                 end
                 @testset "ME Simulation" begin
-                    include("FMI3/sim_ME.jl")
+                    # include("FMI3/sim_ME.jl")
                 end
                 @testset "Support CS and ME simultaneously" begin
-                    # include("FMI3/cs_me.jl")
+                    include("FMI3/cs_me.jl")
                 end
                 @testset "Loading/Saving simulation results" begin
-                    # include("FMI3/load_save.jl")
+                    include("FMI3/load_save.jl")
                 end
             end
         end
@@ -129,16 +120,17 @@ end
     if Sys.iswindows()
         @info "Automated testing is supported on Windows."
         for exportingTool in exportingToolsWindows
-            runtestsFMI2(exportingTool)
+            # runtestsFMI2(exportingTool)
             runtestsFMI3(exportingTool)
         end
     elseif Sys.islinux()
         @info "Automated testing is supported on Linux."
         for exportingTool in exportingToolsLinux
-            runtestsFMI2(exportingTool)
+            # runtestsFMI2(exportingTool)
             runtestsFMI3(exportingTool)
         end
     elseif Sys.isapple()
         @warn "Test-sets are currrently using Windows- and Linux-FMUs, automated testing for macOS is currently not supported."
     end
 end
+

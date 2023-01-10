@@ -500,8 +500,8 @@ end
 Wrapper for fmiGet() in FMIImport/FMI3_ext.jl
 """
 function fmiGet(fmu::FMU3, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi3Get(fmu.components[end], args...; kwargs...)
+    @assert length(fmu.instances) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+    fmi3Get(fmu.instances[end], args...; kwargs...)
 end
 
 """
@@ -510,8 +510,8 @@ end
 Wrapper for fmiGet!() in FMIImport/FMI3_ext.jl
 """
 function fmiGet!(fmu::FMU3, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi3Get!(fmu.components[end], args...; kwargs...)
+    @assert length(fmu.instances) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+    fmi3Get!(fmu.instances[end], args...; kwargs...)
 end
 
 """
@@ -520,8 +520,8 @@ end
 Wrapper for fmiSet() in FMIImport/FMI3_ext.jl
 """
 function fmiSet(fmu::FMU3, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi3Set(fmu.components[end], args...; kwargs...)
+    @assert length(fmu.instances) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+    fmi3Set(fmu.instances[end], args...; kwargs...)
 end
 
 """
@@ -632,8 +632,8 @@ end
 Wrapper for fmi3SampleDirectionalDerivative!() in FMIImport/FMI3_ext.jl
 """
 function fmi3SampleDirectionalDerivative!(fmu::FMU3, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi3SampleDirectionalDerivative!(fmu.components[end], args...; kwargs...)
+    @assert length(fmu.instances) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+    fmi3SampleDirectionalDerivative!(fmu.instances[end], args...; kwargs...)
 end
 
 """
@@ -642,8 +642,8 @@ end
 Wrapper for fmi3SampleDirectionalDerivative() in FMIImport/FMI3_ext.jl
 """
 function fmi3SampleDirectionalDerivative(fmu::FMU3, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi3SampleDirectionalDerivative(fmu.components[end], args...; kwargs...)
+    @assert length(fmu.instances) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+    fmi3SampleDirectionalDerivative(fmu.instances[end], args...; kwargs...)
 end
 
 """
@@ -652,8 +652,8 @@ end
 Wrapper for fmi3GetJacobian!() in FMIImport/FMI3_ext.jl
 """
 function fmi3GetJacobian!(fmu::FMU3, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi3GetJacobian!(fmu.components[end], args...; kwargs...)
+    @assert length(fmu.instances) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+    fmi3GetJacobian!(fmu.instances[end], args...; kwargs...)
 end
 
 """
@@ -662,8 +662,8 @@ end
 Wrapper for fmi3GetJacobian() in FMIImport/FMI3_ext.jl
 """
 function fmi3GetJacobian(fmu::FMU3, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi3GetJacobian(fmu.components[end], args...; kwargs...)
+    @assert length(fmu.instances) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
+    fmi3GetJacobian(fmu.instances[end], args...; kwargs...)
 end
 
 """
