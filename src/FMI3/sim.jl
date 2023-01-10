@@ -7,7 +7,7 @@ using DifferentialEquations, DiffEqCallbacks
 import SciMLBase: RightRootFind
 
 using FMIImport: fmi3EnterInitializationMode, fmi3ExitInitializationMode, fmi3UpdateDiscreteStates, fmi3GetContinuousStates, fmi3GetNominalsOfContinuousStates, fmi3SetContinuousStates, fmi3GetContinuousStateDerivatives!
-using FMIImport.FMICore: fmi3StatusOK, fmi3TypeCoSimulation, fmi3TypeModelExchange
+using FMIImport.FMICore: fmi3StatusOK, fmi3Type, fmi3TypeCoSimulation, fmi3TypeModelExchange
 using FMIImport.FMICore: fmi3InstanceState, fmi3InstanceStateInstantiated, fmi3InstanceStateInitializationMode, fmi3InstanceStateEventMode, fmi3InstanceStateContinuousTimeMode, fmi3InstanceStateTerminated, fmi3InstanceStateError, fmi3InstanceStateFatal
 using FMIImport: FMU3Solution, FMU3Event
 
@@ -501,12 +501,12 @@ end
 # end
 
 import FMIImport: fmi3VariabilityConstant, fmi3InitialApprox, fmi3InitialExact
-function setBeforeInitialization(mv::FMIImport.fmi3ModelVariable)
+function setBeforeInitialization(mv::FMIImport.fmi3Variable)
     return mv.variability != fmi3VariabilityConstant && mv.initial ∈ (fmi3InitialApprox, fmi3InitialExact)
 end
 
 import FMIImport: fmi3CausalityInput, fmi3CausalityParameter, fmi3VariabilityTunable
-function setInInitialization(mv::FMIImport.fmi3ModelVariable)
+function setInInitialization(mv::FMIImport.fmi3Variable)
     return mv.causality == fmi3CausalityInput || (mv.causality != fmi3CausalityParameter && mv.variability == fmi3VariabilityTunable) || (mv.variability != fmi3VariabilityConstant && mv.initial == fmi3InitialExact)
 end
 
