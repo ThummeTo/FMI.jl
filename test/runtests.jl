@@ -26,16 +26,6 @@ function runtestsFMI2(exportingTool)
 
     @testset "Testing FMUs exported from $exportingTool" begin
 
-        @info "Sensitivities (sens.jl)"
-        @testset "Sensitivities" begin
-            include("FMI2/sens.jl")
-        end
-
-        @info "Model Description (model_description.jl)"
-        @testset "Model Description" begin
-            include("FMI2/model_description.jl")
-        end
-
         for str in fmuStructs
             @testset "Functions for $str" begin
                 ENV["FMUSTRUCT"] = str
@@ -45,14 +35,14 @@ function runtestsFMI2(exportingTool)
                     include("FMI2/getter_setter.jl")
                 end
 
+                @info "Execution Configurations (exec_config.jl)"
+                @testset "Execution Configurations" begin
+                    include("FMI2/exec_config.jl")
+                end
+
                 @info "State Manipulation (state.jl)"
                 @testset "State Manipulation" begin
                     include("FMI2/state.jl")
-                end
-
-                @info "Directional derivatives (dir_ders.jl)"
-                @testset "Directional derivatives" begin
-                    include("FMI2/dir_ders.jl")
                 end
 
                 @info "Automatic Simulation (sim_auto.jl)"
