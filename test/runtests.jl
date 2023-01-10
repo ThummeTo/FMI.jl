@@ -8,24 +8,33 @@ using FMIZoo
 using Test
 import Random
 
-import FMI.FMIImport.FMICore: fmi2StatusOK, fmi2ComponentStateTerminated, fmi2ComponentStateInstantiated
-import FMI.FMIImport.FMICore: FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGURATION_NO_RESET, FMU2_EXECUTION_CONFIGURATION_RESET, FMU2_EXECUTION_CONFIGURATION_NOTHING
+import FMI.FMIImport.FMICore: fmi2StatusOK
 
 exportingToolsWindows = [("Dymola", "2022x")]
 exportingToolsLinux = [("Dymola", "2022x")]
 fmuStructs = ["FMU", "FMUCOMPONENT"]
 
 # enable assertions for warnings/errors for all default execution configurations 
-for exec in [FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGURATION_NO_RESET, FMU2_EXECUTION_CONFIGURATION_RESET, FMU2_EXECUTION_CONFIGURATION_NOTHING]
+for exec in [FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGURATION_NO_RESET, FMU2_EXECUTION_CONFIGURATION_RESET]
     exec.assertOnError = true
     exec.assertOnWarning = true
 end
 
-function runtests(exportingTool)
+function runtestsFMI2(exportingTool)
     ENV["EXPORTINGTOOL"] = exportingTool[1]
     ENV["EXPORTINGVERSION"] = exportingTool[2]
 
     @testset "Testing FMUs exported from $exportingTool" begin
+
+        @info "Sensitivities (sens.jl)"
+        @testset "Sensitivities" begin
+            include("FMI2/sens.jl")
+        end
+
+        @info "Model Description (model_description.jl)"
+        @testset "Model Description" begin
+            include("FMI2/model_description.jl")
+        end
 
         for str in fmuStructs
             @testset "Functions for $str" begin
@@ -36,14 +45,14 @@ function runtests(exportingTool)
                     include("FMI2/getter_setter.jl")
                 end
 
-                @info "Execution Configurations (exec_config.jl)"
-                @testset "Execution Configurations" begin
-                    include("FMI2/exec_config.jl")
-                end
-
                 @info "State Manipulation (state.jl)"
                 @testset "State Manipulation" begin
                     include("FMI2/state.jl")
+                end
+
+                @info "Directional derivatives (dir_ders.jl)"
+                @testset "Directional derivatives" begin
+                    include("FMI2/dir_ders.jl")
                 end
 
                 @info "Automatic Simulation (sim_auto.jl)"
@@ -80,16 +89,64 @@ function runtests(exportingTool)
     end
 end
 
+function runtestsFMI3(exportingTool)
+    ENV["EXPORTINGTOOL"] = exportingTool[1]
+    ENV["EXPORTINGVERSION"] = exportingTool[2]
+
+    @testset "Testing FMUs exported from $exportingTool" begin
+
+        @testset "FMI3/Sensitivities" begin
+            # include("FMI3/sens.jl")
+        end
+
+        for str in fmuStructs
+            @testset "Functions for $str" begin
+                ENV["FMUSTRUCT"] = str
+                @testset "Variable Getters / Setters" begin
+                    include("FMI3/getter_setter.jl")
+                end
+                @testset "State Manipulation" begin
+                    include("FMI3/state.jl")
+                end
+                @testset "Directional derivatives" begin
+                    # include("FMI3/dir_ders.jl")
+                end
+                @testset "Automatic Simulation (CS or ME)" begin
+                    # include("FMI3/sim_auto.jl")
+                end
+                @testset "CS Simulation" begin
+                    include("FMI3/sim_CS.jl")
+                end
+                @testset "ME Simulation" begin
+                    include("FMI3/sim_ME.jl")
+                end
+                @testset "Support CS and ME simultaneously" begin
+                    # include("FMI3/cs_me.jl")
+                end
+                @testset "Loading/Saving simulation results" begin
+                    # include("FMI3/load_save.jl")
+                end
+            end
+        end
+
+        @testset "Plotting" begin
+            # include("FMI3/plots.jl")
+        end
+    end
+end
+
 @testset "FMI.jl" begin
     if Sys.iswindows()
         @info "Automated testing is supported on Windows."
         for exportingTool in exportingToolsWindows
-            runtests(exportingTool)
+            runtestsFMI2(exportingTool)
+            runtestsFMI3(exportingTool)
         end
     elseif Sys.islinux()
         @info "Automated testing is supported on Linux."
         for exportingTool in exportingToolsLinux
-            runtests(exportingTool)
+            runtestsFMI2(exportingTool)
+            runtestsFMI3(exportingTool)
         end
     elseif Sys.isapple()
         @warn "Test-sets are currrently using Windows- and Linux-FMUs, automated testing for macOS is currently not supported."
