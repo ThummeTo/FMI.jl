@@ -10,9 +10,9 @@ t_start = 0.0
 t_stop = 8.0
 
 # load the FMU container
-myFMU = fmiLoad("SpringFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
+myFMU = fmiLoad("BouncingBall", "ModelicaReferenceFMUs", "0.0.16", "3.0")
 
-recordValues = ["mass.s", "mass.v"]
+recordValues = ["h", "v"]
 solutionME = fmiSimulateME(myFMU, t_start, t_stop; recordValues=recordValues)
 solutionCS = fmiSimulateCS(myFMU, t_start, t_stop; recordValues=recordValues)
 

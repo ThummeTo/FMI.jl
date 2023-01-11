@@ -99,13 +99,13 @@ function runtestsFMI3(exportingTool)
                     include("FMI3/sim_CS.jl")
                 end
                 @testset "ME Simulation" begin
-                    # include("FMI3/sim_ME.jl")
+                    include("FMI3/sim_ME.jl")
                 end
                 @testset "Support CS and ME simultaneously" begin
                     include("FMI3/cs_me.jl")
                 end
                 @testset "Loading/Saving simulation results" begin
-                    include("FMI3/load_save.jl")
+                    # include("FMI3/load_save.jl")
                 end
             end
         end

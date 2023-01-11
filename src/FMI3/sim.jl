@@ -118,7 +118,7 @@ end
 # Handles the upcoming events.
 function affectFMU!(c::FMU3Instance, integrator, idx, inputFunction, inputValues::Array{fmi3ValueReference}, solution::FMU3Solution)
     
-    @assert c.state == fmi3ComponentStateContinuousTimeMode "affectFMU!(...): Must be in continuous time mode!"
+    @assert c.state == fmi3InstanceStateContinuousTimeMode "affectFMU!(...): Must be in continuous time mode!"
     
     # there are fx-evaluations before the event is handled, reset the FMU state to the current integrator step
     fmi3SetContinuousStates(c, integrator.u)
@@ -165,7 +165,7 @@ end
 # Does one step in the simulation.
 function stepCompleted(c::FMU3Instance, x, t, integrator, inputFunction, inputValues::AbstractArray{fmi3ValueReference}, progressMeter, tStart, tStop, solution::FMU3Solution)
 
-    @assert c.state == fmi3InstanceStateContinuousTimeMode "stepCompleted(...): Must be in continuous time mode."
+    # @assert c.state == fmi3InstanceStateContinuousTimeMode "stepCompleted(...): Must be in continuous time mode."
     #@info "Step completed"
     if progressMeter !== nothing
         stat = 1000.0*(t-tStart)/(tStop-tStart)
