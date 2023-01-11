@@ -70,9 +70,10 @@ import FMIImport: fmi3GetJacobian, fmi3GetJacobian!, fmi3GetFullJacobian, fmi3Ge
 import FMIImport: fmi3LoadModelDescription
 import FMIImport: fmi3GetDefaultStartTime, fmi3GetDefaultStopTime, fmi3GetDefaultTolerance, fmi3GetDefaultStepSize
 import FMIImport: fmi3GetModelName, fmi3GetInstantiationToken, fmi3GetGenerationTool, fmi3GetGenerationDateAndTime, fmi3GetVariableNamingConvention, fmi3GetNumberOfEventIndicators, fmi3GetNumberOfContinuousStates, fmi3IsCoSimulation, fmi3IsModelExchange, fmi3IsScheduledExecution
-import FMIImport: fmi3DependenciesSupported, fmi3GetModelIdentifier, fmi3CanGetSetState, fmi3CanSerializeFMUState, fmi3ProvidesDirectionalDerivatives, fmi3ProvidesAdjointDerivatives
+# import FMIImport: fmi3DependenciesSupported
+import FMIImport:fmi3GetModelIdentifier, fmi3CanGetSetState, fmi3CanSerializeFMUState, fmi3ProvidesDirectionalDerivatives, fmi3ProvidesAdjointDerivatives
 import FMIImport: fmi3Get, fmi3Get!, fmi3Set 
-import FMIImport: fmi3GetSolutionTime, fmi3GetSolutionState, fmi3GetSolutionValue
+# import FMIImport: fmi3GetSolutionTime, fmi3GetSolutionState, fmi3GetSolutionValue
 # export fmi3GetSolutionTime, fmi3GetSolutionState, fmi3GetSolutionValue
 export fmi3InstantiateCoSimulation!, fmi3InstantiateModelExchange!, fmi3InstantiateScheduledExecution!
 export fmi3EnterInitializationMode, fmi3ExitInitializationMode
@@ -89,6 +90,7 @@ import FMIImport: fmi3TypeModelExchange, fmi3TypeCoSimulation, fmi3TypeScheduled
 export fmi2TypeModelExchange, fmi2TypeCoSimulation, fmi3TypeScheduledExecution, fmi2Type
 
 using FMIExport
+using FMIExport: fmi2Create, fmi2CreateSimple
 
 using FMIImport.FMICore: fmi2ValueReference, fmi3ValueReference
 using FMIImport: fmi2ValueReferenceFormat, fmi3ValueReferenceFormat, fmi2StructMD, fmi3StructMD, fmi2Struct, fmi3Struct
@@ -794,6 +796,12 @@ Load FMUs independent of the FMI version, currently supporting version 2.0.X and
 # Returns
 - Returns the instance of the FMU struct.
 
+# Source
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec2.0.2[p.22]: 2.1.4 Inquire Platform and Version Number of Header Files
+- FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
+
+
 See also [`fmi2Load`](@ref), [`fmi3Load`](@ref).
 """
 function fmiLoad(pathToFMU::AbstractString, args...; kwargs...)
@@ -1339,10 +1347,10 @@ end
 """
 #TODO
 Samples the values of the jacobian (in-place).
-Samples the values of the jacobian (in-place).
 """
 function fmiSampleJacobian!(str::fmi3Struct, args...; kwargs...)
     fmi3SampleJacobian!(str, args...; kwargs...)
+end
 function fmiSampleJacobian!(str::fmi2Struct, args...; kwargs...)
     fmi2SampleJacobian!(str, args...; kwargs...)
 end
