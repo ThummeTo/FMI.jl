@@ -1,3 +1,7 @@
+# STATUS: simulation of ME is not working, needs fixing,
+# other TODOs include adding simulation for SE
+
+
 #
 # Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher
 # Licensed under the MIT license. See LICENSE file in the project root for details.
@@ -7,7 +11,7 @@ using DifferentialEquations, DiffEqCallbacks
 import SciMLBase: RightRootFind
 
 using FMIImport: fmi3EnterInitializationMode, fmi3ExitInitializationMode, fmi3UpdateDiscreteStates, fmi3GetContinuousStates, fmi3GetNominalsOfContinuousStates, fmi3SetContinuousStates, fmi3GetContinuousStateDerivatives!
-using FMIImport.FMICore: fmi3StatusOK, fmi3Type, fmi3TypeCoSimulation, fmi3TypeModelExchange
+using FMIImport.FMICore: fmi3StatusOK, fmi3TypeCoSimulation, fmi3TypeModelExchange
 using FMIImport.FMICore: fmi3InstanceState, fmi3InstanceStateInstantiated, fmi3InstanceStateInitializationMode, fmi3InstanceStateEventMode, fmi3InstanceStateContinuousTimeMode, fmi3InstanceStateTerminated, fmi3InstanceStateError, fmi3InstanceStateFatal
 using FMIImport: FMU3Solution, FMU3Event
 
@@ -165,7 +169,7 @@ end
 # Does one step in the simulation.
 function stepCompleted(c::FMU3Instance, x, t, integrator, inputFunction, inputValues::AbstractArray{fmi3ValueReference}, progressMeter, tStart, tStop, solution::FMU3Solution)
 
-    # @assert c.state == fmi3InstanceStateContinuousTimeMode "stepCompleted(...): Must be in continuous time mode."
+    @assert c.state == fmi3InstanceStateContinuousTimeMode "stepCompleted(...): Must be in continuous time mode."
     #@info "Step completed"
     if progressMeter !== nothing
         stat = 1000.0*(t-tStart)/(tStop-tStart)
