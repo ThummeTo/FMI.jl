@@ -1,45 +1,50 @@
 name: Documentation
 
 on:
-  workflow_run:
-    workflows: ["Run Examples"]
-    types:
-      - completed
+  # manual trigger
+  workflow_dispatch:
+  # trigger from an other action
+  repository_dispatch:
+    types: [trigger-docu]
+
+  pull_request:
   push:
     branches: 
       - main
     paths:
       - 'docs/**'
+      - 'README.md'
+      - '.github/workflows/Documentation.yml'
     tags: 
       - '*'
 
 jobs:
   build:
-    if: |
-      ${{ (github.event.workflow_run.conclusion == 'success' && github.sha == github.event.workflow_run.head_sha) || 
-      github.event_name == 'push' }}
     runs-on: ubuntu-latest
-
     steps:
       - name: "Check out repository"
         uses: actions/checkout@v3
         with:
           ref: main
 
-      - name: "Copy examples, readme"
-        env:
-          SRC_BRANCH: 'origin/examples'
-          SRC_FOLDER_PATH: 'examples'
-        run: |
-          git fetch
-          git --work-tree=./docs/src checkout ${SRC_BRANCH/} -- $SRC_FOLDER_PATH/*.md $SRC_FOLDER_PATH/*.svg
-          cp ./README.md ./docs/src/index.md
-
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
           version: '1.6'
           arch: x64
+
+      - name: "Copy examples, readme"
+        env:
+          WORK_TREE: './docs/src/examples'
+          SRC_BRANCH: 'origin/examples'
+          SRC_FOLDER_PATH: 'examples/src'
+        # copy the examples from the examples branch (.md, .svg) and copy the readme in the docs folder
+        run: |
+          git fetch
+          git --work-tree=$WORK_TREE/.. checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/*.md $SRC_FOLDER_PATH/*.svg
+          mv $WORK_TREE/src/* $WORK_TREE 
+          rm -r $WORK_TREE/src
+          cp ./README.md ./docs/src/index.md
 
       - name: "Install dependencies"
         run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'

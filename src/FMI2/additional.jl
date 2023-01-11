@@ -16,19 +16,34 @@ using FMIImport: fmi2DependencyKindDependent, fmi2DependencyKindFixed
 using FMIImport: fmi2CallbackFunctions, fmi2Component
 import FMIImport: fmi2VariableNamingConventionFlat, fmi2VariableNamingConventionStructured
 
-""" 
-Returns how a variable depends on another variable based on the model description.
 """
-function fmi2VariableDependsOnVariable(fmu::FMU2, vr1::fmi2ValueReference, vr2::fmi2ValueReference) 
+Returns how a variable depends on another variable based on the model description.
+
+"""
+function fmi2VariableDependsOnVariable(fmu::FMU2, vr1::fmi2ValueReference, vr2::fmi2ValueReference)
     i1 = fmu.modelDescription.valueReferenceIndicies[vr1]
     i2 = fmu.modelDescription.valueReferenceIndicies[vr2]
     return fmi2GetDependencies(fmu)[i1, i2]
 end
 
 """
-Returns the FMU's dependency-matrix for fast look-ups on dependencies between value references.
 
-Entries are from type fmi2DependencyKind.
+    fmi2GetDependencies(fmu::FMU2)
+
+Building dependency matrix `dim x dim` for fast look-ups on variable dependencies (`dim` is number of states).
+
+# Arguments
+- `fmu::FMU2`: Mutable Struct representing a FMU.
+
+# Retruns
+- `fmu.dependencies::Matrix{Union{fmi2DependencyKind, Nothing}}`: Returns the FMU's dependency-matrix for fast look-ups on dependencies between value references. Entries are from type fmi2DependencyKind.
+
+# Source
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec2.0.2[p.22]: 2.1.4 Inquire Platform and Version Number of Header Files
+- FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
+
+See also [`fmi2GetDependencies`](@ref).
 """
 function fmi2GetDependencies(fmu::FMU2)
     if !isdefined(fmu, :dependencies)
@@ -40,32 +55,32 @@ function fmi2GetDependencies(fmu::FMU2)
 
             for i in 1:dim
                 modelVariable = fmi2ModelVariablesForValueReference(fmu.modelDescription, fmu.modelDescription.valueReferences[i])[1]
-    
+
                 if modelVariable.dependencies !== nothing
                     indicies = collect(fmu.modelDescription.valueReferenceIndicies[fmu.modelDescription.modelVariables[dependency].valueReference] for dependency in modelVariable.dependencies)
                     dependenciesKind = modelVariable.dependenciesKind
 
                     k = 1
-                    for j in 1:dim 
+                    for j in 1:dim
                         if j in indicies
                             if dependenciesKind[k] == "fixed"
                                 fmu.dependencies[i,j] = fmi2DependencyKindFixed
                             elseif dependenciesKind[k] == "dependent"
                                 fmu.dependencies[i,j] = fmi2DependencyKindDependent
-                            else 
+                            else
                                 @warn "Unknown dependency kind for index ($i, $j) = `$(dependenciesKind[k])`."
                             end
                             k += 1
                         end
                     end
                 end
-            end 
-        else 
+            end
+        else
             fmu.dependencies = fill(nothing, dim, dim)
         end
 
         @info "fmi2GetDependencies: Building dependency matrix $(dim) x $(dim) finished."
-    end 
+    end
 
     fmu.dependencies
 end
@@ -78,13 +93,27 @@ function fmi2PrintDependencies(fmu::FMU2)
         str = ""
         for j in 1:nj
             str = "$(str) $(Integer(dep[i,j]))"
-        end 
+        end
         println(str)
     end
 end
 
 """
+
+     fmi2Info(fmu::FMU2)
+
 Prints FMU related information.
+
+# Arguments
+- `fmu::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
+
+# Returns
+- Prints FMU related information.
+
+# Source
+- FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
+- FMISpec2.0.2[p.22]: 2.1.4 Inquire Platform and Version Number of Header Files
+- FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
 """
 function fmi2Info(fmu::FMU2)
     println("#################### Begin information for FMU ####################")
@@ -99,7 +128,7 @@ function fmi2Info(fmu::FMU2)
         println("flat")
     elseif fmi2GetVariableNamingConvention(fmu) == fmi2VariableNamingConventionStructured
         println("structured")
-    else 
+    else
         println("[unknown]")
     end
     println("\tEvent indicators:\t\t$(fmi2GetNumberOfEventIndicators(fmu))")

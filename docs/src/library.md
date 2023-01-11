@@ -1,53 +1,36 @@
 # Library Functions
 
-## Parsing variable names to ValueReferences
+Many of the functions in this library are based on already defined functions of the [FMIImport.jl](https://github.com/ThummeTo/FMIImport.jl) library. Within this library, a distinction is made between the FMI-standards (FMI2 and FMI3), which is why the links to both function collections are provided in the following.
+- FMI2Standard: [https://thummeto.github.io/FMIImport.jl/dev/fmi2_library/](https://thummeto.github.io/FMIImport.jl/dev/fmi2_library/)
+- FMI3Standard: [https://thummeto.github.io/FMIImport.jl/dev/fmi3_library/](https://thummeto.github.io/FMIImport.jl/dev/fmi3_library/)
 
-```@docs
-fmiStringToValueReference
-```
+In this collection only the essential and not in the standard defined functions are listed.
 
-## Opening and closing FMUs
 
-```@docs
-fmiLoad
-fmiUnload
-```
-
-## Reading the model description
-
-```@docs
-fmiGetModelName
-fmiGetGUID
-fmiGetGenerationTool
-fmiGetGenerationDateAndTime
-fmiGetVariableNamingConvention
-fmiGetNumberOfEventIndicators
-fmiCanGetSetState
-fmiCanSerializeFMUstate
-fmiProvidesDirectionalDerivative
-fmiIsCoSimulation
-fmiIsModelExchange
-fmiInfo
-```
-
-## Get/Set variable values
-
-```@docs
-fmiGet
-fmiGet!
-fmiSet
-```
-
-## Simulate FMU
+# Simulate FMUs
 
 ```@docs
 fmiSimulate
 fmiSimulateCS
 fmiSimulateME
+fmiLoad
+fmiUnload
+fmiReload
+```
+### Conversion functions
 
+```@docs
+fmiStringToValueReference
 ```
 
-## Visualize simulation results
+### External/additional functions
+
+```@docs
+fmiGetDependencies
+fmiInfo
+```
+
+### Visualize simulation results
 
 ```@docs
 fmiPlot

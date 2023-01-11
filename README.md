@@ -13,27 +13,19 @@
 
 
 ## How can I use FMI.jl?
-1. Open a Julia-REPL, activate your preferred environment.
-1. Goto Package-Manager (if not already), install FMI.jl.
-    ```julia
-    julia> ]
+1\. Open a Julia-REPL, switch to package mode using `]`, activate your preferred environment.
 
-    (@v1.6) pkg> add FMI
-    ```
+2\. Install [*FMI.jl*](https://github.com/ThummeTo/FMI.jl):
+```julia-repl
+(@v1.6) pkg> add FMI
+```
 
-    If you want to check that everything works correctly, you can run the tests bundled with FMI.jl:
-    ```julia
-    julia> using Pkg
+3\. If you want to check that everything works correctly, you can run the tests bundled with [*FMI.jl*](https://github.com/ThummeTo/FMI.jl):
+```julia-repl
+(@v1.6) pkg> test FMI
+```
 
-    julia> Pkg.test("FMI")
-    ```
-
-    Additionally, you can check the version of FMI.jl that you have installed with the ```status``` command.
-    ```julia
-    julia> ]
-    (@v1.6) pkg> status FMI
-    ```
-1. Have a look inside the [examples folder](https://github.com/ThummeTo/FMI.jl/tree/examples/examples) in the examples branch or the [examples section](https://thummeto.github.io/FMI.jl/dev/examples/overview/) of the documentation. All examples are available as Julia-Script (*.jl*), Jupyter-Notebook (*.ipynb*) and Markdown (*.md*).
+4\. Have a look inside the [examples folder](https://github.com/ThummeTo/FMI.jl/tree/examples/examples) in the examples branch or the [examples section](https://thummeto.github.io/FMI.jl/dev/examples/overview/) of the documentation. All examples are available as Julia-Script (*.jl*), Jupyter-Notebook (*.ipynb*) and Markdown (*.md*).
 
 ## How can I simulate a FMU and plot values?
 ```julia
@@ -63,7 +55,7 @@ fmiUnload(myFMU)
 | CS                                | ✓✓           | ~~     | ✓          | ~      |
 | ME (continuous)                   | ✓✓           | ✓✓     | ✓          | ~      |
 | ME (discontinuous)                | ✓✓           | ✓✓     | ✓          | ~      |
-| SE                 		             | -            | -      | ✓          | ~      |
+| SE                 		    | -            | -      | ✓          | ~      |
 | Explicit solvers                  | ✓✓           | ✓✓     | ✓          | ~      |
 | Implicit solvers (autodiff=false) | ✓✓           | ~~     | ✓          | ~      |
 | Implicit solvers (autodiff=true)  | ✓            | ~~     | ~~         | ~      |
@@ -105,12 +97,15 @@ To keep dependencies nice and clean, the original package [*FMI.jl*](https://git
 - ...
 
 ## What Platforms are supported?
-[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is tested (and testing) under Julia Versions *1.6.5 LTS* (64-bit) and *latest* (64-bit) on Windows *latest* (64-bit) and Ubuntu *latest* (64-bit). Mac and Julia (32-bit) should work, but untested.
+[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is tested (and testing) under Julia Versions *1.6 LTS* (64-bit) and *latest* (64-bit) on Windows *latest* (64-bit) and Ubuntu *latest* (64-bit). Mac and Julia (32-bit) should work, but untested. For the best performance, we recommend using Julia >= 1.7.
 
-## How to cite? Related publications?
+## How to cite?
 Tobias Thummerer, Lars Mikelsons and Josef Kircher. 2021. **NeuralFMU: towards structural integration of FMUs into neural networks.** Martin Sjölund, Lena Buffoni, Adrian Pop and Lennart Ochel (Ed.). Proceedings of 14th Modelica Conference 2021, Linköping, Sweden, September 20-24, 2021. Linköping University Electronic Press, Linköping (Linköping Electronic Conference Proceedings ; 181), 297-306. [DOI: 10.3384/ecp21181297](https://doi.org/10.3384/ecp21181297)
 
-Tobias Thummerer, Johannes Tintenherr, Lars Mikelsons 2021 **Hybrid modeling of the human cardiovascular system using NeuralFMUs** Journal of Physics: Conference Series 2090, 1, 012155. [DOI: 10.1088/1742-6596/2090/1/012155](https://doi.org/10.1088/1742-6596/2090/1/012155)
+## Related publications?
+Tobias Thummerer, Johannes Stoljar and Lars Mikelsons. 2022. **NeuralFMU: presenting a workflow for integrating hybrid NeuralODEs into real-world applications.** Electronics 11, 19, 3202. [DOI: 10.3390/electronics11193202](https://doi.org/10.3390/electronics11193202)
+
+Tobias Thummerer, Johannes Tintenherr, Lars Mikelsons. 2021 **Hybrid modeling of the human cardiovascular system using NeuralFMUs** Journal of Physics: Conference Series 2090, 1, 012155. [DOI: 10.1088/1742-6596/2090/1/012155](https://doi.org/10.1088/1742-6596/2090/1/012155)
 
 ## Interested in Hybrid Modelling in Julia using FMUs?
 See [*FMIFlux.jl*](https://github.com/ThummeTo/FMIFlux.jl).
