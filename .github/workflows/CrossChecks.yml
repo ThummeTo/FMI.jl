@@ -49,6 +49,9 @@ jobs:
       - name: "Build package"
         uses: julia-actions/julia-buildpkg@v1
 
+      - name: "Install dependencies"
+        run: julia --project=cross_checks/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+
       # Run the tests
       - name: "Run FMU Cross checks"
-        run: julia ./cross_checks/cross_check.jl
+        run: julia --project=cross_checks/ ./cross_checks/cross_check.jl
