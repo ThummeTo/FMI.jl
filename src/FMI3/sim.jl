@@ -1,7 +1,3 @@
-# STATUS: simulation of ME is not working, needs fixing,
-# other TODOs include adding simulation for SE
-
-
 #
 # Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher
 # Licensed under the MIT license. See LICENSE file in the project root for details.
@@ -212,7 +208,7 @@ end
 # save FMU values 
 function saveValues(c::FMU3Instance, recordValues, x, t, integrator, inputFunction, inputValues)
 
-    @assert c.state == fmi3ComponentStateContinuousTimeMode "saveValues(...): Must be in continuous time mode."
+    @assert c.state == fmi3InstanceStateContinuousTimeMode "saveValues(...): Must be in continuous time mode."
 
     #x_old = fmi3GetContinuousStates(c)
     #t_old = c.t
@@ -546,7 +542,7 @@ function prepareFMU(fmu::FMU3, c::Union{Nothing, FMU3Instance}, type::fmi3Type, 
         end
     else
         if c === nothing
-            c = fmu.components[end]
+            c = fmu.instances[end]
         end
     end
 
@@ -694,7 +690,7 @@ function prepareFMU(fmu::Vector{FMU3}, c::Vector{Union{Nothing, FMU3Instance}}, 
                 @debug "[NEW INST]"
             else
                 if c[i] === nothing
-                    c[i] = fmu[i].components[end]
+                    c[i] = fmu[i].instances[end]
                 end
             end
 
@@ -804,7 +800,7 @@ end
 Simulates a FMU instance for the given simulation time interval.
 State- and Time-Events are handled correctly.
 
-Via the optional keyword arguemnts `inputValues` and `inputFunction`, a custom input function `f(c, u, t)`, `f(c, t)`, `f(u, t)`, `f(c, u)` or `f(t)` with `c` current component, `u` current state and `t` current time can be defined, that should return a array of values for `fmi3SetFloat64(..., inputValues, inputFunction(...))`.
+Via the optional keyword arguemnts `inputValues` and `inputFunction`, a custom input function `f(c, u, t)`, `f(c, t)`, `f(u, t)`, `f(c, u)` or `f(t)` with `c` current instance, `u` current state and `t` current time can be defined, that should return a array of values for `fmi3SetFloat64(..., inputValues, inputFunction(...))`.
 
 Keywords:
     - solver: Any Julia-supported ODE-solver (default is Tsit5)
@@ -1034,7 +1030,7 @@ end
 """
 Starts a simulation of the Co-Simulation FMU instance.
 
-Via the optional keyword arguments `inputValues` and `inputFunction`, a custom input function `f(c, t)` or `f(t)` with time `t` and component `c` can be defined, that should return a array of values for `fmi3SetFloat64(..., inputValues, inputFunction(...))`.
+Via the optional keyword arguments `inputValues` and `inputFunction`, a custom input function `f(c, t)` or `f(t)` with time `t` and instance `c` can be defined, that should return a array of values for `fmi3SetFloat64(..., inputValues, inputFunction(...))`.
 
 Keywords:
     - recordValues: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
