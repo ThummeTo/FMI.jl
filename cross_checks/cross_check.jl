@@ -43,7 +43,7 @@ function parse_commandline()
         "--os"
             help = "The operating system for which the cross checks should be excecuted"
             arg_type = String
-            default = WIN64
+            default = "windows-latest"
         "--ccrepo"
             help = "The Url to the git repository that contains the cross checks. Not setting this will prevent saving the results"
             arg_type = String
@@ -191,7 +191,11 @@ function main()
     unpackPath = parsed_args["tempdir"]
     fmiVersion = parsed_args["fmiversion"]
     crossCheckRepo = parsed_args["ccrepo"]
-    os = parsed_args["os"]
+    os_version = parsed_args["os"]
+    os = "win64"
+    if os_version == "ubuntu-latest"
+        os = "linux64"
+    end
     includeFatals = parsed_args["includefatals"]
     skipnotcompliant = parsed_args["skipnotcompliant"]
     commitrejected = parsed_args["commitrejected"]
