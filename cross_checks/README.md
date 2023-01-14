@@ -44,7 +44,7 @@ optional arguments:
   -h, --help            show this help message and exit
 
 ```
-## Latest results
+## Latest results 
 ```
         List of successfull Cross checks
                 1:      FmuCrossCheck("2.0", "me", "win64", "CATIA", "R2015x", "ControlledTemperature", false, 0.20156695697370486, true, false, nothing)
