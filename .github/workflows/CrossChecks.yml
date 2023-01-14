@@ -53,5 +53,5 @@ jobs:
         run: julia --project=cross_checks/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
 
       # Run the tests
-      - name: "Run FMU Cross checks"
-        run: julia --project=cross_checks/ ./cross_checks/cross_check.jl
+      - name: "Run FMU Cross checks" 
+        run: julia --project=cross_checks/ ./cross_checks/cross_check.jl --${{ runner.os }}
