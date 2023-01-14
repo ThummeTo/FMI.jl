@@ -54,4 +54,4 @@ jobs:
 
       # Run the tests
       - name: "Run FMU Cross checks" 
-        run: julia --project=cross_checks/ ./cross_checks/cross_check.jl --${{ runner.os }}
+        run: julia --project=cross_checks/ ./cross_checks/cross_check.jl --os ${{ matrix.os }}
