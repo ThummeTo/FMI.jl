@@ -8,7 +8,7 @@ using FMI.FMIImport
 t_start = 0.0
 t_stop = 1.0
 
-myFMU = fmiLoad("BouncingBall", "ModelicaReferenceFMUs", "0.0.16", "3.0")
+myFMU = fmiLoad("BouncingBall", "ModelicaReferenceFMUs", "0.0.20", "3.0")
 
 comp = fmi3InstantiateCoSimulation!(myFMU; loggingOn=false)
 @test comp != 0

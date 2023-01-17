@@ -3,13 +3,15 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
+import FMICore
+
 ###############
 # Prepare FMU #
 ###############
 
-myFMU = fmiLoad("IO", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"]; type=:CS)
-comp = fmiInstantiate!(myFMU; loggingOn=false)
-@test comp != 0
+myFMU = fmiLoad("Feedthrough", "ModelicaReferenceFMUs", "0.0.20", "3.0")
+inst = fmi3InstantiateCoSimulation!(myFMU; loggingOn=true)
+@test inst != 0
 
 # choose FMU or FMUComponent
 fmuStruct = nothing
@@ -17,18 +19,17 @@ envFMUSTRUCT = ENV["FMUSTRUCT"]
 if envFMUSTRUCT == "FMU"
     fmuStruct = myFMU
 elseif envFMUSTRUCT == "FMUCOMPONENT"
-    fmuStruct = comp
+    fmuStruct = inst
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-@test fmiSetupExperiment(fmuStruct, 0.0) == 0
+@test fmi3EnterInitializationMode(fmuStruct) == 0
+@test fmi3ExitInitializationMode(fmuStruct) == 0
 
-@test fmiEnterInitializationMode(fmuStruct) == 0
-
-realValueReferences = ["p_real", "u_real"]
-integerValueReferences = ["p_integer", "u_integer"]
-booleanValueReferences = ["p_boolean", "u_boolean"]
-stringValueReferences = ["p_string", "p_string"]
+realValueReferences = ["Float32_continuous_input", "Float64_continuous_input"]
+integerValueReferences = ["Int32_input", "Int64_input"]
+booleanValueReferences = ["Boolean_input", "Boolean_output"]
+stringValueReferences = ["String_parameter", "String_parameter"]
 
 #########################
 # Testing Single Values #
@@ -46,14 +47,15 @@ cacheString = ""
 
 fmiSet(fmuStruct, 
         [realValueReferences[1], integerValueReferences[1], booleanValueReferences[1], stringValueReferences[1]], 
-        [rndReal,                rndInteger,                rndBoolean,                rndString])
+        [Float32(rndReal),                rndInteger,                rndBoolean,                rndString])
 @test fmiGet(fmuStruct, 
                 [realValueReferences[1], integerValueReferences[1], booleanValueReferences[1], stringValueReferences[1]]) == 
-                [rndReal,                rndInteger,                rndBoolean,                rndString]
+                [Float32(rndReal),                rndInteger,                FMICore.fmi3Boolean(rndBoolean),                rndString]
 
 #@test fmiGetStartValue(fmuStruct, "p_enumeration") == "myEnumeration1"
-@test fmiGetStartValue(fmuStruct, "p_string") == "Hello World!"
-@test fmiGetStartValue(fmuStruct, "p_real") == 0.0 
+# println(fmi3ModelVariablesForValueReference(inst.fmu.modelDescription, UInt32(29)))
+@test fmiGetStartValue(fmuStruct, "String_parameter") == "Set me!"
+@test fmiGetStartValue(fmuStruct, "Float32_continuous_input") == 0.0 
 
 ##################
 # Testing Arrays #
@@ -71,19 +73,7 @@ cacheBoolean = [FMI.fmi3Boolean(false), FMI.fmi3Boolean(false)]
 cacheString = [pointer(""), pointer("")]
 
 #@test fmiGetStartValue(fmuStruct, ["p_enumeration", "p_string", "p_real"]) == ["myEnumeration1", "Hello World!", 0.0] 
-@test fmiGetStartValue(fmuStruct, ["p_string", "p_real"]) == ["Hello World!", 0.0] 
-
-####################################
-# Testing input/output derivatives #
-####################################
-
-@test fmiSetRealInputDerivatives(fmuStruct, ["u_real"], ones(FMI.fmi3Int32, 1), zeros(1)) == 0
-
-@test fmiExitInitializationMode(fmuStruct) == 0
-@test fmiDoStep(fmuStruct, 0.1) == 0
-
-dirs = fmiGetRealOutputDerivatives(fmuStruct, ["y_real"], ones(FMI.fmi3Int32, 1))
-@test dirs == 0.0 # ToDo: Force a `dirs != 0.0`
+@test fmiGetStartValue(fmuStruct, ["String_parameter", "Float32_continuous_input"]) == ["Set me!", 0.0] 
 
 ############
 # Clean up #

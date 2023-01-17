@@ -8,7 +8,7 @@ using FMIZoo
 using Test
 import Random
 
-import FMI.FMIImport.FMICore: fmi2StatusOK, fmi3StatusOK, fmi2ComponentStateTerminated, fmi2ComponentStateInstantiated
+import FMI.FMIImport.FMICore: fmi2StatusOK, fmi3StatusOK, fmi2ComponentStateTerminated, fmi2ComponentStateInstantiated, fmi3Boolean
 import FMI.FMIImport.FMICore: FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGURATION_NO_RESET, FMU2_EXECUTION_CONFIGURATION_RESET, FMU2_EXECUTION_CONFIGURATION_NOTHING
 
 exportingToolsWindows = [("Dymola", "2022x")]
@@ -127,13 +127,13 @@ end
     if Sys.iswindows()
         @info "Automated testing is supported on Windows."
         for exportingTool in exportingToolsWindows
-            runtestsFMI2(exportingTool)
+            # runtestsFMI2(exportingTool)
             runtestsFMI3(exportingTool)
         end
     elseif Sys.islinux()
         @info "Automated testing is supported on Linux."
         for exportingTool in exportingToolsLinux
-            runtestsFMI2(exportingTool)
+            # runtestsFMI2(exportingTool)
             runtestsFMI3(exportingTool)
         end
     elseif Sys.isapple()

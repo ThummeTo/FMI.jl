@@ -3,7 +3,7 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-pathToFMU = get_model_filename("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
+pathToFMU = get_model_filename("BouncingBall", "ModelicaReferenceFMUs", "0.0.16", "3.0")
 
 # load FMU in temporary directory
 myFMU = fmiLoad(pathToFMU)

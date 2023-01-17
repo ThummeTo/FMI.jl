@@ -10,7 +10,7 @@ t_start = 0.0
 t_stop = 8.0
 
 # load the FMU container
-myFMU = fmiLoad("BouncingBall", "ModelicaReferenceFMUs", "0.0.16", "3.0")
+myFMU = fmiLoad("BouncingBall", "ModelicaReferenceFMUs", "0.0.20", "3.0")
 
 recordValues = ["h", "v"]
 # solutionME = fmiSimulateME(myFMU, t_start, t_stop; recordValues=recordValues)

@@ -9,7 +9,7 @@ using FMI.FMIImport
 # Prepare FMU #
 ###############
 
-myFMU = fmiLoad("BouncingBall", "ModelicaReferenceFMUs", "0.0.16", "3.0")
+myFMU = fmiLoad("BouncingBall", "ModelicaReferenceFMUs", "0.0.20", "3.0")
 
 inst = fmi3InstantiateCoSimulation!(myFMU; loggingOn=true)
 @test inst != 0
