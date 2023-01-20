@@ -106,10 +106,10 @@ function runtestsFMI3(exportingTool)
                     include("FMI3/sim_CS.jl")
                 end
                 @testset "ME Simulation (sim_ME.jl)" begin
-                   # include("FMI3/sim_ME.jl")
+                   include("FMI3/sim_ME.jl")
                 end
                 @testset "Support CS and ME simultaneously (cs_me.jl)" begin
-                    # include("FMI3/cs_me.jl")
+                    include("FMI3/cs_me.jl")
                 end
                 @testset "Loading/Saving simulation results (load_save.jl)" begin
                     include("FMI3/load_save.jl")
@@ -127,13 +127,13 @@ end
     if Sys.iswindows()
         @info "Automated testing is supported on Windows."
         for exportingTool in exportingToolsWindows
-            # runtestsFMI2(exportingTool)
+            runtestsFMI2(exportingTool)
             runtestsFMI3(exportingTool)
         end
     elseif Sys.islinux()
         @info "Automated testing is supported on Linux."
         for exportingTool in exportingToolsLinux
-            # runtestsFMI2(exportingTool)
+            runtestsFMI2(exportingTool)
             runtestsFMI3(exportingTool)
         end
     elseif Sys.isapple()

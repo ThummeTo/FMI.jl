@@ -53,8 +53,10 @@ function handleEvents(c::FMU3Instance)
 
         # TODO set inputs
         discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined, nextEventTime = fmi3UpdateDiscreteStates(c)
-          
-        fmi3EnterEventMode(c, c.stepEvent, c.stateEvent, c.rootsFound, Csize_t(c.fmu.modelDescription.numberOfEventIndicators), c.timeEvent)
+        
+        if c.state != fmi3InstanceStateEventMode
+            fmi3EnterEventMode(c, c.stepEvent, c.stateEvent, c.rootsFound, Csize_t(c.fmu.modelDescription.numberOfEventIndicators), c.timeEvent)
+        end
         # TODO inputEvent handling
         discreteStatesNeedUpdate = fmi3True
         while discreteStatesNeedUpdate == fmi3True
@@ -74,7 +76,6 @@ function handleEvents(c::FMU3Instance)
             end
         end
     end
-    
     fmi3EnterContinuousTimeMode(c)
     @debug "handleEvents(_, $(enterEventMode), $(exitInContinuousMode)): rootsFound: $(c.rootsFound)   valuesChanged: $(valuesChanged)   continuousStates: $(fmi3GetContinuousStates(c))", 
     return valuesChanged, nominalsChanged
@@ -542,9 +543,22 @@ function prepareFMU(fmu::FMU3, c::Union{Nothing, FMU3Instance}, type::fmi3Type, 
         end
     else
         if c === nothing
-            c = fmu.instances[end]
+            if length(fmu.instances) > 0
+                c = fmu.instances[end]
+            else
+                @warn "Found no FMU instance, but executionConfig doesn't force allocation. Allocating one. Use `fmi2Instantiate(fmu)` to prevent this message."
+                if type == fmi3TypeCoSimulation
+                    c = fmi3InstantiateCoSimulation!(fmu)
+                elseif type == fmi3TypeModelExchange
+                    c = fmi3InstantiateModelExchange!(fmu)
+                else
+                    c = fmi3InstantiateScheduledExecution!(fmu)
+                end
+            end
         end
     end
+
+    @assert c !== nothing "No FMU instance available, allocate one or use `fmu.executionConfig.instantiate=true`."
 
     # soft terminate (if necessary)
     if terminate
@@ -841,7 +855,7 @@ function fmi3SimulateME(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_st
 
     
     @assert fmi3IsModelExchange(fmu) "fmi3SimulateME(...): This function supports Model Exchange FMUs only."
-    #@assert fmu.type == fmi3TypeModelExchange "fmi3SimulateME(...): This FMU supports Model Exchange, but was instantiated in CS mode. Use `fmiLoad(...; type=:ME)`."
+    #@assert fmu.type == fmi3TypeModelExchange "fmi3SimulateME(...): This FMU supports Model Exchange, but was instantiated in CS mode. Use `fmiLoad(...; type=:ME)`." # TODO why not using this??
 
     # input function handling 
     _inputFunction = nothing
@@ -921,7 +935,7 @@ function fmi3SimulateME(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_st
     # end
 
     # initial event handling
-    fmi3EnterEventMode(c, c.stepEvent, c.stateEvent, c.rootsFound, Csize_t(c.fmu.modelDescription.numberOfEventIndicators), c.timeEvent)
+    # fmi3EnterEventMode(c, c.stepEvent, c.stateEvent, c.rootsFound, Csize_t(c.fmu.modelDescription.numberOfEventIndicators), c.timeEvent)
     handleEvents(c) 
     #fmi3EnterContinuousTimeMode(c)
 

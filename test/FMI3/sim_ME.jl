@@ -10,7 +10,7 @@ t_stop = 3.0
 
 # case 1: ME-FMU with state events
 
-myFMU = fmiLoad("BouncingBall", "ModelicaReferenceFMUs", "0.0.16", "3.0")
+myFMU = fmiLoad("BouncingBall", "ModelicaReferenceFMUs", "0.0.20", "3.0")
 
 comp = fmi3InstantiateModelExchange!(myFMU; loggingOn=false)
 @test comp != 0
