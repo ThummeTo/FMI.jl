@@ -13,23 +13,23 @@ t_stop = 8.0
 myFMU = fmiLoad("BouncingBall", "ModelicaReferenceFMUs", "0.0.20", "3.0")
 
 recordValues = ["h", "v"]
-# solutionME = fmiSimulateME(myFMU, t_start, t_stop; recordValues=recordValues)
+solutionME = fmiSimulateME(myFMU, t_start, t_stop; recordValues=recordValues)
 solutionCS = fmiSimulateCS(myFMU, t_start, t_stop; recordValues=recordValues)
 
 # ME
 
-# fmiSaveSolution(solutionME, "solutionME.jld2")
-# anotherSolutionME = fmiLoadSolution("solutionME.jld2")
+fmiSaveSolution(solutionME, "solutionME.jld2")
+anotherSolutionME = fmiLoadSolution("solutionME.jld2")
 
-# @test solutionME.success == true 
-# @test solutionME.success == anotherSolutionME.success
-# @test solutionME.states.u == anotherSolutionME.states.u
-# @test solutionME.states.t == anotherSolutionME.states.t
-# @test solutionME.values.saveval == anotherSolutionME.values.saveval
-# @test solutionME.values.t == anotherSolutionME.values.t
+@test solutionME.success == true 
+@test solutionME.success == anotherSolutionME.success
+@test solutionME.states.u == anotherSolutionME.states.u
+@test solutionME.states.t == anotherSolutionME.states.t
+@test solutionME.values.saveval == anotherSolutionME.values.saveval
+@test solutionME.values.t == anotherSolutionME.values.t
 
-# # ME-BONUS: events
-# @test solutionME.events == anotherSolutionME.events
+# ME-BONUS: events
+@test solutionME.events == anotherSolutionME.events
 
 # CS 
 

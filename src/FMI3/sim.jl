@@ -223,7 +223,7 @@ function saveValues(c::FMU3Instance, recordValues, x, t, integrator, inputFuncti
     #fmi3SetContinuousStates(c, x_old)
     #fmi3SetTime(c, t_old)
     
-    return (fmiGetFloat64(c, recordValues)...,)
+    return (fmi3GetFloat64(c, recordValues)...,)
 end
 
 # Returns the state derivatives of the FMU.
