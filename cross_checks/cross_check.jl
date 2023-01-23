@@ -99,7 +99,7 @@ function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCross
             relTol = fmuOptions["RelTol"]
 
             # Read Ref values
-            fmuRecordValueNames = readdlm(joinpath(checkPath, "$(check.fmuCheck)_ref.csv"), ',', String)[1, 2:end]
+            fmuRecordValueNames = map((x) -> replace(strip(x),"\"" => "" ), (readdlm(joinpath(checkPath, "$(check.fmuCheck)_ref.csv"), ',', String)[1, 2:end]))
             fmuRefValues = CSV.File(joinpath(checkPath, "$(check.fmuCheck)_ref.csv")) |> Tables.rowtable |> Tables.columntable
 
             if isfile(joinpath(checkPath, "$(check.fmuCheck)_in.csv"))
