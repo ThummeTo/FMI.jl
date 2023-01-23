@@ -86,7 +86,7 @@ function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCross
     #     check.success = false
     #     return check
     # end
-    try
+    try 
         if !(check.notCompliant && skipnotcompliant)
             fmuToCheck = fmiLoad(pathToFMU)
             fmiInfo(fmuToCheck)
@@ -164,8 +164,6 @@ function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCross
             end
         end
         check.error = nothing
-        fmiUnload(fmuToCheck)
-
     catch e
         @warn e
         check.result = nothing
@@ -179,8 +177,9 @@ function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCross
             cd(resultPath)
             touch("failed")
         end
+    finally
+        fmiUnload(fmuToCheck)
     end
-
     return check
     
 end
@@ -214,7 +213,7 @@ function main()
     #   Excecute FMUs
     crossChecks = getFmusToTest(fmiCrossCheckRepoPath, fmiVersion, os)
     if !includeFatals
-        crossChecks = filter(c -> (c.system != "AMESim" && c.system != "Test-FMUs" && c.system != "SimulationX"), crossChecks)
+        crossChecks = filter(c -> (c.system != "AMESim" && c.system != "Test-FMUs" && c.system != "SimulationX" && c.system != "Silver"), crossChecks)
     end
     
     for (index, check) in enumerate(crossChecks)
