@@ -47,7 +47,7 @@ jobs:
 
       # Build FMI.jl package
       - name: "Build package"
-        uses: julia-actions/julia-buildpkg@v1
+        uses: julia-actions/julia-buildpkg@v1 
 
       - name: "Install dependencies"
         run: julia --project=cross_checks/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
