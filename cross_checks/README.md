@@ -41,7 +41,7 @@ optional arguments:
                         hasn't been excecuted (e.g. officially not
                         compliant FMUs if they are not skipped)
   --commitfailed        Also commit the result file for failed FMUs
-  -h, --help            show this help message and exit 
+  -h, --help            show this help message and exit
 
 ```
 ## Latest results 
