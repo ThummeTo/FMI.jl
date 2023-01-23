@@ -86,6 +86,7 @@ function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCross
     #     check.success = false
     #     return check
     # end
+    fmuToCheck = nothing
     try 
         if !(check.notCompliant && skipnotcompliant)
             fmuToCheck = fmiLoad(pathToFMU)
@@ -178,7 +179,10 @@ function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCross
             touch("failed")
         end
     finally
-        fmiUnload(fmuToCheck)
+        try
+            fmiUnload(fmuToCheck)
+        catch
+        end
     end
     return check
     
