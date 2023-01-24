@@ -852,7 +852,7 @@ function fmi3SimulateME(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_st
     callbacks = [],
     showProgress::Bool = true,
     kwargs...)
-
+    @warn "ME-simulation is not working properly right now!"
     
     @assert fmi3IsModelExchange(fmu) "fmi3SimulateME(...): This function supports Model Exchange FMUs only."
     #@assert fmu.type == fmi3TypeModelExchange "fmi3SimulateME(...): This FMU supports Model Exchange, but was instantiated in CS mode. Use `fmiLoad(...; type=:ME)`." # TODO why not using this??
