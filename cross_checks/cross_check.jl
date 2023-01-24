@@ -1,16 +1,3 @@
-using Pkg; 
-
-Pkg.add("FMI")
-Pkg.add("FMIZoo")
-Pkg.add("FMICore")
-Pkg.add("Plots")
-Pkg.add("ArgParse")
-Pkg.add("Git")
-Pkg.add("CSV")
-Pkg.add("DelimitedFiles")
-Pkg.add("Tables")
-Pkg.add("Statistics")
-
 using FMI
 using FMIZoo
 using FMICore
@@ -79,13 +66,6 @@ end
 function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCrossCheck, skipnotcompliant::Bool, commitrejected::Bool, commitfailed::Bool)::FmuCrossCheck
     pathToFMU = joinpath(checkPath, "$(check.fmuCheck).fmu")
 
-    # if check.notCompliant
-    #     check.result = nothing
-    #     check.skipped = true
-    #     check.error = nothing
-    #     check.success = false
-    #     return check
-    # end
     fmuToCheck = nothing
     try 
         if !(check.notCompliant && skipnotcompliant)
@@ -251,6 +231,12 @@ function main()
         println("\u001B[31m\t\t$(index):\t$(error)\u001B[0m")
     end
     println("#################### End FMI Cross check Summary ####################")
+
+    # run(Cmd(`$(git()) config --global user.name 'Your Name'`, dir=fmiCrossCheckRepoPath))
+    # run(Cmd(`$(git()) config --global user.email 'your-username@users.noreply.github.com'"`, dir=fmiCrossCheckRepoPath))
+    # run(Cmd(`$(git()) remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}`, dir=fmiCrossCheckRepoPath))
+    run(Cmd(`$(git()) commit -a -m "Run FMI cross checks for FMI.JL"`, dir=fmiCrossCheckRepoPath))
+    run(Cmd(`$(git()) push`, dir=fmiCrossCheckRepoPath))
 end
 
 main()
