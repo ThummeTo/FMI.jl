@@ -54,7 +54,7 @@ jobs:
 
       - name: auto-commit
         env: 
-          CI_COMMIT_AUTHOR: github-actions[bot]
+          CI_COMMIT_AUTHOR: github-actions[bot] 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # Fetch all and clear the stash list. Include all files from the examples/src folder to the stash and switch the branch.
         # Reset the branch and remove all current files in the examples/src folder. 
