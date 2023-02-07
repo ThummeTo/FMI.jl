@@ -57,7 +57,7 @@ function extForce_t(t)
 end 
 
 function extForce_ct(c::FMU2Component, t::fmi2Real)
-    [cos(t)]
+    [sin(t)]
 end  
 
 myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
