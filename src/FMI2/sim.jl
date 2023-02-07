@@ -461,7 +461,7 @@ function fmi2SimulateCS(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
         if hasmethod(inputFunction, Tuple{fmi2Real})
             _inputFunction = (c, t) -> inputFunction(t)
         else 
-            _inputFunction = inputFunctiont
+            _inputFunction = inputFunction
         end
         @assert hasmethod(_inputFunction, Tuple{FMU2Component, fmi2Real}) "The given input function does not fit the needed input function pattern for CS-FMUs, which are: \n- `inputFunction(t::fmi2Real)`\n- `inputFunction(comp::FMU2Component, t::fmi2Real)`"
     end
