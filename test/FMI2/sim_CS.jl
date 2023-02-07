@@ -56,7 +56,7 @@ function extForce_t(t)
     [sin(t)]
 end 
 
-function extForce_ct(c::FMU2Component, t::fmi2Real)
+function extForce_ct(c::Union{FMU2Component, Nothing}, t::fmi2Real)
     [sin(t)]
 end  
 
