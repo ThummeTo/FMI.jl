@@ -56,12 +56,8 @@ function extForce_t(t)
     [sin(t)]
 end 
 
-function extForce_cxt(c::FMU2Component, x::Union{AbstractArray{fmi2Real}, Nothing}, t::fmi2Real)
-    x1 = 0.0
-    if x != nothing 
-        x1 = x[1] 
-    end
-    [sin(t) * x1]
+function extForce_ct(c::FMU2Component, t::fmi2Real)
+    [cos(t)]
 end  
 
 myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
@@ -79,7 +75,7 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct !== nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-for inpfct in [extForce_cxt, extForce_t]
+for inpfct in [extForce_ct, extForce_t]
     global solution
 
     solution = fmiSimulateCS(fmuStruct, (t_start, t_stop); dt=1e-2, recordValues=["mass.s", "mass.v"], inputValueReferences=["extForce"], inputFunction=inpfct)
