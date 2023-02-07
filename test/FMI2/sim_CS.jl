@@ -82,7 +82,7 @@ end
 for inpfct in [extForce_cxt, extForce_t]
     global solution
 
-    solution = fmiSimulateCS(fmuStruct, (t_start, t_stop); dt=1e-2, recordValues=["mass.s", "mass.v"], inputValueReferences=["extForce"], inputFunction=extForce_t)
+    solution = fmiSimulateCS(fmuStruct, (t_start, t_stop); dt=1e-2, recordValues=["mass.s", "mass.v"], inputValueReferences=["extForce"], inputFunction=inpfct)
     @test solution.success
     @test length(solution.values.saveval) > 0
     @test length(solution.values.t) > 0
