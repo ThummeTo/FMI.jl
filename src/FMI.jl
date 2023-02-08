@@ -101,6 +101,14 @@ function __init__()
         import .JLD2
         include("FMI2/extensions/JLD2.jl")
     end
+    @require DataFrames="a93c6f00-e57d-5684-b7b6-d8193f3e46c0" begin
+        import .DataFrames
+        @require CSV="336ed68f-0bac-5ca0-87d4-7b16caf5d00b" begin
+            import .DataFrames
+            include("FMI2/extensions/CSV.jl")   
+        end
+    end
+        
 end
 
 ### EXPORTING LISTS START ###

@@ -9,7 +9,11 @@ using FMIImport: FMU2Solution
 Saves a FMU2Solution for later use.
 """
 function fmiSaveSolutionCSV(solution::FMU2Solution, filepath::AbstractString) 
-    return JLD2.save(filepath, Dict(keyword=>solution))
+    df = DataFrame(time = solution.values.t)
+    for i in 1:length(solution.values.saveval[1])
+    df[!, Symbol(fmi2ValueReferenceToString(solution.component.fmu, solution.valueReferences[i]))] = [val[i] for val in solution.values.saveval]
+    end
+    CSV.write(filepath, df)
 end
 
 """
