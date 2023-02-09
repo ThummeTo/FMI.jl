@@ -33,9 +33,18 @@ anotherSolutionME = fmiLoadSolution("solutionME.jld2")
 # ME-BONUS: events
 @test solutionME.events == anotherSolutionME.events
 
+# test csv
+x = collect.(solutionME.values.saveval)
+y = []
+for i in 1:length(x)
+    push!(y, x[i][1])
+end
 fmiSaveSolutionCSV(solutionME, "solutionME.csv")
 csv_df = CSV.read("solutionME.csv", DataFrame)
-@test csv_df[!, 2:end] == solutionME.values.saveval
+
+@test y == csv_df[!, 2]
+@test solutionME.values.t == csv_df[!, 1]
+
 
 # CS 
 
@@ -46,6 +55,18 @@ anotherSolutionCS = fmiLoadSolution("solutionCS.jld2")
 @test solutionCS.success == anotherSolutionCS.success
 @test solutionCS.values.saveval == anotherSolutionCS.values.saveval
 @test solutionCS.values.t == anotherSolutionCS.values.t
+
+# test csv
+x = collect.(solutionCS.values.saveval)
+y = []
+for i in 1:length(x)
+    push!(y, x[i][1])
+end
+fmiSaveSolutionCSV(solutionCS, "solutionCS.csv")
+csv_df = CSV.read("solutionCS.csv", DataFrame)
+
+@test y == csv_df[!, 2]
+@test solutionCS.values.t == csv_df[!, 1]
 
 # unload the FMU, remove unpacked data on disc ("clean up")
 fmiUnload(myFMU)
