@@ -90,6 +90,12 @@ function fmiLoadSolution(path::AbstractString; keyword="solution")
 end
 export fmiSaveSolution, fmiLoadSolution
 
+# from CSV.jl
+function fmiSaveSolutionCSV(solution::FMU2Solution, filepath::AbstractString)
+    @assert false "fmiSave(...) needs `CSV` and `Dataframes` package. Please install `CSV` and `Dataframes` and do `using CSV, DataFrames` or `import CSV, DataFrames`."
+end
+export fmiSaveSolutionCSV
+
 # Requires init
 function __init__()
     @require Plots="91a5bcdd-55d7-5caf-9e0b-520d859cae80" begin

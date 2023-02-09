@@ -4,6 +4,8 @@
 #
 
 using JLD2
+using CSV
+using DataFrames
 
 # our simulation setup
 t_start = 0.0
@@ -30,6 +32,10 @@ anotherSolutionME = fmiLoadSolution("solutionME.jld2")
 
 # ME-BONUS: events
 @test solutionME.events == anotherSolutionME.events
+
+fmiSaveSolutionCSV(solutionME, "solutionME.csv")
+csv_df = CSV.read("solutionME.csv", DataFrame)
+@test csv_df[!, 2:end] == solutionME.values.saveval
 
 # CS 
 

@@ -9,9 +9,9 @@ using FMIImport: FMU2Solution
 Saves a FMU2Solution to a csv file.
 """
 function fmiSaveSolutionCSV(solution::FMU2Solution, filepath::AbstractString) 
-    df = DataFrame(time = solution.values.t)
+    df = DataFrames.DataFrame(time = solution.values.t)
     for i in 1:length(solution.values.saveval[1])
-    df[!, Symbol(fmi2ValueReferenceToString(solution.component.fmu, solution.valueReferences[i]))] = [val[i] for val in solution.values.saveval]
+        df[!, Symbol(fmi2ValueReferenceToString(solution.component.fmu, solution.valueReferences[i]))] = [val[i] for val in solution.values.saveval]
     end
     CSV.write(filepath, df)
 end
