@@ -92,9 +92,15 @@ export fmiSaveSolution, fmiLoadSolution
 
 # from CSV.jl
 function fmiSaveSolutionCSV(solution::FMU2Solution, filepath::AbstractString)
-    @assert false "fmiSave(...) needs `CSV` and `Dataframes` package. Please install `CSV` and `Dataframes` and do `using CSV, DataFrames` or `import CSV, DataFrames`."
+    @assert false "fmiSave(...) needs `CSV` and `DataFrames` package. Please install `CSV` and `DataFrames` and do `using CSV, DataFrames` or `import CSV, DataFrames`."
 end
 export fmiSaveSolutionCSV
+
+# from MAT.jl
+function fmiSaveSolutionMAT(solution::FMU2Solution, filepath::AbstractString)
+    @assert false "fmiSave(...) needs `MAT` package. Please install `MAT` and do `using MAT` or `import MAT`."
+end
+export fmiSaveSolutionMAT
 
 # Requires init
 function __init__()
@@ -110,11 +116,14 @@ function __init__()
     @require DataFrames="a93c6f00-e57d-5684-b7b6-d8193f3e46c0" begin
         import .DataFrames
         @require CSV="336ed68f-0bac-5ca0-87d4-7b16caf5d00b" begin
-            import .DataFrames
+            import .CSV
             include("FMI2/extensions/CSV.jl")   
         end
     end
-        
+    @require MAT="23992714-dd62-5051-b70f-ba57cb901cac" begin
+        import .MAT
+        include("FMI2/extensions/MAT.jl")   
+    end
 end
 
 ### EXPORTING LISTS START ###
