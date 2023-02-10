@@ -10,6 +10,7 @@ Because not all users need the full potential of this configuration tool, there 
 - `myFMU.executionConfig = FMU2_EXECUTION_CONFIGURATION_NO_RESET` is the default operation mode for FMUs. FMUs are not reset via `fmi2Reset`, but new instantiated for every simulation run (or training step). This is not the most efficient way, but many FMUs have problems with resetting.
 - `myFMU.executionConfig = FMU2_EXECUTION_CONFIGURATION_RESET` is faster for well-implemented FMUs, but needs a fully working `fmi2Reset`-function. So if you know you have a fully working `fmi2Reset`, you may be faster with that option.
 - `myFMU.executionConfig = FMU2_EXECUTION_CONFIGURATION_NO_FREEING` should only be the very last choice. If your FMU neither supports `fmi2Reset` nor a proper `fmi2FreeInstance`, you could use this configuration as a last way out. Keep in mind, that new FMU instances are allocated but not freed, as long as your Julia instance is running (memory leak). In general, the amount of leaked memory is small, but you need to know what you are doing, if you do thousands or ten-thousands of simulation runs with such a FMU.
+- `myFMU.executionConfig = FMU2_EXECUTION_CONFIGURATION_NOTHING` should be used if you want maximum control over what is done and what not. This means you need to take care of instantiating, initialization, setting up and releasing FMU instances by yourself.
 
 ## Debugging / Logging
 ### Logging FMI-calls

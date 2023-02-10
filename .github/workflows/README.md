@@ -3,7 +3,7 @@
 ## 1. Create an ssh key pair. 
 This command is avaible for Windows (`cmd`) and Linux (`bash`). 
 ```
-ssh-keygen -N "" -f compathelper_key -t ed25519
+ssh-keygen -N "" -f compathelper_key -t ed25519 -C compathelper
 ```
 
 ## 2. Copy the **private** key.
