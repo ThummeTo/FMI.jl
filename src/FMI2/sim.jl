@@ -192,7 +192,7 @@ Via the optional keyword arguemnts `inputValues` and `inputFunction`, a custom i
 
 Keywords:
     - solver: Any Julia-supported ODE-solver (default is Tsit5)
-    - customFx: [deperecated] Ability to give a custom state derivative function ẋ=f(x,t)
+    - customFx: [deprecated] Ability to give a custom state derivative function ẋ=f(x,t)
     - recordValues: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
     - saveat: Time points to save values at (interpolated)
     - setup: Boolean, if FMU should be setup (default=true)
@@ -610,7 +610,7 @@ Keywords:
     - inputFunction: Function to retrieve the values to set the inputs to 
     - saveat: [ME only] Time points to save values at (interpolated)
     - solver: [ME only] Any Julia-supported ODE-solver (default is Tsit5)
-    - customFx: [ME only, deperecated] Ability to give a custom state derivative function ẋ=f(x,t)
+    - customFx: [ME only, deprecated] Ability to give a custom state derivative function ẋ=f(x,t)
 
 Returns:
     - `success::Bool` for CS-FMUs
