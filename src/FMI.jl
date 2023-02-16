@@ -82,13 +82,13 @@ end
 export fmiPlot, fmiPlot!
 
 # from FMI2_JLD2.jl
-function fmiSaveSolution(solution::FMU2Solution, filepath::AbstractString; keyword="solution")
+function fmiSaveSolutionJLD2(solution::FMU2Solution, filepath::AbstractString; keyword="solution")
     @assert false "fmiSave(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
 end
-function fmiLoadSolution(path::AbstractString; keyword="solution")
+function fmiLoadSolutionJLD2(path::AbstractString; keyword="solution")
     @assert false "fmiLoad(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
 end
-export fmiSaveSolution, fmiLoadSolution
+export fmiSaveSolutionJLD2, fmiLoadSolutionJLD2
 
 # from CSV.jl
 function fmiSaveSolutionCSV(solution::FMU2Solution, filepath::AbstractString)
@@ -1144,5 +1144,51 @@ More detailed: `fmi2ValueReferenceFormat = Union{Nothing, String, Array{String,1
 function fmiGetStartValue(s::fmi2Struct, vr::fmi2ValueReferenceFormat)
     fmi2GetStartValue(s, vr)
 end
+
+"""
+    fmiSaveSolution(solution::FMU2Solution, filepath::AbstractString)
+
+saves the given solution in the file format specified by the ending of `filepath`. Currently .mat, .jld2 and .csv are supported.
+
+# Arguments
+- `solution::FMU2Solution`: The simulation results that should be saved
+- `filepath::AbstractString`: The path specifing where to save the results, also indicating the file format. Supports *.mat, *.csv, *.JLD2
+
+# Keywords
+
+- `keyword="solution"`: Specifies the type of data that should be saved
+"""
+function fmiSaveSolution(solution::FMU2Solution, filepath::AbstractString; keyword="solution")
+    ending = split(filepath, ".")[2]
+    if ending == "mat"
+        fmiSaveSolutionMAT(solution, filepath)
+    elseif ending == "jld2"
+        fmiSaveSolutionJLD2(solution, filepath; keyword="solution")
+    elseif ending == "csv"
+        fmiSaveSolutionCSV(solution, filepath)
+    else
+        @warn "This file format is currently not supported, please use *.mat, *.csv, *.JLD2"
+    end
+end
+
+"""
+    fmiLoadSolution(filepath::AbstractString; keyword="solution")
+
+loads a previously saved solution from the file format specified by the ending of `filepath`. Currently .jld2 is supported.
+
+# Arguments
+- `filepath::AbstractString`: The path specifing where to save the results, also indicating the file format. Supports *.mat, *.csv, *.JLD2
+
+- `keyword="solution"`: Specifies the type of data that should be saved
+"""
+function fmiLoadSolution(filepath::AbstractString; keyword="solution")
+    ending = split(filepath, ".")[2]
+    if ending == "jld2"
+        fmiLoadSolutionJLD2(filepath; keyword="solution")
+    else
+        @warn "This file format is currently not supported, please use *.mat, *.csv, *.JLD2"
+    end
+end
+export fmiSaveSolution, fmiLoadSolution
 
 end # module FMI
