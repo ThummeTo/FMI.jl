@@ -38,8 +38,11 @@ function test(f::Foo)
 end
 
 test(x)
-modifyFoo(Ref(x))
+modifyFoo(Ref{Nothing}(x))
 
 ptr = pointer_from_objref(x)
-unsafe
+v = nothing
+p = pointer_from_objref(v)
+Base.unsafe_convert(Ptr{Nothing}, ptr)
+Base.unsafe_load(ptr)
 unsafe_pointer_to_objref(ptr)
