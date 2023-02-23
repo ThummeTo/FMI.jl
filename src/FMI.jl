@@ -833,6 +833,7 @@ See also [`fmi2Unload`](@ref).
 """
 function fmiUnload(fmu::FMU2)
     fmi2Unload(fmu)
+    fmu = nothing
 end
 
 """
