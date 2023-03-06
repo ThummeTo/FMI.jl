@@ -3,7 +3,7 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-import FMICore
+import FMI.FMIImport.FMICore
 
 ###############
 # Prepare FMU #
