@@ -873,7 +873,7 @@ More detailed: `fmi3Struct = Union{FMU3, FMU3Instance}`
 - `tolerance::Union{Real, Nothing} = nothing`: Real number to set the tolerance for any OED-solver
 - `dt::Union{Real, Nothing} = nothing`: Real number to set the step size of the OED-solver. Defaults to an automatic choice if the method is adaptive. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
 - `solver = nothing`: Any Julia-supported OED-solver  (default is Tsit5). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/solvers/ode_solve/#ode_solve)
-- `customFx = nothing`: [deperecated] Ability to give a custom state derivative function ẋ=f(x,t)
+- `customFx = nothing`: [deprecated] Ability to give a custom state derivative function ẋ=f(x,t)
 - `recordValues::fmi2ValueReferenceFormat = nothing`: AbstractArray of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
 - `saveat = []`: Time points to save values at (interpolated). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Output-Control)
 - `setup::Bool = true`: Boolean, if FMU should be setup (default: setup=true)
@@ -939,7 +939,7 @@ More detailed: `fmi3Struct = Union{FMU3, FMU3Instance}`
 - `tolerance::Union{Real, Nothing} = nothing`: Real number to set the tolerance for any OED-solver
 - `dt::Union{Real, Nothing} = nothing`: Real number to set the step size of the OED-solver. Defaults to an automatic choice if the method is adaptive. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
 - `solver = nothing`: Any Julia-supported OED-solver  (default is Tsit5). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/solvers/ode_solve/#ode_solve)
-- `customFx = nothing`: [deperecated] Ability to give a custom state derivative function ẋ=f(x,t)
+- `customFx = nothing`: [deprecated] Ability to give a custom state derivative function ẋ=f(x,t)
 - `recordValues::fmi2ValueReferenceFormat = nothing`: AbstractArray of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
 - `saveat = []`: Time points to save values at (interpolated). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Output-Control)
 - `setup::Bool = true`: Boolean, if FMU should be setup (default: setup=true)
@@ -1004,7 +1004,7 @@ More detailed: `fmi3Struct = Union{FMU3, FMU3Instance}`
 - `tolerance::Union{Real, Nothing} = nothing`: Real number to set the tolerance for any OED-solver
 - `dt::Union{Real, Nothing} = nothing`: Real number to set the step size of the OED-solver. Defaults to an automatic choice if the method is adaptive. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
 - `solver = nothing`: Any Julia-supported OED-solver  (default is Tsit5). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/solvers/ode_solve/#ode_solve)
-- `customFx = nothing`: [deperecated] Ability to give a custom state derivative function ẋ=f(x,t)
+- `customFx = nothing`: [deprecated] Ability to give a custom state derivative function ẋ=f(x,t)
 - `recordValues::fmi2ValueReferenceFormat = nothing`: AbstractArray of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
 - `saveat = []`: Time points to save values at (interpolated). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Output-Control)
 - `setup::Bool = true`: Boolean, if FMU should be setup (default: setup=true)
