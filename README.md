@@ -107,5 +107,12 @@ Tobias Thummerer, Johannes Stoljar and Lars Mikelsons. 2022. **NeuralFMU: presen
 
 Tobias Thummerer, Johannes Tintenherr, Lars Mikelsons. 2021 **Hybrid modeling of the human cardiovascular system using NeuralFMUs** Journal of Physics: Conference Series 2090, 1, 012155. [DOI: 10.1088/1742-6596/2090/1/012155](https://doi.org/10.1088/1742-6596/2090/1/012155)
 
+## Notes for contributors
+Contributors are welcome. Before contributing, please read, understand and follow the [Contributor's Guide on Collaborative Practices for Community Packages](https://github.com/SciML/ColPrac). 
+During development of new implementations or optimizations on exisitng code, one will have to make design decissions that influence the library performance and usability. The following priorization should be the basis for decision-making:
+- **#1 Compliance with standard:** It is the highest priority to be compliant with the FMI standard ([fmi-standard.org](http://fmi-standard.org/)). Identifiers described in the standard must be used. Topologies should follow the specification as far as the possibilities of the Julia programming language allows.
+- **#2 Performance:** Because [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is a simulation tool, performance is very important. This applies to the efficient use of CPU and GPU, but also the conscientious use of RAM and disc space.
+- **#3 Usability:** The library should be as usable as possible, as long as being fully compliant with the FMI standard.
+
 ## Interested in Hybrid Modelling in Julia using FMUs?
 See [*FMIFlux.jl*](https://github.com/ThummeTo/FMIFlux.jl).
