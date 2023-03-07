@@ -401,7 +401,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
         fmusol.states = solve(c.problem, solver; callback = CallbackSet(cbs...), dtmax=dtmax, solveKwargs..., kwargs...)
     end
 
-    fmusol.success = (fmusol.states.retcode == :Success)
+    fmusol.success = (fmusol.states.retcode == :Success || fmusol.states.retcode == "Success")
     
     if !fmusol.success
         @warn "FMU simulation failed with solver return code `$(fmusol.states.retcode)`, please check log for hints."
