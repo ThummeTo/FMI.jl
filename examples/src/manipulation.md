@@ -83,7 +83,7 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_ZEJfak/SpringFrictionPendulum1D`.
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_vHQkHw/SpringFrictionPendulum1D`.
 
 
     #################### Begin information for FMU ####################
@@ -213,7 +213,7 @@ originalGetReal = myFMU.cGetReal
 
 
 
-    Ptr{Nothing} @0x00007fea36ad0faf
+    Ptr{Nothing} @0x00007facee6d0faf
 
 
 
@@ -261,7 +261,7 @@ fmiSetFctGetReal(myFMU, myGetReal!)
 
 
 
-    Ptr{Nothing} @0x00007fead5023fc0
+    Ptr{Nothing} @0x00007fad8d03afc0
 
 
 

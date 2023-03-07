@@ -115,22 +115,22 @@ input_values = collect(collect.(eachrow(rand(batchSize,2))))
 
 
     16-element Vector{Vector{Float64}}:
-     [0.16531787241381823, 0.6523428806672933]
-     [0.014527275350133095, 0.19580434879151098]
-     [0.18295033998406685, 0.15722030201735593]
-     [0.6621691444357838, 0.8207427879286276]
-     [0.9789271461980409, 0.5589168318408605]
-     [0.4864727483259269, 0.9437633774682467]
-     [0.10333068578327609, 0.40009439839879746]
-     [0.7550583763643711, 0.23558028199890502]
-     [0.6870862643931843, 0.32231043257115455]
-     [0.11100427532377255, 0.6861506809555796]
-     [0.5937124216613865, 0.45955540007117823]
-     [0.05843508504232664, 0.5292499488962285]
-     [0.9654979935048879, 0.41820356622676813]
-     [0.5958028089557862, 0.36102477371210784]
-     [0.05209404677651608, 0.522665887955433]
-     [0.9505922485373339, 0.24523307907529945]
+     [0.6419624608569612, 0.3890427622778031]
+     [0.5097163585905372, 0.5640535403061386]
+     [0.38982366418534886, 0.5076768506645246]
+     [0.472778807248289, 0.32687145960943453]
+     [0.10852869146700883, 0.5174282471947652]
+     [0.8472872799333633, 0.5840721037833394]
+     [0.7052501656934651, 0.8188792546290087]
+     [0.06164185806853095, 0.9572969387482493]
+     [0.7994594623650307, 0.45819337922072867]
+     [0.8496773186581223, 0.11184915010947127]
+     [0.32803967807854517, 0.9724565145607306]
+     [0.06469506868022101, 0.010724819304288591]
+     [0.5856951359316901, 0.613881333112325]
+     [0.7247032715197599, 0.8919520285437524]
+     [0.7674525511913651, 0.6934686192437531]
+     [0.6339006810592124, 0.05656611630401598]
 
 
 
@@ -153,11 +153,11 @@ For Distributed we need to embed the FMU into its own `module`. This prevents Di
 end
 ```
 
-    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_QxnGVX/SpringPendulum1D`.
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_ocsuFh/SpringPendulum1D`.
 
 
-          From worker 2:	[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_EG3YUy/SpringPendulum1D`.
-          From worker 3:	[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_T1cvF3/SpringPendulum1D`.
+          From worker 2:	[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_s7y6kI/SpringPendulum1D`.
+          From worker 3:	[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_oTGpyt/SpringPendulum1D`.
 
 
 We define a helper function to calculate the FMU and combine it into an Matrix.
@@ -201,21 +201,35 @@ Running a single evaluation is pretty quick, therefore the speed can be better t
     [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
     [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
     [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
 
 
 
 
 
-    BenchmarkTools.Trial: 4 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m1.371 s[22m[39m … [35m 1.394 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m0.85% … 0.83%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m1.380 s             [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m1.26%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m1.381 s[22m[39m ± [32m9.479 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m1.26% ± 0.49%
+    BenchmarkTools.Trial: 7 samples with 1 evaluation.
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m769.325 ms[22m[39m … [35m840.269 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m1.80% … 1.66%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m817.974 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m3.39%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m814.620 ms[22m[39m ± [32m 22.064 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m2.70% ± 0.90%
     
-      [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [34m█[39m[39m [39m [39m█[39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
-      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[34m█[39m[39m▁[39m▁[39m█[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      1.37 s[90m        Histogram: frequency by time[39m        1.39 s [0m[1m<[22m
+      [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m [32m█[39m[34m [39m[39m█[39m [39m█[39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
+      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[32m█[39m[34m▁[39m[39m█[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
+      769 ms[90m           Histogram: frequency by time[39m          840 ms [0m[1m<[22m
     
-     Memory estimate[90m: [39m[33m152.72 MiB[39m, allocs estimate[90m: [39m[33m6802162[39m.
+     Memory estimate[90m: [39m[33m152.72 MiB[39m, allocs estimate[90m: [39m[33m6802164[39m.
 
 
 
@@ -365,8 +379,8 @@ println("Single Threaded")
 
 
     BenchmarkTools.Trial: 1 sample with 1 evaluation.
-     Single result which took [34m21.989 s[39m (1.39% GC) to evaluate,
-     with a memory estimate of [33m2.39 GiB[39m, over [33m108835269[39m allocations.
+     Single result which took [34m13.271 s[39m (2.88% GC) to evaluate,
+     with a memory estimate of [33m2.39 GiB[39m, over [33m108835301[39m allocations.
 
 
 
@@ -381,22 +395,6 @@ println("Multi Threaded")
 ```
 
     Multi Threaded
-          From worker 3:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-          From worker 3:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-          From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-          From worker 2:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-          From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-          From worker 2:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-          From worker 3:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-          From worker 3:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-          From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-          From worker 2:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-          From worker 3:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-          From worker 3:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-          From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-          From worker 2:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-          From worker 3:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-          From worker 3:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
           From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
           From worker 2:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
           From worker 3:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
@@ -413,10 +411,6 @@ println("Multi Threaded")
           From worker 3:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
           From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
           From worker 2:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-          From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-          From worker 2:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-          From worker 3:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-          From worker 3:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
           From worker 3:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
           From worker 3:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
           From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
@@ -485,10 +479,30 @@ println("Multi Threaded")
           From worker 3:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
           From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
           From worker 2:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+          From worker 3:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+          From worker 3:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
           From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
           From worker 2:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
           From worker 3:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
           From worker 3:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+          From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+          From worker 2:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+          From worker 3:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+          From worker 3:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+          From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+          From worker 2:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+          From worker 3:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+          From worker 3:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+          From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+          From worker 2:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+          From worker 3:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+          From worker 3:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+          From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+          From worker 2:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+          From worker 3:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+          From worker 3:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+          From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+          From worker 2:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
           From worker 3:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
           From worker 3:	[33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
           From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
@@ -515,8 +529,8 @@ println("Multi Threaded")
 
 
     BenchmarkTools.Trial: 1 sample with 1 evaluation.
-     Single result which took [34m6.733 s[39m (0.00% GC) to evaluate,
-     with a memory estimate of [33m240.14 KiB[39m, over [33m3290[39m allocations.
+     Single result which took [34m7.447 s[39m (0.00% GC) to evaluate,
+     with a memory estimate of [33m282.16 KiB[39m, over [33m3715[39m allocations.
 
 
 
