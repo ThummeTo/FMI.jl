@@ -83,7 +83,7 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
-    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_resXdK/SpringFrictionPendulum1D`.
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_ZEJfak/SpringFrictionPendulum1D`.
 
 
     #################### Begin information for FMU ####################
@@ -126,7 +126,9 @@ vrs = ["mass.s"]
 simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
 ```
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:12[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:09[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
 
 
 
@@ -211,7 +213,7 @@ originalGetReal = myFMU.cGetReal
 
 
 
-    Ptr{Nothing} @0x00007f0db0ed0faf
+    Ptr{Nothing} @0x00007fea36ad0faf
 
 
 
@@ -259,7 +261,7 @@ fmiSetFctGetReal(myFMU, myGetReal!)
 
 
 
-    Ptr{Nothing} @0x00007f0e4f423fc0
+    Ptr{Nothing} @0x00007fead5023fc0
 
 
 
@@ -273,11 +275,15 @@ simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
 fmiPlot!(fig, simData; states=false, style=:dash)
 ```
 
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
+    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
+
+
 
 
 
     
-![svg](manipulation_files/manipulation_20_0.svg)
+![svg](manipulation_files/manipulation_20_1.svg)
     
 
 
