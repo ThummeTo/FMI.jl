@@ -83,6 +83,9 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_MRO6MR/SpringFrictionPendulum1D`.
+
+
     #################### Begin information for FMU ####################
     	Model name:			SpringFrictionPendulum1D
     	FMI-Version:			2.0
@@ -177,7 +180,7 @@ dataME = fmiSimulateME(myFMU, (tStart, tStop); saveat=tSave)
     Model name:
     	SpringFrictionPendulum1D
     Success:
-    	true
+    	false
     Jacobian-Evaluations:
     	∂ẋ_∂x: 0
     	∂ẋ_∂u: 0
@@ -197,7 +200,7 @@ dataME = fmiSimulateME(myFMU, (tStart, tStop); saveat=tSave)
     	0.07	[0.5100465543741248, 0.30323530202802584]
     	0.08	[0.5131797325794245, 0.34682968700062083]
     	...
-    	8.0	[0.9297092670632332, 7.232853665739852e-5]
+    	8.0	[0.9297092670632319, 7.232853665712135e-5]
     Events [7]:
     	State-Event #11 @ 0.0s
     	State-Event #11 @ 0.9952s

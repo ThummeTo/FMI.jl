@@ -82,6 +82,9 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_bdoNBY/SpringFrictionPendulum1D`.
+
+
     #################### Begin information for FMU ####################
     	Model name:			SpringFrictionPendulum1D
     	FMI-Version:			2.0
@@ -144,6 +147,9 @@ In the following type of simulation a more advanced variant is presented, which 
 myFMU = fmiLoad(pathToFMU);
 ```
 
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_IhMCvP/SpringFrictionPendulum1D`.
+
+
 Next, it is necessary to create an instance of the FMU, this is achieved by the command `fmiInstantiate!()`.  
 
 
@@ -156,7 +162,7 @@ instanceFMU = fmiInstantiate!(myFMU)
 
     FMU:            SpringFrictionPendulum1D
     InstanceName:   SpringFrictionPendulum1D
-    Address:        Ptr{Nothing} @0x000000000855d5a0
+    Address:        Ptr{Nothing} @0x0000000007823000
     State:          0
     Logging:        false
     FMU time:       -Inf
@@ -209,7 +215,7 @@ fmiUnload(myFMU)
 
     [[32mOK[0m][CvodeStatistics][SpringFrictionPendulum1D]: Sundials CVode Statistics
         Stop time                                : 8.00 s
-        Simulation time                          : 0.36 s
+        Simulation time                          : 0.31 s
         Number of external steps                 : 80
         Number of internal steps                 : 191
         Number of non-linear iterations          : 263

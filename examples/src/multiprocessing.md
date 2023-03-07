@@ -93,8 +93,8 @@ workers()
 ```
 
           From worker 3:	Hello World!
-          From worker 2:	Hello World!
     Hello World!
+          From worker 2:	Hello World!
 
 
 ### Simulation setup
@@ -115,22 +115,22 @@ input_values = collect(collect.(eachrow(rand(batchSize,2))))
 
 
     16-element Vector{Vector{Float64}}:
-     [0.4478945290461118, 0.06419728726840712]
-     [0.5036835414034925, 0.09865760789122036]
-     [0.47119353289649213, 0.3174328408930438]
-     [0.6596583520482303, 0.8265957823526069]
-     [0.9227186428730333, 0.6624210049735749]
-     [0.8074478225562228, 0.7675333821807063]
-     [0.1260508290520781, 0.20164269091909814]
-     [0.37502988531364334, 0.9723021235975124]
-     [0.7522903737569744, 0.007611321882098121]
-     [0.3015537332915835, 0.8784788702213013]
-     [0.34244143874188826, 0.7377131552780617]
-     [0.9812049051945271, 0.15058839606825902]
-     [0.24254764744119728, 0.8199325836697425]
-     [0.26951026805745015, 0.05228103424231889]
-     [0.042961795155773586, 0.6170696512381306]
-     [0.3079033110438635, 0.3513958884067647]
+     [0.25767907427856673, 0.554598901755065]
+     [0.35674012778856046, 0.900575757090421]
+     [0.8277974390975457, 0.5820510703755212]
+     [0.43470448442437726, 0.5186259832956334]
+     [0.772959705008511, 0.09533896731468172]
+     [0.9122792114508392, 0.7808231330096952]
+     [0.8945917952469974, 0.9585578046728084]
+     [0.46045109330173606, 0.7145746944885286]
+     [0.76253346972978, 0.7976591146064059]
+     [0.35030201809438966, 0.5115137686815813]
+     [0.4782416370894109, 0.08830709107243129]
+     [0.5435662964018101, 0.8172226059774971]
+     [0.692588094317838, 0.9854304675206964]
+     [0.2581706588180722, 0.7648415162321831]
+     [0.2950227674485093, 0.24335079762506173]
+     [0.2880002314413509, 0.21681553051002733]
 
 
 
@@ -153,6 +153,13 @@ For Distributed we need to embed the FMU into its own `module`. This prevents Di
 end
 ```
 
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_jRdSn8/SpringPendulum1D`.
+
+
+          From worker 3:	[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_oGYfx0/SpringPendulum1D`.
+          From worker 2:	[36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_XQRMiL/SpringPendulum1D`.
+
+
 We define a helper function to calculate the FMU and combine it into an Matrix.
 
 
@@ -174,15 +181,15 @@ Running a single evaluation is pretty quick, therefore the speed can be better t
 
 
     BenchmarkTools.Trial: 8 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m700.309 ms[22m[39m … [35m721.741 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m1.51% … 1.43%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m715.442 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m2.95%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m712.746 ms[22m[39m ± [32m  7.864 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m2.40% ± 0.77%
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m655.427 ms[22m[39m … [35m680.450 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m1.75% … 1.68%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m670.810 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m3.44%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m668.121 ms[22m[39m ± [32m  8.465 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m2.82% ± 0.89%
     
-      [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m▁[34m▁[39m[39m [39m▁[39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m 
-      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[34m█[39m[39m▁[39m█[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      700 ms[90m           Histogram: frequency by time[39m          722 ms [0m[1m<[22m
+      [39m▁[39m [39m [39m▁[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m▁[34m [39m[39m▁[39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m 
+      [39m█[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m█[34m▁[39m[39m█[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
+      655 ms[90m           Histogram: frequency by time[39m          680 ms [0m[1m<[22m
     
-     Memory estimate[90m: [39m[33m152.88 MiB[39m, allocs estimate[90m: [39m[33m6802006[39m.
+     Memory estimate[90m: [39m[33m152.71 MiB[39m, allocs estimate[90m: [39m[33m6801979[39m.
 
 
 
@@ -202,8 +209,8 @@ println("Single Threaded")
 
 
     BenchmarkTools.Trial: 1 sample with 1 evaluation.
-     Single result which took [34m11.376 s[39m (2.36% GC) to evaluate,
-     with a memory estimate of [33m2.39 GiB[39m, over [33m108832093[39m allocations.
+     Single result which took [34m10.653 s[39m (2.96% GC) to evaluate,
+     with a memory estimate of [33m2.39 GiB[39m, over [33m108831658[39m allocations.
 
 
 
@@ -224,8 +231,8 @@ println("Multi Threaded")
 
 
     BenchmarkTools.Trial: 1 sample with 1 evaluation.
-     Single result which took [34m6.391 s[39m (0.00% GC) to evaluate,
-     with a memory estimate of [33m79.28 KiB[39m, over [33m1220[39m allocations.
+     Single result which took [34m6.022 s[39m (0.00% GC) to evaluate,
+     with a memory estimate of [33m79.39 KiB[39m, over [33m1212[39m allocations.
 
 
 

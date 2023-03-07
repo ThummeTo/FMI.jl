@@ -83,6 +83,9 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_resXdK/SpringFrictionPendulum1D`.
+
+
     #################### Begin information for FMU ####################
     	Model name:			SpringFrictionPendulum1D
     	FMI-Version:			2.0
@@ -123,7 +126,7 @@ vrs = ["mass.s"]
 simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
 ```
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:11[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:12[39m
 
 
 
@@ -132,7 +135,7 @@ simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
     Model name:
     	SpringFrictionPendulum1D
     Success:
-    	true
+    	false
     Jacobian-Evaluations:
     	∂ẋ_∂x: 0
     	∂ẋ_∂u: 0
@@ -152,7 +155,7 @@ simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
     	0.014472994139394972	[0.5003928821168857, 0.06185448416653106]
     	0.017720906994829932	[0.5006003804450831, 0.07582881693720504]
     	...
-    	8.0	[0.9297092670632332, 7.232853665739852e-5]
+    	8.0	[0.9297092670632319, 7.232853665712135e-5]
     Values [576]:
     	0.0	(0.5,)
     	2.3529411764755826e-11	(0.5,)
@@ -164,7 +167,7 @@ simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
     	0.014472994139394972	(0.5003928821168857,)
     	0.017720906994829932	(0.5006003804450831,)
     	...
-    	8.0	(0.9297092670632332,)
+    	8.0	(0.9297092670632319,)
     Events [7]:
     	State-Event #11 @ 0.0s
     	State-Event #11 @ 0.9952s
@@ -208,7 +211,7 @@ originalGetReal = myFMU.cGetReal
 
 
 
-    Ptr{Nothing} @0x00007f7acfcd0faf
+    Ptr{Nothing} @0x00007f0db0ed0faf
 
 
 
@@ -256,7 +259,7 @@ fmiSetFctGetReal(myFMU, myGetReal!)
 
 
 
-    Ptr{Nothing} @0x00007f7b62a19fc0
+    Ptr{Nothing} @0x00007f0e4f423fc0
 
 
 

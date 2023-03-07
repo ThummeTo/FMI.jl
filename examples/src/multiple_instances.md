@@ -82,6 +82,9 @@ myFMU = fmiLoad(pathToFMU)
 fmiInfo(myFMU)
 ```
 
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_hgN0qX/SpringPendulum1D`.
+
+
     #################### Begin information for FMU ####################
     	Model name:			SpringPendulum1D
     	FMI-Version:			2.0
@@ -124,7 +127,7 @@ println(comp1)
 
     FMU:            SpringPendulum1D
     InstanceName:   SpringPendulum1D
-    Address:        Ptr{Nothing} @0x00000000066cc6d0
+    Address:        Ptr{Nothing} @0x0000000007b93eb0
     State:          0
     Logging:        false
     FMU time:       -Inf
@@ -169,7 +172,7 @@ println(comp2)
 
     FMU:            SpringPendulum1D
     InstanceName:   SpringPendulum1D
-    Address:        Ptr{Nothing} @0x000000000949af80
+    Address:        Ptr{Nothing} @0x0000000006ae5490
     State:          0
     Logging:        false
     FMU time:       -Inf
