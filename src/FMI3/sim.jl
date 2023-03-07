@@ -11,8 +11,8 @@ using FMIImport.FMICore: fmi3StatusOK, fmi3TypeCoSimulation, fmi3TypeModelExchan
 using FMIImport.FMICore: fmi3InstanceState, fmi3InstanceStateInstantiated, fmi3InstanceStateInitializationMode, fmi3InstanceStateEventMode, fmi3InstanceStateContinuousTimeMode, fmi3InstanceStateTerminated, fmi3InstanceStateError, fmi3InstanceStateFatal
 using FMIImport: FMU3Solution, FMU3Event
 
-using ChainRulesCore
-import ForwardDiff
+using FMIImport.ChainRulesCore
+import FMIImport.ForwardDiff
 
 import ProgressMeter
 
@@ -1021,7 +1021,7 @@ function fmi3SimulateME(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_st
         fmusol.states = solve(c.problem, solver; callback = CallbackSet(cbs...), dtmax=dtmax, solveKwargs..., kwargs...)
     end
 
-    fmusol.success = (fmusol.states.retcode == :Success)
+    fmusol.success = (fmusol.states.retcode == SciMLBase.ReturnCode.Success)
 
     # cleanup progress meter
     if showProgress 
