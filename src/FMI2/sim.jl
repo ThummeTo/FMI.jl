@@ -558,7 +558,7 @@ function fmi2SimulateCS(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
             ProgressMeter.finish!(progressMeter)
         end
 
-        fmusol.success = true
+        fmusol.success = true # ToDo: Check successful simulation!
 
     else
         i = 1
@@ -588,7 +588,7 @@ function fmi2SimulateCS(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
             ProgressMeter.finish!(progressMeter)
         end
 
-        fmusol.success = true
+        fmusol.success = true # ToDo: Check successful simulation!
     end
 
     finishSolveFMU(fmu, c, freeInstance, terminate)

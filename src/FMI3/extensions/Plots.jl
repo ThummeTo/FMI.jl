@@ -4,7 +4,7 @@
 #
 
 using FMIImport: FMU3Solution
-import ForwardDiff
+import FMIImport.ForwardDiff
 
 """
 Plots data from a ME-FMU.
