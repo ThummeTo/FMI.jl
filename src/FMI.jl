@@ -108,6 +108,8 @@ using FMIImport: prepareValue, prepareValueReference
 
 export fmi2Real, fmi2Integer, fmi2String, fmi2Enumeration, fmi2Boolean
 
+include("check.jl")
+
 include("FMI2/additional.jl")
 include("FMI3/additional.jl")
 include("assertions.jl")

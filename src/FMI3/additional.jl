@@ -16,9 +16,6 @@ using FMIImport: fmi3DependencyKindDependent, fmi3DependencyKindFixed
 using FMIImport: fmi3CallbackLogger, fmi3CallbackIntermediateUpdate, fmi3CallbackClockUpdate, fmi3Instance
 import FMIImport: fmi3VariableNamingConventionFlat, fmi3VariableNamingConventionStructured
 
-using ZipFile, EzXML
-
-
 """ 
 Returns how a variable depends on another variable based on the model description.
 """
@@ -161,83 +158,3 @@ function fmi3Info(fmu::FMU3)
     println("##################### End information for FMU #####################")
 end
 
-function fmiCheckVersion(pathToFMU::String; unpackPath=nothing)
-    # Unzip MD
-
-    # Download FMU if necessary
-    if startswith(pathToFMU, "http")
-        @info "Downloading FMU for Version extraction from `$(pathToFMU)`."
-        pathToFMU = download(pathToFMU)
-    end
-
-    pathToFMU = normpath(pathToFMU)
-
-    fileNameExt = basename(pathToFMU)
-    (fileName, fileExt) = splitext(fileNameExt)
-        
-    if unpackPath === nothing
-        # cleanup=true leads to issues with automatic testing on linux server.
-        unpackPath = mktempdir(; prefix="fmijl_", cleanup=false)
-    end
-
-    zipPath = joinpath(unpackPath, fileName * ".zip")
-    unzippedPath = joinpath(unpackPath, fileName)
-
-    # only copy ZIP if not already there
-    if !isfile(zipPath)
-        cp(pathToFMU, zipPath; force=true)
-    end
-
-    @assert isfile(zipPath) ["fmi3Unzip(...): ZIP-Archive couldn't be copied to `$zipPath`."]
-
-    zipAbsPath = isabspath(zipPath) ?  zipPath : joinpath(pwd(), zipPath)
-    unzippedAbsPath = isabspath(unzippedPath) ? unzippedPath : joinpath(pwd(), unzippedPath)
-
-    @assert isfile(zipAbsPath) ["fmi3Unzip(...): Can't deploy ZIP-Archive at `$(zipAbsPath)`."]
-
-    # only unzip if not already done
-    if !isdir(unzippedAbsPath)
-        mkpath(unzippedAbsPath)
-
-        zarchive = ZipFile.Reader(zipAbsPath)
-        for f in zarchive.files
-            if f.name == "modelDescription.xml"
-                fileAbsPath = normpath(joinpath(unzippedAbsPath, f.name))
-
-                # create directory if not forced by zip file folder
-                mkpath(dirname(fileAbsPath))
-
-                numBytes = write(fileAbsPath, read(f))
-                
-                if numBytes == 0
-                    @info "fmi3Unzip(...): Written file `$(f.name)`, but file is empty."
-                end
-
-                @assert isfile(fileAbsPath) ["fmi3Unzip(...): Can't unzip file `$(f.name)` at `$(fileAbsPath)`."]
-            end
-            
-        end
-        close(zarchive)
-    end
-
-    @assert isdir(unzippedAbsPath) ["fmi3Unzip(...): ZIP-Archive couldn't be unzipped at `$(unzippedPath)`."]
-    @info "fmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `$unzippedAbsPath`."
-
-    # read version tag
-
-    doc = readxml(normpath(joinpath(unzippedAbsPath, "modelDescription.xml")))
-
-    root = doc.root
-    version = root["fmiVersion"]
-
-    # cleanup unzipped modelDescription
-    try
-        rm(unzippedAbsPath; recursive = true, force = true)
-        rm(zipAbsPath; recursive = true, force = true)
-    catch e
-        @warn "Cannot delete unpacked data on disc. Maybe some files are opened in another application."
-    end
-
-    # return version
-    version
-end
