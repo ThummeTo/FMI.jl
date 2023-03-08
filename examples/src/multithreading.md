@@ -98,7 +98,7 @@ input_values = collect(collect.(eachrow(rand(batchSize,2))))
 
 
     1-element Vector{Vector{Float64}}:
-     [0.10858636566695234, 0.43338441792327553]
+     [0.647280164005665, 0.11052100039016932]
 
 
 
@@ -113,8 +113,8 @@ realFMU = fmiLoad("SpringPendulum1D", "Dymola", "2022x")
 realFMUBatch = [fmiLoad("SpringPendulum1D", "Dymola", "2022x") for _ in 1:batchSize]
 ```
 
-    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_dOAIP6/SpringPendulum1D`.
-    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_veXR6c/SpringPendulum1D`.
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_xJKMil/SpringPendulum1D`.
+    [36m[1m[ [22m[39m[36m[1mInfo: [22m[39mfmiUnzipVersion(...): Successfully unzipped modelDescription.xml at `/tmp/fmijl_wUYpCp/SpringPendulum1D`.
 
 
 
@@ -150,59 +150,19 @@ Running a single evaluation is pretty quick, therefore the speed can be better t
 @benchmark data = runCalcFormatted(realFMU, rand(2))
 ```
 
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
 
 
 
-
-
-    BenchmarkTools.Trial: 7 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m787.257 ms[22m[39m … [35m813.474 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m1.36% … 1.31%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m803.842 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m2.68%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m800.782 ms[22m[39m ± [32m  9.117 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m2.12% ± 0.72%
+    BenchmarkTools.Trial: 5 samples with 1 evaluation.
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m1.051 s[22m[39m … [35m 1.078 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m1.22% … 1.19%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m1.068 s             [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m2.40%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m1.067 s[22m[39m ± [32m9.533 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m1.93% ± 0.66%
     
-      [39m█[39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m█[34m [39m[39m [39m [39m█[39m█[39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
-      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m█[34m▁[39m[39m▁[39m▁[39m█[39m█[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      787 ms[90m           Histogram: frequency by time[39m          813 ms [0m[1m<[22m
+      [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m█[39m[34m [39m[39m█[39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
+      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m█[39m[34m▁[39m[39m█[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
+      1.05 s[90m        Histogram: frequency by time[39m        1.08 s [0m[1m<[22m
     
-     Memory estimate[90m: [39m[33m152.72 MiB[39m, allocs estimate[90m: [39m[33m6802164[39m.
+     Memory estimate[90m: [39m[33m152.71 MiB[39m, allocs estimate[90m: [39m[33m6801980[39m.
 
 
 
@@ -218,61 +178,19 @@ println("Single Threaded")
     Single Threaded
 
 
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
 
 
 
-
-
-    BenchmarkTools.Trial: 8 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m672.615 ms[22m[39m … [35m699.459 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m1.75% … 1.68%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m692.648 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m2.54%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m686.930 ms[22m[39m ± [32m 10.855 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m2.56% ± 0.88%
+    BenchmarkTools.Trial: 7 samples with 1 evaluation.
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m725.501 ms[22m[39m … [35m746.549 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m1.89% … 1.84%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m736.498 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m3.70%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m736.411 ms[22m[39m ± [32m  8.245 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m2.92% ± 0.98%
     
-      [39m█[39m [39m█[39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [34m█[39m[39m [39m█[39m█[39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
-      [39m█[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[34m█[39m[39m▁[39m█[39m█[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      673 ms[90m           Histogram: frequency by time[39m          699 ms [0m[1m<[22m
+      [39m█[39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [34m█[39m[39m [39m█[32m [39m[39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m█[39m [39m 
+      [39m█[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[34m█[39m[39m▁[39m█[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m█[39m [39m▁
+      726 ms[90m           Histogram: frequency by time[39m          747 ms [0m[1m<[22m
     
-     Memory estimate[90m: [39m[33m152.72 MiB[39m, allocs estimate[90m: [39m[33m6802161[39m.
+     Memory estimate[90m: [39m[33m152.71 MiB[39m, allocs estimate[90m: [39m[33m6801982[39m.
 
 
 
@@ -289,61 +207,19 @@ println("Multi Threaded")
     Multi Threaded
 
 
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mFMU simulation failed with solver return code `Success`, please check log for hints.
-    [33m[1m└ [22m[39m[90m@ FMI ~/work/FMI.jl/FMI.jl/src/FMI2/sim.jl:407[39m
 
 
 
-
-
-    BenchmarkTools.Trial: 8 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m637.220 ms[22m[39m … [35m663.861 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m1.90% … 1.81%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m654.129 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m2.75%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m652.353 ms[22m[39m ± [32m 10.044 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m2.76% ± 0.95%
+    BenchmarkTools.Trial: 7 samples with 1 evaluation.
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m710.546 ms[22m[39m … [35m744.314 ms[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m1.97% … 4.34%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m733.610 ms               [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m1.92%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m727.366 ms[22m[39m ± [32m 14.411 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m2.83% ± 1.11%
     
-      [39m█[39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [34m█[39m[39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m█[39m█[39m [39m [39m [39m [39m█[39m [39m 
-      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[34m█[39m[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m█[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      637 ms[90m           Histogram: frequency by time[39m          664 ms [0m[1m<[22m
+      [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[34m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m [39m▁[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m [39m [39m [39m [39m▁[39m [39m 
+      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[34m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
+      711 ms[90m           Histogram: frequency by time[39m          744 ms [0m[1m<[22m
     
-     Memory estimate[90m: [39m[33m152.72 MiB[39m, allocs estimate[90m: [39m[33m6802165[39m.
+     Memory estimate[90m: [39m[33m152.71 MiB[39m, allocs estimate[90m: [39m[33m6801986[39m.
 
 
 
