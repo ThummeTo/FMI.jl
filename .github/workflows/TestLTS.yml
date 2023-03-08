@@ -1,0 +1,67 @@
+name: Test v1.6 (LTS)
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: 
+      - main
+    paths:
+      - 'src/**'
+      - 'test/**'
+      - '.github/workflows/Test.yml'
+      - 'Project.toml'
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        julia-version: ['1.6']
+        julia-arch: [x64]
+        os: [ubuntu-latest, windows-latest]
+        experimental: [false]
+
+    steps:
+      # Checks-out your repository
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      # Set up Julia
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ matrix.julia-version }}
+          arch: ${{ matrix.julia-arch }}
+
+     # Set up cache
+      - name: "Set up cache"
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-artifacts
+        with:
+          path: ~/.julia/artifacts
+          key: ${{ runner.os }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-test-${{ env.cache-name }}-
+            ${{ runner.os }}-test-
+            ${{ runner.os }}-
+
+      # Build package
+      - name: "Build package"
+        uses: julia-actions/julia-buildpkg@v1
+
+      # Run the tests
+      - name: "Run tests"
+        uses: julia-actions/julia-runtest@v1
+
+      # Preprocess Coverage
+      - name: "Preprocess Coverage"
+        uses: julia-actions/julia-processcoverage@v1
+
+      # Run codecov
+      - name: "Run CodeCov"
+        uses: codecov/codecov-action@v3
+        with:
+          file: lcov.info

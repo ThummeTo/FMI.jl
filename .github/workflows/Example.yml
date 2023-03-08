@@ -1,4 +1,4 @@
-name: Run Examples
+name: Examples v1 (latest)
 
 on:
   workflow_dispatch:
@@ -20,7 +20,7 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest]
         file-name: [manipulation, modelica_conference_2021, multiple_instances, multiprocessing, multithreading, parameterize, simulate]
-        julia-version: ['1.7']
+        julia-version: ['1.8']
         julia-arch: [x64]
         experimental: [false]
 
@@ -44,7 +44,7 @@ jobs:
         env:
           FILE: examples/src/${{ matrix.file-name }}.ipynb
         run: |
-          jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-1.7" --to notebook --inplace --execute ${{ env.FILE }}
+          jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-1.8" --to notebook --inplace --execute ${{ env.FILE }}
           jupyter nbconvert --to script ${{ env.FILE }}
           jupyter nbconvert --to markdown ${{ env.FILE }}
 

@@ -47,8 +47,8 @@ If you want to force a specific simulation mode, you can use `fmiSimulateME` (fo
 
 ## Simulate arbitrary time intervals
 You can simply simulate arbitrary time intervals by passing a `startTime` unequal zero to `fmi2SetupExperiment`. 
-Because many FMUs don't support `startTime != 0.0` and will throw an error or warning, a time shifting feature inside *FMI.jl* performs all necessary steps in the background - all corresponding commands like e.g. `fmi2SetTime` or `fmi2NewDiscreteStates` act like the desired time interval is simulated.
-If you don't want this feature (maybe because you are simulating time-dependent systems), you may use the execution configuration `myFMU.executionConfig.autoTimeShift=false` while providing a `startTime != 0.0`.
+Because many FMUs don't support `startTime != 0.0` and will throw an error or warning, a time shifting feature inside *FMI.jl* can be used, that performs all necessary steps in the background - corresponding commands like e.g. `fmi2SetTime` or `fmi2NewDiscreteStates` act like the desired time interval is simulated.
+This feature is disabled by default, but can be activated in the execution configuration using `myFMU.executionConfig.autoTimeShift=true` while providing a `startTime != 0.0`.
 
 ## Performance
 **In- and Out-of-Place:** Many commands in *FMI.jl* are available in in-place and out-of-place semantics. Of course, in-place-calls are faster, because they don't need to allocate new memory at every call (for the return values).

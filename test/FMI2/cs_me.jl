@@ -25,6 +25,7 @@ sol = fmiSimulateCS(fmuStruct, (t_start, t_stop))
 @test sol.success 
 sol = fmiSimulateME(fmuStruct, (t_start, t_stop))
 @test sol.success 
+
 fmiUnload(myFMU)
 
 
