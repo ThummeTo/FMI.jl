@@ -893,7 +893,6 @@ function fmiSimulate(str::fmi3Struct, args...; kwargs...)
     fmi3Simulate(str, args...; kwargs...)
 end
 """
-
     fmiSimulateCS(str::Union{fmi2Struct,fmi3Struct}, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing;
                         tolerance::Union{Real, Nothing} = nothing,
                         dt::Union{Real, Nothing} = nothing,
@@ -965,7 +964,6 @@ function fmiSimulateCS(str::fmi3Struct, args...; kwargs...)
 end
 
 """
-
     fmiSimulateME(str::Union{fmi2Struct,fmi3Struct}, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing;
                     tolerance::Union{Real, Nothing} = nothing,
                     dt::Union{Real, Nothing} = nothing,
@@ -1041,7 +1039,6 @@ function fmiSimulateME(str::fmi3Struct, args...; kwargs...)
     fmi3SimulateME(str, args...; kwargs...)
 end
 """
-
     fmiUnload(fmu::Union{FMU2, FMU3})
 
 Unloads the FMU and all its instances and frees the allocated memory.
@@ -1064,7 +1061,6 @@ function fmiUnload(fmu::FMU3)
 end
 
 """
-
     fmiGetNumberOfStates(str::Union{fmi2Struct, fmi3Struct})
 
 Returns the number of states of the FMU.
@@ -1097,7 +1093,6 @@ end
 
 # TODO not in FMI3
 """
-
     fmiGetTypesPlatform(str::fmi2Struct)
 
 Returns the header file used to compile the FMU. By default returns `default`, version independent.
@@ -1123,7 +1118,6 @@ function fmiGetTypesPlatform(str::fmi2Struct)
 end
 
 """
-
     fmiGetVersion(str::Union{fmi2Struct, fmi3Struct})
 
 Returns the version of the FMU, version independent.
@@ -1187,7 +1181,6 @@ function fmiInfo(str::fmi3Struct)
 end
 
 """
-
     fmiGet(str::fmi2Struct, comp::FMU2Component, vrs::fmi2ValueReferenceFormat)
 
 Returns the specific value of `fmi2ScalarVariable` containing the modelVariables with the identical fmi2ValueReference in an array.
@@ -1216,7 +1209,7 @@ function fmiGet(str::fmi3Struct, args...; kwargs...)
     fmi3Get(str, args...; kwargs...)
 end
 """
-   fmiGet!(str::fmi2Struct, comp::FMU2Component, vrs::fmi2ValueReferenceFormat, dstArray::AbstractArray)
+    fmiGet!(str::fmi2Struct, comp::FMU2Component, vrs::fmi2ValueReferenceFormat, dstArray::AbstractArray)
 
 Stors the specific value of `fmi2ScalarVariable` containing the modelVariables with the identical fmi2ValueReference in an array.
 
@@ -1250,8 +1243,7 @@ function fmiGet!(str::fmi3Struct, args...; kwargs...)
     fmi3Get!(str, args...; kwargs...)
 end
 """
-
-   fmiSet(str::fmi2Struct, comp::FMU2Component, vrs::fmi2ValueReferenceFormat, srcArray::AbstractArray; filter=nothing)
+    fmiSet(str::fmi2Struct, comp::FMU2Component, vrs::fmi2ValueReferenceFormat, srcArray::AbstractArray; filter=nothing)
 
 # Arguments
 - `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
@@ -1286,7 +1278,6 @@ function fmiSet(str::fmi3Struct, args...; kwargs...)
 end
 
 """
-
     fmiGetReal(str::fmi2Struct, vr::fmi2ValueReferenceFormat)
 
 Returns the real values of an array of variables
@@ -1319,7 +1310,6 @@ end
 
 
 """
-
     fmiSampleJacobian(str::fmi2Struct, c::FMU2Component,
                                        vUnknown_ref::Array{fmi2ValueReference},
                                        vKnown_ref::Array{fmi2ValueReference},
