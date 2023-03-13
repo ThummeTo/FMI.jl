@@ -4,7 +4,7 @@
 #
 
 using FMIImport: FMU2Solution
-import ForwardDiff
+import FMIImport.ForwardDiff
 
 """
 
