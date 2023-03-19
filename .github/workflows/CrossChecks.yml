@@ -55,7 +55,7 @@ jobs:
       - name: auto-commit
         env: 
           CI_COMMIT_AUTHOR: github-actions[bot] 
-          PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+          PERSONAL_TOKEN: ${{ secrets.CROSS_CHECK_REPO_TOKEN }}
         # Fetch all and clear the stash list. Include all files from the examples/src folder to the stash and switch the branch.
         # Reset the branch and remove all current files in the examples/src folder. 
         # Checkout the last stash to restore the new notebooks and apply the stash index to restore all other new files in the folder.
@@ -66,4 +66,4 @@ jobs:
 
       # Run the tests
       - name: "Run FMU Cross checks" 
-        run: julia --project=cross_checks/ ./cross_checks/cross_check.jl --os ${{ matrix.os }} --ccrepo https://github.com/christofbaumgartner/fmi-cross-check
+        run: julia --project=cross_checks/ ./cross_checks/cross_check.jl --os ${{ matrix.os }} --ccrepo https://github.com/christofbaumgartner/fmi-cross-check --ccbranch fmi.jl_check_${{ matrix.julia-version }}_${{ matrix.os }}

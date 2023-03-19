@@ -35,6 +35,10 @@ function parse_commandline()
             help = "The Url to the git repository that contains the cross checks. Not setting this will prevent saving the results"
             arg_type = String
             default = "https://github.com/modelica/fmi-cross-check"
+        "--ccbranch"
+            help = "The name of the branch in which the results will be pushed"
+            arg_type = String
+            default = "master"
         "--tempdir"
             help = "temporary directive that is used for cross checks and results"
             arg_type = String
@@ -175,6 +179,7 @@ function main()
     unpackPath = parsed_args["tempdir"]
     fmiVersion = parsed_args["fmiversion"]
     crossCheckRepo = parsed_args["ccrepo"]
+    crossCheckBranch = parsed_args["ccbranch"]
     os_version = parsed_args["os"]
     os = "win64"
     if os_version == "ubuntu-latest"
@@ -236,6 +241,7 @@ function main()
     # run(Cmd(`$(git()) config --global user.email 'your-username@users.noreply.github.com'"`, dir=fmiCrossCheckRepoPath))
     personal_token = get(ENV, "PERSONAL_TOKEN", "")
     run(Cmd(`$(git()) remote set-url origin https://x-access-token:$(personal_token)@github.com/christofbaumgartner/fmi-cross-check`, dir=fmiCrossCheckRepoPath))
+    run(Cmd(`$(git()) checkout $(crossCheckBranch)`, dir=fmiCrossCheckRepoPath))
     run(Cmd(`$(git()) add -A`, dir=fmiCrossCheckRepoPath))
     run(Cmd(`$(git()) commit -a -m "Run FMI cross checks for FMI.JL"`, dir=fmiCrossCheckRepoPath))
     run(Cmd(`$(git()) push`, dir=fmiCrossCheckRepoPath))
