@@ -41,8 +41,7 @@ end
 Wrapper for fmi2FreeInstance!() in FMIImport/FMI2_c.jl
 """
 function fmi2FreeInstance!(fmu::FMU2)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2FreeInstance!(fmu.components[end]) # this command also removes the component from the array
+    fmi2FreeInstance!(getCurrentComponent(fmu)) # this command also removes the component from the array
 end
 
 """
@@ -51,8 +50,7 @@ end
 Wrapper for fmi2SetDebugLogging() in FMIImport/FMI2_int.jl
 """
 function fmi2SetDebugLogging(fmu::FMU2)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2SetDebugLogging(fmu.components[end])
+    fmi2SetDebugLogging(getCurrentComponent(fmu))
 end
 
 """
@@ -60,9 +58,8 @@ end
 
 Wrapper for fmi2SetupExperiment() in FMIImport/FMI2_int.jl
 """
-function fmi2SetupExperiment(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2SetupExperiment(fmu.components[end], args...; kwargs...)
+function fmi2SetupExperiment(fmu::FMU2, args...; kwargs...) 
+    fmi2SetupExperiment(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -71,8 +68,7 @@ end
 Wrapper for fmi2EnterInitializationMode() in FMIImport/FMI2_c.jl
 """
 function fmi2EnterInitializationMode(fmu::FMU2)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2EnterInitializationMode(fmu.components[end])
+    fmi2EnterInitializationMode(getCurrentComponent(fmu))
 end
 
 """
@@ -81,8 +77,7 @@ end
 Wrapper for fmi2ExitInitializationMode() in FMIImport/FMI2_c.jl
 """
 function fmi2ExitInitializationMode(fmu::FMU2)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2ExitInitializationMode(fmu.components[end])
+    fmi2ExitInitializationMode(getCurrentComponent(fmu))
 end
 
 """
@@ -91,8 +86,7 @@ end
 Wrapper for fmi2Terminate() in FMIImport/FMI2_c.jl
 """
 function fmi2Terminate(fmu::FMU2)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2Terminate(fmu.components[end])
+    fmi2Terminate(getCurrentComponent(fmu))
 end
 
 """
@@ -101,8 +95,7 @@ end
 Wrapper for fmi2Reset() in FMIImport/FMI2_c.jl
 """
 function fmi2Reset(fmu::FMU2)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2Reset(fmu.components[end])
+    fmi2Reset(getCurrentComponent(fmu))
 end
 
 """
@@ -111,8 +104,7 @@ end
 Wrapper for fmi2GetReal() in FMIImport/FMI2_int.jl
 """
 function fmi2GetReal(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetReal(fmu.components[end], args...; kwargs...)
+    fmi2GetReal(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -121,8 +113,7 @@ end
 Wrapper for fmi2GetReal!() in FMIImport/FMI2_int.jl
 """
 function fmi2GetReal!(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetReal!(fmu.components[end], args...; kwargs...)
+    fmi2GetReal!(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -130,9 +121,8 @@ end
 
 Wrapper for fmiGet() in FMIImport/FMI2_ext.jl
 """
-function fmiGet(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2Get(fmu.components[end], args...; kwargs...)
+function fmi2Get(fmu::FMU2, args...; kwargs...)
+    fmi2Get(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -140,9 +130,8 @@ end
 
 Wrapper for fmiGet!() in FMIImport/FMI2_ext.jl
 """
-function fmiGet!(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2Get!(fmu.components[end], args...; kwargs...)
+function fmi2Get!(fmu::FMU2, args...; kwargs...)
+    fmi2Get!(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -150,9 +139,8 @@ end
 
 Wrapper for fmiSet() in FMIImport/FMI2_ext.jl
 """
-function fmiSet(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2Set(fmu.components[end], args...; kwargs...)
+function fmi2Set(fmu::FMU2, args...; kwargs...)
+    fmi2Set(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -161,8 +149,7 @@ end
 Wrapper for fmi2GetRealOutputDerivatives() in FMIImport/FMI2_int.jl
 """
 function fmi2GetRealOutputDerivatives(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetRealOutputDerivatives(fmu.components[end], args...; kwargs...)
+    fmi2GetRealOutputDerivatives(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -171,8 +158,7 @@ end
 Wrapper for fmi2SetReal() in FMIImport/FMI2_int.jl
 """
 function fmi2SetReal(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2SetReal(fmu.components[end], args...; kwargs...)
+    fmi2SetReal(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -181,8 +167,7 @@ end
 Wrapper for fmi2SetRealInputDerivatives() in FMIImport/FMI2_int.jl
 """
 function fmi2SetRealInputDerivatives(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2SetRealInputDerivatives(fmu.components[end], args...; kwargs...)
+    fmi2SetRealInputDerivatives(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -191,8 +176,7 @@ end
 Wrapper for fmi2GetInteger() in FMIImport/FMI2_int.jl
 """
 function fmi2GetInteger(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetInteger(fmu.components[end], args...; kwargs...)
+    fmi2GetInteger(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -201,8 +185,8 @@ end
 Wrapper for fmi2GetInteger!() in FMIImport/FMI2_int.jl
 """
 function fmi2GetInteger!(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetInteger!(fmu.components[end], args...; kwargs...)
+    
+    fmi2GetInteger!(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -211,8 +195,8 @@ end
 Wrapper for fmi2SetInteger() in FMIImport/FMI2_int.jl
 """
 function fmi2SetInteger(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2SetInteger(fmu.components[end], args...; kwargs...)
+    
+    fmi2SetInteger(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -221,8 +205,8 @@ end
 Wrapper for fmi2GetBoolean() in FMIImport/FMI2_int.jl
 """
 function fmi2GetBoolean(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetBoolean(fmu.components[end], args...; kwargs...)
+    
+    fmi2GetBoolean(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -231,8 +215,8 @@ end
 Wrapper for fmi2GetBoolean!() in FMIImport/FMI2_int.jl
 """
 function fmi2GetBoolean!(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetBoolean!(fmu.components[end], args...; kwargs...)
+    
+    fmi2GetBoolean!(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -241,8 +225,8 @@ end
 Wrapper for fmi2SetBoolean() in FMIImport/FMI2_int.jl
 """
 function fmi2SetBoolean(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2SetBoolean(fmu.components[end], args...; kwargs...)
+    
+    fmi2SetBoolean(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -251,8 +235,8 @@ end
 Wrapper for fmi2GetString() in FMIImport/FMI2_int.jl
 """
 function fmi2GetString(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetString(fmu.components[end], args...; kwargs...)
+    
+    fmi2GetString(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -261,8 +245,8 @@ end
 Wrapper for fmi2GetString!() in FMIImport/FMI2_int.jl
 """
 function fmi2GetString!(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetString!(fmu.components[end], args...; kwargs...)
+    
+    fmi2GetString!(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -271,8 +255,8 @@ end
 Wrapper for fmi2SetString() in FMIImport/FMI2_int.jl
 """
 function fmi2SetString(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2SetString(fmu.components[end], args...; kwargs...)
+    
+    fmi2SetString(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -281,8 +265,8 @@ end
 Wrapper for fmi2GetFMUstate() in FMIImport/FMI2_int.jl
 """
 function fmi2GetFMUstate(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetFMUstate(fmu.components[end], args...; kwargs...)
+    
+    fmi2GetFMUstate(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -291,8 +275,8 @@ end
 Wrapper for fmi2SetFMUstate() in FMIImport/FMI2_c.jl
 """
 function fmi2SetFMUstate(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2SetFMUstate(fmu.components[end], args...; kwargs...)
+    
+    fmi2SetFMUstate(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -301,8 +285,8 @@ end
 Wrapper for fmi2FreeFMUstate!() in FMIImport/FMI2_int.jl
 """
 function fmi2FreeFMUstate!(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2FreeFMUstate!(fmu.components[end], args...; kwargs...)
+    
+    fmi2FreeFMUstate!(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -311,8 +295,8 @@ end
 Wrapper for fmi2SerializedFMUstateSize() in FMIImport/FMI2_int.jl
 """
 function fmi2SerializedFMUstateSize(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2SerializedFMUstateSize(fmu.components[end], args...; kwargs...)
+    
+    fmi2SerializedFMUstateSize(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -321,8 +305,8 @@ end
 Wrapper for fmi2SerializeFMUstate() in FMIImport/FMI2_int.jl
 """
 function fmi2SerializeFMUstate(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2SerializeFMUstate(fmu.components[end], args...; kwargs...)
+    
+    fmi2SerializeFMUstate(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -331,8 +315,8 @@ end
 Wrapper for fmi2DeSerializeFMUstate() in FMIImport/FMI2_int.jl
 """
 function fmi2DeSerializeFMUstate(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2DeSerializeFMUstate(fmu.components[end], args...; kwargs...)
+    
+    fmi2DeSerializeFMUstate(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -341,8 +325,8 @@ end
 Wrapper for fmi2GetDirectionalDerivative!() in FMIImport/FMI2_int.jl
 """
 function fmi2GetDirectionalDerivative!(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetDirectionalDerivative!(fmu.components[end], args...; kwargs...)
+    
+    fmi2GetDirectionalDerivative!(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -351,8 +335,8 @@ end
 Wrapper for fmi2GetDirectionalDerivative() in FMIImport/FMI2_int.jl
 """
 function fmi2GetDirectionalDerivative(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetDirectionalDerivative(fmu.components[end], args...; kwargs...)
+    
+    fmi2GetDirectionalDerivative(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -361,8 +345,8 @@ end
 Wrapper for fmi2SampleDirectionalDerivative!() in FMIImport/FMI2_ext.jl
 """
 function fmi2SampleDirectionalDerivative!(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2SampleDirectionalDerivative!(fmu.components[end], args...; kwargs...)
+    
+    fmi2SampleDirectionalDerivative!(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -371,8 +355,8 @@ end
 Wrapper for fmi2SampleDirectionalDerivative() in FMIImport/FMI2_ext.jl
 """
 function fmi2SampleDirectionalDerivative(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2SampleDirectionalDerivative(fmu.components[end], args...; kwargs...)
+    
+    fmi2SampleDirectionalDerivative(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -381,8 +365,8 @@ end
 Wrapper for fmi2GetJacobian!() in FMIImport/FMI2_ext.jl
 """
 function fmi2GetJacobian!(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetJacobian!(fmu.components[end], args...; kwargs...)
+    
+    fmi2GetJacobian!(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -391,8 +375,8 @@ end
 Wrapper for fmi2GetJacobian() in FMIImport/FMI2_ext.jl
 """
 function fmi2GetJacobian(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetJacobian(fmu.components[end], args...; kwargs...)
+    
+    fmi2GetJacobian(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -401,8 +385,8 @@ end
 Wrapper for fmi2DoStep() in FMIImport/FMI2_c.jl
 """
 function fmi2DoStep(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2DoStep(fmu.components[end], args...; kwargs...)
+    
+    fmi2DoStep(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -411,8 +395,8 @@ end
 Wrapper for fmi2CancelStep() in FMIImport/FMI2_c.jl
 """
 function fmi2CancelStep(fmu::FMU2)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2CancelStep(fmu.components[end])
+    
+    fmi2CancelStep(getCurrentComponent(fmu))
 end
 
 """
@@ -421,8 +405,8 @@ end
 Wrapper for fmi2GetStatus!() in FMIImport/FMI2_c.jl
 """
 function fmi2GetStatus(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetStatus!(fmu.components[end], args...; kwargs...)
+    
+    fmi2GetStatus!(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -431,8 +415,8 @@ end
 Wrapper for fmi2GetRealStatus!() in FMIImport/FMI2_c.jl
 """
 function fmi2GetRealStatus(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetRealStatus!(fmu.components[end], args...; kwargs...)
+    
+    fmi2GetRealStatus!(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -441,8 +425,8 @@ end
 Wrapper for fmi2GetIntegerStatus!() in FMIImport/FMI2_c.jl
 """
 function fmi2GetIntegerStatus(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetIntegerStatus!(fmu.components[end], args...; kwargs...)
+    
+    fmi2GetIntegerStatus!(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -451,8 +435,8 @@ end
 Wrapper for fmi2GetBooleanStatus!() in FMIImport/FMI2_c.jl
 """
 function fmi2GetBooleanStatus(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetBooleanStatus!(fmu.components[end], args...; kwargs...)
+    
+    fmi2GetBooleanStatus!(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -461,8 +445,8 @@ end
 Wrapper for fmi2GetStringStatus!() in FMIImport/FMI2_c.jl
 """
 function fmi2GetStringStatus(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetStringStatus!(fmu.components[end], args...; kwargs...)
+    
+    fmi2GetStringStatus!(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -471,8 +455,8 @@ end
 Wrapper for fmi2SetTime() in FMIImport/FMI2_c.jl
 """
 function fmi2SetTime(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2SetTime(fmu.components[end], args...; kwargs...)
+    
+    fmi2SetTime(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -481,8 +465,8 @@ end
 Wrapper for fmi2SetContinuousStates() in FMIImport/FMI2_c.jl
 """
 function fmi2SetContinuousStates(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2SetContinuousStates(fmu.components[end], args...; kwargs...)
+    
+    fmi2SetContinuousStates(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -491,8 +475,8 @@ end
 Wrapper for fmi2EnterEventMode() in FMIImport/FMI2_c.jl
 """
 function fmi2EnterEventMode(fmu::FMU2)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2EnterEventMode(fmu.components[end])
+    
+    fmi2EnterEventMode(getCurrentComponent(fmu))
 end
 
 """
@@ -501,8 +485,8 @@ end
 Wrapper for fmi2NewDiscreteStates() in FMIImport/FMI2_c.jl
 """
 function fmi2NewDiscreteStates(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2NewDiscreteStates(fmu.components[end], args...; kwargs...)
+    
+    fmi2NewDiscreteStates(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -511,8 +495,8 @@ end
 Wrapper for fmi2EnterContinuousTimeMode() in FMIImport/FMI2_c.jl
 """
 function fmi2EnterContinuousTimeMode(fmu::FMU2)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2EnterContinuousTimeMode(fmu.components[end])
+    
+    fmi2EnterContinuousTimeMode(getCurrentComponent(fmu))
 end
 
 """
@@ -521,8 +505,8 @@ end
 Wrapper for fmi2CompletedIntegratorStep() in FMIImport/FMI2_c.jl
 """
 function fmi2CompletedIntegratorStep(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2CompletedIntegratorStep(fmu.components[end], args...; kwargs...)
+    
+    fmi2CompletedIntegratorStep(getCurrentComponent(fmu), args...; kwargs...)
 end
 
 """
@@ -531,8 +515,8 @@ end
 Wrapper for fmi2GetDerivatives() in FMIImport/FMI2_c.jl
 """
 function fmi2GetDerivatives(fmu::FMU2)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetDerivatives(fmu.components[end])
+    
+    fmi2GetDerivatives(getCurrentComponent(fmu))
 end
 
 """
@@ -541,18 +525,18 @@ end
 Wrapper for fmi2GetEventIndicators() in FMIImport/FMI2_c.jl
 """
 function fmi2GetEventIndicators(fmu::FMU2)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetEventIndicators(fmu.components[end])
+    
+    fmi2GetEventIndicators(getCurrentComponent(fmu))
 end
 
 """
-    fmi2GetContinuousStates(fmu::FMU2)
+    fmi2GetContinuousStates(fmu::FMU2)fmi2ins
 
 Wrapper for fmi2GetContinuousStates() in FMIImport/FMI2_c.jl
 """
 function fmi2GetContinuousStates(fmu::FMU2)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetContinuousStates(fmu.components[end])
+    
+    fmi2GetContinuousStates(getCurrentComponent(fmu))
 end
 
 """
@@ -561,8 +545,8 @@ end
 Wrapper for fmi2GetNominalsOfContinuousStates() in FMIImport/FMI2_c.jl
 """
 function fmi2GetNominalsOfContinuousStates(fmu::FMU2)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetNominalsOfContinuousStates(fmu.components[end])
+    
+    fmi2GetNominalsOfContinuousStates(getCurrentComponent(fmu))
 end
 
 # additionals
@@ -572,6 +556,6 @@ end
 Wrapper for fmi2GetStartValue() in FMIImport/FMI2_c.jl
 """
 function fmi2GetStartValue(fmu::FMU2, args...; kwargs...)
-    @assert length(fmu.components) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
-    fmi2GetStartValue(fmu.components[end], args...; kwargs...)
+    
+    fmi2GetStartValue(getCurrentComponent(fmu), args...; kwargs...)
 end
