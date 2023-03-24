@@ -8,13 +8,13 @@ using FMIImport: FMU2Solution
 """
 Saves a FMU2Solution for later use.
 """
-function fmiSaveSolution(solution::FMU2Solution, filepath::AbstractString; keyword="solution") 
+function fmiSaveSolutionJLD2(solution::FMU2Solution, filepath::AbstractString; keyword="solution") 
     return JLD2.save(filepath, Dict(keyword=>solution))
 end
 
 """
 Loads a FMU2Solution. Returns a previously saved `FMU2Solution`.
 """
-function fmiLoadSolution(filepath::AbstractString; keyword="solution")
+function fmiLoadSolutionJLD2(filepath::AbstractString; keyword="solution")
     return JLD2.load(filepath, keyword)
 end
