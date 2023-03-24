@@ -1415,7 +1415,7 @@ saves the given solution in the file format specified by the ending of `filepath
 
 - `keyword="solution"`: Specifies the type of data that should be saved
 """
-function fmiSaveSolution(solution::FMU2Solution, filepath::AbstractString; keyword="solution")
+function fmiSaveSolution(solution::Union{FMU2Solution, FMU3Solution}, filepath::AbstractString; keyword="solution")
     ending = split(filepath, ".")[2]
     if ending == "mat"
         fmiSaveSolutionMAT(solution, filepath)
@@ -1424,7 +1424,7 @@ function fmiSaveSolution(solution::FMU2Solution, filepath::AbstractString; keywo
     elseif ending == "csv"
         fmiSaveSolutionCSV(solution, filepath)
     else
-        @warn "This file format is currently not supported, please use *.mat, *.csv, *.JLD2"
+        @assert false "This file format is currently not supported, please use *.mat, *.csv, *.JLD2"
     end
 end
 

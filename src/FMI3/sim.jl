@@ -4,7 +4,7 @@
 #
 
 using DifferentialEquations, DiffEqCallbacks
-import SciMLBase: RightRootFind
+import FMIImport.SciMLSensitivity.SciMLBase: RightRootFind, ReturnCode
 
 using FMIImport: fmi3EnterInitializationMode, fmi3ExitInitializationMode, fmi3UpdateDiscreteStates, fmi3GetContinuousStates, fmi3GetNominalsOfContinuousStates, fmi3SetContinuousStates, fmi3GetContinuousStateDerivatives!
 using FMIImport.FMICore: fmi3StatusOK, fmi3TypeCoSimulation, fmi3TypeModelExchange
