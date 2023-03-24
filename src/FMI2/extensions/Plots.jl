@@ -121,7 +121,7 @@ function fmiPlot!(fig, solution::FMU2Solution;
             if v ∈ stateIndices
                 vr = solution.component.fmu.modelDescription.stateValueReferences[v]
                 vrNames = fmi2ValueReferenceToString(solution.component.fmu, vr)
-                vrName = vrNames[1]
+                vrName = length(vrNames) > 0 ? vrNames[1] : "?"
 
                 vals = collect(ForwardDiff.value(data[v]) for data in solution.states.u)
 
