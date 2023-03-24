@@ -3,12 +3,12 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-using FMIImport: FMU2Solution
+using FMIImport: FMUSolution
 
 """
-Saves a FMU2Solution to a mat file.
+Saves a FMUSolution to a mat file.
 """
-function fmiSaveSolutionMAT(solution::FMU2Solution, filepath::AbstractString) 
+function fmiSaveSolutionMAT(solution::FMUSolution, filepath::AbstractString) 
     file = MAT.matopen(filepath, "w")
     x = collect.(solution.values.saveval)
     v = [tup[k] for tup in x, k in 1:length(x[1])]

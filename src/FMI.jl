@@ -123,16 +123,16 @@ include("FMI3/sim.jl")
 include("deprecated.jl")
 
 # from FMI2_plot.jl
-function fmiPlot(solution::FMU2Solution; kwargs...)
+function fmiPlot(solution::FMUSolution; kwargs...)
     @assert false "fmiPlot(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`."
 end
-function fmiPlot!(fig, solution::FMU2Solution; kwargs...)
+function fmiPlot!(fig, solution::FMUSolution; kwargs...)
     @assert false "fmiPlot!(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`."
 end
 export fmiPlot, fmiPlot!
 
 # from FMI2_JLD2.jl
-function fmiSaveSolutionJLD2(solution::FMU2Solution, filepath::AbstractString; keyword="solution")
+function fmiSaveSolutionJLD2(solution::FMUSolution, filepath::AbstractString; keyword="solution")
     @assert false "fmiSave(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
 end
 function fmiLoadSolutionJLD2(path::AbstractString; keyword="solution")
@@ -141,13 +141,13 @@ end
 export fmiSaveSolutionJLD2, fmiLoadSolutionJLD2
 
 # from CSV.jl
-function fmiSaveSolutionCSV(solution::FMU2Solution, filepath::AbstractString)
+function fmiSaveSolutionCSV(solution::FMUSolution, filepath::AbstractString)
     @assert false "fmiSave(...) needs `CSV` and `DataFrames` package. Please install `CSV` and `DataFrames` and do `using CSV, DataFrames` or `import CSV, DataFrames`."
 end
 export fmiSaveSolutionCSV
 
 # from MAT.jl
-function fmiSaveSolutionMAT(solution::FMU2Solution, filepath::AbstractString)
+function fmiSaveSolutionMAT(solution::FMUSolution, filepath::AbstractString)
     @assert false "fmiSave(...) needs `MAT` package. Please install `MAT` and do `using MAT` or `import MAT`."
 end
 export fmiSaveSolutionMAT
@@ -173,23 +173,22 @@ export fmiSaveSolutionMAT
 function __init__()
     @require Plots="91a5bcdd-55d7-5caf-9e0b-520d859cae80" begin
         import .Plots
-        include("FMI2/extensions/Plots.jl")
-        include("FMI3/extensions/Plots.jl")
+        include("extensions/Plots.jl")
     end
     @require JLD2="033835bb-8acc-5ee8-8aae-3f567f8a3819" begin
         import .JLD2
-        include("FMI2/extensions/JLD2.jl")
+        include("extensions/JLD2.jl")
     end
     @require DataFrames="a93c6f00-e57d-5684-b7b6-d8193f3e46c0" begin
         import .DataFrames
         @require CSV="336ed68f-0bac-5ca0-87d4-7b16caf5d00b" begin
             import .CSV
-            include("FMI2/extensions/CSV.jl")   
+            include("extensions/CSV.jl")   
         end
     end
     @require MAT="23992714-dd62-5051-b70f-ba57cb901cac" begin
         import .MAT
-        include("FMI2/extensions/MAT.jl")   
+        include("extensions/MAT.jl")   
     end
 end
 
@@ -1403,19 +1402,19 @@ function fmiGetStartValue(s::fmi3Struct, vr::fmi3ValueReferenceFormat)
 end
 
 """
-    fmiSaveSolution(solution::FMU2Solution, filepath::AbstractString)
+    fmiSaveSolution(solution::FMUSolution, filepath::AbstractString)
 
 saves the given solution in the file format specified by the ending of `filepath`. Currently .mat, .jld2 and .csv are supported.
 
 # Arguments
-- `solution::FMU2Solution`: The simulation results that should be saved
+- `solution::FMUSolution`: The simulation results that should be saved
 - `filepath::AbstractString`: The path specifing where to save the results, also indicating the file format. Supports *.mat, *.csv, *.JLD2
 
 # Keywords
 
 - `keyword="solution"`: Specifies the type of data that should be saved
 """
-function fmiSaveSolution(solution::Union{FMU2Solution, FMU3Solution}, filepath::AbstractString; keyword="solution")
+function fmiSaveSolution(solution::FMUSolution, filepath::AbstractString; keyword="solution")
     ending = split(filepath, ".")[2]
     if ending == "mat"
         fmiSaveSolutionMAT(solution, filepath)

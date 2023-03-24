@@ -3,17 +3,17 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-using FMIImport: FMU2Solution
+using FMIImport: FMUSolution
 
 """
-Saves a FMU2Solution for later use.
+Saves a FMUSolution for later use.
 """
-function fmiSaveSolutionJLD2(solution::FMU2Solution, filepath::AbstractString; keyword="solution") 
+function fmiSaveSolutionJLD2(solution::FMUSolution, filepath::AbstractString; keyword="solution") 
     return JLD2.save(filepath, Dict(keyword=>solution))
 end
 
 """
-Loads a FMU2Solution. Returns a previously saved `FMU2Solution`.
+Loads a FMUSolution. Returns a previously saved `FMUSolution`.
 """
 function fmiLoadSolutionJLD2(filepath::AbstractString; keyword="solution")
     return JLD2.load(filepath, keyword)
