@@ -12,4 +12,4 @@ result = evaluate([config], [package])
 println(result)
 
 @info "Log"
-println(result["log"])
+println(result.log)

@@ -54,6 +54,5 @@ jobs:
           julia --project=. -e '
             import Pkg;
             Pkg.instantiate(); 
-            Pkg.add(path="./PkgEval.jl")
-            test/FMI2/eval.jl
-            '
+            Pkg.add(path="./PkgEval.jl")'
+          julia --project=. ./test/FMI2/eval.jl
