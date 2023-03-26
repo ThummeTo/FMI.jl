@@ -9,14 +9,8 @@ using DelimitedFiles
 using Tables
 using Statistics
 
-include("cross_check_types.jl")
+include("cross_check_config.jl")
 include("cross_check_lib.jl")
-
-#config
-const TOOL_ID = "FMI_jl"
-const TOOL_VERSION = "0.9.2"
-const FMI_CROSS_CHECK_REPO_NAME = "fmi-cross-check"
-const NRMSE_THRESHHOLD = 5
 
 # Main Array that holds all information about the excecuted cross checks and results
 crossChecks = []
@@ -32,7 +26,7 @@ function parse_commandline()
             arg_type = String
             default = "windows-latest"
         "--ccrepo"
-            help = "The Url to the git repository that contains the cross checks. Not setting this will prevent saving the results"
+            help = "The Url to the git repository that contains the cross checks."
             arg_type = String
             default = "https://github.com/modelica/fmi-cross-check"
         "--ccbranch"
@@ -202,13 +196,15 @@ function main()
     cross_check_repo_token = get(ENV, "CROSS_CHECK_REPO_TOKEN", "")
     cross_check_repo_url = get(ENV, "CROSS_CHECK_REPO_URL", "")
     cross_check_repo_user = get(ENV, "CROSS_CHECK_REPO_USER", "")
-    run(Cmd(`$(git()) remote set-url origin https://$(cross_check_repo_user):$(cross_check_repo_token)@$(cross_check_repo_url)`, dir=fmiCrossCheckRepoPath))
-    run(Cmd(`$(git()) checkout $(crossCheckBranch)`, dir=fmiCrossCheckRepoPath))
+    if cross_check_repo_token != "" && cross_check_repo_url != "" && cross_check_repo_user != ""
+        run(Cmd(`$(git()) remote set-url origin https://$(cross_check_repo_user):$(cross_check_repo_token)@$(cross_check_repo_url)`, dir=fmiCrossCheckRepoPath))
+        run(Cmd(`$(git()) checkout $(crossCheckBranch)`, dir=fmiCrossCheckRepoPath))
+    end
 
     #   Excecute FMUs
     crossChecks = getFmusToTest(fmiCrossCheckRepoPath, fmiVersion, os)
     if !includeFatals
-        crossChecks = filter(c -> (c.system != "AMESim" && c.system != "Test-FMUs" && c.system != "SimulationX" && c.system != "Silver"), crossChecks)
+        crossChecks = filter(c -> (!(c.system in EXCLUDED_SYSTEMS)), crossChecks)
     end
     
     for (index, check) in enumerate(crossChecks)
@@ -243,9 +239,11 @@ function main()
     end
     println("#################### End FMI Cross check Summary ####################")
 
-    run(Cmd(`$(git()) add -A`, dir=fmiCrossCheckRepoPath))
-    run(Cmd(`$(git()) commit -a -m "Run FMI cross checks for FMI.JL"`, dir=fmiCrossCheckRepoPath))
-    run(Cmd(`$(git()) push`, dir=fmiCrossCheckRepoPath))
+    if cross_check_repo_token != "" && cross_check_repo_url != "" && cross_check_repo_user != ""
+        run(Cmd(`$(git()) add -A`, dir=fmiCrossCheckRepoPath))
+        run(Cmd(`$(git()) commit -a --allow-empty -m "Run FMI cross checks for FMI.JL"`, dir=fmiCrossCheckRepoPath))
+        run(Cmd(`$(git()) push`, dir=fmiCrossCheckRepoPath))
+    end
 end
 
 main()

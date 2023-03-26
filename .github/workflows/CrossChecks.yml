@@ -66,4 +66,4 @@ jobs:
           CROSS_CHECK_REPO_TOKEN: ${{ secrets.CROSS_CHECK_REPO_TOKEN }}
           CROSS_CHECK_REPO_URL: ${{ vars.CROSS_CHECK_REPO_URL }}
           CROSS_CHECK_REPO_USER: ${{ vars.CROSS_CHECK_REPO_USER }}
-        run: julia --project=cross_checks/ ./cross_checks/cross_check.jl --os ${{ matrix.os }} --ccrepo https://github.com/christofbaumgartner/fmi-cross-check --ccbranch fmi.jl_check_${{ matrix.julia-version }}_${{ matrix.os }}
+        run: julia --project=cross_checks/ ./cross_checks/cross_check.jl --os ${{ matrix.os }} --ccrepo https://${{ vars.CROSS_CHECK_REPO_URL }} --ccbranch fmi.jl_check_${{ matrix.julia-version }}_${{ matrix.os }}

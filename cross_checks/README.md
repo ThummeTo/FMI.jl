@@ -37,8 +37,7 @@ optional arguments:
                         checks should be excecuted (default:
                         "windows-latest")
   --ccrepo CCREPO       The Url to the git repository that contains
-                        the cross checks. Not setting this will
-                        prevent saving the results (default:
+                        the cross checks. (default:
                         "https://github.com/modelica/fmi-cross-check")
   --ccbranch CCBRANCH   The name of the branch in which the results
                         will be pushed (default: "master")
@@ -58,3 +57,14 @@ optional arguments:
   -h, --help            show this help message and exit
 
 ```
+
+## Further configuration
+
+More parameters can be found under `.\cross_check_config.jl`.
+
+* TOOL_ID: Used for the results folder name in the fmi-cross-checks
+* TOOL_VERSION: Used for the results folder name in the fmi-cross-checks
+* FMI_CROSS_CHECK_REPO_NAME: Used to identify the fmi-cross-checks folder
+* NRMSE_THRESHHOLD: Used to identify successful FMUs
+* EXCLUDED_SYSTEMS: These fmi cross check systems are excluded from the fmi cross check run, because the have been unstable and caused the script to crash
+* CROSS_CHECK_README_CONTENT: File content that is written in the readme in the results folder of the fmi-cross-checks
