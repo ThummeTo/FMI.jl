@@ -191,13 +191,19 @@ function main()
     commitfailed = parsed_args["commitfailed"]
 
     # checking of inputs
-    # TODO: Might work better as assert
     if fmiVersion != "2.0"
         @warn "cross checks only for fmi version 2.0 validated"
     end
 
     # Loading all available cross checks
     fmiCrossCheckRepoPath = getFmuCrossCheckRepo(crossCheckRepo, unpackPath)
+
+    # set up the github access for the fmi-cross-checks repo and checkout the respective branch
+    cross_check_repo_token = get(ENV, "CROSS_CHECK_REPO_TOKEN", "")
+    cross_check_repo_url = get(ENV, "CROSS_CHECK_REPO_URL", "")
+    cross_check_repo_user = get(ENV, "CROSS_CHECK_REPO_USER", "")
+    run(Cmd(`$(git()) remote set-url origin https://$(cross_check_repo_user):$(cross_check_repo_token)@$(cross_check_repo_url)`, dir=fmiCrossCheckRepoPath))
+    run(Cmd(`$(git()) checkout $(crossCheckBranch)`, dir=fmiCrossCheckRepoPath))
 
     #   Excecute FMUs
     crossChecks = getFmusToTest(fmiCrossCheckRepoPath, fmiVersion, os)
@@ -237,11 +243,6 @@ function main()
     end
     println("#################### End FMI Cross check Summary ####################")
 
-    cross_check_repo_token = get(ENV, "CROSS_CHECK_REPO_TOKEN", "")
-    cross_check_repo_url = get(ENV, "CROSS_CHECK_REPO_URL", "")
-    cross_check_repo_user = get(ENV, "CROSS_CHECK_REPO_USER", "")
-    run(Cmd(`$(git()) remote set-url origin https://$(cross_check_repo_user):$(cross_check_repo_token)@$(cross_check_repo_url)`, dir=fmiCrossCheckRepoPath))
-    run(Cmd(`$(git()) checkout $(crossCheckBranch)`, dir=fmiCrossCheckRepoPath))
     run(Cmd(`$(git()) add -A`, dir=fmiCrossCheckRepoPath))
     run(Cmd(`$(git()) commit -a -m "Run FMI cross checks for FMI.JL"`, dir=fmiCrossCheckRepoPath))
     run(Cmd(`$(git()) push`, dir=fmiCrossCheckRepoPath))
