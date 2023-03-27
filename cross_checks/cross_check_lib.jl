@@ -11,12 +11,8 @@ Hint: This will not check the cross check repository for integrety
 function getFmuCrossCheckRepo(crossCheckRepo::String, unpackPath::Union{String, Nothing} = nothing)::String
     @info "Create temporary working directory"
     if unpackPath === nothing
-        if Sys.iswindows()
-            unpackPath = mktempdir(; prefix="fmicrosschecks_", cleanup=false)
-        else
-            # cleanup=true leads to issues with automatic testing on linux server.
-            unpackPath = mktempdir(; prefix="fmicrosschecks_", cleanup=false)
-        end
+        # cleanup=true leads to issues with automatic testing on linux server.
+        unpackPath = mktempdir(; prefix="fmicrosschecks_", cleanup=false)
         @info "temporary working directory created at $(unpackPath)"
     end
 
