@@ -57,6 +57,7 @@ jobs:
 
   auto-commit:
     needs: sync-files
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -95,6 +96,7 @@ jobs:
 
   call-docu:
     needs: auto-commit
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       # Trigger an repoisitory dispath event
