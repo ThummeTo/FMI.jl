@@ -40,7 +40,7 @@ fmiInfo(myFMU)</code></pre><pre><code class="nohighlight hljs">#################
 		Dir. Derivatives:	true
 ##################### End information for FMU #####################</code></pre><h3 id="Simulate-FMU"><a class="docs-heading-anchor" href="#Simulate-FMU">Simulate FMU</a><a id="Simulate-FMU-1"></a><a class="docs-heading-anchor-permalink" href="#Simulate-FMU" title="Permalink"></a></h3><p>In the next steps the recorded value is defined. The recorded value is the position of the mass. In the function <code>fmiSimulateME()</code> the FMU is simulated in model-exchange mode (ME) with an adaptive step size. In addition, the start and end time and the recorded variables are specified.</p><pre><code class="language-julia hljs">vrs = [&quot;mass.s&quot;]
 
-simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)</code></pre><pre><code class="nohighlight hljs">[34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:13[39m
+simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)</code></pre><pre><code class="nohighlight hljs">[34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:09[39m
 
 
 
@@ -58,39 +58,38 @@ Jacobian-Evaluations:
 Gradient-Evaluations:
 	∂ẋ_∂t: 0
 	∂y_∂t: 0
-States [576]:
+States [131]:
 	0.0	[0.5, 0.0]
-	2.3529411764755826e-11	[0.5, 1.0e-10]
-	0.002306805098500577	[0.5000032899071831, 0.009807041893014795]
-	0.004237904655716211	[0.5000245387978334, 0.018034052329153064]
-	0.006454577691691707	[0.5000675640776422, 0.027494289055019494]
-	0.008870226442845686	[0.5001376092826245, 0.037823480779697966]
-	0.011534292382006543	[0.5002427956159401, 0.04923758489053389]
-	0.014472994139394972	[0.5003928821168857, 0.06185448416653106]
-	0.017720906994829932	[0.5006003804450831, 0.07582881693720504]
+	2.352941176471972e-11	[0.5, 1.0e-10]
+	0.002306805098500577	[0.50001131604032, 0.009814511243552598]
+	0.01777270244764722	[0.5006746897285066, 0.0761020888387732]
+	0.05358198534179392	[0.5061791781920479, 0.231641032514133]
+	0.11852691526990361	[0.5303834643745903, 0.5124206161359472]
+	0.1848828094709355	[0.573492996354974, 0.7828256191561919]
+	0.2648828094709355	[0.6478174725986621, 1.0657732960206507]
+	0.3448828094709355	[0.7422425202486511, 1.2823803113750607]
 	...
-	8.0	[0.9297092670632319, 7.232853665712135e-5]
-Values [576]:
+	8.0	[1.0666322778272936, -7.60398591662422e-5]
+Values [131]:
 	0.0	(0.5,)
-	2.3529411764755826e-11	(0.5,)
-	0.002306805098500577	(0.5000032899071831,)
-	0.004237904655716211	(0.5000245387978334,)
-	0.006454577691691707	(0.5000675640776422,)
-	0.008870226442845686	(0.5001376092826245,)
-	0.011534292382006543	(0.5002427956159401,)
-	0.014472994139394972	(0.5003928821168857,)
-	0.017720906994829932	(0.5006003804450831,)
+	2.352941176471972e-11	(0.5,)
+	0.002306805098500577	(0.50001131604032,)
+	0.01777270244764722	(0.5006746897285066,)
+	0.05358198534179392	(0.5061791781920479,)
+	0.11852691526990361	(0.5303834643745903,)
+	0.1848828094709355	(0.573492996354974,)
+	0.2648828094709355	(0.6478174725986621,)
+	0.3448828094709355	(0.7422425202486511,)
 	...
-	8.0	(0.9297092670632319,)
-Events [7]:
+	8.0	(1.0666322778272936,)
+Events [6]:
 	State-Event #11 @ 0.0s
-	State-Event #11 @ 0.9952s
-	State-Event #19 @ 1.9908s
-	State-Event #11 @ 2.9869s
-	State-Event #19 @ 3.9839s
-	State-Event #11 @ 4.9823s
-	State-Event #19 @ 5.9837s</code></pre><h3 id="Plotting-FMU"><a class="docs-heading-anchor" href="#Plotting-FMU">Plotting FMU</a><a id="Plotting-FMU-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting-FMU" title="Permalink"></a></h3><p>After the simulation is finished, the result of the FMU for the model-exchange mode can be plotted. In the plot for the FMU it can be seen that the oscillation continues to decrease due to the effect of the friction. If you simulate long enough, the oscillation comes to a standstill in a certain time.</p><pre><code class="language-julia hljs">fig = fmiPlot(simData, states=false)</code></pre><p><img src="../manipulation_files/manipulation_12_0.svg" alt="svg"/></p><h3 id="Override-Function"><a class="docs-heading-anchor" href="#Override-Function">Override Function</a><a id="Override-Function-1"></a><a class="docs-heading-anchor-permalink" href="#Override-Function" title="Permalink"></a></h3><p>After overwriting a function, the previous one is no longer accessible. The original function <code>fmi2GetReal()</code> is cached by storing the address of the pointer. The addresses of the pointers are kept in the FMU and are thus accessible.</p><pre><code class="language-julia hljs"># save, where the original `fmi2GetReal` function was stored, so we can access it in our new function
-originalGetReal = myFMU.cGetReal</code></pre><pre><code class="nohighlight hljs">Ptr{Nothing} @0x00007fc331f69faf</code></pre><p>To overwrite the function <code>fmi2GetReal!()</code>, the function header of the new custom function must be identical to the previous one. The function header looks like <code>fmi2GetReal!(cfunc::Ptr{Nothing}, c::fmi2Component, vr::Union{Array{fmi2ValueReference}, Ptr{fmi2ValueReference}}, nvr::Csize_t, value::Union{Array{fmi2Real}, Ptr{fmi2Real}})::fmi2Status</code>. The information how the FMI2 function are structured can be seen from <a href="https://github.com/ThummeTo/FMICore.jl/blob/main/src/FMI2_c.jl#L718">FMICore.jl</a> or the FMI2.0.3-specification.</p><p>In the new implementation the original function is called by the previously stored pointer. Next there is a special handling if <code>value</code> is a pointer to an array. In this case the pointer is treated as an array, so that the entries are accessible. Otherwise, each value in <code>value</code> is multiplied by two. Finally, the original state of the original function is output.</p><pre><code class="language-julia hljs">function myGetReal!(c::fmi2Component, vr::Union{Array{fmi2ValueReference}, Ptr{fmi2ValueReference}}, 
+	State-Event #11 @ 0.994s
+	State-Event #19 @ 1.9883s
+	State-Event #11 @ 2.9831s
+	State-Event #19 @ 3.9789s
+	State-Event #11 @ 4.977s</code></pre><h3 id="Plotting-FMU"><a class="docs-heading-anchor" href="#Plotting-FMU">Plotting FMU</a><a id="Plotting-FMU-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting-FMU" title="Permalink"></a></h3><p>After the simulation is finished, the result of the FMU for the model-exchange mode can be plotted. In the plot for the FMU it can be seen that the oscillation continues to decrease due to the effect of the friction. If you simulate long enough, the oscillation comes to a standstill in a certain time.</p><pre><code class="language-julia hljs">fig = fmiPlot(simData, states=false)</code></pre><p><img src="../manipulation_files/manipulation_12_0.svg" alt="svg"/></p><h3 id="Override-Function"><a class="docs-heading-anchor" href="#Override-Function">Override Function</a><a id="Override-Function-1"></a><a class="docs-heading-anchor-permalink" href="#Override-Function" title="Permalink"></a></h3><p>After overwriting a function, the previous one is no longer accessible. The original function <code>fmi2GetReal()</code> is cached by storing the address of the pointer. The addresses of the pointers are kept in the FMU and are thus accessible.</p><pre><code class="language-julia hljs"># save, where the original `fmi2GetReal` function was stored, so we can access it in our new function
+originalGetReal = myFMU.cGetReal</code></pre><pre><code class="nohighlight hljs">Ptr{Nothing} @0x00007f349b169faf</code></pre><p>To overwrite the function <code>fmi2GetReal!()</code>, the function header of the new custom function must be identical to the previous one. The function header looks like <code>fmi2GetReal!(cfunc::Ptr{Nothing}, c::fmi2Component, vr::Union{Array{fmi2ValueReference}, Ptr{fmi2ValueReference}}, nvr::Csize_t, value::Union{Array{fmi2Real}, Ptr{fmi2Real}})::fmi2Status</code>. The information how the FMI2 function are structured can be seen from <a href="https://github.com/ThummeTo/FMICore.jl/blob/main/src/FMI2_c.jl#L718">FMICore.jl</a> or the FMI2.0.3-specification.</p><p>In the new implementation the original function is called by the previously stored pointer. Next there is a special handling if <code>value</code> is a pointer to an array. In this case the pointer is treated as an array, so that the entries are accessible. Otherwise, each value in <code>value</code> is multiplied by two. Finally, the original state of the original function is output.</p><pre><code class="language-julia hljs">function myGetReal!(c::fmi2Component, vr::Union{Array{fmi2ValueReference}, Ptr{fmi2ValueReference}}, 
                     nvr::Csize_t, value::Union{Array{fmi2Real}, Ptr{fmi2Real}})
     # first, we do what the original function does
     status = fmi2GetReal!(originalGetReal, c, vr, nvr, value)
@@ -108,5 +107,5 @@ originalGetReal = myFMU.cGetReal</code></pre><pre><code class="nohighlight hljs"
     # return the original status
     return status
 end</code></pre><pre><code class="nohighlight hljs">myGetReal! (generic function with 1 method)</code></pre><p>In the next command the original function is overwritten with the new defined function, for which the command <code>fmiSetFctGetReal()</code> is called.</p><pre><code class="language-julia hljs"># no we overwrite the original function
-fmiSetFctGetReal(myFMU, myGetReal!)</code></pre><pre><code class="nohighlight hljs">Ptr{Nothing} @0x00007fc3a269ffc0</code></pre><h3 id="Simulate-and-Plot-FMU-with-modified-function"><a class="docs-heading-anchor" href="#Simulate-and-Plot-FMU-with-modified-function">Simulate and Plot FMU with modified function</a><a id="Simulate-and-Plot-FMU-with-modified-function-1"></a><a class="docs-heading-anchor-permalink" href="#Simulate-and-Plot-FMU-with-modified-function" title="Permalink"></a></h3><p>As before, the identical command is called here for simulation. This is also a model exchange simulation. Immediately afterwards, the results are added to the previous graph as a dashed line.</p><pre><code class="language-julia hljs">simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
-fmiPlot!(fig, simData; states=false, style=:dash)</code></pre><p><img src="../manipulation_files/manipulation_20_0.svg" alt="svg"/></p><p>As expected by overwriting the function, all values are doubled.</p><h3 id="Unload-FMU"><a class="docs-heading-anchor" href="#Unload-FMU">Unload FMU</a><a id="Unload-FMU-1"></a><a class="docs-heading-anchor-permalink" href="#Unload-FMU" title="Permalink"></a></h3><p>After plotting the data, the FMU is unloaded and all unpacked data on disc is removed.</p><pre><code class="language-julia hljs">fmiUnload(myFMU)</code></pre><h3 id="Summary"><a class="docs-heading-anchor" href="#Summary">Summary</a><a id="Summary-1"></a><a class="docs-heading-anchor-permalink" href="#Summary" title="Permalink"></a></h3><p>In this tutorial it is shown how an existing function of the library can be replaced by an own implementation. Through this possibility, there are almost no limits for the user, whereby the user can customize the function to his liking.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../modelica_conference_2021/">« Modelica conference 2021</a><a class="docs-footer-nextpage" href="../multithreading/">Multithreading »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Wednesday 8 March 2023 08:22">Wednesday 8 March 2023</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+fmiSetFctGetReal(myFMU, myGetReal!)</code></pre><pre><code class="nohighlight hljs">Ptr{Nothing} @0x00007f35948a0fc0</code></pre><h3 id="Simulate-and-Plot-FMU-with-modified-function"><a class="docs-heading-anchor" href="#Simulate-and-Plot-FMU-with-modified-function">Simulate and Plot FMU with modified function</a><a id="Simulate-and-Plot-FMU-with-modified-function-1"></a><a class="docs-heading-anchor-permalink" href="#Simulate-and-Plot-FMU-with-modified-function" title="Permalink"></a></h3><p>As before, the identical command is called here for simulation. This is also a model exchange simulation. Immediately afterwards, the results are added to the previous graph as a dashed line.</p><pre><code class="language-julia hljs">simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
+fmiPlot!(fig, simData; states=false, style=:dash)</code></pre><p><img src="../manipulation_files/manipulation_20_0.svg" alt="svg"/></p><p>As expected by overwriting the function, all values are doubled.</p><h3 id="Unload-FMU"><a class="docs-heading-anchor" href="#Unload-FMU">Unload FMU</a><a id="Unload-FMU-1"></a><a class="docs-heading-anchor-permalink" href="#Unload-FMU" title="Permalink"></a></h3><p>After plotting the data, the FMU is unloaded and all unpacked data on disc is removed.</p><pre><code class="language-julia hljs">fmiUnload(myFMU)</code></pre><h3 id="Summary"><a class="docs-heading-anchor" href="#Summary">Summary</a><a id="Summary-1"></a><a class="docs-heading-anchor-permalink" href="#Summary" title="Permalink"></a></h3><p>In this tutorial it is shown how an existing function of the library can be replaced by an own implementation. Through this possibility, there are almost no limits for the user, whereby the user can customize the function to his liking.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../modelica_conference_2021/">« Modelica conference 2021</a><a class="docs-footer-nextpage" href="../multithreading/">Multithreading »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Monday 27 March 2023 07:18">Monday 27 March 2023</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
