@@ -120,16 +120,22 @@ function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCross
                 check.success = true
                 mkpath(resultPath)
                 cd(resultPath)
+                rm("failed", force=true)
+                rm("rejected", force=true)
+                rm("README.md", force=true)
                 touch("passed")
                 touch("README.md")
                 file = open("README.md", "w")
-                write(file, "test content")
+                write(file, CROSS_CHECK_README_CONTENT)
                 close(file)
             else
                 check.success = false
                 if commitfailed
                     mkpath(resultPath)
                     cd(resultPath)
+                    rm("passed", force=true)
+                    rm("rejected", force=true)
+                    rm("README.md", force=true)
                     touch("failed")
                 end
             end
@@ -138,6 +144,9 @@ function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCross
             if commitrejected
                 mkpath(resultPath)
                 cd(resultPath)
+                rm("failed", force=true)
+                rm("passed", force=true)
+                rm("README.md", force=true)
                 touch("rejected")
             end
         end
