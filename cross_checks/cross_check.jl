@@ -162,6 +162,9 @@ function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCross
         if commitfailed
             mkpath(resultPath)
             cd(resultPath)
+            rm("rejected", force=true)
+            rm("passed", force=true)
+            rm("README.md", force=true)
             touch("failed")
         end
     finally

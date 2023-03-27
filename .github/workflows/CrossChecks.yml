@@ -61,7 +61,7 @@ jobs:
           git config --global core.autocrlf false
 
       # Run the cross checks and push the results to the cross check repo 
-      - name: "Run FMU Cross checks" 
+      - name: "Run FMU Cross checks"  
         env:
           CROSS_CHECK_REPO_TOKEN: ${{ secrets.CROSS_CHECK_REPO_TOKEN }}
           CROSS_CHECK_REPO_URL: ${{ vars.CROSS_CHECK_REPO_URL }}
