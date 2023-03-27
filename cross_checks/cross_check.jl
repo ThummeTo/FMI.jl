@@ -159,12 +159,12 @@ function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCross
         showerror(io, e)
         check.error = String(take!(io))
         check.success = false
+        mkpath(resultPath)
+        cd(resultPath)
+        rm("rejected", force=true)
+        rm("passed", force=true)
+        rm("README.md", force=true)
         if commitfailed
-            mkpath(resultPath)
-            cd(resultPath)
-            rm("rejected", force=true)
-            rm("passed", force=true)
-            rm("README.md", force=true)
             touch("failed")
         end
     finally
