@@ -3,12 +3,12 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-using FMIImport: FMU2Solution
+using FMIImport: FMUSolution
 import FMIImport.ForwardDiff
 
 """
 
-    fmiPlot(solution::FMU2Solution; states::Union{Bool, Nothing}=nothing,
+    fmiPlot(solution::FMUSolution; states::Union{Bool, Nothing}=nothing,
     values::Union{Bool, Nothing}=nothing,
     stateEvents::Union{Bool, Nothing}=nothing,
     timeEvents::Union{Bool, Nothing}=nothing,
@@ -22,7 +22,7 @@ Plots data from a ME-FMU.
 Optional `t_in_solution` controls if the first state in the solution is interpreted as t(ime).
 
 # Arguments
-- `solution::FMU2Solution`:  Struct contains information about the solution `value`, `success`, `state` and  `events` of a specific FMU.
+- `solution::FMUSolution`:  Struct contains information about the solution `value`, `success`, `state` and  `events` of a specific FMU.
 
 # Keywords
 - `states::Union{Bool, Nothing}`: controls if states should be ploted (default = nothing)
@@ -36,12 +36,12 @@ Optional `t_in_solution` controls if the first state in the solution is interpre
 - `fig `: Returns a figure containing the plotted data from a ME-FMU.
 
 """
-function fmiPlot(solution::FMU2Solution; kwargs...)
+function fmiPlot(solution::FMUSolution; kwargs...)
     fig = Plots.plot(; xlabel="t [s]")
     fmiPlot!(fig, solution; kwargs...)
     return fig
 end
-function fmiPlot!(fig, solution::FMU2Solution;
+function fmiPlot!(fig, solution::FMUSolution;
     states::Union{Bool, Nothing}=nothing,
     values::Union{Bool, Nothing}=nothing,
     stateEvents::Union{Bool, Nothing}=nothing,
@@ -50,6 +50,15 @@ function fmiPlot!(fig, solution::FMU2Solution;
     valueIndices=nothing,
     maxLabelLength=64,
     plotkwargs...)
+
+    component = nothing
+    if isa(solution, FMU2Solution)
+        component = solution.component
+    elseif isa(solution, FMU3Solution)
+        component = solution.fmu.instances[end] # ToDo: This is very poor!
+    else
+        @assert false "Invalid solution type."
+    end
 
     numStateEvents = 0
     numTimeEvents = 0
@@ -100,7 +109,7 @@ function fmiPlot!(fig, solution::FMU2Solution;
     end
 
     if stateIndices === nothing 
-        stateIndices = 1:length(solution.component.fmu.modelDescription.stateValueReferences)
+        stateIndices = 1:length(component.fmu.modelDescription.stateValueReferences)
     end
 
     if valueIndices === nothing
@@ -119,8 +128,8 @@ function fmiPlot!(fig, solution::FMU2Solution;
 
         for v in 1:numValues
             if v ∈ stateIndices
-                vr = solution.component.fmu.modelDescription.stateValueReferences[v]
-                vrNames = fmi2ValueReferenceToString(solution.component.fmu, vr)
+                vr = component.fmu.modelDescription.stateValueReferences[v]
+                vrNames = fmi2ValueReferenceToString(component.fmu, vr)
                 vrName = length(vrNames) > 0 ? vrNames[1] : "?"
 
                 vals = collect(ForwardDiff.value(data[v]) for data in solution.states.u)
@@ -151,8 +160,8 @@ function fmiPlot!(fig, solution::FMU2Solution;
                 vrName = "[unknown]"
                 if solution.valueReferences != nothing && v <= length(solution.valueReferences)
                     vr = solution.valueReferences[v]
-                    vrNames = fmi2ValueReferenceToString(solution.component.fmu, vr)
-                    vrName = vrNames[1]
+                    vrNames = fmi2ValueReferenceToString(component.fmu, vr)
+                    vrName = length(vrNames) > 0 ? vrNames[1] : "?"
                 end
     
                 vals = collect(ForwardDiff.value(data[v]) for data in solution.values.saveval)
@@ -200,9 +209,9 @@ Extended the original plot-command by plotting FMUs.
 
 For further information seek `?fmiPlot`.
 """
-function Plots.plot(solution::FMU2Solution, args...; kwargs...)
+function Plots.plot(solution::FMUSolution, args...; kwargs...)
     fmiPlot(solution, args...; kwargs...)
 end
-function Plots.plot!(fig, solution::FMU2Solution, args...; kwargs...)
+function Plots.plot!(fig, solution::FMUSolution, args...; kwargs...)
     fmiPlot!(fig, solution, args...; kwargs...)
 end
