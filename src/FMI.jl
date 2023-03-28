@@ -194,10 +194,8 @@ export fmiGetState, fmiSetState, fmiFreeState!
 function (str::Union{fmi2Struct, fmi3Struct})(; t::Tuple{Float64, Float64}, kwargs...)
     fmiSimulate(str, t; kwargs...)
 end
-
-"""
 #ToDo fmi3Docs for all functions
-
+"""
     fmiGetState(str::fmi2Struct)
 
 Makes a copy of the internal FMU state and returns a pointer to this copy.
@@ -227,9 +225,7 @@ function fmiGetState(str::fmi3Struct)
 end
 
 """
-
     fmiFreeState!(str::fmi2Struct, c::FMU2Component, state::fmi2FMUstate)
-
     fmiFreeState!(str::fmi2Struct, c::FMU2Component, FMUstate::Ref{fmi2FMUstate})
 
 Free the memory for the allocated FMU state
@@ -269,7 +265,6 @@ function fmiFreeState!(str::fmi3Struct, args...; kwargs...)
 end
 
 """
-
     fmiSetState(str::fmi2Struct, c::FMU2Component, FMUstate::fmi2FMUstate)
 
 Sets the FMU to the given state
@@ -308,7 +303,6 @@ function fmiSetState(str::fmi3Struct, args...; kwargs...)
 end
 
 """
-
     fmiGetDependencies(fmu::FMU2)
 
 Building dependency matrix `dim x dim` for fast look-ups on variable dependencies (`dim` is number of states).
@@ -334,7 +328,6 @@ function fmiGetDependencies(fmu::FMU3)
 end
 
 """
-
     fmiStringToValueReference(dataStruct::Union{FMU2, fmi2ModelDescription, FMU3, fmmi3ModelDescription}, identifier::Union{String, AbstractArray{String}})
 
 Returns the ValueReference coresponding to the variable identifier.
@@ -359,7 +352,6 @@ end
 
 # Wrapping modelDescription Functions
 """
-
     fmiGetModelName(str::Union{fmi2StructMD, fmi3StructMD})
 
 Returns the tag 'modelName' from the model description.
@@ -390,7 +382,6 @@ end
 
 # TODO call differently in fmi3: getInstantationToken
 """  
-
     fmiGetGUID(str::fmi2StructMD)
 
 Returns the tag 'guid' from the model description.
@@ -414,7 +405,6 @@ end
 
 # TODO how wo work with docstring
 """  
-
     fmiGetGenerationTool(str::Union{fmi2StructMD, fmi3StructMD})
 
 Returns the tag 'generationtool' from the model description.
@@ -447,7 +437,6 @@ function fmiGetGenerationTool(str::fmi3StructMD)
     fmi3GetGenerationTool(str)
 end
 """
-
     fmiGetGenerationDateAndTime(str::Union{fmi2StructMD, fmi3StructMD})
 
 Returns the tag 'generationdateandtime' from the model description.
@@ -481,7 +470,6 @@ function fmiGetGenerationDateAndTime(str::fmi3StructMD)
 end
 
 """
-
     fmiGetVariableNamingConvention(str::Union{fmi2StructMD, fmi3StructMD})
 
 Returns the tag 'varaiblenamingconvention' from the model description.
@@ -515,7 +503,6 @@ function fmiGetVariableNamingConvention(str::fmi3StructMD)
 end
 
 """
-
     fmiGetNumberOfEventIndicators(str::str::Union{fmi2StructMD, fmi3StructMD})
 
 Returns the tag 'numberOfEventIndicators' from the model description.
@@ -549,7 +536,6 @@ function fmiGetNumberOfEventIndicators(str::fmi3StructMD)
 end
 
 """
-
     fmiGetModelIdentifier(fmu::Union{FMU2, FMU3})
 
 Returns the tag 'modelIdentifier' from CS or ME section.
@@ -576,7 +562,6 @@ function fmiGetModelIdentifier(fmu::FMU3)
     fmi3GetModelIdentifier(fmu.modelDescription; type=fmu.type)
 end
 """
-
     fmiCanGetSetState(str::Union{fmi2StructMD, fmi3StructMD})
 
 Returns true, if the FMU supports the getting/setting of states
@@ -610,7 +595,6 @@ function fmiCanGetSetState(str::fmi3StructMD)
 end
 
 """
-
     fmiCanSerializeFMUstate(str::Union{fmi2StructMD, fmi3StructMD})
 
 Returns true, if the FMU state can be serialized
@@ -645,7 +629,6 @@ end
 
 # TODO fmi3Call fmiProvidesDirectionalDerivatives
 """
-
     fmiProvidesDirectionalDerivative(str::Union{fmi2StructMD, fmi3StructMD})
 
 Returns true, if the FMU provides directional derivatives
@@ -674,7 +657,6 @@ function fmiProvidesDirectionalDerivative(str::fmi3StructMD)
 end
 
 """
-
     fmiProvidesAdjointDerivative(str::fmi3StructMD)
 
 Returns true, if the FMU provides adjoint derivatives
@@ -696,7 +678,6 @@ function fmiProvidesAdjointDerivative(str::fmi3StructMD)
 end
 
 """
-
     fmiIsCoSimulation(str::Union{fmi2StructMD, fmi3StructMD})
 
 Returns true, if the FMU supports co simulation
@@ -725,7 +706,6 @@ function fmiIsCoSimulation(str::fmi3StructMD)
 end
 
 """
-
     fmiIsModelExchange(str::Union{fmi2StructMD, fmi3StructMD})
 
 Returns true, if the FMU supports model exchange
@@ -759,7 +739,6 @@ function fmiIsModelExchange(str::fmi3StructMD)
 end
 
 """
-
     fmiIsScheduledExecution(str::fmi3StructMD)
 
 Returns true, if the FMU supports scheduled execution
@@ -783,7 +762,6 @@ end
 # Multiple Dispatch variants for FMUs with version 2.0.X
 
 """
-
    fmiLoad(pathToFMU::String; unpackPath=nothing, type=nothing)
 
 Load FMUs independent of the FMI version, currently supporting version 2.0.X and 3.0.
@@ -818,7 +796,6 @@ function fmiLoad(pathToFMU::AbstractString, args...; kwargs...)
 end
 
 """
-
     fmiReload(fmu::Union{FMU2, FMU3})
 
 Reloads the FMU-binary. This is useful, if the FMU does not support a clean reset implementation.
@@ -841,21 +818,24 @@ function fmiReload(fmu::FMU3, args...; kwargs...)
 end
 
 """
-
-    fmiSimulate(str::Union{fmi2Struct, fmi3Struct}, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
-                tolerance::Union{Real, Nothing} = nothing,
-                dt::Union{Real, Nothing} = nothing,
-                solver = nothing,
-                customFx = nothing,
-                recordValues::fmi2ValueReferenceFormat = nothing,
-                saveat = [],
-                setup::Bool = true,
-                reset::Union{Bool, Nothing} = nothing, # nothing = auto
-                inputValueReferences::fmi2ValueReferenceFormat = nothing,
-                inputFunction = nothing,
-                parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
-                dtmax::Union{Real, Nothing} = nothing,
-                kwargs...)
+    fmiSimulate(str::Union{fmi2Struct, fmi3Struct}, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing;
+                    tolerance::Union{Real, Nothing} = nothing,
+                    dt::Union{Real, Nothing} = nothing,
+                    solver = nothing,
+                    customFx = nothing,
+                    recordValues::fmi2ValueReferenceFormat = nothing,
+                    saveat = nothing,
+                    x0::Union{AbstractArray{<:Real}, Nothing} = nothing,
+                    setup::Union{Bool, Nothing} = nothing,
+                    reset::Union{Bool, Nothing} = nothing, # nothing = auto
+                    instantiate::Union{Bool, Nothing} = nothing,
+                    freeInstance::Union{Bool, Nothing} = nothing,
+                    terminate::Union{Bool, Nothing} = nothing,
+                    inputValueReferences::fmi2ValueReferenceFormat = nothing,
+                    inputFunction = nothing,
+                    parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
+                    dtmax::Union{Real, Nothing} = nothing,
+                    kwargs...)
 
 Starts a simulation of the FMU instance for the matching FMU type, if both types are available, CS is preferred.
 
@@ -868,22 +848,28 @@ More detailed: `fmi3Struct = Union{FMU3, FMU3Instance}`
  - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
  - `str::FMU3`: Mutable struct representing an FMU in the [FMI 3.0 Standard](https://fmi-standard.org/).
  - `str::FMU3Instance`:  Mutable struct represents a pointer to an FMU specific data structure that contains the information needed. Also in [FMI 3.0 Standard](https://fmi-standard.org/).
- - `t_start::Union{Real, Nothing} = nothing`: Set the start time to a value of type Real or the default value from the model description is used.
- - `t_stop::Union{Real, Nothing} = nothing`: Set the end time to a value of type Real or the default value from the model description is used.
+ - `tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing`: Sets the time span as a tuple or the default value from the model description is used.  
 
 # Keywords
 - `tolerance::Union{Real, Nothing} = nothing`: Real number to set the tolerance for any OED-solver
 - `dt::Union{Real, Nothing} = nothing`: Real number to set the step size of the OED-solver. Defaults to an automatic choice if the method is adaptive. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
 - `solver = nothing`: Any Julia-supported OED-solver  (default is Tsit5). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/solvers/ode_solve/#ode_solve)
-- `customFx = nothing`: [deprecated] Ability to give a custom state derivative function ẋ=f(x,t)
+- `customFx = nothing`: [deperecated] Ability to give a custom state derivative function ẋ=f(x,t)
 - `recordValues::fmi2ValueReferenceFormat = nothing`: AbstractArray of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
 - `saveat = []`: Time points to save values at (interpolated). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Output-Control)
-- `setup::Bool = true`: Boolean, if FMU should be setup (default: setup=true)
-- `reset::Union{Bool, Nothing} = nothing`: Boolean, if FMU should be reset before simulation (default: reset:=auto)
+- `saveat = nothing`: Time points to save values at (interpolated). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Output-Control)
+- `x0::Union{AbstractArray{<:Real}, Nothing} = nothing`: Stores the specific value of `fmi2ScalarVariable` containing the modelVariables with the identical fmi2ValueReference to the input variable vr (vr = vrs[i]). And is therefore passed within prepareSolveFMU to fmi2Set , to set the start state.
+- `setup::Bool = true`: Boolean value if FMU is to be set up (default: setup=true).
+- `reset::Union{Bool, Nothing} = nothing`: Boolean value that determines whether the FMU should be reset before simulation (default: reset:=auto).
+- `instantiate::Union{Bool, Nothing} = nothing`: Boolean value that decides whether to create a new instance of the specified fmu.
+- `freeInstance::Union{Bool, Nothing} = nothing`: Boolean value that determines whether to dispose of the given instance, unload the loaded model, and free the allocated memory and other resources allocated by the FMU interface functions.
+- `terminate::Union{Bool, Nothing} = nothing`: Boolean value that tells the FMU that the simulation run will be aborted.
 - `inputValueReferences::fmi2ValueReferenceFormat = nothing`: AbstractArray of input variables (strings or variableIdentifiers) to set at every simulation step
 - `inputFunction = nothing`: Function to retrieve the values to set the inputs to
 - `parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing`: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization
 - `dtmax::Union{Real, Nothing} = nothing`: Real number for setting maximum dt for adaptive timestepping for the ODE solver. The default values are package dependent. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
+- `callbacks = []`: custom callbacks to add.
+- `showProgress::Bool = true`: Boolean value that determines whether a progress bar is generated for a task
 - `kwargs...`: Further parameters of already defined functions `solve(args..., kwargs...)` from the library [DifferentialEquations.jl](https://diffeq.sciml.ai/stable/#DifferentialEquations.jl:-Scientific-Machine-Learning-(SciML)-Enabled-Simulation-and-Estimation)
 
 # Returns
@@ -907,21 +893,24 @@ function fmiSimulate(str::fmi3Struct, args...; kwargs...)
     fmi3Simulate(str, args...; kwargs...)
 end
 """
-
-    fmiSimulateCS(str::Union{fmi2Struct,fmi3Struct}, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
-                tolerance::Union{Real, Nothing} = nothing,
-                dt::Union{Real, Nothing} = nothing,
-                solver = nothing,
-                customFx = nothing,
-                recordValues::fmi2ValueReferenceFormat = nothing,
-                saveat = [],
-                setup::Bool = true,
-                reset::Union{Bool, Nothing} = nothing, # nothing = auto
-                inputValueReferences::fmi2ValueReferenceFormat = nothing,
-                inputFunction = nothing,
-                parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
-                dtmax::Union{Real, Nothing} = nothing,
-                kwargs...)
+    fmiSimulateCS(str::Union{fmi2Struct,fmi3Struct}, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing;
+                        tolerance::Union{Real, Nothing} = nothing,
+                        dt::Union{Real, Nothing} = nothing,
+                        solver = nothing,
+                        customFx = nothing,
+                        recordValues::fmi2ValueReferenceFormat = nothing,
+                        saveat = [],
+                        setup::Bool = true,
+                        reset::Union{Bool, Nothing} = nothing, # nothing = auto
+                        instantiate::Union{Bool, Nothing} = nothing,
+                        freeInstance::Union{Bool, Nothing} = nothing,
+                        terminate::Union{Bool, Nothing} = nothing,
+                        inputValueReferences::fmi2ValueReferenceFormat = nothing,
+                        inputFunction = nothing,
+                        showProgress::Bool=true,
+                        parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
+                        dtmax::Union{Real, Nothing} = nothing,
+                        kwargs...)
 
 Starts a simulation of the Co-Simulation FMU instance.
 
@@ -934,24 +923,27 @@ More detailed: `fmi3Struct = Union{FMU3, FMU3Instance}`
  - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
  - `str::FMU3`: Mutable struct representing an FMU in the [FMI 3.0 Standard](https://fmi-standard.org/).
  - `str::FMU3Instance`:  Mutable struct represents a pointer to an FMU specific data structure that contains the information needed. Also in [FMI 3.0 Standard](https://fmi-standard.org/).
-- `t_start::Union{Real, Nothing} = nothing`: Set the start time to a value of type Real or the default value from the model description is used.
-- `t_stop::Union{Real, Nothing} = nothing`: Set the end time to a value of type Real or the default value from the model description is used.
+ - `tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing`: Sets the time span as a tuple or the default value from the model description is used.  
 
 # Keywords
 - `tolerance::Union{Real, Nothing} = nothing`: Real number to set the tolerance for any OED-solver
 - `dt::Union{Real, Nothing} = nothing`: Real number to set the step size of the OED-solver. Defaults to an automatic choice if the method is adaptive. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
 - `solver = nothing`: Any Julia-supported OED-solver  (default is Tsit5). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/solvers/ode_solve/#ode_solve)
-- `customFx = nothing`: [deprecated] Ability to give a custom state derivative function ẋ=f(x,t)
+- `customFx = nothing`: [deperecated] Ability to give a custom state derivative function ẋ=f(x,t)
 - `recordValues::fmi2ValueReferenceFormat = nothing`: AbstractArray of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
 - `saveat = []`: Time points to save values at (interpolated). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Output-Control)
 - `setup::Bool = true`: Boolean, if FMU should be setup (default: setup=true)
 - `reset::Union{Bool, Nothing} = nothing`: Boolean, if FMU should be reset before simulation (default: reset:=auto)
+- `instantiate::Union{Bool, Nothing} = nothing`: Boolean value that decides whether to create a new instance of the specified fmu.
+- `freeInstance::Union{Bool, Nothing} = nothing`: Boolean value that determines whether to dispose of the given instance, unload the loaded model, and free the allocated memory and other resources allocated by the FMU interface functions.
+- `terminate::Union{Bool, Nothing} = nothing`: Boolean value that tells the FMU that the simulation run will be aborted.
 - `inputValueReferences::fmi2ValueReferenceFormat = nothing`: AbstractArray of input variables (strings or variableIdentifiers) to set at every simulation step
 - `inputFunction = nothing`: Function to retrieve the values to set the inputs to
+- `showProgress::Bool = true`: Boolean value that determines whether a progress bar is generated for a task
 - `parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing`: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization
 - `dtmax::Union{Real, Nothing} = nothing`: Real number for setting maximum dt for adaptive timestepping for the ODE solver. The default values are package dependent. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
 - `kwargs...`: Further parameters of already defined functions `solve(args..., kwargs...)` from the library [DifferentialEquations.jl](https://diffeq.sciml.ai/stable/#DifferentialEquations.jl:-Scientific-Machine-Learning-(SciML)-Enabled-Simulation-and-Estimation)
-
+ 
 # Returns
 - If keyword `recordValues` is not set, a boolean `success` is returned (simulation success).
 - If keyword `recordValues` is set, a tuple of type (true, DiffEqCallbacks.SavedValues) or (false, nothing).
@@ -972,21 +964,26 @@ function fmiSimulateCS(str::fmi3Struct, args...; kwargs...)
 end
 
 """
-
-    fmiSimulateME(str::Union{fmi2Struct,fmi3Struct}, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
-                tolerance::Union{Real, Nothing} = nothing,
-                dt::Union{Real, Nothing} = nothing,
-                solver = nothing,
-                customFx = nothing,
-                recordValues::fmi2ValueReferenceFormat = nothing,
-                saveat = [],
-                setup::Bool = true,
-                reset::Union{Bool, Nothing} = nothing, # nothing = auto
-                inputValueReferences::fmi2ValueReferenceFormat = nothing,
-                inputFunction = nothing,
-                parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
-                dtmax::Union{Real, Nothing} = nothing,
-                kwargs...)
+    fmiSimulateME(str::Union{fmi2Struct,fmi3Struct}, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing;
+                    tolerance::Union{Real, Nothing} = nothing,
+                    dt::Union{Real, Nothing} = nothing,
+                    solver = nothing,
+                    customFx = nothing,
+                    recordValues::fmi2ValueReferenceFormat = nothing,
+                    saveat = nothing,
+                    x0::Union{AbstractArray{<:Real}, Nothing} = nothing,
+                    setup::Union{Bool, Nothing} = nothing,
+                    reset::Union{Bool, Nothing} = nothing,
+                    instantiate::Union{Bool, Nothing} = nothing,
+                    freeInstance::Union{Bool, Nothing} = nothing,
+                    terminate::Union{Bool, Nothing} = nothing,
+                    inputValueReferences::fmi2ValueReferenceFormat = nothing,
+                    inputFunction = nothing,
+                    parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
+                    dtmax::Union{Real, Nothing} = nothing,
+                    callbacks = [],
+                    showProgress::Bool = true,
+                    kwargs...)
 
 Simulates a FMU instance for the given simulation time interval.
 
@@ -999,22 +996,27 @@ More detailed: `fmi3Struct = Union{FMU3, FMU3Instance}`
  - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the [FMI 2.0.2 Standard](https://fmi-standard.org/).
  - `str::FMU3`: Mutable struct representing an FMU in the [FMI 3.0 Standard](https://fmi-standard.org/).
  - `str::FMU3Instance`:  Mutable struct represents a pointer to an FMU specific data structure that contains the information needed. Also in [FMI 3.0 Standard](https://fmi-standard.org/).
-- `t_start::Union{Real, Nothing} = nothing`: Set the start time to a value of type Real or the default value from the model description is used.
-- `t_stop::Union{Real, Nothing} = nothing`: Set the end time to a value of type Real or the default value from the model description is used.
+ - `tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing`: Sets the time span as a tuple or the default value from the model description is used. 
 
 # Keywords
 - `tolerance::Union{Real, Nothing} = nothing`: Real number to set the tolerance for any OED-solver
 - `dt::Union{Real, Nothing} = nothing`: Real number to set the step size of the OED-solver. Defaults to an automatic choice if the method is adaptive. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
 - `solver = nothing`: Any Julia-supported OED-solver  (default is Tsit5). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/solvers/ode_solve/#ode_solve)
-- `customFx = nothing`: [deprecated] Ability to give a custom state derivative function ẋ=f(x,t)
+- `customFx = nothing`: [deperecated] Ability to give a custom state derivative function ẋ=f(x,t)
 - `recordValues::fmi2ValueReferenceFormat = nothing`: AbstractArray of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
-- `saveat = []`: Time points to save values at (interpolated). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Output-Control)
+- `saveat = nothing`: Time points to save values at (interpolated). More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Output-Control)
+- `x0::Union{AbstractArray{<:Real}, Nothing} = nothing`: Stores the specific value of `fmi2ScalarVariable` containing the modelVariables with the identical fmi2ValueReference to the input variable vr (vr = vrs[i]). And is therefore passed within prepareSolveFMU to fmi2Set , to set the start state.
 - `setup::Bool = true`: Boolean, if FMU should be setup (default: setup=true)
 - `reset::Union{Bool, Nothing} = nothing`: Boolean, if FMU should be reset before simulation (default: reset:=auto)
+- `instantiate::Union{Bool, Nothing} = nothing`: Boolean value that decides whether to create a new instance of the specified fmu.
+- `freeInstance::Union{Bool, Nothing} = nothing`: Boolean value that determines whether to dispose of the given instance, unload the loaded model, and free the allocated memory and other resources allocated by the FMU interface functions.
+- `terminate::Union{Bool, Nothing} = nothing`: Boolean value that tells the FMU that the simulation run will be aborted.
 - `inputValueReferences::fmi2ValueReferenceFormat = nothing`: AbstractArray of input variables (strings or variableIdentifiers) to set at every simulation step
 - `inputFunction = nothing`: Function to retrieve the values to set the inputs to
 - `parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing`: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization
 - `dtmax::Union{Real, Nothing} = nothing`: Real number for setting maximum dt for adaptive timestepping for the ODE solver. The default values are package dependent. More Info: [DifferentialEquations.jl Documentation](https://diffeq.sciml.ai/stable/basics/common_solver_opts/#Stepsize-Control)
+- `callbacks = []`: custom callbacks to add.
+- `showProgress::Bool = true`: Boolean value that determines whether a progress bar is generated for a task
 - `kwargs...`: Further parameters of already defined functions `solve(args..., kwargs...)` from the library [DifferentialEquations.jl](https://diffeq.sciml.ai/stable/#DifferentialEquations.jl:-Scientific-Machine-Learning-(SciML)-Enabled-Simulation-and-Estimation)
 
 # Returns
@@ -1037,7 +1039,6 @@ function fmiSimulateME(str::fmi3Struct, args...; kwargs...)
     fmi3SimulateME(str, args...; kwargs...)
 end
 """
-
     fmiUnload(fmu::Union{FMU2, FMU3})
 
 Unloads the FMU and all its instances and frees the allocated memory.
@@ -1060,7 +1061,6 @@ function fmiUnload(fmu::FMU3)
 end
 
 """
-
     fmiGetNumberOfStates(str::Union{fmi2Struct, fmi3Struct})
 
 Returns the number of states of the FMU.
@@ -1093,7 +1093,6 @@ end
 
 # TODO not in FMI3
 """
-
     fmiGetTypesPlatform(str::fmi2Struct)
 
 Returns the header file used to compile the FMU. By default returns `default`, version independent.
@@ -1119,7 +1118,6 @@ function fmiGetTypesPlatform(str::fmi2Struct)
 end
 
 """
-
     fmiGetVersion(str::Union{fmi2Struct, fmi3Struct})
 
 Returns the version of the FMU, version independent.
@@ -1183,7 +1181,6 @@ function fmiInfo(str::fmi3Struct)
 end
 
 """
-
     fmiGet(str::fmi2Struct, comp::FMU2Component, vrs::fmi2ValueReferenceFormat)
 
 Returns the specific value of `fmi2ScalarVariable` containing the modelVariables with the identical fmi2ValueReference in an array.
@@ -1212,7 +1209,9 @@ function fmiGet(str::fmi3Struct, args...; kwargs...)
     fmi3Get(str, args...; kwargs...)
 end
 """
-   fmiGet!(str::fmi2Struct, comp::FMU2Component, vrs::fmi2ValueReferenceFormat, dstArray::AbstractArray)
+    fmiGet!(str::fmi2Struct, comp::FMU2Component, vrs::fmi2ValueReferenceFormat, dstArray::AbstractArray)
+
+Stors the specific value of `fmi2ScalarVariable` containing the modelVariables with the identical fmi2ValueReference in an array.
 
 # Arguments
 - `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
@@ -1244,8 +1243,7 @@ function fmiGet!(str::fmi3Struct, args...; kwargs...)
     fmi3Get!(str, args...; kwargs...)
 end
 """
-
-   fmiSet(str::fmi2Struct, comp::FMU2Component, vrs::fmi2ValueReferenceFormat, srcArray::AbstractArray; filter=nothing)
+    fmiSet(str::fmi2Struct, comp::FMU2Component, vrs::fmi2ValueReferenceFormat, srcArray::AbstractArray; filter=nothing)
 
 # Arguments
 - `str::fmi2Struct`:  Representative for an FMU in the FMI 2.0.2 Standard.
@@ -1280,7 +1278,6 @@ function fmiSet(str::fmi3Struct, args...; kwargs...)
 end
 
 """
-
     fmiGetReal(str::fmi2Struct, vr::fmi2ValueReferenceFormat)
 
 Returns the real values of an array of variables
@@ -1313,7 +1310,6 @@ end
 
 
 """
-#TODO
     fmiSampleJacobian(str::fmi2Struct, c::FMU2Component,
                                        vUnknown_ref::Array{fmi2ValueReference},
                                        vKnown_ref::Array{fmi2ValueReference},
@@ -1330,8 +1326,9 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
  - `str::FMU2Component`: Mutable struct represents an instantiated instance of an FMU in the FMI 2.0.2 Standard.
 - `vUnknown_ref::Array{fmi2ValueReference}`:  Argument `vUnKnown_ref` contains values of type `fmi2ValueReference` which are identifiers of a variable value of the model.`vKnown_ref` is the Array of the vector values of Real input variables of function h that changes its value in the actual Mode.
 - `vKnown_ref::Array{fmi2ValueReference}`: Argument `vKnown_ref` contains values of type `fmi2ValueReference` which are identifiers of a variable value of the model.`vKnown_ref` is the Array of the vector values of Real input variables of function h that changes its value in the actual Mode.
-- `steps::Array{fmi2Real} = ones(fmi2Real, length(vKnown_ref)).*1e-5`:
-- `steps::Union{AbstractArray{fmi2Real}, Nothing} = nothing`:
+- `steps::Array{fmi2Real} = ones(fmi2Real, length(vKnown_ref)).*1e-5`: Predefined step size vector `steps`, where all entries have the value 1e-5.
+- `steps::Union{AbstractArray{fmi2Real}, Nothing} = nothing`:  Step size to be used for numerical differentiation. If nothing, a default value will be chosen automatically.
+
 # Returns
 - `dvUnknown::Arrya{fmi2Real}`:
 # Source

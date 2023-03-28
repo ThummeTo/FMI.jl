@@ -37,7 +37,7 @@ using FMI, Plots
 myFMU = fmiLoad(pathToFMU)
 
 # simulate from t=0.0s until t=10.0s and record the FMU variable named "mass.s"
-simData = fmiSimulate(myFMU, 0.0, 10.0; recordValues=["mass.s"])
+simData = fmiSimulate(myFMU, (0.0, 10.0); recordValues=["mass.s"])
 
 # plot it!
 fmiPlot(simData)
