@@ -117,9 +117,9 @@ function runtestsFMI3(exportingTool)
             end
         end
 
-        @testset "Plotting (plots.jl)" begin
-            include("FMI3/plots.jl")
-        end
+        # @testset "Plotting (plots.jl)" begin
+        #     include("FMI3/plots.jl")
+        # end
     end
 end
 

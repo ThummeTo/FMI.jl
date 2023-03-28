@@ -4,7 +4,7 @@
 #
 
 using DifferentialEquations, DiffEqCallbacks
-import SciMLBase: RightRootFind
+import FMIImport.SciMLSensitivity.SciMLBase: RightRootFind, ReturnCode
 
 using FMIImport: fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2NewDiscreteStates, fmi2GetContinuousStates, fmi2GetNominalsOfContinuousStates, fmi2SetContinuousStates, fmi2GetDerivatives!
 using FMIImport.FMICore: fmi2StatusOK, fmi2TypeCoSimulation, fmi2TypeModelExchange
@@ -18,6 +18,7 @@ using FMIImport.ChainRulesCore
 import FMIImport.ForwardDiff
 
 import ProgressMeter
+import ThreadPools
 
 ############ Model-Exchange ############
 
@@ -165,6 +166,16 @@ function fx(c::FMU2Component,
     return dx
 end
 
+function fx(c::FMU2Component, 
+    x::AbstractArray{<:Real}, 
+    p::AbstractArray, 
+    t::Real)
+
+    _, dx = c(;x=x, t=t)
+
+    return dx
+end
+
 # wrapper
 function fmi2SimulateME(c::FMU2Component, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...)
     fmi2SimulateME(c.fmu, c, tspan; kwargs...)
@@ -172,12 +183,26 @@ end
 
 # sets up the ODEProblem for simulating a ME-FMU
 function setupODEProblem(c::FMU2Component, x0::AbstractArray{fmi2Real}, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; p=[], customFx=nothing)
-    if customFx === nothing
-        customFx = (dx, x, p, t) -> fx(c, dx, x, p, t)
-    end
-
+    
     p = []
-    c.problem = ODEProblem(customFx, x0, tspan, p)
+    
+    if c.fmu.executionConfig.inPlace
+        if customFx === nothing
+            customFx = (dx, x, p, t) -> fx(c, dx, x, p, t)
+        end
+
+        ff = ODEFunction{true}(customFx, 
+                               tgrad=nothing)
+        c.problem = ODEProblem{true}(ff, x0, tspan, p)
+    else 
+        if customFx === nothing
+            customFx = (x, p, t) -> fx(c, x, p, t)
+        end
+
+        ff = ODEFunction{false}(customFx, 
+                               tgrad=nothing)
+        c.problem = ODEProblem{false}(ff, x0, tspan, p)
+    end
 
     return c.problem
 end
@@ -395,13 +420,13 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
         solveKwargs[:saveat] = saveat
     end
 
-    if solver === nothing
+    if isnothing(solver)
         fmusol.states = solve(c.problem; callback = CallbackSet(cbs...), dtmax=dtmax, solveKwargs..., kwargs...)
     else
         fmusol.states = solve(c.problem, solver; callback = CallbackSet(cbs...), dtmax=dtmax, solveKwargs..., kwargs...)
     end
 
-    fmusol.success = (fmusol.states.retcode == SciMLBase.ReturnCode.Success)
+    fmusol.success = (fmusol.states.retcode == ReturnCode.Success)
     
     if !fmusol.success
         @warn "FMU simulation failed with solver return code `$(fmusol.states.retcode)`, please check log for hints."
@@ -416,6 +441,15 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
 
     return fmusol
 end
+
+# function fmi2SimulateME(fmu::FMU2, 
+#     c::Union{AbstractArray{<:Union{FMU2Component, Nothing}}, Nothing}=nothing, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing;
+#     x0::Union{AbstractArray{<:AbstractArray{<:Real}}, AbstractArray{<:Real}, Nothing} = nothing,
+#     parameters::Union{AbstractArray{<:Dict{<:Any, <:Any}}, Dict{<:Any, <:Any}, Nothing} = nothing,
+#     kwargs...)
+
+#     return ThreadPool.foreach((c, x0, parameters) -> fmi2SimulateME(fmu, c; x0=x0, parameters=parameters, kwargs...), zip()) 
+# end
 
 # wrapper
 function fmi2SimulateCS(c::FMU2Component, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...)
