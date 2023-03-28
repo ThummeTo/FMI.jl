@@ -58,7 +58,7 @@ jobs:
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "${{ env.CI_COMMIT_AUTHOR }}@users.noreply.github.com"
-          git config --global core.autocrlf false
+          git config --global core.autocrlf false 
 
       # Run the cross checks and push the results to the cross check repo 
       - name: "Run FMU Cross checks"
