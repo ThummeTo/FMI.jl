@@ -6,9 +6,11 @@
 using FMIImport: FMUSolution
 
 """
+ToDo: DocString.
+
 Saves a FMUSolution to a csv file.
 """
-function fmi2SaveSolutionCSV(solution::FMUSolution, filepath::AbstractString) 
+function fmiSaveSolutionCSV(solution::FMUSolution, filepath::AbstractString) 
     df = DataFrames.DataFrame(time = solution.values.t)
     for i in 1:length(solution.values.saveval[1])
         df[!, Symbol(fmi2ValueReferenceToString(solution.component.fmu, solution.valueReferences[i]))] = [val[i] for val in solution.values.saveval]

@@ -51,6 +51,15 @@ function fmiPlot!(fig, solution::FMUSolution;
     maxLabelLength=64,
     plotkwargs...)
 
+    component = nothing
+    if isa(solution, FMU2Solution)
+        component = solution.component
+    elseif isa(solution, FMU3Solution)
+        component = solution.fmu.instances[end] # ToDo: This is very poor!
+    else
+        @assert false "Invalid solution type."
+    end
+
     numStateEvents = 0
     numTimeEvents = 0
     for e in solution.events
@@ -100,7 +109,7 @@ function fmiPlot!(fig, solution::FMUSolution;
     end
 
     if stateIndices === nothing 
-        stateIndices = 1:length(solution.component.fmu.modelDescription.stateValueReferences)
+        stateIndices = 1:length(component.fmu.modelDescription.stateValueReferences)
     end
 
     if valueIndices === nothing
@@ -119,8 +128,8 @@ function fmiPlot!(fig, solution::FMUSolution;
 
         for v in 1:numValues
             if v ∈ stateIndices
-                vr = solution.component.fmu.modelDescription.stateValueReferences[v]
-                vrNames = fmi2ValueReferenceToString(solution.component.fmu, vr)
+                vr = component.fmu.modelDescription.stateValueReferences[v]
+                vrNames = fmi2ValueReferenceToString(component.fmu, vr)
                 vrName = length(vrNames) > 0 ? vrNames[1] : "?"
 
                 vals = collect(ForwardDiff.value(data[v]) for data in solution.states.u)
@@ -151,8 +160,8 @@ function fmiPlot!(fig, solution::FMUSolution;
                 vrName = "[unknown]"
                 if solution.valueReferences != nothing && v <= length(solution.valueReferences)
                     vr = solution.valueReferences[v]
-                    vrNames = fmi2ValueReferenceToString(solution.component.fmu, vr)
-                    vrName = vrNames[1]
+                    vrNames = fmi2ValueReferenceToString(component.fmu, vr)
+                    vrName = length(vrNames) > 0 ? vrNames[1] : "?"
                 end
     
                 vals = collect(ForwardDiff.value(data[v]) for data in solution.values.saveval)

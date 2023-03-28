@@ -95,7 +95,7 @@ using FMIExport: fmi2Create, fmi2CreateSimple
 using FMIImport.FMICore: fmi2ValueReference, fmi3ValueReference
 using FMIImport: fmi2ValueReferenceFormat, fmi3ValueReferenceFormat, fmi2StructMD, fmi3StructMD, fmi2Struct, fmi3Struct
 
-using FMIImport.FMICore: FMU, FMU2, FMU3, FMU2Component, FMU3Instance
+using FMIImport.FMICore: FMU, FMU2, FMU3, FMU2Component, FMU3Instance, FMUSolution
 export FMU, FMU2, FMU3, FMU2Component, FMU3Instance
 
 using FMIImport.FMICore: FMU2ExecutionConfiguration, FMU2_EXECUTION_CONFIGURATION_RESET, FMU2_EXECUTION_CONFIGURATION_NO_RESET, FMU2_EXECUTION_CONFIGURATION_NO_FREEING

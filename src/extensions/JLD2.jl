@@ -6,6 +6,8 @@
 using FMIImport: FMUSolution
 
 """
+ToDo: DocString.
+
 Saves a FMUSolution for later use.
 """
 function fmiSaveSolutionJLD2(solution::FMUSolution, filepath::AbstractString; keyword="solution") 
@@ -13,6 +15,8 @@ function fmiSaveSolutionJLD2(solution::FMUSolution, filepath::AbstractString; ke
 end
 
 """
+ToDo: DocString.
+
 Loads a FMUSolution. Returns a previously saved `FMUSolution`.
 """
 function fmiLoadSolutionJLD2(filepath::AbstractString; keyword="solution")

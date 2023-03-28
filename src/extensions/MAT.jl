@@ -6,6 +6,8 @@
 using FMIImport: FMUSolution
 
 """
+ToDo: DocString.
+
 Saves a FMUSolution to a mat file.
 """
 function fmiSaveSolutionMAT(solution::FMUSolution, filepath::AbstractString) 
