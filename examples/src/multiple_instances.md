@@ -124,7 +124,7 @@ println(comp1)
 
     FMU:            SpringPendulum1D
     InstanceName:   SpringPendulum1D
-    Address:        Ptr{Nothing} @0x00000000153e3870
+    Address:        Ptr{Nothing} @0x000000001448a300
     State:          0
     Logging:        false
     FMU time:       -Inf
@@ -169,7 +169,7 @@ println(comp2)
 
     FMU:            SpringPendulum1D
     InstanceName:   SpringPendulum1D
-    Address:        Ptr{Nothing} @0x0000000014c5fad0
+    Address:        Ptr{Nothing} @0x00000000157e8510
     State:          0
     Logging:        false
     FMU time:       -Inf
