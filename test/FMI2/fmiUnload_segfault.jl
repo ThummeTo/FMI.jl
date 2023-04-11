@@ -4,33 +4,29 @@ myFMU = fmiLoad("Feedthrough", "ModelicaReferenceFMUs", "0.0.20", "2.0")
 fmiInstantiate!(myFMU)
 solution = fmiSimulate(myFMU, (0.0, 1.0))
 myFMU = fmi2Unload(myFMU)
-fmiUnload(myFMU)
-typeof(myFMU)
-stateRef = Ref(myFMU)
-stateRef = Ptr{Nothing}(0)
-myFMU = stateRef
-typeof(myFMU)
-myFMU = nothing
-typeof(myFMU)
+myFMU = fmiUnload(myFMU)
+p1 = pointer_from_objref(myFMU)
+p2 = Ref(myFMU)
 fmiInfo(myFMU)
+test(myFMU) = fmiUnload
+Ptr(myFMU)
+Base.unsafe_convert(Ref{Nothing}, myFMU)
 
 mutable struct Foo
     x::Int16
 end
 
+convert(::Type{Nothing}, x::FMU2) = (Ref(x)[] = nothing)
+
+myFMU = convert(Nothing, myFMU)
 x = Foo(1)
 x.x 
 function modifyFoo(foo)
     println(foo)
-    # z = Ref(foo)
-    # println(z)
     z = Ref(nothing)
     foo = z[]
-    # println(Ref(Ref(foo)))
     println(foo)
     nothing
-    # foo = nothing
-    # foo
 end
 
 function test(f::Foo)
@@ -46,3 +42,7 @@ p = pointer_from_objref(v)
 Base.unsafe_convert(Ptr{Nothing}, ptr)
 Base.unsafe_load(ptr)
 unsafe_pointer_to_objref(ptr)
+
+function (fmu::FMU2)()
+    fmu = fmi2Unload(fmu)
+end
