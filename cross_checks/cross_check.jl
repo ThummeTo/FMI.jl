@@ -204,12 +204,29 @@ function main()
     fmiCrossCheckRepoPath = getFmuCrossCheckRepo(crossCheckRepo, unpackPath)
 
     # set up the github access for the fmi-cross-checks repo and checkout the respective branch
-    cross_check_repo_token = get(ENV, "CROSS_CHECK_REPO_TOKEN", "")
-    cross_check_repo_url = get(ENV, "CROSS_CHECK_REPO_URL", "")
+    github_token = get(ENV, "GITHUB_TOKEN", "")
+    tmp_dir = mktempdir(; cleanup=true)
+    pkey_filename = create_ssh_private_key(tmp_dir, github_token, os)
+    if os == "win64"
+        pkey_filename = replace(pkey_filename, "\\" => "/")
+    end
+    
+    cross_check_repo_name = get(ENV, "CROSS_CHECK_REPO_NAME", "")
     cross_check_repo_user = get(ENV, "CROSS_CHECK_REPO_USER", "")
-    if cross_check_repo_token != "" && cross_check_repo_url != "" && cross_check_repo_user != ""
-        run(Cmd(`$(git()) remote set-url origin https://$(cross_check_repo_user):$(cross_check_repo_token)@$(cross_check_repo_url)`, dir=fmiCrossCheckRepoPath))
-        run(Cmd(`$(git()) checkout $(crossCheckBranch)`, dir=fmiCrossCheckRepoPath))
+    if github_token != "" && cross_check_repo_name != "" && cross_check_repo_user != ""
+        withenv(
+            "GIT_SSH_COMMAND" => isnothing(github_token) ? "ssh" : "ssh -i $pkey_filename -o StrictHostKeyChecking=no"
+        ) do
+            run(
+                Cmd(`$(git()) remote set-url origin git@github.com:$cross_check_repo_user/$cross_check_repo_name`, dir=fmiCrossCheckRepoPath)
+            )
+        end
+
+        try
+            run(Cmd(`$(git()) checkout $(crossCheckBranch)`, dir=fmiCrossCheckRepoPath))
+        catch
+            run(Cmd(`$(git()) checkout -b $(crossCheckBranch)`, dir=fmiCrossCheckRepoPath))
+        end
     end
 
     #   Excecute FMUs
@@ -232,9 +249,9 @@ function main()
     # Write Summary of Cross Check run
     println("#################### Start FMI Cross check Summary ####################")
     println("\tTotal Cross checks:\t\t\t$(count(c -> (true), crossChecks))")
-    println("\tSuccessfull Cross checks:\t\t\t$(count(c -> (c.success), crossChecks))")
+    println("\tSuccessfull Cross checks:\t\t$(count(c -> (c.success), crossChecks))")
     println("\tFailed Cross checks:\t\t\t$(count(c -> (!c.success && c.error === nothing && !c.skipped), crossChecks))")
-    println("\tCross checks with errors:\t\t\t$(count(c -> (c.error !== nothing), crossChecks))")
+    println("\tCross checks with errors:\t\t$(count(c -> (c.error !== nothing), crossChecks))")
     println("\tSkipped Cross checks:\t\t\t$(count(c -> (c.skipped), crossChecks))")
     println("\tList of successfull Cross checks")
     for (index, success) in enumerate(filter(c -> (c.success), crossChecks))
@@ -249,11 +266,21 @@ function main()
         println("\u001B[31m\t\t$(index):\t$(error)\u001B[0m")
     end
     println("#################### End FMI Cross check Summary ####################")
-
-    if cross_check_repo_token != "" && cross_check_repo_url != "" && cross_check_repo_user != ""
+ 
+    if github_token != "" && cross_check_repo_name != "" && cross_check_repo_user != ""
         run(Cmd(`$(git()) add -A`, dir=fmiCrossCheckRepoPath))
         run(Cmd(`$(git()) commit -a --allow-empty -m "Run FMI cross checks for FMI.JL"`, dir=fmiCrossCheckRepoPath))
-        run(Cmd(`$(git()) push`, dir=fmiCrossCheckRepoPath))
+        
+        withenv(
+            "GIT_SSH_COMMAND" => isnothing(github_token) ? "ssh" : "ssh -i $pkey_filename -o StrictHostKeyChecking=no"
+        ) do
+            try
+                run(Cmd(`$(git()) push`, dir=fmiCrossCheckRepoPath))
+            catch
+                run(Cmd(`$(git()) push --set-upstream origin $(crossCheckBranch)`, dir=fmiCrossCheckRepoPath))
+            end
+        end
+        rm(tmp_dir; force=true, recursive=true)
     end
 end
 
