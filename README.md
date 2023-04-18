@@ -7,6 +7,7 @@
 [![Dev Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) 
 [![Test (latest)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLatest.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLatest.yml)
 [![Test (LTS)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLTS.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLTS.yml)
+[![FMI2 Cross Checks (latest)](https://github.com/ThummeTo/FMI.jl/actions/workflows/CrossChecks.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/CrossChecks.yml)
 [![Examples (latest)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Example.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Example.yml)
 [![Build Docs](https://github.com/ThummeTo/FMI.jl/actions/workflows/Documentation.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Documentation.yml)
 [![Run PkgEval](https://github.com/ThummeTo/FMI.jl/actions/workflows/Eval.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Eval.yml)
@@ -89,7 +90,7 @@ To keep dependencies nice and clean, the original package [*FMI.jl*](https://git
 - [*FMIZoo.jl*](https://github.com/ThummeTo/FMIZoo.jl): A collection of testing and example FMUs
 
 ## What is further under development in FMI.jl?
-- FMI Cross Checks (as soon as the successor is available)
+- FMI3 Cross Checks (as soon as the successor is available)
 - nice documentation & doc-strings
 - more examples/tutorials
 - ...
