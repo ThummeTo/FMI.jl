@@ -1,3 +1,8 @@
+#
+# Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Cristof Baumgartner
+# Licensed under the MIT license. See LICENSE file in the project root for details.
+#
+
 """ 
 Returns the path where the FMU cross checks are saved locally.
 This will also checkout the repository from a specified URL if they are not yet present in the specified path.
