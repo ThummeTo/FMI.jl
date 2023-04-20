@@ -156,7 +156,7 @@ instanceFMU = fmiInstantiate!(myFMU)
 
     FMU:            SpringFrictionPendulum1D
     InstanceName:   SpringFrictionPendulum1D
-    Address:        Ptr{Nothing} @0x0000000016dd1850
+    Address:        Ptr{Nothing} @0x00000000158c5360
     State:          0
     Logging:        false
     FMU time:       -Inf
