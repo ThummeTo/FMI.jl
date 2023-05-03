@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest]
-        file-name: [manipulation, modelica_conference_2021, multiple_instances, multiprocessing, multithreading, parameterize, simulate]
+        file-name: [manipulation, modelica_conference_2021, multiple_instances, multiprocessing, multithreading, parameterize, simulate, parameter_optimization]
         julia-version: ['1.8']
         julia-arch: [x64]
         experimental: [false]
