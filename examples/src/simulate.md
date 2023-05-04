@@ -168,7 +168,7 @@ In the function `fmiSimulateME()` the FMU is simulated in model-exchange mode (M
 dataME = fmiSimulateME(myFMU, (tStart, tStop); saveat=tSave)
 ```
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:12[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:09[39m
 
 
 
