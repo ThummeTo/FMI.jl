@@ -20,12 +20,12 @@
 
 2\. Install [*FMI.jl*](https://github.com/ThummeTo/FMI.jl):
 ```julia-repl
-(@v1.6) pkg> add FMI
+(@v1.X) pkg> add FMI
 ```
 
 3\. If you want to check that everything works correctly, you can run the tests bundled with [*FMI.jl*](https://github.com/ThummeTo/FMI.jl):
 ```julia-repl
-(@v1.6) pkg> test FMI
+(@v1.X) pkg> test FMI
 ```
 
 4\. Have a look inside the [examples folder](https://github.com/ThummeTo/FMI.jl/tree/examples/examples) in the examples branch or the [examples section](https://thummeto.github.io/FMI.jl/dev/examples/overview/) of the documentation. All examples are available as Julia-Script (*.jl*), Jupyter-Notebook (*.ipynb*) and Markdown (*.md*).
@@ -52,31 +52,32 @@ fmiUnload(myFMU)
 - parameterization, simulation & plotting of CS- and ME-FMUs
 - event-handling for imported discontinuous ME-FMUs
 
-|                                   | **FMI2.0.3** |        | **FMI3.0** |        |
-|-----------------------------------|--------------|--------|------------|--------|
-|                                   | Import       | Export | Import     | Export |
-| CS                                | ✓✓           | ~~     | ✓          | ~      |
-| ME (continuous)                   | ✓✓           | ✓✓     | ✓          | ~      |
-| ME (discontinuous)                | ✓✓           | ✓✓     | ✓          | ~      |
-| SE                 		    | -            | -      | ✓          | ~      |
-| Explicit solvers                  | ✓✓           | ✓✓     | ✓          | ~      |
-| Implicit solvers (autodiff=false) | ✓✓           | ~~     | ✓          | ~      |
-| Implicit solvers (autodiff=true)  | ✓            | ~~     | ~~         | ~      |
-| get/setState                      | ✓✓           | ~      | ✓          | ~      |
-| getDirectionalDerivatives         | ✓✓           | ~      | ✓          | ~      |
-| getAdjointDerivatives             | -            | -      | ✓          | ~      |
+|                                   | **FMI2.0.3** |        | **FMI3.0** |        | **SSP1.0** |        |
+|-----------------------------------|--------------|--------|------------|--------|------------|--------|
+|                                   | Import       | Export | Import     | Export | Import     | Export |
+| CS                                | ✔️✔️         | 🚧     | ✔️          | 📅     | 📅         | 📅      |
+| ME (continuous)                   | ✔️✔️         | ✔️✔️   | 🚧          | 📅     | 📅         | 📅      |
+| ME (discontinuous)                | ✔️✔️         | ✔️✔️   | 🚧          | 📅     | 📅         | 📅      |
+| SE                 		    | 🚫           | 🚫     | 🚧          | 📅     | 🚫         | 🚫     |
+| Explicit solvers                  | ✔️✔️         | ✔️✔️   | ✔️          | 📅     | 📅         | 📅      |
+| Implicit solvers (autodiff=false) | ✔️✔️         | 🚧     | ✔️          | 📅     | 📅         | 📅      |
+| Implicit solvers (autodiff=true)  | ✔️✔️         | 🚧     | 🚧          | 📅     | 📅         | 📅      |
+| get/setState                      | ✔️✔️         | 📅     | ✔️          | 📅     | 🚫         | 🚫      |
+| getDirectionalDerivatives         | ✔️✔️         | 📅     | ✔️          | 📅     | 🚫         | 🚫      |
+| getAdjointDerivatives             | 🚫           | 🚫     | ✔️          | 📅     | 🚫         | 🚫     |
+| FMI Cross Checks                  | ✔️✔️         | 📅     | 📅          | 📅     | 🚫         | 🚫      |
 
-✓✓ supported & tested
+✔️✔️ supported & tested
 
-✓  beta supported, untested
+✔️  beta supported (implemented), but untested
 
-~~ work in progress
+🚧 work in progress
 
-~  planned
+📅  planned
 
-\-  not supported by the corresponding FMI standard
+🚫  not supported by the corresponding FMI standard (not applicable)
 
-x  not planned
+❌  not planned
 
 ## What FMI.jl-Library to use?
 ![FMI.jl Logo](https://github.com/ThummeTo/FMI.jl/blob/main/docs/src/assets/FMI_JL_family.png?raw=true "FMI.jl Family")
@@ -88,16 +89,6 @@ To keep dependencies nice and clean, the original package [*FMI.jl*](https://git
 - [*FMIBuild.jl*](https://github.com/ThummeTo/FMIBuild.jl): Compiler/Compilation dependencies for FMIExport.jl
 - [*FMIFlux.jl*](https://github.com/ThummeTo/FMIFlux.jl): Machine Learning with FMUs (differentiation over FMUs)
 - [*FMIZoo.jl*](https://github.com/ThummeTo/FMIZoo.jl): A collection of testing and example FMUs
-
-## What is further under development in FMI.jl?
-- FMI3 Cross Checks (as soon as the successor is available)
-- nice documentation & doc-strings
-- more examples/tutorials
-- ...
-
-## What is planned for FMI.jl?
-- SSP 1.0 support
-- ...
 
 ## What Platforms are supported?
 [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is tested (and testing) under Julia Versions *1.6 LTS* (64-bit) and *latest* (64-bit) on Windows *latest* (64-bit) and Ubuntu *latest* (64-bit). Mac and Julia (32-bit) should work, but untested. For the best performance, we recommend using Julia >= 1.7.
