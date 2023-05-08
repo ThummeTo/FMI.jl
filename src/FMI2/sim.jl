@@ -161,7 +161,11 @@ function fx(c::FMU2Component,
     p::AbstractArray, 
     t::Real)
 
-    _, dx = c(;dx=dx, x=x, t=t)
+    if c.fmu.executionConfig.concat_y_dx
+        dx = c(;dx=dx, x=x, t=t)
+    else
+        _, dx = c(;dx=dx, x=x, t=t)
+    end
 
     return dx
 end
@@ -171,7 +175,11 @@ function fx(c::FMU2Component,
     p::AbstractArray, 
     t::Real)
 
-    _, dx = c(;x=x, t=t)
+    if c.fmu.executionConfig.concat_y_dx
+        dx = c(;x=x, t=t)
+    else
+        _, dx = c(;x=x, t=t)
+    end
 
     return dx
 end
@@ -320,6 +328,12 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
         dtmax = (t_stop-t_start)/100.0
     end
 
+    # Zero state FMU: add dummy state
+    isZeroState = (length(fmu.modelDescription.stateValueReferences) == 0)
+    if isZeroState
+        x0 = [0.0]
+    end
+
     # argument `tolerance=nothing` here, because ME-FMUs doesn't support tolerance control (no solver included)
     # tolerance for the solver is set-up later in this function
     inputs = nothing
@@ -430,6 +444,11 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
     
     if !fmusol.success
         @warn "FMU simulation failed with solver return code `$(fmusol.states.retcode)`, please check log for hints."
+    end
+
+    # ZeroStateFMU: remove dummy state
+    if isZeroState
+        c.solution.state = nothing
     end
 
     # cleanup progress meter
