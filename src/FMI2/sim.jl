@@ -143,7 +143,9 @@ function saveValues(c::FMU2Component, recordValues, x, t, integrator, inputFunct
     #x_old = fmi2GetContinuousStates(c)
     #t_old = c.t
     
-    fmi2SetContinuousStates(c, x)
+    if !c.fmu.isZeroState
+        fmi2SetContinuousStates(c, x)
+    end
     fmi2SetTime(c, t) 
     if inputFunction != nothing
         fmi2SetReal(c, inputValues, inputFunction(c, x, t)) 
@@ -328,12 +330,6 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
         dtmax = (t_stop-t_start)/100.0
     end
 
-    # Zero state FMU: add dummy state
-    isZeroState = (length(fmu.modelDescription.stateValueReferences) == 0)
-    if isZeroState
-        x0 = [0.0]
-    end
-
     # argument `tolerance=nothing` here, because ME-FMUs doesn't support tolerance control (no solver included)
     # tolerance for the solver is set-up later in this function
     inputs = nothing
@@ -345,6 +341,11 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
 
     c, x0 = prepareSolveFMU(fmu, c, fmi2TypeModelExchange, instantiate, freeInstance, terminate, reset, setup, parameters, t_start, t_stop, nothing; x0=x0, inputs=inputs, handleEvents=FMI.handleEvents)
     fmusol = c.solution
+
+    # Zero state FMU: add dummy state
+    if c.fmu.isZeroState
+        x0 = [0.0]
+    end
 
     # from here on, we are in event mode, if `setup=false` this is the job of the user
     #@assert c.state == fmi2ComponentStateEventMode "FMU needs to be in event mode after setup."
@@ -447,8 +448,8 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
     end
 
     # ZeroStateFMU: remove dummy state
-    if isZeroState
-        c.solution.state = nothing
+    if c.fmu.isZeroState
+        c.solution.states = nothing
     end
 
     # cleanup progress meter
