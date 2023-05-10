@@ -53,6 +53,7 @@ jobs:
           git clone https://github.com/JuliaCI/PkgEval.jl.git
           julia --project=. -e '
             import Pkg;
-            Pkg.instantiate(); 
+            Pkg.instantiate();
+            Pkg.add("Test");
             Pkg.add(path="./PkgEval.jl")'
           julia --project=. ./test/FMI2/eval.jl

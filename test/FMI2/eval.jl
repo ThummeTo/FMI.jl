@@ -1,7 +1,8 @@
 using PkgEval
 using FMI
+using Test
 
-config = Configuration(; julia="1.8");
+config = Configuration(; julia="1.8", time_limit=120*60);
 
 package = Package(; name="FMI");
 
@@ -12,4 +13,6 @@ result = evaluate([config], [package])
 println(result)
 
 @info "Log"
-println(result.log)
+println(result[1, :log])
+
+@test result[1, :status] == :ok
