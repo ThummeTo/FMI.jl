@@ -27,6 +27,8 @@ function time_choice(c::FMU2Component, integrator, tStart, tStop)
 
     #@info "TC"
 
+    c.solution.evals_timechoice += 1
+
     if c.eventInfo.nextEventTimeDefined == fmi2True
 
         if c.eventInfo.nextEventTime >= tStart && c.eventInfo.nextEventTime <= tStop
@@ -47,6 +49,8 @@ function condition(c::FMU2Component, out::AbstractArray{<:Real}, x, t, integrato
 
     @assert c.state == fmi2ComponentStateContinuousTimeMode "condition(...): Must be called in mode continuous time."
 
+    c.solution.evals_condition += 1
+
     t = undual(t)
     x = undual(x)
 
@@ -65,6 +69,8 @@ end
 function affectFMU!(c::FMU2Component, integrator, idx, inputFunction, inputValues::AbstractArray{fmi2ValueReference}, solution::FMU2Solution)
 
     @assert c.state == fmi2ComponentStateContinuousTimeMode "affectFMU!(...): Must be in continuous time mode!"
+
+    c.solution.evals_affect += 1
 
     # there are fx-evaluations before the event is handled, reset the FMU state to the current integrator step
     fmi2SetContinuousStates(c, integrator.u; force=true)
@@ -112,6 +118,9 @@ function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, inputV
 
     @assert c.state == fmi2ComponentStateContinuousTimeMode "stepCompleted(...): Must be in continuous time mode."
     #@info "Step completed"
+
+    c.solution.evals_stepcompleted += 1
+
     if progressMeter !== nothing
         stat = 1000.0*(t-tStart)/(tStop-tStart)
         if !isnan(stat)
@@ -140,6 +149,8 @@ function saveValues(c::FMU2Component, recordValues, x, t, integrator, inputFunct
 
     @assert c.state == fmi2ComponentStateContinuousTimeMode "saveValues(...): Must be in continuous time mode."
 
+    c.solution.evals_savevalues += 1
+
     #x_old = fmi2GetContinuousStates(c)
     #t_old = c.t
     
@@ -154,7 +165,7 @@ function saveValues(c::FMU2Component, recordValues, x, t, integrator, inputFunct
     #fmi2SetContinuousStates(c, x_old)
     #fmi2SetTime(c, t_old)
     
-    return (fmiGetReal(c, recordValues)...,)
+    return (fmiGet(c, recordValues)...,)
 end
 
 function fx(c::FMU2Component, 
@@ -163,10 +174,12 @@ function fx(c::FMU2Component,
     p::AbstractArray, 
     t::Real)
 
+    c.solution.evals_fx_inplace += 1
+
     if c.fmu.executionConfig.concat_y_dx
-        dx = c(;dx=dx, x=x, t=t)
+        dx[:] = c(;dx=dx, x=x, t=t)
     else
-        _, dx = c(;dx=dx, x=x, t=t)
+        _, dx[:] = c(;dx=dx, x=x, t=t)
     end
 
     return dx
@@ -176,6 +189,10 @@ function fx(c::FMU2Component,
     x::AbstractArray{<:Real}, 
     p::AbstractArray, 
     t::Real)
+
+    c.solution.evals_fx_outofplace += 1
+
+    dx = nothing
 
     if c.fmu.executionConfig.concat_y_dx
         dx = c(;x=x, t=t)
@@ -400,7 +417,8 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
     end
 
     if savingValues
-        fmusol.values = SavedValues(Float64, Tuple{collect(Float64 for i in 1:length(recordValues))...})
+        dtypes = collect(fmi2DataTypeForValueReference(c.fmu.modelDescription, vr) for vr in recordValues)
+        fmusol.values = SavedValues(Float64, Tuple{dtypes...})
         fmusol.valueReferences = copy(recordValues)
 
         if saveat === nothing
