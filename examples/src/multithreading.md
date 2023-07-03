@@ -98,7 +98,7 @@ input_values = collect(collect.(eachrow(rand(batchSize,2))))
 
 
     1-element Vector{Vector{Float64}}:
-     [0.5452595639739716, 0.6498023622201993]
+     [0.38269996489546143, 0.7742017815880927]
 
 
 
@@ -146,19 +146,57 @@ Running a single evaluation is pretty quick, therefore the speed can be better t
 @benchmark data = runCalcFormatted(realFMU, rand(2))
 ```
 
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
 
 
 
-    BenchmarkTools.Trial: 5 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m1.210 s[22m[39m … [35m  1.276 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m3.69% … 7.00%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m1.247 s              [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m7.16%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m1.244 s[22m[39m ± [32m27.063 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m5.75% ± 1.87%
+
+
+    BenchmarkTools.Trial: 4 samples with 1 evaluation.
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m1.635 s[22m[39m … [35m  1.669 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m4.58% … 4.51%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m1.642 s              [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m4.59%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m1.647 s[22m[39m ± [32m14.862 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m4.57% ± 0.04%
     
-      [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[34m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
-      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[34m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      1.21 s[90m         Histogram: frequency by time[39m        1.28 s [0m[1m<[22m
+      [39m▁[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[34m [39m[39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m▁[39m [39m 
+      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[34m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
+      1.64 s[90m         Histogram: frequency by time[39m        1.67 s [0m[1m<[22m
     
-     Memory estimate[90m: [39m[33m402.92 MiB[39m, allocs estimate[90m: [39m[33m11401359[39m.
+     Memory estimate[90m: [39m[33m467.06 MiB[39m, allocs estimate[90m: [39m[33m12001460[39m.
 
 
 
@@ -174,19 +212,57 @@ println("Single Threaded")
     Single Threaded
 
 
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
 
 
 
-    BenchmarkTools.Trial: 5 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m1.187 s[22m[39m … [35m  1.258 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m3.68% … 6.96%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m1.237 s              [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m7.06%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m1.228 s[22m[39m ± [32m28.735 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m5.69% ± 1.85%
+
+
+    BenchmarkTools.Trial: 4 samples with 1 evaluation.
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m1.626 s[22m[39m … [35m  1.655 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m4.68% … 4.56%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m1.631 s              [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m4.66%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m1.636 s[22m[39m ± [32m13.408 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m4.65% ± 0.06%
     
-      [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[34m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m█[39m [39m 
-      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[34m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      1.19 s[90m         Histogram: frequency by time[39m        1.26 s [0m[1m<[22m
+      [39m█[39m [39m [39m [39m [39m [39m [39m█[34m [39m[39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
+      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[34m▁[39m[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
+      1.63 s[90m         Histogram: frequency by time[39m        1.66 s [0m[1m<[22m
     
-     Memory estimate[90m: [39m[33m402.92 MiB[39m, allocs estimate[90m: [39m[33m11401362[39m.
+     Memory estimate[90m: [39m[33m467.06 MiB[39m, allocs estimate[90m: [39m[33m12001463[39m.
 
 
 
@@ -203,19 +279,57 @@ println("Multi Threaded")
     Multi Threaded
 
 
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
 
 
 
-    BenchmarkTools.Trial: 5 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m1.158 s[22m[39m … [35m  1.229 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m3.76% … 7.06%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m1.212 s              [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m7.16%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m1.199 s[22m[39m ± [32m29.651 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m5.81% ± 1.86%
+
+
+    BenchmarkTools.Trial: 4 samples with 1 evaluation.
+     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m1.600 s[22m[39m … [35m  1.642 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m4.78% … 4.66%
+     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m1.615 s              [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m4.75%
+     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m1.618 s[22m[39m ± [32m17.588 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m4.74% ± 0.06%
     
-      [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [34m█[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
-      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[34m█[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      1.16 s[90m         Histogram: frequency by time[39m        1.23 s [0m[1m<[22m
+      [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[34m [39m[39m [39m [39m [39m [39m [39m [39m [39m [32m█[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
+      [39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[34m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m█[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
+      1.6 s[90m          Histogram: frequency by time[39m        1.64 s [0m[1m<[22m
     
-     Memory estimate[90m: [39m[33m402.92 MiB[39m, allocs estimate[90m: [39m[33m11401366[39m.
+     Memory estimate[90m: [39m[33m467.06 MiB[39m, allocs estimate[90m: [39m[33m12001478[39m.
 
 
 

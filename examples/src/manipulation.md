@@ -123,7 +123,10 @@ vrs = ["mass.s"]
 simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
 ```
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:10[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:23[39m
 
 
 
@@ -133,6 +136,9 @@ simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
     	SpringFrictionPendulum1D
     Success:
     	true
+    f(x)-Evaluations:
+    	In-place: 1377
+    	Out-of-place: 0
     Jacobian-Evaluations:
     	∂ẋ_∂x: 0
     	∂ẋ_∂u: 0
@@ -141,6 +147,12 @@ simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
     Gradient-Evaluations:
     	∂ẋ_∂t: 0
     	∂y_∂t: 0
+    Callback-Evaluations:
+    	Condition (event-indicators): 1893
+    	Time-Choice (event-instances): 0
+    	Affect (event-handling): 6
+    	Save values: 131
+    	Steps completed: 131
     States [131]:
     	0.0	[0.5, 0.0]
     	2.352941176471972e-11	[0.5, 1.0e-10]
@@ -207,7 +219,7 @@ originalGetReal = myFMU.cGetReal
 
 
 
-    Ptr{Nothing} @0x00007f40c2769faf
+    Ptr{Nothing} @0x00007f2cf3769faf
 
 
 
@@ -255,7 +267,7 @@ fmiSetFctGetReal(myFMU, myGetReal!)
 
 
 
-    Ptr{Nothing} @0x00007f41b82a3fc0
+    Ptr{Nothing} @0x00007f2dd2183fc0
 
 
 
@@ -269,11 +281,16 @@ simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
 fmiPlot!(fig, simData; states=false, style=:dash)
 ```
 
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+
+
 
 
 
     
-![svg](manipulation_files/manipulation_20_0.svg)
+![svg](manipulation_files/manipulation_20_1.svg)
     
 
 

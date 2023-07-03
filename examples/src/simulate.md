@@ -134,6 +134,9 @@ dataCS = fmiSimulateCS(myFMU, (tStart, tStop); recordValues=vrs, saveat=tSave)
     	SpringFrictionPendulum1D
     Success:
     	true
+    f(x)-Evaluations:
+    	In-place: 0
+    	Out-of-place: 0
     Jacobian-Evaluations:
     	∂ẋ_∂x: 0
     	∂ẋ_∂u: 0
@@ -142,6 +145,12 @@ dataCS = fmiSimulateCS(myFMU, (tStart, tStop); recordValues=vrs, saveat=tSave)
     Gradient-Evaluations:
     	∂ẋ_∂t: 0
     	∂y_∂t: 0
+    Callback-Evaluations:
+    	Condition (event-indicators): 0
+    	Time-Choice (event-instances): 0
+    	Affect (event-handling): 0
+    	Save values: 0
+    	Steps completed: 0
     Values [801]:
     	0.0	(0.5, 0.0)
     	0.01	(0.5002235448486548, 0.042692491939260585)
@@ -168,7 +177,10 @@ In the function `fmiSimulateME()` the FMU is simulated in model-exchange mode (M
 dataME = fmiSimulateME(myFMU, (tStart, tStop); saveat=tSave)
 ```
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:09[39m
+    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+    [33m[1m│ [22m[39mConsider using tuples instead.
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:24[39m
 
 
 
@@ -178,6 +190,9 @@ dataME = fmiSimulateME(myFMU, (tStart, tStop); saveat=tSave)
     	SpringFrictionPendulum1D
     Success:
     	true
+    f(x)-Evaluations:
+    	In-place: 1377
+    	Out-of-place: 0
     Jacobian-Evaluations:
     	∂ẋ_∂x: 0
     	∂ẋ_∂u: 0
@@ -186,6 +201,12 @@ dataME = fmiSimulateME(myFMU, (tStart, tStop); saveat=tSave)
     Gradient-Evaluations:
     	∂ẋ_∂t: 0
     	∂y_∂t: 0
+    Callback-Evaluations:
+    	Condition (event-indicators): 1893
+    	Time-Choice (event-instances): 0
+    	Affect (event-handling): 6
+    	Save values: 0
+    	Steps completed: 131
     States [801]:
     	0.0	[0.5, 0.0]
     	0.01	[0.5002131418270838, 0.042689450733423825]
