@@ -66,6 +66,11 @@ function runtestsFMI2(exportingTool)
                     include("FMI2/cs_me.jl")
                 end
 
+                @info "Simulation FMU without states (sim_zero_state.jl)"
+                @testset "Simulation FMU without states" begin
+                    include("FMI2/sim_zero_state.jl")
+                end
+
                 @info "Loading/Saving simulation results (load_save.jl)"
                 @testset "Loading/Saving simulation results" begin
                     include("FMI2/load_save.jl")
