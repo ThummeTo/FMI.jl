@@ -15,7 +15,9 @@ import FMIImport: prepareSolveFMU, finishSolveFMU, handleEvents
 import FMIImport: undual
 
 using FMIImport.ChainRulesCore
-import FMIImport.ForwardDiff
+
+import FMIImport.ReverseDiff 
+import LinearAlgebra: eigvals
 
 import ProgressMeter
 import ThreadPools
@@ -168,6 +170,64 @@ function saveValues(c::FMU2Component, recordValues, x, t, integrator, inputFunct
     return (fmiGet(c, recordValues)...,)
 end
 
+function saveEventIndicators(c::FMU2Component, recordEventIndicators, x, t, integrator, inputFunction, inputValues)
+
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "saveEventIndicators(...): Must be in continuous time mode."
+
+    c.solution.evals_saveeventindicators += 1
+
+    #x_old = fmi2GetContinuousStates(c)
+    #t_old = c.t
+    
+    if !c.fmu.isZeroState
+        fmi2SetContinuousStates(c, x)
+    end
+    fmi2SetTime(c, t) 
+    if inputFunction != nothing
+        fmi2SetReal(c, inputValues, inputFunction(c, x, t)) 
+    end
+
+    #fmi2SetContinuousStates(c, x_old)
+    #fmi2SetTime(c, t_old)
+
+    out = zeros(fmi2Real, c.fmu.modelDescription.numberOfEventIndicators)
+    fmi2GetEventIndicators!(c, out)
+    
+    return (out[recordEventIndicators]...,)
+end
+
+function saveEigenvalues(c::FMU2Component, x, t, integrator, inputFunction, inputValues)
+
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "saveEigenvalues(...): Must be in continuous time mode."
+
+    c.solution.evals_saveeigenvalues += 1
+
+    #x_old = fmi2GetContinuousStates(c)
+    #t_old = c.t
+    
+    if !c.fmu.isZeroState
+        fmi2SetContinuousStates(c, x)
+    end
+    fmi2SetTime(c, t) 
+    if inputFunction != nothing
+        fmi2SetReal(c, inputValues, inputFunction(c, x, t)) 
+    end
+
+    #fmi2SetContinuousStates(c, x_old)
+    #fmi2SetTime(c, t_old)
+
+    A = ReverseDiff.jacobian(_x -> FMI.fx(c, _x, [], t), x)
+    eigs = eigvals(A)
+
+    vals = []
+    for e in eigs 
+        push!(vals, real(e))
+        push!(vals, imag(e))
+    end
+    
+    return (vals...,)
+end
+
 function fx(c::FMU2Component, 
     dx::AbstractArray{<:Real},
     x::AbstractArray{<:Real}, 
@@ -246,6 +306,8 @@ Keywords:
     - solver: Any Julia-supported ODE-solver (default is the DifferentialEquations.jl default solver, currently `AutoTsit5(Rosenbrock23())`)
     - customFx: [deprecated] Ability to give a custom state derivative function ẋ=f(x,t)
     - recordValues: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
+    - recordEventIndicators: Array or Range of event indicators (identified by integers) to record
+    - recordEigenvalues: Boolean value, if eigenvalues shall be computed and recorded
     - saveat: Time points to save values at (interpolated)
     - setup: Boolean, if FMU should be setup (default=true)
     - reset: Union{Bool, :auto}, if FMU should be reset before simulation (default reset=:auto)
@@ -264,6 +326,8 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
     solver = nothing,
     customFx = nothing,
     recordValues::fmi2ValueReferenceFormat = nothing,
+    recordEventIndicators::Union{AbstractArray{<:Integer, 1}, UnitRange{<:Integer}, Nothing} = nothing,
+    recordEigenvalues::Bool=false,
     saveat = nothing,
     x0::Union{AbstractArray{<:Real}, Nothing} = nothing,
     setup::Union{Bool, Nothing} = nothing,
@@ -275,7 +339,8 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
     inputFunction = nothing,
     parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
     dtmax::Union{Real, Nothing} = nothing,
-    callbacks = [],
+    callbacksBefore = [],
+    callbacksAfter = [],
     showProgress::Bool = true,
     kwargs...)
 
@@ -287,11 +352,11 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
     if inputFunction != nothing
         if hasmethod(inputFunction, Tuple{fmi2Real})
             _inputFunction = (c, u, t) -> inputFunction(t)
-        elseif  hasmethod(inputFunction, Tuple{Union{FMU2Component, Nothing}, fmi2Real})
+        elseif hasmethod(inputFunction, Tuple{Union{FMU2Component, Nothing}, fmi2Real})
             _inputFunction = (c, u, t) -> inputFunction(c, t)
-        elseif  hasmethod(inputFunction, Tuple{Union{FMU2Component, Nothing}, AbstractArray{fmi2Real,1}})
+        elseif hasmethod(inputFunction, Tuple{Union{FMU2Component, Nothing}, AbstractArray{fmi2Real,1}})
             _inputFunction = (c, u, t) -> inputFunction(c, u)
-        elseif  hasmethod(inputFunction, Tuple{AbstractArray{fmi2Real,1}, fmi2Real})
+        elseif hasmethod(inputFunction, Tuple{AbstractArray{fmi2Real,1}, fmi2Real})
             _inputFunction = (c, u, t) -> inputFunction(u, t)
         else 
             _inputFunction = inputFunction
@@ -303,6 +368,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
     inputValueReferences = prepareValueReference(fmu, inputValueReferences)
     
     savingValues = (length(recordValues) > 0)
+    savingEventIndicators = !isnothing(recordEventIndicators) 
     hasInputs = (length(inputValueReferences) > 0)
     hasParameters = (parameters !== nothing)
     hasStartState = (x0 !== nothing)
@@ -311,7 +377,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
 
     cbs = []
 
-    for cb in callbacks
+    for cb in callbacksBefore
         push!(cbs, cb)
     end
 
@@ -416,11 +482,12 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
         push!(cbs, stepCb)
     end
 
-    if savingValues
+    if savingValues 
         dtypes = collect(fmi2DataTypeForValueReference(c.fmu.modelDescription, vr) for vr in recordValues)
-        fmusol.values = SavedValues(Float64, Tuple{dtypes...})
+        fmusol.values = SavedValues(fmi2Real, Tuple{dtypes...})
         fmusol.valueReferences = copy(recordValues)
 
+        savingCB = nothing
         if saveat === nothing
             savingCB = SavingCallback((u,t,integrator) -> saveValues(c, recordValues, u, t, integrator, _inputFunction, inputValueReferences), 
                                     fmusol.values)
@@ -431,6 +498,45 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
         end
 
         push!(cbs, savingCB)
+    end
+
+    if savingEventIndicators
+        dtypes = collect(fmi2Real for ei in recordEventIndicators)
+        fmusol.eventIndicators = SavedValues(fmi2Real, Tuple{dtypes...})
+        fmusol.recordEventIndicators = copy(recordEventIndicators)
+
+        savingCB = nothing
+        if saveat === nothing
+            savingCB = SavingCallback((u,t,integrator) -> saveEventIndicators(c, recordEventIndicators, u, t, integrator, _inputFunction, inputValueReferences), 
+                                    fmusol.eventIndicators)
+        else
+            savingCB = SavingCallback((u,t,integrator) -> saveEventIndicators(c, recordEventIndicators, u, t, integrator, _inputFunction, inputValueReferences), 
+                                    fmusol.eventIndicators, 
+                                    saveat=saveat)
+        end
+
+        push!(cbs, savingCB)
+    end
+
+    if recordEigenvalues
+        dtypes = collect(Float64 for _ in 1:2*length(c.fmu.modelDescription.stateValueReferences))
+        fmusol.eigenvalues = SavedValues(fmi2Real, Tuple{dtypes...})
+        
+        savingCB = nothing
+        if saveat === nothing
+            savingCB = SavingCallback((u,t,integrator) -> saveEigenvalues(c, u, t, integrator, _inputFunction, inputValueReferences), 
+                                    fmusol.eigenvalues)
+        else
+            savingCB = SavingCallback((u,t,integrator) -> saveEigenvalues(c, u, t, integrator, _inputFunction, inputValueReferences), 
+                                    fmusol.eigenvalues, 
+                                    saveat=saveat)
+        end
+
+        push!(cbs, savingCB)
+    end
+
+    for cb in callbacksAfter
+        push!(cbs, cb)
     end
 
     # if auto_dt == true
