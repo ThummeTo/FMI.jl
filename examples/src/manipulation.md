@@ -125,8 +125,8 @@ simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
 
     [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
     [33m[1m│ [22m[39mConsider using tuples instead.
-    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:23[39m
+    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/wvDeR/src/performance_warnings.jl:32[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:20[39m
 
 
 
@@ -219,7 +219,7 @@ originalGetReal = myFMU.cGetReal
 
 
 
-    Ptr{Nothing} @0x00007f2cf3769faf
+    Ptr{Nothing} @0x00007f907748efaf
 
 
 
@@ -267,7 +267,7 @@ fmiSetFctGetReal(myFMU, myGetReal!)
 
 
 
-    Ptr{Nothing} @0x00007f2dd2183fc0
+    Ptr{Nothing} @0x00007f917b41bfc0
 
 
 
@@ -281,16 +281,11 @@ simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
 fmiPlot!(fig, simData; states=false, style=:dash)
 ```
 
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
-    [33m[1m│ [22m[39mConsider using tuples instead.
-    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
-
-
 
 
 
     
-![svg](manipulation_files/manipulation_20_1.svg)
+![svg](manipulation_files/manipulation_20_0.svg)
     
 
 
