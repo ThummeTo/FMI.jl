@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>FMU Parameter Optimization · FMI.jl</title><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.png" alt="FMI.jl logo"/></a><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Introduction</a></li><li><a class="tocitem" href="../../features/">Features</a></li><li><a class="tocitem" href="../../faq/">FAQ</a></li><li><input class="collapse-toggle" id="menuitem-4" type="checkbox"/><label class="tocitem" for="menuitem-4"><span class="docs-label">Examples</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../overview/">Overview</a></li><li><a class="tocitem" href="../simulate/">Simulate</a></li><li><a class="tocitem" href="../parameterize/">Parameterize</a></li><li><a class="tocitem" href="../multiple_instances/">Multiple instances</a></li><li><a class="tocitem" href="../modelica_conference_2021/">Modelica conference 2021</a></li><li><a class="tocitem" href="../manipulation/">Manipulation</a></li><li><a class="tocitem" href="../multithreading/">Multithreading</a></li><li><a class="tocitem" href="../multiprocessing/">Multiprocessing</a></li></ul></li><li><a class="tocitem" href="../../library/">Library Functions</a></li><li><a class="tocitem" href="../../related/">Related Publication</a></li><li><a class="tocitem" href="../../contents/">Contents</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>FMU Parameter Optimization</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>FMU Parameter Optimization</a></li></ul></nav><div class="docs-right"><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="FMU-Parameter-Optimization"><a class="docs-heading-anchor" href="#FMU-Parameter-Optimization">FMU Parameter Optimization</a><a id="FMU-Parameter-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#FMU-Parameter-Optimization" title="Permalink"></a></h1><p>Tutorial by Tobias Thummerer</p><h2 id="License"><a class="docs-heading-anchor" href="#License">License</a><a id="License-1"></a><a class="docs-heading-anchor-permalink" href="#License" title="Permalink"></a></h2><pre><code class="language-julia hljs"># Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons
+# Licensed under the MIT license. 
+# See LICENSE (https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.</code></pre><h2 id="Introduction-to-the-example"><a class="docs-heading-anchor" href="#Introduction-to-the-example">Introduction to the example</a><a id="Introduction-to-the-example-1"></a><a class="docs-heading-anchor-permalink" href="#Introduction-to-the-example" title="Permalink"></a></h2><p>This example shows how a parameter optimization can be set up for a FMU. The goal is to fit FMU parameters (and initial states), so that a reference trajectory is fit as good as possible.</p><p>Note, that this tutorial covers optimization <em>without</em> gradient information. Basically, <em>FMI.jl</em> supports gradient based optimization, too.</p><h2 id="Other-formats"><a class="docs-heading-anchor" href="#Other-formats">Other formats</a><a id="Other-formats-1"></a><a class="docs-heading-anchor-permalink" href="#Other-formats" title="Permalink"></a></h2><p>Besides, this <a href="https://github.com/thummeto/FMI.jl/blob/examples/examples/src/parameter_optimization.ipynb">Jupyter Notebook</a> there is also a <a href="https://github.com/thummeto/FMI.jl/blob/examples/examples/src/parameter_optimization.jl">Julia file</a> with the same name, which contains only the code cells and for the documentation there is a <a href="https://github.com/thummeto/FMI.jl/blob/examples/examples/src/parameter_optimization.md">Markdown file</a> corresponding to the notebook.  </p><h2 id="Getting-started"><a class="docs-heading-anchor" href="#Getting-started">Getting started</a><a id="Getting-started-1"></a><a class="docs-heading-anchor-permalink" href="#Getting-started" title="Permalink"></a></h2><h3 id="Installation-prerequisites"><a class="docs-heading-anchor" href="#Installation-prerequisites">Installation prerequisites</a><a id="Installation-prerequisites-1"></a><a class="docs-heading-anchor-permalink" href="#Installation-prerequisites" title="Permalink"></a></h3><table><tr><th style="text-align: left"></th><th style="text-align: left">Description</th><th style="text-align: left">Command</th></tr><tr><td style="text-align: left">1.</td><td style="text-align: left">Enter Package Manager via</td><td style="text-align: left">]</td></tr><tr><td style="text-align: left">2.</td><td style="text-align: left">Install FMI via</td><td style="text-align: left">add FMI</td></tr><tr><td style="text-align: left">3.</td><td style="text-align: left">Install FMIZoo via</td><td style="text-align: left">add FMIZoo</td></tr><tr><td style="text-align: left">4.</td><td style="text-align: left">Install Optim  via</td><td style="text-align: left">add Optim</td></tr><tr><td style="text-align: left">5.</td><td style="text-align: left">Install Plots  via</td><td style="text-align: left">add Plots</td></tr></table><h2 id="Code-section"><a class="docs-heading-anchor" href="#Code-section">Code section</a><a id="Code-section-1"></a><a class="docs-heading-anchor-permalink" href="#Code-section" title="Permalink"></a></h2><p>To run the example, the previously installed packages must be included. </p><pre><code class="language-julia hljs"># imports
+using FMI
+using FMIZoo
+using Optim
+using Plots</code></pre><h3 id="Simulation-setup"><a class="docs-heading-anchor" href="#Simulation-setup">Simulation setup</a><a id="Simulation-setup-1"></a><a class="docs-heading-anchor-permalink" href="#Simulation-setup" title="Permalink"></a></h3><p>Next, the start time and end time of the simulation are set.</p><pre><code class="language-julia hljs">tStart = 0.0
+tStop = 5.0
+tStep = 0.1
+tSave = tStart:tStep:tStop</code></pre><pre><code class="nohighlight hljs">0.0:0.1:5.0</code></pre><h3 id="Import-FMU"><a class="docs-heading-anchor" href="#Import-FMU">Import FMU</a><a id="Import-FMU-1"></a><a class="docs-heading-anchor-permalink" href="#Import-FMU" title="Permalink"></a></h3><p>In the next lines of code the FMU model from <em>FMIZoo.jl</em> is loaded and the information about the FMU is shown.</p><pre><code class="language-julia hljs"># we use an FMU from the FMIZoo.jl
+fmu = fmiLoad(&quot;SpringPendulum1D&quot;, &quot;Dymola&quot;, &quot;2022x&quot;; type=:ME)
+fmiInfo(fmu)</code></pre><pre><code class="nohighlight hljs">#################### Begin information for FMU ####################
+	Model name:			SpringPendulum1D
+	FMI-Version:			2.0
+	GUID:				{fc15d8c4-758b-48e6-b00e-5bf47b8b14e5}
+	Generation tool:		Dymola Version 2022x (64-bit), 2021-10-08
+	Generation time:		2022-05-19T06:54:23Z
+	Var. naming conv.:		structured
+	Event indicators:		0
+	Inputs:				0
+	Outputs:			0
+	States:				2
+		33554432 [&quot;mass.s&quot;]
+		33554433 [&quot;mass.v&quot;]
+	Supports Co-Simulation:		true
+		Model identifier:	SpringPendulum1D
+		Get/Set State:		true
+		Serialize State:	true
+		Dir. Derivatives:	true
+		Var. com. steps:	true
+		Input interpol.:	true
+		Max order out. der.:	1
+	Supports Model-Exchange:	true
+		Model identifier:	SpringPendulum1D
+		Get/Set State:		true
+		Serialize State:	true
+		Dir. Derivatives:	true
+##################### End information for FMU #####################</code></pre><p>Now, the optimization objective (the function to minimize) needs to be defined. In this case, we just want to do a simulation and compare it to a regular <code>sin</code> wave.</p><pre><code class="language-julia hljs">s_tar = 1.0 .+ sin.(tSave)
+
+# a function to simulate the FMU for given parameters
+function simulateFMU(p)
+    s0, v0, c, m = p # unpack parameters: s0 (start position), v0 (start velocity), c (spring constant) and m (pendulum mass)
+
+    # pack the parameters into a dictionary
+    paramDict = Dict{String, Any}()
+    paramDict[&quot;spring.c&quot;] = c 
+    paramDict[&quot;mass.m&quot;] = m
+
+    # pack the start state
+    x0 = [s0, v0]
+
+    # simulate with given start stae and parameters
+    sol = fmiSimulate(fmu, (tStart, tStop); x0=x0, parameters=paramDict, saveat=tSave)
+
+    # get state with index 1 (the position) from the solution
+    s_res = fmiGetSolutionState(sol, 1; isIndex=true) 
+
+    return s_res
+end
+
+# the optimization objective
+function objective(p)
+    s_res = simulateFMU(p)
+
+    # return the position error sum between FMU simulation (s_res) and target (s_tar)
+    return sum(abs.(s_tar .- s_res))    
+end</code></pre><pre><code class="nohighlight hljs">objective (generic function with 1 method)</code></pre><p>Now let&#39;s see how far we are away for our guess parameters:</p><pre><code class="language-julia hljs">s0 = 0.0 
+v0 = 0.0
+c = 1.0
+m = 1.0 
+p = [s0, v0, c, m]
+
+obj_before = objective(p) # not really good!</code></pre><pre><code class="nohighlight hljs">[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:28[39m
+
+
+
+
+
+54.43219974960283</code></pre><p>Let&#39;s have a look on the differences:</p><pre><code class="language-julia hljs">s_fmu = simulateFMU(p); # simulate the position
+
+plot(tSave, s_fmu; label=&quot;FMU&quot;)
+plot!(tSave, s_tar; label=&quot;Optimization target&quot;)</code></pre><pre><code class="nohighlight hljs">[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m</code></pre><p><img src="../parameter_optimization_files/parameter_optimization_14_1.svg" alt="svg"/></p><p>Not that good. So let&#39;s do a bit of optimization!</p><pre><code class="language-julia hljs">opt = Optim.optimize(objective, p; iterations=250) # do max. 250 iterations
+obj_after = opt.minimum # much better!
+p_res = opt.minimizer # the optimized parameters</code></pre><pre><code class="nohighlight hljs">[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m
+
+
+
+
+
+4-element Vector{Float64}:
+ 1.000000090936486
+ 0.9779757996615742
+ 0.130860011492463
+ 0.11402874395172038</code></pre><p>Looks promising, let&#39;s have a look on the results plot:</p><pre><code class="language-julia hljs">s_fmu = simulateFMU(p_res); # simulate the position
+
+plot(tSave, s_fmu; label=&quot;FMU&quot;)
+plot!(tSave, s_tar; label=&quot;Optimization target&quot;)</code></pre><pre><code class="nohighlight hljs">[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
+[33m[1m│ [22m[39mConsider using tuples instead.
+[33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/s9wrq/src/performance_warnings.jl:32[39m</code></pre><p><img src="../parameter_optimization_files/parameter_optimization_18_1.svg" alt="svg"/></p><p>Actually a pretty fit! If you have higher requirements, check out the <em>Optim.jl</em> library.</p><h3 id="Summary"><a class="docs-heading-anchor" href="#Summary">Summary</a><a id="Summary-1"></a><a class="docs-heading-anchor-permalink" href="#Summary" title="Permalink"></a></h3><p>This tutorial showed how a parameter (and start value) optimization can be performed on a FMU with a gradient free optimizer. This tutorial will be extended soon to further show how convergence for large parameter spaces can be improoved!</p></article><nav class="docs-footer"><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Friday 21 July 2023 20:05">Friday 21 July 2023</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
