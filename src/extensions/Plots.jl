@@ -41,7 +41,7 @@ function fmiPlot(solution::FMUSolution; kwargs...)
     fmiPlot!(fig, solution; kwargs...)
     return fig
 end
-function fmiPlot!(fig, solution::FMUSolution;
+function fmiPlot!(fig::Plots.Plot, solution::FMUSolution;
     states::Union{Bool, Nothing}=nothing,
     values::Union{Bool, Nothing}=nothing,
     stateEvents::Union{Bool, Nothing}=nothing,
@@ -209,9 +209,9 @@ Extended the original plot-command by plotting FMUs.
 
 For further information seek `?fmiPlot`.
 """
-function Plots.plot(solution::FMUSolution, args...; kwargs...)
-    fmiPlot(solution, args...; kwargs...)
+function Plots.plot(solution::FMUSolution; kwargs...)
+    fmiPlot(solution; kwargs...)
 end
-function Plots.plot!(fig, solution::FMUSolution, args...; kwargs...)
-    fmiPlot!(fig, solution, args...; kwargs...)
+function Plots.plot!(fig::Plots.Plot, solution::FMUSolution; kwargs...)
+    fmiPlot!(fig, solution; kwargs...)
 end
