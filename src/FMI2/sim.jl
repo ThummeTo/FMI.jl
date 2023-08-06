@@ -231,7 +231,7 @@ end
 function fx(c::FMU2Component, 
     dx::AbstractArray{<:Real},
     x::AbstractArray{<:Real}, 
-    p::AbstractArray, 
+    p::Tuple,
     t::Real)
 
     c.solution.evals_fx_inplace += 1
@@ -247,7 +247,7 @@ end
 
 function fx(c::FMU2Component, 
     x::AbstractArray{<:Real}, 
-    p::AbstractArray, 
+    p::Tuple,
     t::Real)
 
     c.solution.evals_fx_outofplace += 1
@@ -269,9 +269,9 @@ function fmi2SimulateME(c::FMU2Component, tspan::Union{Tuple{Float64, Float64}, 
 end 
 
 # sets up the ODEProblem for simulating a ME-FMU
-function setupODEProblem(c::FMU2Component, x0::AbstractArray{fmi2Real}, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; p=[], customFx=nothing)
+function setupODEProblem(c::FMU2Component, x0::AbstractArray{fmi2Real}, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; p=(), customFx=nothing)
     
-    p = []
+    p = ()
     
     if c.fmu.executionConfig.inPlace
         if customFx === nothing
