@@ -13,6 +13,7 @@
 [![Run PkgEval](https://github.com/ThummeTo/FMI.jl/actions/workflows/Eval.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Eval.yml)
 [![Coverage](https://codecov.io/gh/ThummeTo/FMI.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ThummeTo/FMI.jl)
 [![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
+[![FMI Downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/FMI)](https://pkgs.genieframework.com?packages=FMI).
 
 
 ## How can I use FMI.jl?
@@ -20,12 +21,12 @@
 
 2\. Install [*FMI.jl*](https://github.com/ThummeTo/FMI.jl):
 ```julia-repl
-(@v1.X) pkg> add FMI
+(@v1) pkg> add FMI
 ```
 
 3\. If you want to check that everything works correctly, you can run the tests bundled with [*FMI.jl*](https://github.com/ThummeTo/FMI.jl):
 ```julia-repl
-(@v1.X) pkg> test FMI
+(@v1) pkg> test FMI
 ```
 
 4\. Have a look inside the [examples folder](https://github.com/ThummeTo/FMI.jl/tree/examples/examples) in the examples branch or the [examples section](https://thummeto.github.io/FMI.jl/dev/examples/overview/) of the documentation. All examples are available as Julia-Script (*.jl*), Jupyter-Notebook (*.ipynb*) and Markdown (*.md*).
@@ -35,13 +36,13 @@
 using FMI, Plots
 
 # load and instantiate a FMU
-myFMU = fmiLoad(pathToFMU)
+fmu = fmiLoad(pathToFMU) 
 
 # simulate from t=0.0s until t=10.0s and record the FMU variable named "mass.s"
-simData = fmiSimulate(myFMU, (0.0, 10.0); recordValues=["mass.s"])
+simData = fmiSimulate(fmu, (0.0, 10.0); recordValues=["mass.s"])
 
 # plot it!
-fmiPlot(simData)
+plot(simData)
 
 # free memory
 fmiUnload(myFMU)

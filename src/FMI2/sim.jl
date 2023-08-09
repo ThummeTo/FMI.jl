@@ -781,6 +781,14 @@ function fmi2Simulate(c::FMU2Component, tspan::Union{Tuple{Float64, Float64}, No
     fmi2Simulate(c.fmu, c, tspan; kwargs...)
 end 
 
+# function (c::FMU2Component)(; t::Tuple{Float64, Float64}, kwargs...)
+#     fmi2Simulate(c, t; kwargs...)
+# end
+
+# function (f::FMU2)(; t::Tuple{Float64, Float64}, kwargs...)
+#     fmi2Simulate(c.fmu, t; kwargs...)
+# end
+
 """
 Starts a simulation of the FMU instance for the matching FMU type, if both types are available, CS is preferred.
 
@@ -791,7 +799,7 @@ Keywords:
     - inputValues: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
     - inputFunction: Function to retrieve the values to set the inputs to 
     - saveat: [ME only] Time points to save values at (interpolated)
-    - solver: [ME only] Any Julia-supported ODE-solver (default is Tsit5)
+    - solver: [ME only] Any Julia-supported ODE-solver (default is default from DifferentialEquations.jl)
     - customFx: [ME only, deprecated] Ability to give a custom state derivative function ẋ=f(x,t)
 
 Returns:
