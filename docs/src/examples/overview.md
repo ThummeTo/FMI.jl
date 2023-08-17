@@ -2,7 +2,8 @@
 
 This section discusses the included examples of the FMI.jl library.
 If you require further information about the function calls, see the function sections of the [library](https://thummeto.github.io/FMI.jl/dev/library/).
-Examples are subdevided into *Basics*, *Advanced* and *Publication appendices*
+
+Examples are subdevided into *Basics*, *Advanced* and *Publication appendices*.
 
 
 **Basic examples:**
