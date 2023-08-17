@@ -1076,7 +1076,6 @@ See also [`fmi2Unload`](@ref), [`fmi3Unload`](@ref).
 """
 function fmiUnload(fmu::FMU2)
     fmi2Unload(fmu)
-    fmu = nothing
 end
 function fmiUnload(fmu::FMU3)
     fmi3Unload(fmu)
