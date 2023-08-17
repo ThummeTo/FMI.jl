@@ -75,6 +75,11 @@ function runtestsFMI2(exportingTool)
                 @testset "Loading/Saving simulation results" begin
                     include("FMI2/load_save.jl")
                 end
+
+                @info "Call function after fmi2Unload (fmiUnload.jl)"
+                @testset "Call function after fmi2Unload" begin
+                    include("FMI2/fmiUnload.jl")
+                end
             end
         end
 
