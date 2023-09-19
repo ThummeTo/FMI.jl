@@ -16,7 +16,7 @@ t_stop = 8.0
 myFMU = fmiLoad("SpringFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 
 recordValues = ["mass.s", "mass.v"]
-solutionME = fmiSimulateME(myFMU, (t_start, t_stop); recordValues=recordValues)
+solutionME = fmiSimulateME(myFMU, (t_start, t_stop); recordValues=recordValues, solver=FBDF(autodiff=false))
 solutionCS = fmiSimulateCS(myFMU, (t_start, t_stop); recordValues=recordValues)
 
 # ME

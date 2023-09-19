@@ -4,7 +4,7 @@
 #
 
 using DifferentialEquations, DiffEqCallbacks
-import FMIImport.SciMLSensitivity.SciMLBase: RightRootFind, ReturnCode
+import DifferentialEquations.SciMLBase: RightRootFind, ReturnCode
 
 using FMIImport: fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2NewDiscreteStates, fmi2GetContinuousStates, fmi2GetNominalsOfContinuousStates, fmi2SetContinuousStates, fmi2GetDerivatives!
 using FMIImport.FMICore: fmi2StatusOK, fmi2TypeCoSimulation, fmi2TypeModelExchange
@@ -12,11 +12,9 @@ using FMIImport.FMICore: fmi2ComponentState, fmi2ComponentStateInstantiated, fmi
 using FMIImport: FMU2Solution, FMU2Event
 
 import FMIImport: prepareSolveFMU, finishSolveFMU, handleEvents
-import FMIImport: undual
 
-using FMIImport.ChainRulesCore
+using FMIImport.FMICore.ChainRulesCore
 
-import FMIImport.ReverseDiff 
 import LinearAlgebra: eigvals
 
 import ProgressMeter
@@ -47,14 +45,14 @@ function time_choice(c::FMU2Component, integrator, tStart, tStop)
 end
 
 # Returns the event indicators for an FMU.
-function condition(c::FMU2Component, out::AbstractArray{<:Real}, x, t, integrator, inputFunction, inputValues::AbstractArray{fmi2ValueReference}) 
+function condition(c::FMU2Component, out::Array{fmi2Real}, x, t, integrator, inputFunction, inputValues::Array{fmi2ValueReference}) 
 
     @assert c.state == fmi2ComponentStateContinuousTimeMode "condition(...): Must be called in mode continuous time."
 
     c.solution.evals_condition += 1
 
-    t = undual(t)
-    x = undual(x)
+    t = unsense(t)
+    x = unsense(x)
 
     fmi2SetContinuousStates(c, x)
     fmi2SetTime(c, t)
@@ -62,6 +60,14 @@ function condition(c::FMU2Component, out::AbstractArray{<:Real}, x, t, integrato
         fmi2SetReal(c, inputValues, inputFunction(c, x, t)) 
     end
     fmi2GetEventIndicators!(c, out)
+
+    return nothing
+end
+function condition(c::FMU2Component, out::AbstractArray{fmi2Real}, x, t, integrator, inputFunction, inputValues::Array{fmi2ValueReference}) 
+    # ToDo: single @warn "Condition called with AbstractArray buffer, this is slow."
+    buf = Array{fmi2Real}(out)
+    condition(c, buf, x, t, integrator, inputFunction, inputValues)
+    out[:] = buf 
 
     return nothing
 end
@@ -140,7 +146,7 @@ function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, inputV
     if enterEventMode == fmi2True
         affectFMU!(c, integrator, -1, inputFunction, inputValues, solution)
     else
-        if inputFunction != nothing
+        if !isnothing(inputFunction)
             fmi2SetReal(c, inputValues, inputFunction(c, x, t)) 
         end
     end
@@ -167,6 +173,7 @@ function saveValues(c::FMU2Component, recordValues, x, t, integrator, inputFunct
     #fmi2SetContinuousStates(c, x_old)
     #fmi2SetTime(c, t_old)
     
+    # ToDo: Replace by inplace statement!
     return (fmiGet(c, recordValues)...,)
 end
 
@@ -193,6 +200,7 @@ function saveEventIndicators(c::FMU2Component, recordEventIndicators, x, t, inte
     out = zeros(fmi2Real, c.fmu.modelDescription.numberOfEventIndicators)
     fmi2GetEventIndicators!(c, out)
     
+    # ToDo: Replace by inplace statement!
     return (out[recordEventIndicators]...,)
 end
 
@@ -216,6 +224,7 @@ function saveEigenvalues(c::FMU2Component, x, t, integrator, inputFunction, inpu
     #fmi2SetContinuousStates(c, x_old)
     #fmi2SetTime(c, t_old)
 
+    # ToDo: Replace this by an directional derivative call!
     A = ReverseDiff.jacobian(_x -> FMI.fx(c, _x, [], t), x)
     eigs = eigvals(A)
 
@@ -225,6 +234,7 @@ function saveEigenvalues(c::FMU2Component, x, t, integrator, inputFunction, inpu
         push!(vals, imag(e))
     end
     
+    # ToDo: Replace by inplace statement!
     return (vals...,)
 end
 
@@ -236,13 +246,9 @@ function fx(c::FMU2Component,
 
     c.solution.evals_fx_inplace += 1
 
-    if c.fmu.executionConfig.concat_y_dx
-        dx[:] = c(;dx=dx, x=x, t=t)
-    else
-        _, dx[:] = c(;dx=dx, x=x, t=t)
-    end
-
-    return dx
+    c(;dx=dx, x=x, t=t)
+    
+    return nothing
 end
 
 function fx(c::FMU2Component, 
@@ -270,8 +276,6 @@ end
 
 # sets up the ODEProblem for simulating a ME-FMU
 function setupODEProblem(c::FMU2Component, x0::AbstractArray{fmi2Real}, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; p=(), customFx=nothing)
-    
-    p = ()
     
     if c.fmu.executionConfig.inPlace
         if customFx === nothing
@@ -781,6 +785,14 @@ function fmi2Simulate(c::FMU2Component, tspan::Union{Tuple{Float64, Float64}, No
     fmi2Simulate(c.fmu, c, tspan; kwargs...)
 end 
 
+# function (c::FMU2Component)(; t::Tuple{Float64, Float64}, kwargs...)
+#     fmi2Simulate(c, t; kwargs...)
+# end
+
+# function (f::FMU2)(; t::Tuple{Float64, Float64}, kwargs...)
+#     fmi2Simulate(c.fmu, t; kwargs...)
+# end
+
 """
 Starts a simulation of the FMU instance for the matching FMU type, if both types are available, CS is preferred.
 
@@ -791,7 +803,7 @@ Keywords:
     - inputValues: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
     - inputFunction: Function to retrieve the values to set the inputs to 
     - saveat: [ME only] Time points to save values at (interpolated)
-    - solver: [ME only] Any Julia-supported ODE-solver (default is Tsit5)
+    - solver: [ME only] Any Julia-supported ODE-solver (default is default from DifferentialEquations.jl)
     - customFx: [ME only, deprecated] Ability to give a custom state derivative function ẋ=f(x,t)
 
 Returns:

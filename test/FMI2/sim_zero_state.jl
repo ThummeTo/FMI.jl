@@ -7,7 +7,7 @@ using DifferentialEquations: Tsit5
 
 t_start = 0.0
 t_stop = 8.0
-solver = Tsit5()
+solver=FBDF(autodiff=false)
 dtmax = 0.01
 
 function extForce_t(t)
