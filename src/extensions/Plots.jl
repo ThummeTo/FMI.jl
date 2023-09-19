@@ -4,7 +4,7 @@
 #
 
 using FMIImport: FMUSolution
-import FMIImport.ForwardDiff
+import FMIImport.FMICore: unsense
 
 """
 
@@ -17,19 +17,17 @@ import FMIImport.ForwardDiff
     maxLabelLength=64,
     plotkwargs...)
 
-Plots data from a ME-FMU.
-
-Optional `t_in_solution` controls if the first state in the solution is interpreted as t(ime).
+Plots data from a FMU simulation run.
 
 # Arguments
-- `solution::FMUSolution`:  Struct contains information about the solution `value`, `success`, `state` and  `events` of a specific FMU.
+- `solution::FMUSolution`: Struct that contains information about the solution of a FMU simulation run.
 
 # Keywords
 - `states::Union{Bool, Nothing}`: controls if states should be ploted (default = nothing)
 - `values::Union{Bool, Nothing}`: controls if values should be ploted (default = nothing)
-- `timeEvents::Union{Bool, Nothing}=nothing`: controls if timeEvents should be ploted (default = noting )
-- `stateIndices=nothing`: controls the number of ploted states
-- `valueIndices=nothing`: controls the number of ploted values
+- `timeEvents::Union{Bool, Nothing}`: controls if timeEvents should be ploted (default = nothing)
+- `stateIndices`: controls the indices of ploted states, `nothing` for plotting all (default = nothing)
+- `valueIndices`: controls the indices of ploted values, `nothing` for plotting all (default = nothing)
 - `maxLabelLength=64`: controls the maximum length for legend labels (too long labels are cut from front)
 
 # Returns
@@ -70,7 +68,7 @@ function fmiPlot!(fig::Plots.Plot, solution::FMUSolution;
         end
     end
 
-    if states === nothing
+    if isnothing(states)
         states = (solution.states !== nothing)
     end
 
@@ -123,7 +121,7 @@ function fmiPlot!(fig::Plots.Plot, solution::FMUSolution;
 
     # plot states
     if states
-        t = collect(ForwardDiff.value(e) for e in solution.states.t)
+        t = collect(unsense(e) for e in solution.states.t)
         numValues = length(solution.states.u[1])
 
         for v in 1:numValues
@@ -132,7 +130,7 @@ function fmiPlot!(fig::Plots.Plot, solution::FMUSolution;
                 vrNames = fmi2ValueReferenceToString(component.fmu, vr)
                 vrName = length(vrNames) > 0 ? vrNames[1] : "?"
 
-                vals = collect(ForwardDiff.value(data[v]) for data in solution.states.u)
+                vals = collect(unsense(data[v]) for data in solution.states.u)
 
                 plot_min = min(plot_min, vals...)
                 plot_max = max(plot_max, vals...)
@@ -151,7 +149,7 @@ function fmiPlot!(fig::Plots.Plot, solution::FMUSolution;
 
     # plot recorded values
     if values
-        t = collect(ForwardDiff.value(e) for e in solution.values.t)
+        t = collect(unsense(e) for e in solution.values.t)
         numValues = length(solution.values.saveval[1])
 
         for v in 1:numValues
@@ -164,7 +162,7 @@ function fmiPlot!(fig::Plots.Plot, solution::FMUSolution;
                     vrName = length(vrNames) > 0 ? vrNames[1] : "?"
                 end
     
-                vals = collect(ForwardDiff.value(data[v]) for data in solution.values.saveval)
+                vals = collect(unsense(data[v]) for data in solution.values.saveval)
 
                 plot_min = min(plot_min, vals...)
                 plot_max = max(plot_max, vals...)

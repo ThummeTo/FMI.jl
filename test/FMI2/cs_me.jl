@@ -23,7 +23,7 @@ end
 
 sol = fmiSimulateCS(fmuStruct, (t_start, t_stop))
 @test sol.success 
-sol = fmiSimulateME(fmuStruct, (t_start, t_stop))
+sol = fmiSimulateME(fmuStruct, (t_start, t_stop); solver=FBDF(autodiff=false))
 @test sol.success 
 
 fmiUnload(myFMU)
@@ -40,7 +40,7 @@ if envFMUSTRUCT == "FMU"
 elseif envFMUSTRUCT == "FMUCOMPONENT"
     fmuStruct = comp
 end
-sol = fmiSimulate(fmuStruct, (t_start, t_stop))
+sol = fmiSimulate(fmuStruct, (t_start, t_stop); solver=FBDF(autodiff=false))
 @test sol.success
 fmiUnload(myFMU)
 

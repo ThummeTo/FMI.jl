@@ -11,6 +11,8 @@ using Requires
 
 using FMIImport
 
+import FMIImport.FMICore: unsense, getCurrentComponent
+
 # TODO recheck export import list
 # fmi2 imports
 import FMIImport: fmi2CallbackLogger, fmi2CallbackAllocateMemory, fmi2CallbackFreeMemory, fmi2CallbackStepFinished
