@@ -229,7 +229,7 @@ end
 function fx(c::FMU3Instance, 
     dx::AbstractArray{<:Real},
     x::AbstractArray{<:Real}, 
-    p::AbstractArray, 
+    p::Tuple,
     t::Real)
 
     # if isa(t, ForwardDiff.Dual) 
@@ -657,12 +657,12 @@ function fmi3SimulateME(c::FMU3Instance, t_start::Union{Real, Nothing} = nothing
 end 
 
 # sets up the ODEProblem for simulating a ME-FMU
-function setupODEProblem(c::FMU3Instance, x0::AbstractArray{fmi3Float64}, t_start::fmi3Float64, t_stop::fmi3Float64; p=[], customFx=nothing)
+function setupODEProblem(c::FMU3Instance, x0::AbstractArray{fmi3Float64}, t_start::fmi3Float64, t_stop::fmi3Float64; p=(), customFx=nothing)
     if customFx === nothing
         customFx = (dx, x, p, t) -> fx(c, dx, x, p, t)
     end
 
-    p = []
+    p = ()
     c.problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
 
     return c.problem
