@@ -1054,13 +1054,13 @@ More detailed: `fmi3Struct = Union{FMU3, FMU3Instance}`
 See also [`fmi2SimulateME`](@ref) [`fmi2SimulateCS`](@ref), [`fmi2Simulate`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 
 """
-
 function fmiSimulateME(str::fmi2Struct, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing, args...; kwargs...)
     fmi2SimulateME(str, tspan, args...; kwargs...)
 end
 function fmiSimulateME(str::fmi3Struct, args...; kwargs...)
     fmi3SimulateME(str, args...; kwargs...)
 end
+
 """
     fmiUnload(fmu::Union{FMU2, FMU3})
 

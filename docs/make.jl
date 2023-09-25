@@ -3,7 +3,7 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-using Documenter, FMI
+using Documenter, FMI, Plots
 using Documenter: GitHubActions
 
 makedocs(sitename="FMI.jl",
