@@ -17,21 +17,38 @@ fmiLoad
 fmiUnload
 fmiReload
 ```
-### Conversion functions
+
+# Conversion functions
 
 ```@docs
 fmiStringToValueReference
 ```
 
-### External/additional functions
+# External/additional functions
 
 ```@docs
 fmiGetDependencies
 fmiInfo
 ```
 
-### Visualize simulation results
+# Visualize simulation results
 
 ```@docs
 fmiPlot
+```
+
+# FMI2 specific
+
+```@docs
+fmi2Simulate
+fmi2SimulateME
+fmi2SimulateCS
+```
+
+# FMI3 specific
+
+```@docs
+fmi3Simulate
+fmi3SimulateME
+fmi3SimulateCS
 ```

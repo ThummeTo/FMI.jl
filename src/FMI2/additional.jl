@@ -27,7 +27,6 @@ function fmi2VariableDependsOnVariable(fmu::FMU2, vr1::fmi2ValueReference, vr2::
 end
 
 """
-
     fmi2GetDependencies(fmu::FMU2)
 
 Building dependency matrix `dim x dim` for fast look-ups on variable dependencies (`dim` is number of states).
@@ -42,8 +41,6 @@ Building dependency matrix `dim x dim` for fast look-ups on variable dependencie
 - FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
 - FMISpec2.0.2[p.22]: 2.1.4 Inquire Platform and Version Number of Header Files
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
-
-See also [`fmi2GetDependencies`](@ref).
 """
 function fmi2GetDependencies(fmu::FMU2)
     if !isdefined(fmu, :dependencies)
