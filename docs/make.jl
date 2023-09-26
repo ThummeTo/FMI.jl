@@ -6,6 +6,7 @@
 using Documenter, FMI, Plots
 using Documenter: GitHubActions
 
+println("I am a DEBUG print statement")
 makedocs(sitename="FMI.jl",
          format = Documenter.HTML(
             collapselevel = 1,
