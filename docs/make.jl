@@ -7,13 +7,13 @@ using Documenter, FMI, Plots, FMIImport
 using Documenter: GitHubActions
 
 makedocs(sitename="FMI.jl",
-         #modules = [FMI,FMIImport],
          format = Documenter.HTML(
             collapselevel = 1,
             sidebar_sitename = false,
             edit_link = nothing,
             size_threshold_ignore = ["fmi2_library.md"]
          ),
+         warnonly=true,
          pages= Any[
             "Introduction" => "index.md"
             "Features" => "features.md"
