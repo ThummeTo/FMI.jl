@@ -30,3 +30,22 @@ fmiInfo
 ```@docs
 fmiPlot
 ```
+
+# FMI2 specific
+
+```@docs
+fmi2Info
+fmi2Simulate
+fmi2SimulateME
+fmi2SimulateCS
+```
+
+# FMI3 specific
+
+```@docs
+fmi3Info
+fmi3Simulate
+fmi3SimulateME
+fmi3SimulateSE
+fmi3SimulateCS
+```

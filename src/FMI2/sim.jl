@@ -295,6 +295,30 @@ function setupODEProblem(c::FMU2Component, x0::AbstractArray{fmi2Real}, tspan::U
 end
 
 """
+function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing;
+    tolerance::Union{Real, Nothing} = nothing,
+    dt::Union{Real, Nothing} = nothing,
+    solver = nothing,
+    customFx = nothing,
+    recordValues::fmi2ValueReferenceFormat = nothing,
+    recordEventIndicators::Union{AbstractArray{<:Integer, 1}, UnitRange{<:Integer}, Nothing} = nothing,
+    recordEigenvalues::Bool=false,
+    saveat = nothing,
+    x0::Union{AbstractArray{<:Real}, Nothing} = nothing,
+    setup::Union{Bool, Nothing} = nothing,
+    reset::Union{Bool, Nothing} = nothing,
+    instantiate::Union{Bool, Nothing} = nothing,
+    freeInstance::Union{Bool, Nothing} = nothing,
+    terminate::Union{Bool, Nothing} = nothing,
+    inputValueReferences::fmi2ValueReferenceFormat = nothing,
+    inputFunction = nothing,
+    parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
+    dtmax::Union{Real, Nothing} = nothing,
+    callbacksBefore = [],
+    callbacksAfter = [],
+    showProgress::Bool = true,
+    kwargs...)
+
 ToDo: Update DocString
 
 Simulates a FMU instance for the given simulation time interval.
@@ -586,6 +610,8 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
     return fmusol
 end
 
+export fmi2SimulateME
+
 # function fmi2SimulateME(fmu::FMU2, 
 #     c::Union{AbstractArray{<:Union{FMU2Component, Nothing}}, Nothing}=nothing, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing;
 #     x0::Union{AbstractArray{<:AbstractArray{<:Real}}, AbstractArray{<:Real}, Nothing} = nothing,
@@ -603,6 +629,21 @@ end
 ############ Co-Simulation ############
 
 """
+    fmi2SimulateCS(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing;
+                tolerance::Union{Real, Nothing} = nothing,
+                dt::Union{Real, Nothing} = nothing,
+                recordValues::fmi2ValueReferenceFormat = nothing,
+                saveat = [],
+                setup::Union{Bool, Nothing} = nothing,
+                reset::Union{Bool, Nothing} = nothing,
+                instantiate::Union{Bool, Nothing} = nothing,
+                freeInstance::Union{Bool, Nothing} = nothing,
+                terminate::Union{Bool, Nothing} = nothing,
+                inputValueReferences::fmi2ValueReferenceFormat = nothing,
+                inputFunction = nothing,
+                showProgress::Bool=true,
+                parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing)
+
 Starts a simulation of the Co-Simulation FMU instance.
 
 Via the optional keyword arguments `inputValues` and `inputFunction`, a custom input function `f(c, t)` or `f(t)` with time `t` and component `c` can be defined, that should return a array of values for `fmi2SetReal(..., inputValues, inputFunction(...))`.
@@ -774,6 +815,8 @@ function fmi2SimulateCS(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
     return fmusol
 end
 
+export fmi2SimulateCS
+
 ##### CS & ME #####
 
 # wrapper
@@ -790,6 +833,7 @@ end
 # end
 
 """
+fmi2Simulate(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...)
 Starts a simulation of the FMU instance for the matching FMU type, if both types are available, CS is preferred.
 
 Keywords:
@@ -818,3 +862,5 @@ function fmi2Simulate(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tspan
         error(unknownFMUType)
     end
 end
+
+export fmi2Simulate

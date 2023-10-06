@@ -107,6 +107,8 @@ export FMU3ExecutionConfiguration, FMU3_EXECUTION_CONFIGURATION_RESET, FMU3_EXEC
 using FMIImport: prepareValue, prepareValueReference
 
 export fmi2Real, fmi2Integer, fmi2String, fmi2Enumeration, fmi2Boolean
+export fmi2Info, fmi3Info
+export fmi2GetDependencies, fmi3GetDependencies
 
 include("check.jl")
 
@@ -1328,6 +1330,8 @@ end
 function fmiGetReal(str::fmi3Struct, args...; kwargs...)
     fmi3GetReal(str, args...; kwargs...)
 end
+
+export fmiGetReal
 
 
 """

@@ -3,7 +3,7 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-using Documenter, FMI, Plots, FMIImport
+using Documenter, FMI, Plots, FMIImport, FMICore
 using Documenter: GitHubActions
 
 makedocs(sitename="FMI.jl",
@@ -11,8 +11,10 @@ makedocs(sitename="FMI.jl",
             collapselevel = 1,
             sidebar_sitename = false,
             edit_link = nothing,
-            size_threshold_ignore = ["fmi2_library.md"]
+            size_threshold_ignore = ["fmi_import_library.md","fmi2_import_library.md","fmi3_import_library.md"]
          ),
+         modules = [FMI, FMIImport, FMICore],#, FMIBuild]
+         checkdocs=:none,#:exports,
          warnonly=true,
          pages= Any[
             "Introduction" => "index.md"
@@ -28,9 +30,17 @@ makedocs(sitename="FMI.jl",
                 "Multithreading" => "examples/multithreading.md"
                 "Multiprocessing" => "examples/multiprocessing.md"
             ]
-            "Developer Level API" => "fmi2_library.md"
-            #"" => "fmi3_library.md"
             "User Level API" => "library.md"
+            "Developer Level API" => Any[
+                #"fmi_import_library.md",
+                "fmi2_import_library.md",
+                "fmi3_import_library.md"
+            ]
+            "Foundation Level API" => Any[
+                #"fmi_core_library.md",
+                "fmi2_core_library.md",
+                "fmi3_core_library.md"
+            ]
             "Related Publication" => "related.md"
             "Contents" => "contents.md"
             ]

@@ -811,6 +811,26 @@ function setupODEProblem(c::FMU3Instance, x0::AbstractArray{fmi3Float64}, t_star
 end
 
 """
+fmi3SimulateME(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
+    tolerance::Union{Real, Nothing} = nothing,
+    dt::Union{Real, Nothing} = nothing,
+    solver = nothing,
+    customFx = nothing,
+    recordValues::fmi3ValueReferenceFormat = nothing,
+    saveat = nothing,
+    x0::Union{AbstractArray{<:Real}, Nothing} = nothing,
+    setup::Union{Bool, Nothing} = nothing,
+    reset::Union{Bool, Nothing} = nothing,
+    instantiate::Union{Bool, Nothing} = nothing,
+    freeInstance::Union{Bool, Nothing} = nothing,
+    terminate::Union{Bool, Nothing} = nothing,
+    inputValueReferences::fmi3ValueReferenceFormat = nothing,
+    inputFunction = nothing,
+    parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
+    dtmax::Union{Real, Nothing} = nothing,
+    callbacks = [],
+    showProgress::Bool = true,
+    kwargs...)
 Simulates a FMU instance for the given simulation time interval.
 State- and Time-Events are handled correctly.
 
@@ -1033,6 +1053,8 @@ function fmi3SimulateME(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_st
     return fmusol
 end
 
+export fmi3SimulateME
+
 
 # wrapper
 function fmi3SimulateCS(c::FMU3Instance, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
@@ -1042,6 +1064,21 @@ end
 ############ Co-Simulation ############
 
 """
+fmi3SimulateCS(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
+    tolerance::Union{Real, Nothing} = nothing,
+    dt::Union{Real, Nothing} = nothing,
+    recordValues::fmi3ValueReferenceFormat = nothing,
+    saveat = [],
+    setup::Union{Bool, Nothing} = nothing,
+    reset::Union{Bool, Nothing} = nothing,
+    instantiate::Union{Bool, Nothing} = nothing,
+    freeInstance::Union{Bool, Nothing} = nothing,
+    terminate::Union{Bool, Nothing} = nothing,
+    inputValueReferences::fmi3ValueReferenceFormat = nothing,
+    inputFunction = nothing,
+    showProgress::Bool=true,
+    parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing)
+
 Starts a simulation of the Co-Simulation FMU instance.
 
 Via the optional keyword arguments `inputValues` and `inputFunction`, a custom input function `f(c, t)` or `f(t)` with time `t` and instance `c` can be defined, that should return a array of values for `fmi3SetFloat64(..., inputValues, inputFunction(...))`.
@@ -1231,7 +1268,27 @@ function fmi3SimulateCS(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_st
     return fmusol
 end
 
+export fmi3SimulateCS
+
 # TODO simulate ScheduledExecution
+"""
+fmi3SimulateSE(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
+    tolerance::Union{Real, Nothing} = nothing,
+    dt::Union{Real, Nothing} = nothing,
+    recordValues::fmi3ValueReferenceFormat = nothing,
+    saveat = [],
+    setup::Union{Bool, Nothing} = nothing,
+    reset::Union{Bool, Nothing} = nothing,
+    instantiate::Union{Bool, Nothing} = nothing,
+    freeInstance::Union{Bool, Nothing} = nothing,
+    terminate::Union{Bool, Nothing} = nothing,
+    inputValueReferences::fmi3ValueReferenceFormat = nothing,
+    inputFunction = nothing,
+    showProgress::Bool=true,
+    parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing)
+TODO simulate ScheduledExecution
+not yet implemented in library
+"""
 function fmi3SimulateSE(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
     tolerance::Union{Real, Nothing} = nothing,
     dt::Union{Real, Nothing} = nothing,
@@ -1248,6 +1305,8 @@ function fmi3SimulateSE(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_st
     parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing)    @assert false "Not implemented"
 end
 
+export fmi3SimulateSE
+
 ##### CS & ME #####
 
 # wrapper
@@ -1256,7 +1315,8 @@ function fmi3Simulate(c::FMU3Instance, t_start::Union{Real, Nothing} = nothing, 
 end 
 
 """
-Starts a simulation of the FMU instance for the matching FMU type, if both types are available, CS is preferred.
+fmi3Simulate(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
+Starts a simulation of the FMU instance for the matching FMU type, if multiple types are available, CS is preferred over ME, over SE.
 
 Keywords:
     - recordValues: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
@@ -1264,9 +1324,9 @@ Keywords:
     - reset: Boolean, if FMU should be reset before simulation (default reset=setup)
     - inputValues: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
     - inputFunction: Function to retrieve the values to set the inputs to 
-    - saveat: [ME only] Time points to save values at (interpolated)
-    - solver: [ME only] Any Julia-supported ODE-solver (default is Tsit5)
-    - customFx: [ME only, deperecated] Ability to give a custom state derivative function ẋ=f(x,t)
+    - saveat: Time points to save values at (interpolated)
+    - solver: Any Julia-supported ODE-solver (default is default from DifferentialEquations.jl)
+    - customFx: [ME only, deprecated] Ability to give a custom state derivative function ẋ=f(x,t)
 
 Returns:
     - `success::Bool` for CS-FMUs
@@ -1286,3 +1346,5 @@ function fmi3Simulate(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_star
         error(unknownFMUType)
     end
 end
+
+export fmi3Simulate
