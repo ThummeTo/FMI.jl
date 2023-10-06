@@ -21,8 +21,13 @@ fmiStringToValueReference
 # External/additional functions
 
 ```@docs
+fmiGetNumberOfStates
 fmiGetDependencies
 fmiInfo
+fmiGetGUID
+fmiIsCoSimulation
+fmiIsModelExchange
+fmiIsScheduledExecution
 ```
 
 # Visualize simulation results

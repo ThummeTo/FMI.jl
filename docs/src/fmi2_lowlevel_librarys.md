@@ -4,6 +4,10 @@
 FMU2
 FMU2Component
 fmi2Struct
+fmi2SimpleType
+fmi2Variability
+fmi2VariableDependency
+fmi2EventInfo
 ```
 
 ## FMI Common Concepts for Model Exchange and Co-Simulation

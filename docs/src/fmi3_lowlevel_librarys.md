@@ -4,6 +4,9 @@
 FMU3
 FMU3Instance
 fmi3Struct
+fmi3Initial
+fmi3False
+fmi3Status
 ```
 
 ## FMI Common Concepts for Model Exchange and Co-Simulation
@@ -29,6 +32,7 @@ fmi3GetGenerationTool
 fmi3GetGenerationDateAndTime
 fmi3GetVariableNamingConvention
 fmi3GetNumberOfEventIndicators
+fmi3GetNumberOfEventIndicators!
 fmi3IsCoSimulation
 fmi3IsModelExchange
 fmi3IsScheduledExecution
@@ -40,6 +44,7 @@ fmi3IsScheduledExecution
 ```@docs
 fmi3GetModelIdentifier
 fmi3CanGetSetState
+fmi3CanSerializeFMUState
 fmi3GetVersion
 ```
 
@@ -58,6 +63,8 @@ This section documents functions that deal with initialization, termination, res
 ```@docs
 fmi3EnterInitializationMode
 fmi3ExitInitializationMode
+fmi3EnterConfigurationMode
+fmi3ExitConfigurationMode
 fmi3Terminate
 fmi3Reset
 ```
@@ -72,11 +79,26 @@ attributes)].
 ```@docs
 fmi3Get
 fmi3Get!
-fmi3Set
+fmi3GetFloat32
+fmi3GetFloat32!
+fmi3GetFloat64
+fmi3GetFloat64!
+fmi3GetInt16
+fmi3GetInt16!
+fmi3GetInt32
+fmi3GetInt32!
+fmi3GetInt64
+fmi3GetInt64!
 fmi3GetBoolean
 fmi3GetBoolean!
 fmi3GetString
 fmi3GetString!
+fmi3Set
+fmi3SetFloat32
+fmi3SetFloat64
+fmi3SetInt16
+fmi3SetInt32
+fmi3SetInt64
 fmi3SetBoolean
 fmi3SetString
 ```
@@ -85,7 +107,13 @@ fmi3SetString
 ### Getting and Setting the Complete FMU State
 The FMU has an internal state consisting of all values that are needed to continue a simulation. This internal state consists especially of the values of the continuous-time states, iteration variables, parameter values, input values, delay buffers, file identifiers, and FMU internal status information. With the functions of this section, the internal FMU state can be copied and the pointer to this copy is returned to the environment. The FMU state copy can be set as actual FMU state, in order to continue the simulation from it.
 
+TODO: Clockstuff
+
 ```@docs
+fmi3GetIntervalDecimal!
+fmi3SetClock
+fmi3ActivateModelPartition
+fmi3CallbackClockUpdate
 ```
 
 ### Getting Partial Dervatives
@@ -98,6 +126,8 @@ directional derivatives. This function can be used to construct the desired part
 ```@docs
 fmi3GetDirectionalDerivative
 fmi3GetDirectionalDerivative!
+fmi3GetContinuousStateDerivatives
+fmi3GetContinuousStateDerivatives!
 ```
 
 ## FMI for Model Exchange
@@ -140,6 +170,8 @@ derivatives of the inputs with respect to time can be provided. Also, higher der
 higher order interpolation.
 
 ```@docs
+fmi3InstantiateCoSimulation
+fmi3InstantiateCoSimulation!
 ```
 
 ### Computation
@@ -170,6 +202,7 @@ fmi3Reload
 fmi3StringToValueReference
 fmi3ModelVariablesForValueReference
 fmi3ValueReferenceToString
+fmi3IntervalQualifierToString
 ```
 
 ### External/Additional functions
@@ -180,10 +213,4 @@ fmi3GetJacobian!
 fmi3GetFullJacobian
 fmi3GetFullJacobian!
 fmi3GetStartValue
-```
-
-
-## All functions
-
-```@index
 ```
