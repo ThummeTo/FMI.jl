@@ -1,4 +1,4 @@
-# Library Functions
+# FMI.jl Library Functions
 
 Many of the functions in this library are based on already defined functions of the [FMIImport.jl](https://github.com/ThummeTo/FMIImport.jl) library. 
 
@@ -29,6 +29,17 @@ fmiInfo
 
 ```@docs
 fmiPlot
+```
+
+# Save/load simulation results
+
+```@docs
+fmiSaveSolution
+fmiSaveSolutionJLD2
+fmiSaveSolutionMAT
+fmiSaveSolutionCSV
+fmiLoadSolution
+fmiLoadSolutionJLD2
 ```
 
 # FMI2 specific
