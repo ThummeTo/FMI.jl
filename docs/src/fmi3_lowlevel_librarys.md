@@ -3,10 +3,31 @@
 ```@docs
 FMU3
 FMU3Instance
+FMU3InstanceEnvironment
 fmi3Struct
 fmi3Initial
+FMU3Solution
+fmi3Variable
+fmi3VariableDependency
+fmi3SimpleType
+fmi3Type
+fmi3Unit
+fmi3Float32
+fmi3Float64
+fmi3Int8
+fmi3Int16
+fmi3Int32
+fmi3Int64
+fmi3True
 fmi3False
+fmi3IntervalQualifier
+fmi3Variability
+fmi3DependencyKind
+FMU3Event
+FMU3ExecutionConfiguration
 fmi3Status
+fmi3StatusOK
+fmi3Annotation
 ```
 
 ## FMI Common Concepts for Model Exchange and Co-Simulation
@@ -18,6 +39,7 @@ This section documents functions to inquire information about the model descript
 
 #### Load/Parse the FMI model description
 ```@docs
+fmi3ModelDescription
 fmi3LoadModelDescription
 ```
 #### Get value functions
@@ -43,15 +65,33 @@ fmi3IsScheduledExecution
 
 ```@docs
 fmi3GetModelIdentifier
+fmi3ProvidesAdjointDerivatives
 fmi3CanGetSetState
 fmi3CanSerializeFMUState
+fmi3ProvidesDirectionalDerivatives
 fmi3GetVersion
+fmi3VariableNamingConvention
+fmi3VariableNamingConventionFlat
+fmi3VariableNamingConventionStructured
+fmi3VariableNamingConventionToString
+fmi3StringToVariableNamingConvention
+fmi3StringToVariability
+fmi3VariabilityToString
+fmi3StatusToString
+fmi3DependencyKindToString
+fmi3StringToDependencyKind
 ```
 
 ###  Creation, Destruction and Logging of FMU Instances
 This section documents functions that deal with instantiation, destruction and logging of FMUs.
 
 ```@docs
+fmi3InstantiateCoSimulation
+fmi3InstantiateCoSimulation!
+fmi3InstantiateModelExchange
+fmi3InstantiateModelExchange!
+fmi3InstantiateScheduledExecution
+fmi3InstantiateScheduledExecution!
 fmi3FreeInstance!
 fmi3SetDebugLogging
 
@@ -83,34 +123,74 @@ fmi3GetFloat32
 fmi3GetFloat32!
 fmi3GetFloat64
 fmi3GetFloat64!
+fmi3GetInt8
+fmi3GetInt8!
 fmi3GetInt16
 fmi3GetInt16!
 fmi3GetInt32
 fmi3GetInt32!
 fmi3GetInt64
 fmi3GetInt64!
+fmi3GetUInt8
+fmi3GetUInt8!
+fmi3GetUInt16
+fmi3GetUInt16!
+fmi3GetUInt32
+fmi3GetUInt32!
+fmi3GetUInt64
+fmi3GetUInt64!
 fmi3GetBoolean
 fmi3GetBoolean!
 fmi3GetString
 fmi3GetString!
+fmi3GetBinary
+fmi3GetBinary!
 fmi3Set
 fmi3SetFloat32
 fmi3SetFloat64
+fmi3SetInt8
 fmi3SetInt16
 fmi3SetInt32
 fmi3SetInt64
+fmi3SetUInt8
+fmi3SetUInt16
+fmi3SetUInt32
+fmi3SetUInt64
 fmi3SetBoolean
 fmi3SetString
+fmi3SetBinary
 ```
 
 
 ### Getting and Setting the Complete FMU State
 The FMU has an internal state consisting of all values that are needed to continue a simulation. This internal state consists especially of the values of the continuous-time states, iteration variables, parameter values, input values, delay buffers, file identifiers, and FMU internal status information. With the functions of this section, the internal FMU state can be copied and the pointer to this copy is returned to the environment. The FMU state copy can be set as actual FMU state, in order to continue the simulation from it.
 
+```@docs
+fmi3GetFMUState
+fmi3GetFMUState!
+fmi3SetFMUState
+fmi3FreeFMUState!
+fmi3SerializeFMUState
+fmi3SerializeFMUState!
+fmi3SerializedFMUStateSize
+fmi3SerializedFMUStateSize!
+fmi3DeSerializeFMUState
+fmi3DeSerializeFMUState!
+fmi3UpdateDiscreteStates
+fmi3EvaluateDiscreteStates
+```
+
 TODO: Clockstuff
 
 ```@docs
 fmi3GetIntervalDecimal!
+fmi3GetIntervalFraction!
+fmi3GetShiftDecimal!
+fmi3GetShiftFraction!
+fmi3GetClock
+fmi3GetClock!
+fmi3SetIntervalDecimal
+fmi3SetIntervalFraction
 fmi3SetClock
 fmi3ActivateModelPartition
 fmi3CallbackClockUpdate
@@ -128,6 +208,9 @@ fmi3GetDirectionalDerivative
 fmi3GetDirectionalDerivative!
 fmi3GetContinuousStateDerivatives
 fmi3GetContinuousStateDerivatives!
+fmi3GetAdjointDerivative!
+fmi3GetOutputDerivatives
+fmi3GetOutputDerivatives!
 ```
 
 ## FMI for Model Exchange
@@ -155,6 +238,8 @@ fmi3CompletedIntegratorStep!
 fmi3GetEventIndicators!
 fmi3GetContinuousStates!
 fmi3GetNominalsOfContinuousStates!
+fmi3GetNumberOfContinuousStates
+fmi3GetNumberOfContinuousStates!
 ```
 
 ## FMI for Co-Simulation
@@ -170,14 +255,15 @@ derivatives of the inputs with respect to time can be provided. Also, higher der
 higher order interpolation.
 
 ```@docs
-fmi3InstantiateCoSimulation
-fmi3InstantiateCoSimulation!
+fmi3CallbackIntermediateUpdate
 ```
 
 ### Computation
 The computation of time steps is controlled by the following function.
 
 ```@docs
+fmi3EnterStepMode
+fmi3DoStep!
 ```
 
 ### Retrieving Status Information from the Slave
@@ -203,6 +289,12 @@ fmi3StringToValueReference
 fmi3ModelVariablesForValueReference
 fmi3ValueReferenceToString
 fmi3IntervalQualifierToString
+fmi3StringToIntervalQualifier
+fmi3Causality
+fmi3StringToCausality
+fmi3CausalityToString
+fmi3InitialToString
+fmi3StringToInitial
 ```
 
 ### External/Additional functions
@@ -213,4 +305,14 @@ fmi3GetJacobian!
 fmi3GetFullJacobian
 fmi3GetFullJacobian!
 fmi3GetStartValue
+fmi3GetNumberOfVariableDependencies!
+fmi3GetVariableDependencies!
+fmi3GetDependencies
+fmi3SampleDirectionalDerivative
+fmi3SampleDirectionalDerivative!
+```
+
+```@docs
+fmi3StringToType
+fmi3TypeToString
 ```

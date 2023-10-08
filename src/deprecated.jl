@@ -69,7 +69,7 @@ More detailed:
 - FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
-See also [fmi2FreeInstance](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
+See also [`fmi2FreeInstance`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 """
 function fmiFreeInstance!(str::fmi2Struct)
     fmi2FreeInstance!(str)
@@ -143,7 +143,7 @@ More detailed:
 - FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
-See also [fmi2SetupExperiment](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
+See also [`fmi2SetupExperiment`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 """
 function fmiSetupExperiment(str::fmi2Struct, args...; kwargs...)
     fmi2SetupExperiment(str, args...; kwargs...)
@@ -178,7 +178,7 @@ More detailed:
 - FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
- See also [fmi2EnterInitializationMode](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
+ See also [`fmi2EnterInitializationMode`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 """
 function fmiEnterInitializationMode(str::fmi2Struct)
     fmi2EnterInitializationMode(str)

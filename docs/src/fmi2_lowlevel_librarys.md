@@ -3,11 +3,26 @@
 ```@docs
 FMU2
 FMU2Component
+FMU2ComponentEnvironment
 fmi2Struct
+fmi2Initial
+FMU2Solution
+fmi2ScalarVariable
 fmi2SimpleType
+fmi2Type
+fmi2Unit
+fmi2Char
+fmi2True
+fmi2False
 fmi2Variability
 fmi2VariableDependency
+fmi2DependencyKind
 fmi2EventInfo
+FMU2Event
+FMU2ExecutionConfiguration
+fmi2Status
+fmi2StatusOK
+fmi2Annotation
 ```
 
 ## FMI Common Concepts for Model Exchange and Co-Simulation
@@ -19,8 +34,10 @@ This section documents functions to inquire information about the model descript
 
 #### Load/Parse the FMI model description
 ```@docs
+fmi2ModelDescription
 fmi2LoadModelDescription
 ```
+
 #### Get value functions
 ```@docs
 fmi2GetDefaultStartTime
@@ -67,6 +84,12 @@ fmi2GetInputNamesAndStarts
 fmi2GetVersion
 fmi2GetTypesPlatform
 fmi2GetSolutionDerivative
+fmi2StringToVariability
+fmi2VariabilityToString
+fmi2StatusToString
+fmi2DataTypeForValueReference
+fmi2DependencyKindToString
+fmi2StringToDependencyKind
 ```
 
 ###  Creation, Destruction and Logging of FMU Instances
@@ -202,6 +225,7 @@ fmi2GetRealOutputDerivatives
 The computation of time steps is controlled by the following function.
 
 ```@docs
+fmi2StatusKind
 fmi2DoStep
 fmi2CancelStep
 ```
@@ -227,12 +251,18 @@ fmi2Unload
 fmi2Load
 fmi2Reload
 ```
+
 ### Conversion functions
 
 ```@docs
 fmi2StringToValueReference
 fmi2ModelVariablesForValueReference
 fmi2ValueReferenceToString
+fmi2Causality
+fmi2StringToCausality
+fmi2CausalityToString
+fmi2InitialToString
+fmi2StringToInitial
 fmi2GetSolutionState
 fmi2GetSolutionValue
 fmi2GetSolutionTime

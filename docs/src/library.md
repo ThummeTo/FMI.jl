@@ -21,6 +21,9 @@ fmiStringToValueReference
 # External/additional functions
 
 ```@docs
+fmiSet
+fmiGet
+fmiGet!
 fmiGetNumberOfStates
 fmiGetDependencies
 fmiInfo

@@ -202,7 +202,7 @@ export fmiInfo
 export fmiGetModelName, fmiGetGUID, fmiGetGenerationTool, fmiGetGenerationDateAndTime
 
 export fmiProvidesDirectionalDerivative
-export fmiIsCoSimulation, fmiIsModelExchange
+export fmiIsCoSimulation, fmiIsModelExchange, fmiIsScheduledExecution
 export fmiGetDependencies
 export fmiGetStartValue, fmiStringToValueReference
 export fmiGet, fmiGet!, fmiSet

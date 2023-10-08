@@ -11,7 +11,7 @@ makedocs(sitename="FMI.jl",
             collapselevel = 1,
             sidebar_sitename = false,
             edit_link = nothing,
-            size_threshold_ignore = ["fmi2_lowlevel_librarys.md","fmi3_lowlevel_librarys.md"]
+            size_threshold_ignore = ["deprecated.md","fmi2_lowlevel_librarys.md","fmi3_lowlevel_librarys.md"]
          ),
          modules = [FMI, FMIImport, FMICore],#, FMIBuild]
          checkdocs=:exports,
@@ -32,12 +32,14 @@ makedocs(sitename="FMI.jl",
             ]
             "User Level API - FMI.jl" => "library.md"
             "Developer Level API" => Any[
+                "fmi_lowlevel_librarys.md",
                 "fmi2_lowlevel_librarys.md",
                 "fmi3_lowlevel_librarys.md"
             ]
             "API Index" => "index_library.md"
             "Related Publication" => "related.md"
             "Contents" => "contents.md"
+            hide("Deprecated" => "deprecated.md")
             ]
          )
 

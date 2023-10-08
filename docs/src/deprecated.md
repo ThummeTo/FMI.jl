@@ -2,13 +2,29 @@
 
 ### internal funtions: remove export?
 ```@docs
+fmi2CallbackLogger
 fmi2CallbackAllocateMemory
+fmi2CallbackFreeMemory
+fmi3CallbackLogger
+fmi2CallbackFunctions
+fmi2CallbackStepFinished
 ```
 
 ### deprecated
-Mostly wrappers that are not supposed to be used
+Mostly wrappers that are not supposed to be used (call specific wrapped functions instead)
 
 ```@docs
+fmiSetReal
+fmiReset
+fmiGetGenerationTool
+fmiEnterContinuousTimeMode
+fmiGetEventIndicators
+fmiSetBoolean
+fmiFreeInstance!
+fmiInstantiate!
+fmiTerminate
+fmiDoStep
+fmiSetInteger
 fmiCompletedIntegratorStep
 fmiExitInitializationMode
 fmiSetupExperiment
@@ -26,7 +42,6 @@ fmiGetGenerationDateAndTime
 fmiGetContinuousStates
 fmiSetContinuousStates
 fmiGetNominalsOfContinuousStates
-fmiGetState
 fmiSetTime
 fmiSetString
 fmiGetString
