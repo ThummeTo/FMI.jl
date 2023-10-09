@@ -7,16 +7,42 @@
 @everywhere workers using BenchmarkTools
 @everywhere workers using Sundials 
 
-@everywhere function evalBenchmark(b; kwargs...)
-    res = run(b; kwargs...)
+using Suppressor
+
+@everywhere function evalBenchmark(b; samples=2, seconds=600, kwargs...)
+    res = nothing
+    try
+        res = run(b; samples=samples, seconds=seconds, kwargs...)
+    catch e 
+       @error "Benchmark failed:\n$(e)"
+       return 0.0, 0, 0
+    end
+
+    if length(res.times) <= 1 
+        @error "Only ran $(length(res.times)) benchmarks, this is not enough because of the first compilation run!"
+    end
+
     min_time = min(res.times...)
     memory = res.memory 
     allocs = res.allocs
     return min_time, memory, allocs 
 end
 
-@everywhere function benchmark1(fmu, data, cvode)
-    return @benchmarkable fmiSimulate(fmu, (data.consumption_t[1], data.consumption_t[end]); parameters=data.params, saveat=data.consumption_t, recordValues=realVRs, showProgress=false, solver=cvode, reltol=1e-4);
+@everywhere workers function benchmarkSimulation(fmu, data, solver)
+    return @benchmarkable fmiSimulate(fmu, (data.consumption_t[1], data.consumption_t[end]); parameters=data.params, saveat=data.consumption_t, recordValues=realVRs, showProgress=false, solver=solver, reltol=1e-4);
+end
+
+@everywhere workers using ReverseDiff
+
+@everywhere workers function loss(p, x0, fmu, data, solver)
+    fmu.optim_p = p 
+    fmu.optim_p_refs = collect(fmi2StringToValueReference(fmu, vr) for vr in keys(data.params))
+    sol = fmiSimulate(fmu, (data.consumption_t[1], 1.0); x0=x0, parameters=data.params, saveat=data.consumption_t, showProgress=false, solver=solver, reltol=1e-4);
+    return sum(collect(u[1] for u in sol.states))
+end
+
+@everywhere workers function benchmarkGradient(p, x0, fmu, data, solver)
+    return @benchmarkable grad(p, x0, fmu, data, solver)
 end
 
 @everywhere function versionName(version)
@@ -37,43 +63,38 @@ end
     Pkg.activate("FMI_" * name * "_Benchmark")
 
     if ispath
-        Pkg.add(url=version[5:end])
+        Pkg.develop(url=version[5:end])
     else
         Pkg.add(name="FMI", version=version)
     end
 
     Pkg.add("FMIZoo")
+
+    # install FMISensitivity for FMI.jl >= 0.13.0
+    if !ispath
+        f, m, b = split(version, ".")
+        f = parse(Float64, f)
+        m = parse(Float64, m)
+        b = parse(Float64, b)
+
+        if f >= 1 || m >= 13 
+            Pkg.add(name="FMISensitivity")
+        end
+    end
 end 
 
-futures = Vector{Any}(undef, numVersions)
-for i in 1:numVersions
-    futures[i] = @spawnat workers[i] setupVersion(versions[i]);
-end
-
-fetch.(futures)
-
-@everywhere workers using FMI, FMIZoo
-@everywhere workers data = FMIZoo.VLDM(:train)
-@everywhere workers fmu = fmiLoad("VLDM", "Dymola", "2020x"; type=:ME)
-@everywhere workers using FMI.DifferentialEquations: Tsit5
-@everywhere workers cvode = CVODE_BDF()
-
-@everywhere workers realBuffer = zeros(fmi2Real, 2)
-@everywhere workers realVRs = vcat(fmu.modelDescription.stateValueReferences, fmu.modelDescription.derivativeValueReferences)
-
-@everywhere workers c=FMI.fmi2Instantiate!(fmu)
-@everywhere workers FMI.fmi2EnterInitializationMode(fmu)
-
-function runBenchmark(b)
+function runBenchmark()
 
     min_times = zeros(numVersions)
     memories = zeros(numVersions)
     allocs = zeros(numVersions)
 
-    # simulate one after another, so we don't have negative influences between processes
-    for i in 1:numVersions
-        future = @spawnat workers[i] evalBenchmark(b; samples=3, seconds=60)
-        min_times[i], memories[i], allocs[i] = fetch(future)
+    @suppress begin
+        # simulate one after another, so we don't have negative influences between processes
+        for i in 1:numVersions
+            future = @spawnat workers[i] evalBenchmark(b; samples=3)
+            min_times[i], memories[i], allocs[i] = fetch(future)
+        end
     end
 
     return min_times, memories, allocs
@@ -81,7 +102,7 @@ end
 
 function round_or_empty(val; suffix="", digits=0)
     if val == 0.0
-        return ""
+        return "[n.a.]"
     elseif digits > 0
         return "" * "$(round(val; digits=digits))" * suffix
     else
@@ -117,7 +138,7 @@ function resultPlot(versions, min_times, memories)
     for i in 1:length(versions)
         annotate!(fig, 2+(i-1)*3, min_times[i]/2.0, text(round_or_empty(min_times[i]; digits=1, suffix=" s"); halign=:center, valign=:center, rotation=90, color=:white))
     end
-    bar!(twinx(), y2s; ylabel="Memory Allocations [MB]", color=:red, xticks=:none, legend=:none)
+    bar!(twinx(), y2s; ylabel="Allocated Memory [MB]", color=:red, xticks=:none, legend=:none)
     for i in 1:length(versions)
         annotate!(fig, 3+(i-1)*3, memories[i]/2.0, text(round_or_empty(memories[i];digits=0, suffix=" MB"); halign=:center, valign=:center, rotation=90, color=:white))
     end

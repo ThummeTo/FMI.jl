@@ -80,6 +80,11 @@ function runtestsFMI2(exportingTool)
             end
         end
 
+        @info "Performance (performance.jl)"
+        @testset "Performance" begin
+            include("FMI2/performance.jl")
+        end
+
         @info "Plotting (plots.jl)"
         @testset "Plotting" begin
             include("FMI2/plots.jl")

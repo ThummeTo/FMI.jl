@@ -116,16 +116,16 @@ fmiUnload(myFMU)
 
 # case 3a: ME-FMU without events, but with input signal (explicit solver: Tsit5)
 
-function extForce_t(t)
-    [sin(t)]
+function extForce_t(t::Real, u::AbstractArray{<:Real})
+    u[1] = sin(t)
 end 
 
-function extForce_cxt(c::Union{FMU2Component, Nothing}, x::Union{AbstractArray{fmi2Real}, Nothing}, t::fmi2Real)
+function extForce_cxt(c::Union{FMU2Component, Nothing}, x::Union{AbstractArray{<:Real}, Nothing}, t::Real, u::AbstractArray{<:Real})
     x1 = 0.0
     if x != nothing 
         x1 = x[1] 
     end
-    [sin(t) * x1]
+    u[1] = sin(t) * x1
 end 
 
 myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])

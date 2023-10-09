@@ -10,8 +10,8 @@ t_stop = 8.0
 solver=FBDF(autodiff=false)
 dtmax = 0.01
 
-function extForce_t(t)
-    [sin(t)]
+function extForce_t!(t, u)
+    u[1] = sin(t)
 end 
 
 myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
@@ -35,7 +35,7 @@ elseif envFMUSTRUCT == "FMUCOMPONENT"
 end
 @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
-solution = fmiSimulateME(fmuStruct, (t_start, t_stop); solver=solver, dtmax=dtmax, recordValues=["a"], inputValueReferences=myFMU.modelDescription.inputValueReferences, inputFunction=extForce_t)
+solution = fmiSimulateME(fmuStruct, (t_start, t_stop); solver=solver, dtmax=dtmax, recordValues=["a"], inputValueReferences=myFMU.modelDescription.inputValueReferences, inputFunction=extForce_t!)
 @test isnothing(solution.states)
 
 @test solution.values.t[1] == t_start 
