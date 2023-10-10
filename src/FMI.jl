@@ -651,6 +651,7 @@ function fmiCanSerializeFMUstate(str::fmi3StructMD)
 end
 
 # TODO fmi3Call fmiProvidesDirectionalDerivatives
+
 """
     fmiProvidesDirectionalDerivative(str::Union{fmi2StructMD, fmi3StructMD})
 
@@ -670,7 +671,7 @@ More detailed: `fmi3StructMD =  Union{FMU3, FMU3Instance, fmi3ModelDescription}`
 # Returns
 - `::Bool`: The function `fmi2ProvidesDirectionalDerivative` returns True, if the FMU provides directional derivatives.
 
-See also [`fmi2ProvidesDirectionalDerivative`](@ref), [`fmi2StructMD`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref), [`fmi2ModelDescription`](@ref), [`fmi3ProvidesDirectionalDerivative`](@ref), [`fmi3StructMD`](@ref), [`FMU3`](@ref), [`FMU3Instance`](@ref), [`fmi3ModelDescription`](@ref).
+See also [`fmi2ProvidesDirectionalDerivative`](@ref), [`fmi2StructMD`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref), [`fmi2ModelDescription`](@ref), [`fmi3ProvidesDirectionalDerivatives`](@ref), [`fmi3StructMD`](@ref), [`FMU3`](@ref), [`FMU3Instance`](@ref), [`fmi3ModelDescription`](@ref).
 """
 function fmiProvidesDirectionalDerivative(str::fmi2StructMD)
     fmi2ProvidesDirectionalDerivative(str)
@@ -1083,6 +1084,7 @@ function fmiUnload(fmu::FMU3)
     fmi3Unload(fmu)
 end
 
+#to add to docstring: see also [`fmi3GetNumberOfStates`](@ref)
 """
     fmiGetNumberOfStates(str::Union{fmi2Struct, fmi3Struct})
 
@@ -1105,7 +1107,7 @@ More detailed: `fmi3StructMD = Union{FMU3, FMU3Instance, fmi3ModelDescription}`
 - FMISpec2.0.2[p.22]: 2.1.4 Inquire Platform and Version Number of Header Files
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
 
-See also [`fmi2GetNumberOfStates`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref), [`fmi3GetNumberOfStates`](@ref), [`fmi3Struct`](@ref), [`FMU3`](@ref), [`FMU3Instance`](@ref).
+See also [`fmi2GetNumberOfStates`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref), , [`fmi3Struct`](@ref), [`FMU3`](@ref), [`FMU3Instance`](@ref).
 """
 function fmiGetNumberOfStates(str::fmi2Struct)
     fmi2GetNumberOfStates(str)

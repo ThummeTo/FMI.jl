@@ -1,6 +1,4 @@
-# FMI Import/Export/Core/Build .jl Library Functions
-
-TODO: move FMI to User API
+# FMI Import/Core .jl Library Functions/Types
 
 ```@docs
 FMU
@@ -11,11 +9,5 @@ FMULogLevel
 logInfo
 logWarning
 logError
-fmiGetStartValue
-fmiGetState
-fmiSetState
-fmiGetModelName
-fmiCanGetSetState
-fmiFreeState!
 loadBinary
 ```

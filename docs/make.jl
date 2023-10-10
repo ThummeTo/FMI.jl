@@ -11,11 +11,10 @@ makedocs(sitename="FMI.jl",
             collapselevel = 1,
             sidebar_sitename = false,
             edit_link = nothing,
-            size_threshold_ignore = ["deprecated.md","fmi2_lowlevel_librarys.md","fmi3_lowlevel_librarys.md"]
+            size_threshold_ignore = ["library.md","deprecated.md","fmi2_lowlevel_librarys.md","fmi3_lowlevel_librarys.md"]
          ),
-         modules = [FMI, FMIImport, FMICore],#, FMIBuild]
+         modules = [FMI, FMIImport, FMICore],
          checkdocs=:exports,
-         warnonly=true,
          pages= Any[
             "Introduction" => "index.md"
             "Features" => "features.md"

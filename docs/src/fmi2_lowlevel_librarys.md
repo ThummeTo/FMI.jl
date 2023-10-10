@@ -1,10 +1,11 @@
 
-# [FMI Import/Export/Core/Build .jl Library Functions for FMI2](@id fmi2importlibrary)
+# [FMI Import/Core .jl Library Functions/Types for FMI2](@id fmi2importlibrary)
 ```@docs
 FMU2
 FMU2Component
 FMU2ComponentEnvironment
 fmi2Struct
+fmi2StructMD
 fmi2Initial
 FMU2Solution
 fmi2ScalarVariable
@@ -14,6 +15,7 @@ fmi2Unit
 fmi2Char
 fmi2True
 fmi2False
+fmi2ValueReferenceFormat
 fmi2Variability
 fmi2VariableDependency
 fmi2DependencyKind
@@ -143,6 +145,7 @@ fmi2SetString
 The FMU has an internal state consisting of all values that are needed to continue a simulation. This internal state consists especially of the values of the continuous-time states, iteration variables, parameter values, input values, delay buffers, file identifiers, and FMU internal status information. With the functions of this section, the internal FMU state can be copied and the pointer to this copy is returned to the environment. The FMU state copy can be set as actual FMU state, in order to continue the simulation from it.
 
 ```@docs
+fmi2FMUstate
 fmi2GetFMUstate
 fmi2GetFMUstate!
 fmi2SetFMUstate

@@ -5,17 +5,18 @@ Many of the functions in this library are based on already defined functions of 
 # Simulate FMUs
 
 ```@docs
+fmiLoad
 fmiSimulate
 fmiSimulateCS
 fmiSimulateME
-fmiLoad
 fmiUnload
 fmiReload
 ```
-# Conversion functions
+# Handling Value References
 
 ```@docs
 fmiStringToValueReference
+fmiGetStartValue
 ```
 
 # External/additional functions
@@ -25,8 +26,14 @@ fmiSet
 fmiGet
 fmiGet!
 fmiGetNumberOfStates
+fmiCanGetSetState
+fmiGetState
+fmiSetState
+fmiFreeState!
 fmiGetDependencies
+fmiProvidesDirectionalDerivative
 fmiInfo
+fmiGetModelName
 fmiGetGUID
 fmiIsCoSimulation
 fmiIsModelExchange

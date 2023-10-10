@@ -1,10 +1,11 @@
 
-# [FMI Import/Export/Core/Build .jl Library Functions for FMI3](@id library)
+# [FMI Import/Core .jl Library Functions/Types for FMI3](@id library)
 ```@docs
 FMU3
 FMU3Instance
 FMU3InstanceEnvironment
 fmi3Struct
+fmi3StructMD
 fmi3Initial
 FMU3Solution
 fmi3Variable
