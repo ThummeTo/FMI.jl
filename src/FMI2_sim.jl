@@ -4,7 +4,7 @@
 #
 
 using DifferentialEquations, DiffEqCallbacks
-import SciMLBase: RightRootFind
+import SciMLBase: RightRootFind, ReturnCode
 
 using FMIImport: fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2NewDiscreteStates, fmi2GetContinuousStates, fmi2GetNominalsOfContinuousStates, fmi2SetContinuousStates, fmi2GetDerivatives!
 using FMIImport.FMICore: fmi2StatusOK, fmi2TypeCoSimulation, fmi2TypeModelExchange
@@ -985,7 +985,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, t_s
         fmusol.states = solve(c.problem, solver; callback = CallbackSet(cbs...), dtmax=dtmax, solveKwargs..., kwargs...)
     end
 
-    fmusol.success = (fmusol.states.retcode == :Success)
+    fmusol.success = (fmusol.states.retcode == ReturnCode.Success)
 
     # cleanup progress meter
     if showProgress 
