@@ -21,6 +21,7 @@ fmi3Int32
 fmi3Int64
 fmi3True
 fmi3False
+fmi3ValueReferenceFormat
 fmi3IntervalQualifier
 fmi3Variability
 fmi3DependencyKind

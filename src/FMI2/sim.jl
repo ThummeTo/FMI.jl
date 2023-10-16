@@ -295,7 +295,7 @@ function setupODEProblem(c::FMU2Component, x0::AbstractArray{fmi2Real}, tspan::U
 end
 
 """
-function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing;
+    function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing;
     tolerance::Union{Real, Nothing} = nothing,
     dt::Union{Real, Nothing} = nothing,
     solver = nothing,
@@ -319,30 +319,42 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
     showProgress::Bool = true,
     kwargs...)
 
-ToDo: Update DocString
-
 Simulates a FMU instance for the given simulation time interval.
 State- and Time-Events are handled correctly.
 
 Via the optional keyword arguemnts `inputValues` and `inputFunction`, a custom input function `f(c, u, t)`, `f(c, t)`, `f(u, t)`, `f(c, u)` or `f(t)` with `c` current component, `u` current state and `t` current time can be defined, that should return a array of values for `fmi2SetReal(..., inputValues, inputFunction(...))`.
 
 Keywords:
-    - solver: Any Julia-supported ODE-solver (default is the DifferentialEquations.jl default solver, currently `AutoTsit5(Rosenbrock23())`)
-    - customFx: [deprecated] Ability to give a custom state derivative function ẋ=f(x,t)
-    - recordValues: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
-    - recordEventIndicators: Array or Range of event indicators (identified by integers) to record
-    - recordEigenvalues: Boolean value, if eigenvalues shall be computed and recorded
-    - saveat: Time points to save values at (interpolated)
-    - setup: Boolean, if FMU should be setup (default=true)
-    - reset: Union{Bool, :auto}, if FMU should be reset before simulation (default reset=:auto)
-    - inputValueReferences: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
-    - inputFunction: Function to retrieve the values to set the inputs to 
-    - parameters: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization 
-    - `callbacks`: custom callbacks to add
+
+- solver: Any Julia-supported ODE-solver (default is the DifferentialEquations.jl default solver, currently `AutoTsit5(Rosenbrock23())`)
+
+- customFx: [deprecated] Ability to give a custom state derivative function ẋ=f(x,t)
+
+- recordValues: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
+
+- recordEventIndicators: Array or Range of event indicators (identified by integers) to record
+
+- recordEigenvalues: Boolean value, if eigenvalues shall be computed and recorded
+
+- saveat: Time points to save values at (interpolated)
+
+- setup: Boolean, if FMU should be setup (default=true)
+
+- reset: Union{Bool, :auto}, if FMU should be reset before simulation (default reset=:auto)
+
+- inputValueReferences: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
+
+- inputFunction: Function to retrieve the values to set the inputs to 
+
+- parameters: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization 
+
+- `callbacks`: custom callbacks to add
 
 Returns:
-    - If keyword `recordValues` is not set, a struct of type `ODESolution`.
-    - If keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues).
+
+- If keyword `recordValues` is not set, a struct of type `ODESolution`.
+
+- If keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues).
 """
 function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing;
     tolerance::Union{Real, Nothing} = nothing,

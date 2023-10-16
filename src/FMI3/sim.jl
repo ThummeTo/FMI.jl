@@ -811,46 +811,59 @@ function setupODEProblem(c::FMU3Instance, x0::AbstractArray{fmi3Float64}, t_star
 end
 
 """
-fmi3SimulateME(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
-    tolerance::Union{Real, Nothing} = nothing,
-    dt::Union{Real, Nothing} = nothing,
-    solver = nothing,
-    customFx = nothing,
-    recordValues::fmi3ValueReferenceFormat = nothing,
-    saveat = nothing,
-    x0::Union{AbstractArray{<:Real}, Nothing} = nothing,
-    setup::Union{Bool, Nothing} = nothing,
-    reset::Union{Bool, Nothing} = nothing,
-    instantiate::Union{Bool, Nothing} = nothing,
-    freeInstance::Union{Bool, Nothing} = nothing,
-    terminate::Union{Bool, Nothing} = nothing,
-    inputValueReferences::fmi3ValueReferenceFormat = nothing,
-    inputFunction = nothing,
-    parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
-    dtmax::Union{Real, Nothing} = nothing,
-    callbacks = [],
-    showProgress::Bool = true,
-    kwargs...)
+    fmi3SimulateME(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
+            tolerance::Union{Real, Nothing} = nothing,
+            dt::Union{Real, Nothing} = nothing,
+            solver = nothing,
+            customFx = nothing,
+            recordValues::fmi3ValueReferenceFormat = nothing,
+            saveat = nothing,
+            x0::Union{AbstractArray{<:Real}, Nothing} = nothing,
+            setup::Union{Bool, Nothing} = nothing,
+            reset::Union{Bool, Nothing} = nothing,
+            instantiate::Union{Bool, Nothing} = nothing,
+            freeInstance::Union{Bool, Nothing} = nothing,
+            terminate::Union{Bool, Nothing} = nothing,
+            inputValueReferences::fmi3ValueReferenceFormat = nothing,
+            inputFunction = nothing,
+            parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing,
+            dtmax::Union{Real, Nothing} = nothing,
+            callbacks = [],
+            showProgress::Bool = true,
+            kwargs...)
+
 Simulates a FMU instance for the given simulation time interval.
 State- and Time-Events are handled correctly.
 
 Via the optional keyword arguemnts `inputValues` and `inputFunction`, a custom input function `f(c, u, t)`, `f(c, t)`, `f(u, t)`, `f(c, u)` or `f(t)` with `c` current instance, `u` current state and `t` current time can be defined, that should return a array of values for `fmi3SetFloat64(..., inputValues, inputFunction(...))`.
 
 Keywords:
-    - solver: Any Julia-supported ODE-solver (default is Tsit5)
-    - customFx: [deperecated] Ability to give a custom state derivative function ẋ=f(x,t)
-    - recordValues: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
-    - saveat: Time points to save values at (interpolated)
-    - setup: Boolean, if FMU should be setup (default=true)
-    - reset: Union{Bool, :auto}, if FMU should be reset before simulation (default reset=:auto)
-    - inputValueReferences: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
-    - inputFunction: Function to retrieve the values to set the inputs to 
-    - parameters: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization 
-    - `callbacks`: custom callbacks to add
+
+- solver: Any Julia-supported ODE-solver (default is Tsit5)
+
+- customFx: [deperecated] Ability to give a custom state derivative function ẋ=f(x,t)
+
+- recordValues: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
+
+- saveat: Time points to save values at (interpolated)
+
+- setup: Boolean, if FMU should be setup (default=true)
+
+- reset: Union{Bool, :auto}, if FMU should be reset before simulation (default reset=:auto)
+
+- inputValueReferences: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
+
+- inputFunction: Function to retrieve the values to set the inputs to 
+
+- parameters: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization 
+
+- `callbacks`: custom callbacks to add
 
 Returns:
-    - If keyword `recordValues` is not set, a struct of type `ODESolution`.
-    - If keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues).
+
+- If keyword `recordValues` is not set, a struct of type `ODESolution`.
+
+- If keyword `recordValues` is set, a tuple of type (ODESolution, DiffEqCallbacks.SavedValues).
 """
 function fmi3SimulateME(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
     tolerance::Union{Real, Nothing} = nothing,
@@ -1064,7 +1077,7 @@ end
 ############ Co-Simulation ############
 
 """
-fmi3SimulateCS(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
+    fmi3SimulateCS(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
     tolerance::Union{Real, Nothing} = nothing,
     dt::Union{Real, Nothing} = nothing,
     recordValues::fmi3ValueReferenceFormat = nothing,
@@ -1084,16 +1097,26 @@ Starts a simulation of the Co-Simulation FMU instance.
 Via the optional keyword arguments `inputValues` and `inputFunction`, a custom input function `f(c, t)` or `f(t)` with time `t` and instance `c` can be defined, that should return a array of values for `fmi3SetFloat64(..., inputValues, inputFunction(...))`.
 
 Keywords:
-    - recordValues: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
-    - saveat: Time points to save values at (interpolated)
-    - setup: Boolean, if FMU should be setup (default=true)
-    - reset: Boolean, if FMU should be reset before simulation (default reset=setup)
-    - inputValueReferences: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
-    - inputFunction: Function to retrieve the values to set the inputs to 
-    - parameters: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization 
+
+- recordValues: Array of variables (strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
+
+- saveat: Time points to save values at (interpolated)
+
+- setup: Boolean, if FMU should be setup (default=true)
+
+- reset: Boolean, if FMU should be reset before simulation (default reset=setup)
+
+- inputValueReferences: Array of input variables (strings or variableIdentifiers) to set at every simulation step 
+
+- inputFunction: Function to retrieve the values to set the inputs to 
+
+- parameters: Dictionary of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization 
+
 Returns:
-    - If keyword `recordValues` is not set, a boolean `success` is returned (simulation success).
-    - If keyword `recordValues` is set, a tuple of type (true, DiffEqCallbacks.SavedValues) or (false, nothing).
+    
+- If keyword `recordValues` is not set, a boolean `success` is returned (simulation success).
+
+- If keyword `recordValues` is set, a tuple of type (true, DiffEqCallbacks.SavedValues) or (false, nothing).
 """
 function fmi3SimulateCS(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
     tolerance::Union{Real, Nothing} = nothing,
@@ -1272,7 +1295,7 @@ export fmi3SimulateCS
 
 # TODO simulate ScheduledExecution
 """
-fmi3SimulateSE(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
+    fmi3SimulateSE(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
     tolerance::Union{Real, Nothing} = nothing,
     dt::Union{Real, Nothing} = nothing,
     recordValues::fmi3ValueReferenceFormat = nothing,
@@ -1286,8 +1309,8 @@ fmi3SimulateSE(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Unio
     inputFunction = nothing,
     showProgress::Bool=true,
     parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing)
-TODO simulate ScheduledExecution
-not yet implemented in library
+
+TODO simulate ScheduledExecution not yet implemented in library
 """
 function fmi3SimulateSE(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing;
     tolerance::Union{Real, Nothing} = nothing,
@@ -1315,7 +1338,8 @@ function fmi3Simulate(c::FMU3Instance, t_start::Union{Real, Nothing} = nothing, 
 end 
 
 """
-fmi3Simulate(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
+    fmi3Simulate(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_start::Union{Real, Nothing} = nothing, t_stop::Union{Real, Nothing} = nothing; kwargs...)
+
 Starts a simulation of the FMU instance for the matching FMU type, if multiple types are available, CS is preferred over ME, over SE.
 
 Keywords:

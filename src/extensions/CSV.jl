@@ -6,7 +6,7 @@
 using FMIImport: FMUSolution
 
 """
-ToDo: DocString.
+    fmiSaveSolutionCSV(solution::FMUSolution, filepath::AbstractString)
 
 Saves a FMUSolution to a csv file.
 """

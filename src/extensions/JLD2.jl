@@ -6,18 +6,18 @@
 using FMIImport: FMUSolution
 
 """
-ToDo: DocString.
+    fmiSaveSolutionJLD2(solution::FMUSolution, filepath::AbstractString; keyword="solution") 
 
-Saves a FMUSolution for later use.
+Saves a FMUSolution for later use. `keyword` is the used keyword for the jld data structure
 """
 function fmiSaveSolutionJLD2(solution::FMUSolution, filepath::AbstractString; keyword="solution") 
     return JLD2.save(filepath, Dict(keyword=>solution))
 end
 
 """
-ToDo: DocString.
+    fmiLoadSolutionJLD2(filepath::AbstractString; keyword="solution")
 
-Loads a FMUSolution. Returns a previously saved `FMUSolution`.
+Loads a FMUSolution. Returns a previously saved `FMUSolution`. `keyword` is the used keyword for the jld data structure
 """
 function fmiLoadSolutionJLD2(filepath::AbstractString; keyword="solution")
     return JLD2.load(filepath, keyword)
