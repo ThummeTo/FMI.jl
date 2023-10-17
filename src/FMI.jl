@@ -779,7 +779,7 @@ More detailed: `fmi3StructMD =  Union{FMU3, FMU3Instance, fmi3ModelDescription}`
 
 See also [`fmi3IsScheduledExecution`](@ref), [`fmi3StructMD`](@ref), [`FMU3`](@ref), [`FMU3Instance`](@ref), [`fmi3ModelDescription`](@ref).
 """
-function fmiIsScheduledExecution(str::fmi2StructMD)
+function fmiIsScheduledExecution(str::fmi3StructMD)
     fmi3IsScheduledExecution(str)
 end
 
