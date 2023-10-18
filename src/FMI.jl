@@ -786,7 +786,7 @@ end
 # Multiple Dispatch variants for FMUs with version 2.0.X
 
 """
-   fmiLoad(pathToFMU::String; unpackPath=nothing, type=nothing)
+    fmiLoad(pathToFMU::String; unpackPath=nothing, type=nothing)
 
 Load FMUs independent of the FMI version, currently supporting version 2.0.X and 3.0.
 
@@ -1383,7 +1383,7 @@ end
 
 """
 
-   fmiGetStartValue(s::fmi2Struct, vr::fmi2ValueReferenceFormat)
+    fmiGetStartValue(s::fmi2Struct, vr::fmi2ValueReferenceFormat)
 
 Returns the start/default value for a given value reference.
 
@@ -1405,17 +1405,14 @@ function fmiGetStartValue(s::fmi3Struct, vr::fmi3ValueReferenceFormat)
 end
 
 """
-    fmiSaveSolution(solution::FMUSolution, filepath::AbstractString)
+    fmiSaveSolution(solution::FMUSolution, filepath::AbstractString [; keyword="solution"])
 
-saves the given solution in the file format specified by the ending of `filepath`. Currently .mat, .jld2 and .csv are supported.
+Save a `solution` of an FMU simulation at `filepath`.
+    
+Currently .mat, .jld2 and .csv are supported for saving and selected by the ending of `filepath`.
+Loading a FMUSolution into FMI.jl is currently only possible for .jld2 files.
 
-# Arguments
-- `solution::FMUSolution`: The simulation results that should be saved
-- `filepath::AbstractString`: The path specifing where to save the results, also indicating the file format. Supports *.mat, *.csv, *.JLD2
-
-# Keywords
-
-- `keyword="solution"`: Specifies the type of data that should be saved
+See also [`fmiSaveSolutionCSV`](@ref), [`fmiSaveSolutionMAT`](@ref), [`fmiSaveSolutionJLD2`](@ref), [`fmiLoadSolutionJLD2`](@ref).
 """
 function fmiSaveSolution(solution::FMUSolution, filepath::AbstractString; keyword="solution")
     ending = split(filepath, ".")[2]

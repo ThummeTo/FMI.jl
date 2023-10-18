@@ -8,7 +8,10 @@ using FMIImport: FMUSolution
 """
     fmiSaveSolutionCSV(solution::FMUSolution, filepath::AbstractString)
 
-Saves a FMUSolution to a csv file.
+Save a `solution` of an FMU simulation as csv file at `filepath`. 
+(requires Package CSV in Julia Environment)
+
+See also [`fmiSaveSolutionMAT`](@ref), [`fmiSaveSolutionJLD2`](@ref), [`fmiLoadSolutionJLD2`](@ref).
 """
 function fmiSaveSolutionCSV(solution::FMUSolution, filepath::AbstractString) 
     df = DataFrames.DataFrame(time = solution.values.t)

@@ -15,6 +15,7 @@ makedocs(sitename="FMI.jl",
          ),
          modules = [FMI, FMIImport, FMICore],
          checkdocs=:exports,
+         #linkcheck=true,
          pages= Any[
             "Introduction" => "index.md"
             "Features" => "features.md"
@@ -31,9 +32,13 @@ makedocs(sitename="FMI.jl",
             ]
             "User Level API - FMI.jl" => "library.md"
             "Developer Level API" => Any[
-                "fmi_lowlevel_librarys.md",
-                "fmi2_lowlevel_librarys.md",
-                "fmi3_lowlevel_librarys.md"
+                "fmi version independent content" => Any[
+                    "fmi_lowlevel_library_types.md",
+                    "fmi_lowlevel_library_constants.md",
+                    "fmi_lowlevel_library_functions.md"
+                ],
+                "FMI2 specific content" => "fmi2_lowlevel_librarys.md",
+                "FMI3 specific content" => "fmi3_lowlevel_librarys.md"
             ]
             "API Index" => "index_library.md"
             "Related Publication" => "related.md"

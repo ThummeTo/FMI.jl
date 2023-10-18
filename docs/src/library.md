@@ -44,6 +44,8 @@ fmiIsScheduledExecution
 
 ```@docs
 fmiPlot
+fmiPlot!
+Plots.plot
 ```
 
 # Save/load simulation results

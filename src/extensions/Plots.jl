@@ -7,40 +7,46 @@ using FMIImport: FMUSolution
 import FMIImport.ForwardDiff
 
 """
+    fmiPlot(solution::FMUSolution; kwargs...)
 
-    fmiPlot(solution::FMUSolution; states::Union{Bool, Nothing}=nothing,
-    values::Union{Bool, Nothing}=nothing,
-    stateEvents::Union{Bool, Nothing}=nothing,
-    timeEvents::Union{Bool, Nothing}=nothing,
-    stateIndices=nothing,
-    valueIndices=nothing,
-    maxLabelLength=64,
-    plotkwargs...)
+Create a figure and [`fmiPlot!`](@ref)'s the `solution` of a FMU simulation with the `kwargs` into it and returns the figure. 
+(requires Package Plots in Julia Environment)
 
-Plots data from a ME-FMU.
-
-Optional `t_in_solution` controls if the first state in the solution is interpreted as t(ime).
-
-# Arguments
-- `solution::FMUSolution`:  Struct contains information about the solution `value`, `success`, `state` and  `events` of a specific FMU.
-
-# Keywords
-- `states::Union{Bool, Nothing}`: controls if states should be ploted (default = nothing)
-- `values::Union{Bool, Nothing}`: controls if values should be ploted (default = nothing)
-- `timeEvents::Union{Bool, Nothing}=nothing`: controls if timeEvents should be ploted (default = noting )
-- `stateIndices=nothing`: controls the number of ploted states
-- `valueIndices=nothing`: controls the number of ploted values
-- `maxLabelLength=64`: controls the maximum length for legend labels (too long labels are cut from front)
-
-# Returns
-- `fig `: Returns a figure containing the plotted data from a ME-FMU.
-
+See also [`fmiPlot!`](@ref)
 """
 function fmiPlot(solution::FMUSolution; kwargs...)
     fig = Plots.plot(; xlabel="t [s]")
     fmiPlot!(fig, solution; kwargs...)
     return fig
 end
+
+"""
+    fmiPlot!(fig::Plots.Plot, solution::FMUSolution; 
+                [states::Union{Bool, Nothing}=nothing,
+                values::Union{Bool, Nothing}=nothing,
+                stateEvents::Union{Bool, Nothing}=nothing,
+                timeEvents::Union{Bool, Nothing}=nothing,
+                stateIndices=nothing,
+                valueIndices=nothing,
+                maxLabelLength=64,
+                plotkwargs...])
+
+Plot the `solution` of a FMU simulation into `fig` and return the figure.
+
+# Arguments
+- `fig::Plots.Plot`: Figure to plot into
+- `solution::FMUSolution`: Struct containing information about the solutions values, success, states and events of a specific FMU simulation.
+- `states::Union{Bool, Nothing}=nothing`: controls if states should be plotted (default = nothing: plot states from `solution`, as long as they exist)
+- `values::Union{Bool, Nothing}=nothing`: controls if values should be plotted (default = nothing: plot values from `solution`, as long as they exist)
+- `stateEvents::Union{Bool, Nothing}=nothing`: controls if stateEvents should be plotted (default = nothing: plot stateEvents from `solution`, if at least one and at most 100 exist)
+- `timeEvents::Union{Bool, Nothing}=nothing`: controls if timeEvents should be plotted (default = nothing: plot timeEvents from `solution`, if at least one and at most 100 exist)
+- `stateIndices=nothing`: controls which states will be plotted by index in state vector (default = nothing: plot all states)
+- `valueIndices=nothing`: controls which values will be plotted by index (default = nothing: plot all values)
+- `maxLabelLength=64`: controls the maximum length for legend labels (too long labels are cut from front)
+- `plotkwargs...`: Arguments, that are passed on to Plots.plot!
+
+See also [`fmiPlot`](@ref)
+"""
 function fmiPlot!(fig::Plots.Plot, solution::FMUSolution;
     states::Union{Bool, Nothing}=nothing,
     values::Union{Bool, Nothing}=nothing,
@@ -205,10 +211,13 @@ function fmiPlot!(fig::Plots.Plot, solution::FMUSolution;
 end
 
 """
-Extended the original plot-command by plotting FMUs.
+    Plots.plot(solution::FMUSolution; kwargs...)
+    Plots.plot!(fig::Plots.Plot, solution::FMUSolution; kwargs...)
 
-For further information seek `?fmiPlot`.
-"""
+Plot FMUs using the original plot-command from Plots.
+
+See also [`fmiPlot`](@ref), [`fmiPlot!`](@ref).
+""" Plots.plot, Plots.plot!
 function Plots.plot(solution::FMUSolution; kwargs...)
     fmiPlot(solution; kwargs...)
 end
