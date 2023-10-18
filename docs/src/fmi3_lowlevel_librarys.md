@@ -309,7 +309,6 @@ fmi3GetFullJacobian!
 fmi3GetStartValue
 fmi3GetNumberOfVariableDependencies!
 fmi3GetVariableDependencies!
-fmi3GetDependencies
 fmi3SampleDirectionalDerivative
 fmi3SampleDirectionalDerivative!
 ```

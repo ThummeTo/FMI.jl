@@ -15,7 +15,8 @@ makedocs(sitename="FMI.jl",
          ),
          modules = [FMI, FMIImport, FMICore],
          checkdocs=:exports,
-         #linkcheck=true,
+         linkcheck=true,
+         linkcheck_ignore=["https://thummeto.github.io/FMI.jl/dev/examples/inputs/"], 
          pages= Any[
             "Introduction" => "index.md"
             "Features" => "features.md"

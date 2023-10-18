@@ -108,7 +108,7 @@ using FMIImport: prepareValue, prepareValueReference
 
 export fmi2Real, fmi2Integer, fmi2String, fmi2Enumeration, fmi2Boolean
 export fmi2Info, fmi3Info
-export fmi2GetDependencies, fmi3GetDependencies
+export fmi2VariableDependsOnVariable, fmi2GetDependencies, fmi2PrintDependencies, fmi3VariableDependsOnVariable, fmi3GetDependencies, fmi3PrintDependencies
 
 include("check.jl")
 

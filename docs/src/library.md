@@ -22,6 +22,7 @@ fmiGetStartValue
 # External/additional functions
 
 ```@docs
+fmiInfo
 fmiSet
 fmiGet
 fmiGet!
@@ -32,7 +33,6 @@ fmiSetState
 fmiFreeState!
 fmiGetDependencies
 fmiProvidesDirectionalDerivative
-fmiInfo
 fmiGetModelName
 fmiGetGUID
 fmiIsCoSimulation
@@ -66,6 +66,9 @@ fmi2Info
 fmi2Simulate
 fmi2SimulateME
 fmi2SimulateCS
+fmi2VariableDependsOnVariable
+fmi2GetDependencies
+fmi2PrintDependencies
 ```
 
 # FMI3 specific
@@ -76,4 +79,7 @@ fmi3Simulate
 fmi3SimulateME
 fmi3SimulateSE
 fmi3SimulateCS
+fmi3VariableDependsOnVariable
+fmi3GetDependencies
+fmi3PrintDependencies
 ```

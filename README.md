@@ -2,7 +2,7 @@
 # FMI.jl
 
 ## What is FMI.jl?
-[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is a free-to-use software library for the Julia programming language which integrates the **F**unctional **M**ock-Up **I**nterface ([fmi-standard.org](http://fmi-standard.org/)): load or create, parameterize, differentiate, simulate and plot FMUs seamlessly inside the Julia programming language!
+[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is a free-to-use software library for the Julia programming language which integrates the **F**unctional **M**ock-Up **I**nterface ([fmi-standard.org](https://fmi-standard.org/)): load or create, parameterize, differentiate, simulate and plot FMUs seamlessly inside the Julia programming language!
 
 [![Dev Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) 
 [![Test (latest)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLatest.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLatest.yml)
@@ -105,7 +105,7 @@ Tobias Thummerer, Johannes Tintenherr, Lars Mikelsons. 2021 **Hybrid modeling of
 ## Notes for contributors
 Contributors are welcome. Before contributing, please read, understand and follow the [Contributor's Guide on Collaborative Practices for Community Packages](https://github.com/SciML/ColPrac). 
 During development of new implementations or optimizations on exisitng code, one will have to make design decissions that influence the library performance and usability. The following priorization should be the basis for decision-making:
-- **#1 Compliance with standard:** It is the highest priority to be compliant with the FMI standard ([fmi-standard.org](http://fmi-standard.org/)). Identifiers described in the standard must be used. Topologies should follow the specification as far as the possibilities of the Julia programming language allows.
+- **#1 Compliance with standard:** It is the highest priority to be compliant with the FMI standard ([fmi-standard.org](https://fmi-standard.org/)). Identifiers described in the standard must be used. Topologies should follow the specification as far as the possibilities of the Julia programming language allows.
 - **#2 Performance:** Because [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is a simulation tool, performance is very important. This applies to the efficient use of CPU and GPU, but also the conscientious use of RAM and disc space.
 - **#3 Usability:** The library should be as usable as possible, as long as being fully compliant with the FMI standard.
 

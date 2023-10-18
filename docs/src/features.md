@@ -1,6 +1,6 @@
 
 # Features
-Please note, that this guide focuses also on users, that are not familiar with FMI. The following feature explanations are written in an easy-to-read-fashion, so there might be some points that are scientifically only 95% correct. For further information on FMI and FMUs, see [fmi-standard.org](http://fmi-standard.org/).
+Please note, that this guide focuses also on users, that are not familiar with FMI. The following feature explanations are written in an easy-to-read-fashion, so there might be some points that are scientifically only 95% correct. For further information on FMI and FMUs, see [fmi-standard.org](https://fmi-standard.org/).
 
 ## Execution Configuration
 Not all FMUs support all features they should according to the FMI-standard, so *FMI.jl* provides a so called *execution configuration*. 
