@@ -7,16 +7,17 @@ using FMIImport: FMU3Solution
 import FMIImport.ForwardDiff
 
 """
-Plots data from a ME-FMU.
-
-Optional `t_in_solution` controls if the first state in the solution is interpreted as t(ime).
-Optional keyword argument `maxLabelLength` controls the maximum length for legend labels (too long labels are cut from front).
+function no longer here... (hopefully)
 """
 function fmiPlot(solution::FMU3Solution; kwargs...)
     fig = Plots.plot(; xlabel="t [s]")
     fmiPlot!(fig, solution; kwargs...)
     return fig
 end
+
+"""
+function no longer here... (hopefully)
+"""
 function fmiPlot!(fig, solution::FMU3Solution; 
     states::Union{Bool, Nothing}=nothing, 
     values::Union{Bool, Nothing}=nothing, 
@@ -168,9 +169,7 @@ function fmiPlot!(fig, solution::FMU3Solution;
 end
 
 """
-Extended the original plot-command by plotting FMUs.
-
-For further information seek `?fmiPlot`.
+function no longer here... (hopefully)
 """
 function Plots.plot(solution::FMU3Solution, args...; kwargs...)
     fmiPlot(solution, args...; kwargs...)

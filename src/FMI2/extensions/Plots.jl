@@ -7,40 +7,17 @@ using FMIImport: FMU2Solution
 import FMIImport.ForwardDiff
 
 """
-
-    fmiPlot(solution::FMU2Solution; states::Union{Bool, Nothing}=nothing,
-    values::Union{Bool, Nothing}=nothing,
-    stateEvents::Union{Bool, Nothing}=nothing,
-    timeEvents::Union{Bool, Nothing}=nothing,
-    stateIndices=nothing,
-    valueIndices=nothing,
-    maxLabelLength=64,
-    plotkwargs...)
-
-Plots data from a ME-FMU.
-
-Optional `t_in_solution` controls if the first state in the solution is interpreted as t(ime).
-
-# Arguments
-- `solution::FMU2Solution`:  Struct contains information about the solution `value`, `success`, `state` and  `events` of a specific FMU.
-
-# Keywords
-- `states::Union{Bool, Nothing}`: controls if states should be ploted (default = nothing)
-- `values::Union{Bool, Nothing}`: controls if values should be ploted (default = nothing)
-- `timeEvents::Union{Bool, Nothing}=nothing`: controls if timeEvents should be ploted (default = noting )
-- `stateIndices=nothing`: controls the number of ploted states
-- `valueIndices=nothing`: controls the number of ploted values
-- `maxLabelLength=64`: controls the maximum length for legend labels (too long labels are cut from front)
-
-# Returns
-- `fig `: Returns a figure containing the plotted data from a ME-FMU.
-
+function no longer here... (hopefully)
 """
 function fmiPlot(solution::FMU2Solution; kwargs...)
     fig = Plots.plot(; xlabel="t [s]")
     fmiPlot!(fig, solution; kwargs...)
     return fig
 end
+
+"""
+function no longer here... (hopefully)
+"""
 function fmiPlot!(fig, solution::FMU2Solution;
     states::Union{Bool, Nothing}=nothing,
     values::Union{Bool, Nothing}=nothing,
@@ -196,9 +173,7 @@ function fmiPlot!(fig, solution::FMU2Solution;
 end
 
 """
-Extended the original plot-command by plotting FMUs.
-
-For further information seek `?fmiPlot`.
+function no longer here... (hopefully)
 """
 function Plots.plot(solution::FMU2Solution, args...; kwargs...)
     fmiPlot(solution, args...; kwargs...)

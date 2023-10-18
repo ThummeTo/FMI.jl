@@ -16,8 +16,12 @@ using FMIImport: fmi3DependencyKindDependent, fmi3DependencyKindFixed
 using FMIImport: fmi3CallbackLogger, fmi3CallbackIntermediateUpdate, fmi3CallbackClockUpdate, fmi3Instance
 import FMIImport: fmi3VariableNamingConventionFlat, fmi3VariableNamingConventionStructured
 
-""" 
-Returns how a variable depends on another variable based on the model description.
+"""
+    fmi3VariableDependsOnVariable(fmu::FMU3, vr1::fmi3ValueReference, vr2::fmi3ValueReference)
+    
+Return the dependence of the variable described by `vr1` on another variable described by `vr2` based on the model description of the `fmu`.
+
+See also [`fmi3GetDependencies`](@ref).
 """
 function fmi3VariableDependsOnVariable(fmu::FMU3, vr1::fmi3ValueReference, vr2::fmi3ValueReference) 
     i1 = fmu.modelDescription.valueReferenceIndicies[vr1]
@@ -26,9 +30,11 @@ function fmi3VariableDependsOnVariable(fmu::FMU3, vr1::fmi3ValueReference, vr2::
 end
 
 """
-Returns the FMU's dependency-matrix for fast look-ups on dependencies between value references.
+    fmi3GetDependencies(fmu::FMU3)
 
-Entries are from type fmi3DependencyKind.
+Build dependency `Matrix{Union{fmi3DependencyKind, Nothing}}` of dimension `n x n` for fast look-ups on dependencies between value references (`n` is number of states of the `fmu`).
+
+See also [`fmi3PrintDependencies`](@ref), [`fmi3VariableDependsOnVariable`](@ref).
 """
 function fmi3GetDependencies(fmu::FMU3)
     if !isdefined(fmu, :dependencies)
@@ -70,7 +76,14 @@ function fmi3GetDependencies(fmu::FMU3)
     fmu.dependencies
 end
 
-function fmi3PrintDependencies(fmu::FMU2)
+"""
+    fmi3PrintDependencies(fmu::FMU3)
+
+Print the dependency matrix for `fmu` as returned by [`fmi3GetDependencies`](@ref).
+
+See also [`fmi3GetDependencies`](@ref).
+"""
+function fmi3PrintDependencies(fmu::FMU3)
     dep = fmi3GetDependencies(fmu)
     ni, nj = size(dep)
 
@@ -84,7 +97,9 @@ function fmi3PrintDependencies(fmu::FMU2)
 end
 
 """
-Prints FMU related information.
+     fmi3Info(fmu::FMU3)
+
+Print information about the `fmu`.
 """
 function fmi3Info(fmu::FMU3)
     println("#################### Begin information for FMU ####################")
