@@ -129,9 +129,9 @@ function fmi2GetReal!(fmu::FMU2, args...; kwargs...)
 end
 
 """
-    fmiGet(fmu::FMU2, args...; kwargs...)
+    fmi2Get(fmu::FMU2, args...; kwargs...)
 
-Wrapper for `fmiGet(c::FMU2Component, args...; kwargs...)` without a provided FMU2Component. 
+Wrapper for `fmi2Get(c::FMU2Component, args...; kwargs...)` without a provided FMU2Component. 
 (Component `c` gets selected from `fmu`)
 """
 function fmi2Get(fmu::FMU2, args...; kwargs...)
@@ -139,9 +139,9 @@ function fmi2Get(fmu::FMU2, args...; kwargs...)
 end
 
 """
-    fmiGet!(fmu::FMU2, args...; kwargs...)
+    fmi2Get!(fmu::FMU2, args...; kwargs...)
 
-Wrapper for `fmiGet!(c::FMU2Component, args...; kwargs...)` without a provided FMU2Component. 
+Wrapper for `fmi2Get!(c::FMU2Component, args...; kwargs...)` without a provided FMU2Component. 
 (Component `c` gets selected from `fmu`)
 """
 function fmi2Get!(fmu::FMU2, args...; kwargs...)
@@ -149,9 +149,9 @@ function fmi2Get!(fmu::FMU2, args...; kwargs...)
 end
 
 """
-    fmiSet(fmu::FMU2, args...; kwargs...)
+    fmi2Set(fmu::FMU2, args...; kwargs...)
 
-Wrapper for `fmiSet(c::FMU2Component, args...; kwargs...)` without a provided FMU2Component. 
+Wrapper for `fmi2Set(c::FMU2Component, args...; kwargs...)` without a provided FMU2Component. 
 (Component `c` gets selected from `fmu`)
 """
 function fmi2Set(fmu::FMU2, args...; kwargs...)

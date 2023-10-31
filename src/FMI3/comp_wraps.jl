@@ -567,34 +567,34 @@ function fmi3SetClock(fmu::FMU3, args...; kwargs...)
 end
 
 """
-    fmiGet(fmu::FMU3, args...; kwargs...)
+    fmi3Get(fmu::FMU3, args...; kwargs...)
 
-Wrapper for `fmiGet(c::FMU3Instance, args...; kwargs...)` without a provided FMU3Instance.
+Wrapper for `fmi3Get(c::FMU3Instance, args...; kwargs...)` without a provided FMU3Instance.
 (Instance `c` gets selected from `fmu`)
 """
-function fmiGet(fmu::FMU3, args...; kwargs...)
+function fmi3Get(fmu::FMU3, args...; kwargs...)
     @assert length(fmu.instances) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi3Get(fmu.instances[end], args...; kwargs...)
 end
 
 """
-    fmiGet!(fmu::FMU3, args...; kwargs...)
+    fmi3Get!(fmu::FMU3, args...; kwargs...)
 
-Wrapper for `fmiGet!(c::FMU3Instance, args...; kwargs...)` without a provided FMU3Instance.
+Wrapper for `fmi3Get!(c::FMU3Instance, args...; kwargs...)` without a provided FMU3Instance.
 (Instance `c` gets selected from `fmu`)
 """
-function fmiGet!(fmu::FMU3, args...; kwargs...)
+function fmi3Get!(fmu::FMU3, args...; kwargs...)
     @assert length(fmu.instances) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi3Get!(fmu.instances[end], args...; kwargs...)
 end
 
 """
-    fmiSet(fmu::FMU3, args...; kwargs...)
+    fmi3Set(fmu::FMU3, args...; kwargs...)
 
-Wrapper for `fmiSet(c::FMU3Instance, args...; kwargs...)` without a provided FMU3Instance.
+Wrapper for `fmi3Set(c::FMU3Instance, args...; kwargs...)` without a provided FMU3Instance.
 (Instance `c` gets selected from `fmu`)
 """
-function fmiSet(fmu::FMU3, args...; kwargs...)
+function fmi3Set(fmu::FMU3, args...; kwargs...)
     @assert length(fmu.instances) > 0 ["No FMU instance allocated, have you already called fmiInstantiate?"]
     fmi3Set(fmu.instances[end], args...; kwargs...)
 end
@@ -611,9 +611,9 @@ function fmi3GetFMUState(fmu::FMU3, args...; kwargs...)
 end
 
 """
-    fmi3SetFMUstate(fmu::FMU3, args...; kwargs...)
+    fmi3SetFMUState(fmu::FMU3, args...; kwargs...)
 
-Wrapper for `fmi3SetFMUstate(c::FMU3Instance, args...; kwargs...)` without a provided FMU3Instance.
+Wrapper for `fmi3SetFMUState(c::FMU3Instance, args...; kwargs...)` without a provided FMU3Instance.
 (Instance `c` gets selected from `fmu`)
 """
 function fmi3SetFMUState(fmu::FMU3, args...; kwargs...)
