@@ -21,7 +21,6 @@ docs/site/
 # It records a fixed state of all packages used by the project. As such, it should not be
 # committed for packages, but should be committed for applications that require a static
 # environment.
-docs/Manifest.toml
 Manifest.toml
 LocalPreferences.toml
 
@@ -29,17 +28,3 @@ LocalPreferences.toml
 tmp/
 .vscode/settings.json
 examples/src/.ipynb_checkpoints/
-docs/src/examples/manipulation.md
-docs/src/examples/manipulation_files/
-docs/src/examples/modelica_conference_2021.md
-docs/src/examples/modelica_conference_2021_files/
-docs/src/examples/multiple_instances.md
-docs/src/examples/multiple_instances_files/
-docs/src/examples/multiprocessing.md
-docs/src/examples/multithreading.md
-docs/src/examples/parameter_optimization.md
-docs/src/examples/parameter_optimization_files/
-docs/src/examples/parameterize.md
-docs/src/examples/simulate.md
-docs/src/examples/simulate_files/
-docs/src/index.md
