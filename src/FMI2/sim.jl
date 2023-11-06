@@ -3,7 +3,7 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-using DifferentialEquations, DiffEqCallbacks
+using DifferentialEquations, DifferentialEquations.DiffEqCallbacks
 import DifferentialEquations.SciMLBase: RightRootFind, ReturnCode
 
 using FMIImport: fmi2SetupExperiment, fmi2EnterInitializationMode, fmi2ExitInitializationMode, fmi2NewDiscreteStates, fmi2GetContinuousStates, fmi2GetNominalsOfContinuousStates, fmi2SetContinuousStates, fmi2GetDerivatives!
@@ -20,6 +20,8 @@ import LinearAlgebra: eigvals
 
 import ProgressMeter
 import ThreadPools
+
+import FMIImport.FMICore: EMPTY_fmi2Real, EMPTY_fmi2ValueReference
 
 ############ Model-Exchange ############
 
@@ -48,7 +50,7 @@ end
 # Returns the event indicators for an FMU.
 function condition(c::FMU2Component, out, x, t, integrator, inputFunction) 
 
-    @assert c.state == fmi2ComponentStateContinuousTimeMode "condition(...): Must be called in mode continuous time."
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "condition(...):\n" * FMICore.ERR_MSG_CONT_TIME_MODE
 
     indicators!(c, out, x, t, inputFunction)
 
@@ -59,7 +61,7 @@ end
 # Sets a new state for the solver from the FMU (if needed).
 function affectFMU!(c::FMU2Component, integrator, idx, inputFunction, solution::FMU2Solution)
 
-    @assert c.state == fmi2ComponentStateContinuousTimeMode "affectFMU!(...): Must be in continuous time mode!"
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "affectFMU!(...):\n" * FMICore.ERR_MSG_CONT_TIME_MODE
 
     c.solution.evals_affect += 1
 
@@ -103,7 +105,7 @@ end
 # This callback is called every time the integrator finishes an (accpeted) integration step.
 function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, progressMeter, tStart, tStop, solution::FMU2Solution)
 
-    @assert c.state == fmi2ComponentStateContinuousTimeMode "stepCompleted(...): Must be in continuous time mode."
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "stepCompleted(...):\n" * FMICore.ERR_MSG_CONT_TIME_MODE
     
     c.solution.evals_stepcompleted += 1
 
@@ -135,7 +137,7 @@ end
 # save FMU values 
 function saveValues(c::FMU2Component, recordValues, x, t, integrator, inputFunction)
 
-    @assert c.state == fmi2ComponentStateContinuousTimeMode "saveValues(...): Must be in continuous time mode."
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "saveValues(...):\n" * FMICore.ERR_MSG_CONT_TIME_MODE
 
     c.solution.evals_savevalues += 1
 
@@ -147,7 +149,7 @@ end
 
 function saveEventIndicators(c::FMU2Component, recordEventIndicators, x, t, integrator, inputFunction)
 
-    @assert c.state == fmi2ComponentStateContinuousTimeMode "saveEventIndicators(...): Must be in continuous time mode."
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "saveEventIndicators(...):\n" * FMICore.ERR_MSG_CONT_TIME_MODE
 
     c.solution.evals_saveeventindicators += 1
 
@@ -160,7 +162,7 @@ end
 
 function saveEigenvalues(c::FMU2Component, x, t, integrator, inputFunction)
 
-    @assert c.state == fmi2ComponentStateContinuousTimeMode "saveEigenvalues(...): Must be in continuous time mode."
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "saveEigenvalues(...):\n" * FMICore.ERR_MSG_CONT_TIME_MODE
 
     c.solution.evals_saveeigenvalues += 1
 
@@ -189,14 +191,19 @@ function fx(c::FMU2Component,
 
     c.solution.evals_fx_inplace += 1
 
-    u = c.fmu.empty_fmi2Real
-    u_refs = c.fmu.empty_fmi2ValueReference
+    u = EMPTY_fmi2Real
+    u_refs = EMPTY_fmi2ValueReference
     if !isnothing(inputFunction)
         u = eval!(inputFunction, c, x, t)
         u_refs = inputFunction.vrs
     end
 
-    c(;dx=dx, x=x, u=u, u_refs=u_refs, t=t)
+    # for zero state FMUs, don't request a `dx`
+    if c.fmu.isZeroState
+        c(;x=x, u=u, u_refs=u_refs, t=t)
+    else
+        c(;dx=dx, x=x, u=u, u_refs=u_refs, t=t)
+    end
     
     return nothing
 end
@@ -222,8 +229,8 @@ function fx_set(c::FMU2Component,
     t::Real,
     inputFunction::Union{Nothing, FMU2InputFunction}; force::Bool=false)
 
-    u = c.fmu.empty_fmi2Real
-    u_refs = c.fmu.empty_fmi2ValueReference
+    u = EMPTY_fmi2Real
+    u_refs = EMPTY_fmi2ValueReference
     if !isnothing(inputFunction)
         u = eval!(inputFunction, c, x, t)
         u_refs = inputFunction.vrs
@@ -245,8 +252,8 @@ function indicators!(c::FMU2Component,
 
     c.solution.evals_condition += 1
 
-    u = c.fmu.empty_fmi2Real
-    u_refs = c.fmu.empty_fmi2ValueReference
+    u = EMPTY_fmi2Real
+    u_refs = EMPTY_fmi2ValueReference
     if !isnothing(inputFunction)
         u = eval!(inputFunction, c, x, t)
         u_refs = inputFunction.vrs
@@ -611,16 +618,16 @@ function fmi2SimulateCS(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
     hasInputs = (length(inputValueReferences) > 0)
 
     _inputFunction = nothing
-    u = fmu.empty_fmi2Real
-    u_refs = fmu.empty_fmi2ValueReference
+    u = EMPTY_fmi2Real
+    u_refs = EMPTY_fmi2ValueReference
     if hasInputs
         _inputFunction = FMU2InputFunction(inputFunction, inputValueReferences)
         u_refs = _inputFunction.vrs
     end
 
     # outputs 
-    y_refs = fmu.empty_fmi2ValueReference
-    y = fmu.empty_fmi2Real
+    y_refs = EMPTY_fmi2ValueReference
+    y = EMPTY_fmi2Real
     if !isnothing(recordValues)
         y_refs = prepareValueReference(fmu, recordValues)
         y = zeros(fmi2Real, length(y_refs))

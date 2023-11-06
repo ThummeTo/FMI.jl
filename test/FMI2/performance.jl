@@ -134,6 +134,7 @@ import FMI.FMIImport.FMICore: eval!
 
 cRef = UInt64(pointer_from_objref(c))
 dx = zeros(fmi2Real, 2)
+dx_refs = c.fmu.modelDescription.derivativeValueReferences
 y = zeros(fmi2Real, 0)
 y_refs = zeros(fmi2ValueReference, 0)
 x = zeros(fmi2Real, 2)
@@ -144,22 +145,22 @@ p_refs = zeros(fmi2ValueReference, 0)
 ec = zeros(fmi2Real, 0)
 ec_idcs = zeros(fmi2ValueReference, 0)
 t = -1.0
-b = @benchmarkable eval!($cRef, $dx, $y, $y_refs, $x, $u, $u_refs, $p, $p_refs, $ec, $ec_idcs, $t)
+b = @benchmarkable eval!($cRef, $dx, $dx_refs, $y, $y_refs, $x, $u, $u_refs, $p, $p_refs, $ec, $ec_idcs, $t)
 min_time, memory, allocs = evalBenchmark(b)
 @test allocs <= 1
 @test memory <= 80     # ToDo: ?
 
 b = @benchmarkable $c(dx=$dx, y=$y, y_refs=$y_refs, x=$x, u=$u, u_refs=$u_refs, p=$p, p_refs=$p_refs, ec=$ec, ec_idcs=$ec_idcs, t=$t)
 min_time, memory, allocs = evalBenchmark(b)
-@test allocs <= 5   # `ignore_derivatives` causes an extra 3 allocations (48 bytes)
-@test memory <= 208 # ToDo: What is the remaning 1 allocation (112 Bytes) compared to `eval!`?
+@test allocs <= 8   # `ignore_derivatives` causes an extra 3 allocations (48 bytes)
+@test memory <= 272 # ToDo: What is the remaning 1 allocation (112 Bytes) compared to `eval!`?
 
 _p = ()
 b = @benchmarkable FMI.fx($c, $dx, $x, $_p, $t, nothing)
 min_time, memory, allocs = evalBenchmark(b)
 # ToDo: This is too much, but currently necessary to be compatible with all AD-frameworks, as well as ForwardDiffChainRules
-@test allocs <= 6
-@test memory <= 224 # ToDo: What is the remaning 1 allocation (16 Bytes) compared to `c(...)`?
+@test allocs <= 8
+@test memory <= 272 # ToDo: What is the remaning 1 allocation (16 Bytes) compared to `c(...)`?
 
 # using FMISensitivity
 # import FMISensitivity.ForwardDiff

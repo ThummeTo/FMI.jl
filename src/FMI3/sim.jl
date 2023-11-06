@@ -3,7 +3,7 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-using DifferentialEquations, DiffEqCallbacks
+using DifferentialEquations, DifferentialEquations.DiffEqCallbacks
 import DifferentialEquations.SciMLBase: RightRootFind, ReturnCode
 
 using FMIImport: fmi3EnterInitializationMode, fmi3ExitInitializationMode, fmi3UpdateDiscreteStates, fmi3GetContinuousStates, fmi3GetNominalsOfContinuousStates, fmi3SetContinuousStates, fmi3GetContinuousStateDerivatives!
