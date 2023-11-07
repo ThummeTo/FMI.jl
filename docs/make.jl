@@ -27,6 +27,7 @@ makedocs(sitename="FMI.jl",
                 "Multiprocessing" => "examples/multiprocessing.md"
             ]
             "Library Functions" => "library.md"
+            "FMI Tool Information" => "fmi-tool-info.md"
             "Related Publication" => "related.md"
             "Contents" => "contents.md"
             ]
