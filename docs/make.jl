@@ -3,6 +3,7 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
+#import Pkg; Pkg.develop(path=joinpath(@__DIR__,"../../FMI.jl"))
 using Documenter, Plots, JLD2, DataFrames, CSV, MAT, FMI, FMIImport, FMICore
 using Documenter: GitHubActions
 

@@ -24,6 +24,11 @@ FMU2Event
 FMU2ExecutionConfiguration
 fmi2Status
 fmi2StatusOK
+fmi2StatusWarning
+fmi2StatusPending
+fmi2StatusError
+fmi2StatusDiscard
+fmi2StatusFatal
 fmi2Annotation
 ```
 

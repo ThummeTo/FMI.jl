@@ -19,6 +19,10 @@ fmi3Int8
 fmi3Int16
 fmi3Int32
 fmi3Int64
+fmi3UInt8
+fmi3UInt16
+fmi3UInt32
+fmi3UInt64
 fmi3True
 fmi3False
 fmi3ValueReferenceFormat
@@ -29,6 +33,10 @@ FMU3Event
 FMU3ExecutionConfiguration
 fmi3Status
 fmi3StatusOK
+fmi3StatusWarning
+fmi3StatusDiscard
+fmi3StatusError
+fmi3StatusFatal
 fmi3Annotation
 ```
 
