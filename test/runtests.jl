@@ -11,6 +11,8 @@ import Random
 import FMI.FMIImport.FMICore: fmi2StatusOK, fmi3StatusOK, fmi2ComponentStateTerminated, fmi2ComponentStateInstantiated, fmi3Boolean
 import FMI.FMIImport.FMICore: FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGURATION_NO_RESET, FMU2_EXECUTION_CONFIGURATION_RESET, FMU2_EXECUTION_CONFIGURATION_NOTHING
 
+using DifferentialEquations: FBDF
+
 exportingToolsWindows = [("Dymola", "2022x")]
 exportingToolsLinux = [("Dymola", "2022x")]
 fmuStructs = ["FMU", "FMUCOMPONENT"]
@@ -76,6 +78,11 @@ function runtestsFMI2(exportingTool)
                     include("FMI2/load_save.jl")
                 end
             end
+        end
+
+        @info "Performance (performance.jl)"
+        @testset "Performance" begin
+            include("FMI2/performance.jl")
         end
 
         @info "Plotting (plots.jl)"
