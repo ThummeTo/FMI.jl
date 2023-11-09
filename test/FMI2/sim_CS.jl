@@ -52,12 +52,12 @@ fmiUnload(myFMU)
 
 # case 2: CS-FMU with input signal
 
-function extForce_t(t)
-    [sin(t)]
+function extForce_t(t::Real, u::AbstractArray{<:Real})
+    u[1] = sin(t)
 end 
 
-function extForce_ct(c::Union{FMU2Component, Nothing}, t::fmi2Real)
-    [sin(t)]
+function extForce_ct(c::Union{FMU2Component, Nothing}, t::Real, u::AbstractArray{<:Real})
+    u[1] = sin(t)
 end  
 
 myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])

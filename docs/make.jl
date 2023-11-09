@@ -43,6 +43,7 @@ makedocs(sitename="FMI.jl",
                 "FMI3 specific content" => "fmi3_lowlevel_librarys.md"
             ]
             "API Index" => "index_library.md"
+            "FMI Tool Information" => "fmi-tool-info.md"            
             "Related Publication" => "related.md"
             "Contents" => "contents.md"
             hide("Deprecated" => "deprecated.md")

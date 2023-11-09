@@ -4,7 +4,7 @@
 #
 
 using FMIImport: FMUSolution
-import FMIImport.ForwardDiff
+import FMIImport.FMICore: unsense
 
 """
     fmiPlot(solution::FMUSolution; kwargs...)
@@ -76,7 +76,7 @@ function fmiPlot!(fig::Plots.Plot, solution::FMUSolution;
         end
     end
 
-    if states === nothing
+    if isnothing(states)
         states = (solution.states !== nothing)
     end
 
@@ -129,7 +129,7 @@ function fmiPlot!(fig::Plots.Plot, solution::FMUSolution;
 
     # plot states
     if states
-        t = collect(ForwardDiff.value(e) for e in solution.states.t)
+        t = collect(unsense(e) for e in solution.states.t)
         numValues = length(solution.states.u[1])
 
         for v in 1:numValues
@@ -138,7 +138,7 @@ function fmiPlot!(fig::Plots.Plot, solution::FMUSolution;
                 vrNames = fmi2ValueReferenceToString(component.fmu, vr)
                 vrName = length(vrNames) > 0 ? vrNames[1] : "?"
 
-                vals = collect(ForwardDiff.value(data[v]) for data in solution.states.u)
+                vals = collect(unsense(data[v]) for data in solution.states.u)
 
                 plot_min = min(plot_min, vals...)
                 plot_max = max(plot_max, vals...)
@@ -157,7 +157,7 @@ function fmiPlot!(fig::Plots.Plot, solution::FMUSolution;
 
     # plot recorded values
     if values
-        t = collect(ForwardDiff.value(e) for e in solution.values.t)
+        t = collect(unsense(e) for e in solution.values.t)
         numValues = length(solution.values.saveval[1])
 
         for v in 1:numValues
@@ -170,7 +170,7 @@ function fmiPlot!(fig::Plots.Plot, solution::FMUSolution;
                     vrName = length(vrNames) > 0 ? vrNames[1] : "?"
                 end
     
-                vals = collect(ForwardDiff.value(data[v]) for data in solution.values.saveval)
+                vals = collect(unsense(data[v]) for data in solution.values.saveval)
 
                 plot_min = min(plot_min, vals...)
                 plot_max = max(plot_max, vals...)

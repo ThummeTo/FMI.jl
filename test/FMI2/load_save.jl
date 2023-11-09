@@ -16,12 +16,15 @@ t_stop = 8.0
 myFMU = fmiLoad("SpringFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 
 recordValues = ["mass.s", "mass.v"]
-solutionME = fmiSimulateME(myFMU, (t_start, t_stop); recordValues=recordValues)
+solutionME = fmiSimulateME(myFMU, (t_start, t_stop); recordValues=recordValues, solver=FBDF(autodiff=false))
 solutionCS = fmiSimulateCS(myFMU, (t_start, t_stop); recordValues=recordValues)
 
 # ME
 
 fmiSaveSolution(solutionME, "solutionME.jld2")
+
+#@warn "Loading solution tests are disabled for now."
+#anotherSolutionME = solutionME
 anotherSolutionME = fmiLoadSolution("solutionME.jld2")
 
 @test solutionME.success == true 
@@ -55,6 +58,9 @@ end
 # CS 
 
 fmiSaveSolution(solutionCS, "solutionCS.jld2")
+
+#@warn "Loading solution tests are disabled for now."
+#anotherSolutionCS = solutionCS
 anotherSolutionCS = fmiLoadSolution("solutionCS.jld2")
 
 @test solutionCS.success == true 

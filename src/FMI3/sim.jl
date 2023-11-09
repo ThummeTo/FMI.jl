@@ -3,16 +3,15 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-using DifferentialEquations, DiffEqCallbacks
-import FMIImport.SciMLSensitivity.SciMLBase: RightRootFind, ReturnCode
+using DifferentialEquations, DifferentialEquations.DiffEqCallbacks
+import DifferentialEquations.SciMLBase: RightRootFind, ReturnCode
 
 using FMIImport: fmi3EnterInitializationMode, fmi3ExitInitializationMode, fmi3UpdateDiscreteStates, fmi3GetContinuousStates, fmi3GetNominalsOfContinuousStates, fmi3SetContinuousStates, fmi3GetContinuousStateDerivatives!
 using FMIImport.FMICore: fmi3StatusOK, fmi3TypeCoSimulation, fmi3TypeModelExchange
 using FMIImport.FMICore: fmi3InstanceState, fmi3InstanceStateInstantiated, fmi3InstanceStateInitializationMode, fmi3InstanceStateEventMode, fmi3InstanceStateContinuousTimeMode, fmi3InstanceStateTerminated, fmi3InstanceStateError, fmi3InstanceStateFatal
 using FMIImport: FMU3Solution, FMU3Event
 
-using FMIImport.ChainRulesCore
-import FMIImport.ForwardDiff
+using FMIImport.FMICore.ChainRulesCore
 
 import ProgressMeter
 
@@ -230,7 +229,7 @@ end
 function fx(c::FMU3Instance, 
     dx::AbstractArray{<:Real},
     x::AbstractArray{<:Real}, 
-    p::AbstractArray, 
+    p::Tuple,
     t::Real)
 
     # if isa(t, ForwardDiff.Dual) 
@@ -253,14 +252,6 @@ function fx(c::FMU3Instance,
     # y, dx = FMIImport.eval!(c, dx, nothing, nothing, x, nothing, nothing, t)
 
     return dx
-end
-
-# same function as in FMI2_sim.jl
-function fd_eltypes(e::ForwardDiff.Dual{T, V, N}) where {T, V, N}
-    return (T, V, N)
-end
-function fd_eltypes(e::AbstractArray{<:ForwardDiff.Dual{T, V, N}}) where {T, V, N}
-    return (T, V, N)
 end
 
 # same function as in FMI2_sim.jl
@@ -367,139 +358,6 @@ function _fx_fd(comp, dx, x, p, t)
 
     ys
 end
-
-# same functionhead as in FMI2_sim.jl
-# frule for fx
-function ChainRulesCore.frule((Δself, Δcomp, Δdx, Δx, Δp, Δt), 
-    ::typeof(fx), 
-    comp, #::FMU3Instance,
-    dx, 
-    x,#::AbstractArray{<:Real},
-    p,
-    t)
-
-    y = fx(comp, dx, x, p, t)
-    function fx_pullforward(Δdx, Δx, Δt)
-
-        # if t >= 0.0 
-        #     fmi3SetTime(comp, t)
-        # end
-
-        # if all(isa.(x, ForwardDiff.Dual))
-        #     xf = collect(ForwardDiff.value(e) for e in x)
-        #     fmi3SetContinuousStates(comp, xf)
-        # else
-        #     fmi3SetContinuousStates(comp, x)
-        # end
-
-        c̄omp = ZeroTangent()
-        d̄x = ZeroTangent()
-        x̄ = ZeroTangent()
-        p̄ = ZeroTangent()
-        t̄ = ZeroTangent() 
-
-        if Δdx != NoTangent()
-            d̄x = Δdx
-        end
-
-        if Δx != NoTangent()
-            if comp.A === nothing || size(comp.A) != (length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
-                comp.A = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
-            end 
-            comp.jacobianUpdate!(comp.A, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
-            x̄ = comp.A * Δx
-        end
-
-        if Δt != NoTangent()
-            dt = 1e-6
-            dx1 = fmi3GetContinuousStateDerivatives(comp)
-            fmi3SetTime(comp, t + dt)
-            dx2 = fmi3GetContinuousStateDerivatives(comp)
-            ∂t = (dx2-dx1)/dt 
-            t̄ = ∂t * Δt
-        end
-
-        return (c̄omp, d̄x, x̄, p̄, t̄)
-    end
-    return (y, fx_pullforward(Δdx, Δx, Δt)...)
-end
-
-# rrule for fx
-function ChainRulesCore.rrule(::typeof(fx), 
-    comp::FMU3Instance,
-    dx, 
-    x,
-    p,
-    t)
-
-    y = fx(comp, dx, x, p, t)
-    function fx_pullback(ȳ)
-
-        if t >= 0.0
-            fmi3SetTime(comp, t)
-        end
-
-        fmi3SetContinuousStates(comp, x)
-
-        if comp.A === nothing || size(comp.A) != (length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
-            comp.A = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
-        end 
-        comp.jacobianUpdate!(comp.A, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
-
-        n_dx_x = @thunk(comp.A' * ȳ)
-
-        f̄ = NoTangent()
-        c̄omp = ZeroTangent()
-        d̄x = ZeroTangent()
-        x̄ = n_dx_x
-        p̄ = ZeroTangent()
-        t̄ = ZeroTangent()
-
-        return f̄, c̄omp, d̄x, x̄, p̄, t̄
-    end
-    return (y, fx_pullback)
-end
-
-# frule for fx
-# function ChainRulesCore.frule((Δself, Δcomp, Δdx, Δx, Δp, Δt), 
-#                               ::typeof(fx), 
-#                               comp, #::FMU3Instance,
-#                               dx, 
-#                               x,#::AbstractArray{<:Real},
-#                               p,
-#                               t)
-
-#     y = fx(comp, dx, x, p, t)
-#     function fx_pullforward(Δx)
-
-#         if t >= 0.0 
-#             fmi3SetTime(comp, t)
-#         end
-
-#         if all(isa.(x, ForwardDiff.Dual))
-#             xf = collect(ForwardDiff.value(e) for e in x)
-#             fmi3SetContinuousStates(comp, xf)
-#         else
-#             fmi3SetContinuousStates(comp, x)
-#         end
-
-#         if comp.A == nothing || size(comp.A) != (length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
-#             comp.A = zeros(length(comp.fmu.modelDescription.derivativeValueReferences), length(comp.fmu.modelDescription.stateValueReferences))
-#         end 
-#         comp.jacobianUpdate!(comp.A, comp, comp.fmu.modelDescription.derivativeValueReferences, comp.fmu.modelDescription.stateValueReferences)
-
-#         n_dx_x = comp.A * Δx
-
-#         c̄omp = ZeroTangent()
-#         d̄x = ZeroTangent()
-#         x̄ = n_dx_x 
-#         p̄ = ZeroTangent()
-#         t̄ = ZeroTangent()
-
-#         return (c̄omp, d̄x, x̄, p̄, t̄)
-#     end
-#     return (y, fx_pullforward(Δx)...)
-# end
 
 import FMIImport: fmi3VariabilityConstant, fmi3InitialApprox, fmi3InitialExact
 function setBeforeInitialization(mv::FMIImport.fmi3Variable)
@@ -804,12 +662,12 @@ function fmi3SimulateME(c::FMU3Instance, t_start::Union{Real, Nothing} = nothing
 end 
 
 # sets up the ODEProblem for simulating a ME-FMU
-function setupODEProblem(c::FMU3Instance, x0::AbstractArray{fmi3Float64}, t_start::fmi3Float64, t_stop::fmi3Float64; p=[], customFx=nothing)
+function setupODEProblem(c::FMU3Instance, x0::AbstractArray{fmi3Float64}, t_start::fmi3Float64, t_stop::fmi3Float64; p=(), customFx=nothing)
     if customFx === nothing
         customFx = (dx, x, p, t) -> fx(c, dx, x, p, t)
     end
 
-    p = []
+    p = ()
     c.problem = ODEProblem(customFx, x0, (t_start, t_stop), p,)
 
     return c.problem
@@ -1073,7 +931,7 @@ function fmi3SimulateME(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_st
         fmusol.states = solve(c.problem, solver; callback = CallbackSet(cbs...), dtmax=dtmax, solveKwargs..., kwargs...)
     end
 
-    fmusol.success = (fmusol.states.retcode == SciMLBase.ReturnCode.Success)
+    fmusol.success = (fmusol.states.retcode == ReturnCode.Success)
 
     # cleanup progress meter
     if showProgress 
