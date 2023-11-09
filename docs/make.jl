@@ -3,7 +3,7 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-#import Pkg; Pkg.develop(path=joinpath(@__DIR__,"../../FMI.jl"))
+import Pkg; Pkg.develop(path=joinpath(@__DIR__,"../../FMI.jl"))
 using Documenter, Plots, JLD2, DataFrames, CSV, MAT, FMI, FMIImport, FMICore
 using Documenter: GitHubActions
 
@@ -47,8 +47,8 @@ makedocs(sitename="FMI.jl",
             "Related Publication" => "related.md"
             "Contents" => "contents.md"
             hide("Deprecated" => "deprecated.md")
-            ]
-         )
+        ]
+    )
 
 function deployConfig()
     github_repository = get(ENV, "GITHUB_REPOSITORY", "")

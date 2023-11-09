@@ -25,7 +25,7 @@ fmi3UInt32
 fmi3UInt64
 fmi3True
 fmi3False
-fmi3ValueReferenceFormat
+FMIImport.fmi3ValueReferenceFormat
 fmi3IntervalQualifier
 fmi3Variability
 fmi3DependencyKind
@@ -88,6 +88,7 @@ fmi3StringToVariableNamingConvention
 fmi3StringToVariability
 fmi3VariabilityToString
 fmi3StatusToString
+fmi3StringToStatus
 fmi3DependencyKindToString
 fmi3StringToDependencyKind
 ```

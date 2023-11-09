@@ -4,6 +4,7 @@
 FMU2
 FMU2Component
 FMU2ComponentEnvironment
+FMU2InputFunction
 fmi2Struct
 fmi2StructMD
 fmi2Initial
@@ -15,7 +16,7 @@ fmi2Unit
 fmi2Char
 fmi2True
 fmi2False
-fmi2ValueReferenceFormat
+FMIImport.fmi2ValueReferenceFormat
 fmi2Variability
 fmi2VariableDependency
 fmi2DependencyKind
@@ -279,6 +280,8 @@ fmi2GetSolutionTime
 ### External/Additional functions
 
 ```@docs
+getCurrentComponent
+hasCurrentComponent
 fmi2GetJacobian
 fmi2GetJacobian!
 fmi2GetFullJacobian

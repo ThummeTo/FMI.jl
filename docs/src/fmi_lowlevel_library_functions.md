@@ -5,4 +5,5 @@ logInfo
 logWarning
 logError
 loadBinary
+eval!
 ```
