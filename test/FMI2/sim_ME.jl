@@ -86,6 +86,12 @@ dataLength = length(solution.states.u)
 @test solution.values.t[1] == t_start 
 @test solution.values.t[end] == t_stop 
 
+# value/state getters 
+@test solution.states.t == fmi2GetSolutionTime(solution)
+@test collect(s[1] for s in solution.values.saveval) == fmi2GetSolutionValue(solution, 1; isIndex=true)
+@test collect(u[1] for u in solution.states.u      ) == fmi2GetSolutionState(solution, 1; isIndex=true)
+@test isapprox(fmi2GetSolutionState(solution, 2; isIndex=true), fmi2GetSolutionDerivative(solution, 1; isIndex=true); atol=1e-4)
+
 # reference values from Simulation in Dymola2020x (Dassl)
 @test sum(abs.(solution.states.u[1] - [0.5, 0.0])) < 1e-4
 @test sum(abs.(solution.states.u[end] - [1.05444, 1e-10])) < 0.01

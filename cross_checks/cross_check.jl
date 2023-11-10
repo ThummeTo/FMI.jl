@@ -14,6 +14,8 @@ using DelimitedFiles
 using Tables
 using Statistics
 
+import Base64
+
 include("cross_check_config.jl")
 include("cross_check_lib.jl")
 
