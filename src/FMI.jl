@@ -181,16 +181,17 @@ function __init__()
         import .JLD2
         include("extensions/JLD2.jl")
     end
-    @require DataFrames="a93c6f00-e57d-5684-b7b6-d8193f3e46c0" begin
-        import .DataFrames
-        @require CSV="336ed68f-0bac-5ca0-87d4-7b16caf5d00b" begin
-            import .CSV
-            include("extensions/CSV.jl")   
-        end
+    @require CSV="336ed68f-0bac-5ca0-87d4-7b16caf5d00b" begin
+        import .CSV
+        include("extensions/CSV.jl")
     end
     @require MAT="23992714-dd62-5051-b70f-ba57cb901cac" begin
         import .MAT
-        include("extensions/MAT.jl")   
+        include("extensions/MAT.jl")
+    end
+    @require Tables="bd369af6-aec1-5ad0-b16a-f7cc5008161c" begin
+        import .Tables
+        include("extensions/Tables.jl")
     end
 end
 
