@@ -20,6 +20,6 @@ function fmiSaveSolutionMAT(solution::FMUSolution, filepath::AbstractString)
         MAT.write(file, replace(fmi2ValueReferenceToString(solution.component.fmu, solution.valueReferences[i-1])[1], "." => "_"), v[:,i])
         # df[!, Symbol(fmi2ValueReferenceToString(solution.component.fmu, solution.valueReferences[i]))] = [val[i] for val in solution.values.saveval]
     end
-    
+
     MAT.close(file)
 end

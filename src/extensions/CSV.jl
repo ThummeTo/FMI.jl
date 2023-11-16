@@ -6,14 +6,14 @@
 using FMIImport: FMUSolution
 
 """
-ToDo: DocString.
+    fmiSaveSolutionCSV(solution::FMUSolution, filepath::AbstractString)
 
 Saves a FMUSolution to a csv file.
+
+# Arguments
+- `solution::FMUSolution`: The simulation results that should be saved
+- `filepath::AbstractString`: The path specifing where to save the results, also indicating the file format. Supports *.mat, *.csv, *.JLD2
 """
-function fmiSaveSolutionCSV(solution::FMUSolution, filepath::AbstractString) 
-    df = DataFrames.DataFrame(time = solution.values.t)
-    for i in 1:length(solution.values.saveval[1])
-        df[!, Symbol(fmi2ValueReferenceToString(solution.component.fmu, solution.valueReferences[i]))] = [val[i] for val in solution.values.saveval]
-    end
-    CSV.write(filepath, df)
+function fmiSaveSolutionCSV(solution::FMUSolution, filepath::AbstractString)
+    CSV.write(filepath, solution)
 end
