@@ -758,13 +758,13 @@ function fmiSimulate(str::fmi3Struct, args...; kwargs...)
 end
 
 """
-    fmiSimulateCS(str::fmi2Struct, args...; kwargs...)
+    fmiSimulateCS(str::fmi2Struct, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing, args...; kwargs...)
 
 Start a simulation of the Co-Simulation FMU instance `str`.
 
 Wrapper for [`fmi2SimulateCS`](@ref).
 """
-function fmiSimulateCS(str::fmi2Struct, args...; kwargs...)
+function fmiSimulateCS(str::fmi2Struct, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing, args...; kwargs...)
     fmi2SimulateCS(str, tspan, args...; kwargs...)
 end
 
