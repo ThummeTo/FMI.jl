@@ -63,6 +63,13 @@ tStop = 8.0
 tSave = tStart:tStep:tStop
 ```
 
+
+
+
+    0.0:0.01:8.0
+
+
+
 ### Import FMU
 
 In the next lines of code the FMU model from *FMIZoo.jl* is loaded and the information about the FMU is shown.
@@ -77,6 +84,35 @@ myFMU = fmiLoad(pathToFMU)
 
 fmiInfo(myFMU)
 ```
+
+    #################### Begin information for FMU ####################
+    	Model name:			SpringFrictionPendulum1D
+    	FMI-Version:			2.0
+    	GUID:				{2e178ad3-5e9b-48ec-a7b2-baa5669efc0c}
+    	Generation tool:		Dymola Version 2022x (64-bit), 2021-10-08
+    	Generation time:		2022-05-19T06:54:12Z
+    	Var. naming conv.:		structured
+    	Event indicators:		24
+    	Inputs:				0
+    	Outputs:			0
+    	States:				2
+    		33554432 ["mass.s"]
+    		33554433 ["mass.v", "mass.v_relfric"]
+    	Supports Co-Simulation:		true
+    		Model identifier:	SpringFrictionPendulum1D
+    		Get/Set State:		true
+    		Serialize State:	true
+    		Dir. Derivatives:	true
+    		Var. com. steps:	true
+    		Input interpol.:	true
+    		Max order out. der.:	1
+    	Supports Model-Exchange:	true
+    		Model identifier:	SpringFrictionPendulum1D
+    		Get/Set State:		true
+    		Serialize State:	true
+    		Dir. Derivatives:	true
+    ##################### End information for FMU #####################
+    
 
 ### Simulate FMU
 
@@ -93,6 +129,50 @@ vrs = ["mass.s", "mass.v"]
 dataCS = fmiSimulateCS(myFMU, (tStart, tStop); recordValues=vrs, saveat=tSave)
 ```
 
+
+
+
+    Model name:
+    	SpringFrictionPendulum1D
+    Success:
+    	true
+    f(x)-Evaluations:
+    	In-place: 0
+    	Out-of-place: 0
+    Jacobian-Evaluations:
+    	∂ẋ_∂x: 0
+    	∂ẋ_∂u: 0
+    	∂y_∂x: 0
+    	∂y_∂u: 0
+    	∂e_∂x: 0
+    	∂e_∂u: 0
+    Gradient-Evaluations:
+    	∂ẋ_∂t: 0
+    	∂y_∂t: 0
+    	∂e_∂t: 0
+    Callback-Evaluations:
+    	Condition (event-indicators): 0
+    	Time-Choice (event-instances): 0
+    	Affect (event-handling): 0
+    	Save values: 0
+    	Steps completed: 0
+    Values [801]:
+    	0.0	(0.5, 0.0)
+    	0.01	(0.5002235448486548, 0.042692491939260585)
+    	0.02	(0.5008715291319449, 0.08568000508550636)
+    	0.03	(0.5019478597521578, 0.12892136998736314)
+    	0.04	(0.5034570452098334, 0.17232325681284336)
+    	0.05	(0.5053993458877354, 0.2158440857658765)
+    	0.06	(0.5077764240578201, 0.259420181133082)
+    	0.07	(0.5105886522837868, 0.30295578207463486)
+    	0.08	(0.5138351439717114, 0.3464184707972189)
+    	...
+    	8.0	(1.0713672543616686, -1.0008145180651074e-10)
+    Events [0]:
+    
+
+
+
 #### Simulate as Model-Exchange
 
 In the function `fmiSimulateME()` the FMU is simulated in model-exchange mode (ME) with an adaptive step size but with fixed save points `tSave`. In addition, the start and end time are specified. In contrast to the co-simulation, the values to be stored are not specified here, since the states and events of the FMU are always output as well. The identifiers given above just correspond to the states of the FMU.
@@ -101,6 +181,59 @@ In the function `fmiSimulateME()` the FMU is simulated in model-exchange mode (M
 ```julia
 dataME = fmiSimulateME(myFMU, (tStart, tStop); saveat=tSave)
 ```
+
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:11[39m
+    
+
+
+
+
+    Model name:
+    	SpringFrictionPendulum1D
+    Success:
+    	true
+    f(x)-Evaluations:
+    	In-place: 1377
+    	Out-of-place: 0
+    Jacobian-Evaluations:
+    	∂ẋ_∂x: 0
+    	∂ẋ_∂u: 0
+    	∂y_∂x: 0
+    	∂y_∂u: 0
+    	∂e_∂x: 0
+    	∂e_∂u: 0
+    Gradient-Evaluations:
+    	∂ẋ_∂t: 0
+    	∂y_∂t: 0
+    	∂e_∂t: 0
+    Callback-Evaluations:
+    	Condition (event-indicators): 1717
+    	Time-Choice (event-instances): 0
+    	Affect (event-handling): 6
+    	Save values: 0
+    	Steps completed: 131
+    States [801]:
+    	0.0	[0.5, 0.0]
+    	0.01	[0.5002131418270838, 0.042689450733423825]
+    	0.02	[0.5008548874900927, 0.08570846009092127]
+    	0.03	[0.5019281657668402, 0.12898390160770806]
+    	0.04	[0.5034351795297135, 0.17244393632491417]
+    	0.05	[0.5053774247131727, 0.2160182108112464]
+    	0.06	[0.5077556991013406, 0.2596379123127993]
+    	0.07	[0.5105701153011459, 0.3032358504004333]
+    	0.08	[0.5138201146588774, 0.3467464532244224]
+    	...
+    	8.0	[1.0666322778272936, -7.60398591662422e-5]
+    Events [6]:
+    	State-Event #11 @ 0.0s
+    	State-Event #11 @ 0.994s
+    	State-Event #19 @ 1.9883s
+    	State-Event #11 @ 2.9831s
+    	State-Event #19 @ 3.9789s
+    	State-Event #11 @ 4.977s
+    
+
+
 
 ### Plotting FMU
 
@@ -112,9 +245,27 @@ fmiPlot(dataCS)
 ```
 
 
+
+
+    
+![svg](simulate_files/simulate_14_0.svg)
+    
+
+
+
+
 ```julia
 fmiPlot(dataME)
 ```
+
+
+
+
+    
+![svg](simulate_files/simulate_15_0.svg)
+    
+
+
 
 From both graphs it can be seen that the simulation calculates exactly the same results.
 

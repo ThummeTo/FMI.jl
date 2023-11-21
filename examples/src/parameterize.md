@@ -42,6 +42,15 @@ tStop = 1.0
 tSave = collect(tStart:tStop)
 ```
 
+
+
+
+    2-element Vector{Float64}:
+     0.0
+     1.0
+
+
+
 ### Import FMU
 
 In the next lines of code the FMU model from *FMIZoo.jl* is loaded and the information about the FMU is shown.
@@ -56,6 +65,39 @@ fmu = fmiLoad(pathToFMU)
 fmiInfo(fmu)
 ```
 
+    #################### Begin information for FMU ####################
+    	Model name:			IO
+    	FMI-Version:			2.0
+    	GUID:				{889089a6-481b-41a6-a282-f6ce02a33aa6}
+    	Generation tool:		Dymola Version 2022x (64-bit), 2021-10-08
+    	Generation time:		2022-05-19T06:53:52Z
+    	Var. naming conv.:		structured
+    	Event indicators:		4
+    	Inputs:				3
+    		352321536 ["u_real"]
+    		352321537 ["u_boolean"]
+    		352321538 ["u_integer"]
+    	Outputs:			3
+    		335544320 ["y_real"]
+    		335544321 ["y_boolean"]
+    		335544322 ["y_integer"]
+    	States:				0
+    	Supports Co-Simulation:		true
+    		Model identifier:	IO
+    		Get/Set State:		true
+    		Serialize State:	true
+    		Dir. Derivatives:	true
+    		Var. com. steps:	true
+    		Input interpol.:	true
+    		Max order out. der.:	1
+    	Supports Model-Exchange:	true
+    		Model identifier:	IO
+    		Get/Set State:		true
+    		Serialize State:	true
+    		Dir. Derivatives:	true
+    ##################### End information for FMU #####################
+    
+
 ### Option A: Integrated parameterization feature of *FMI.jl*
 If you are using the commands for simulation integrated in *FMI.jl*, the parameters and initial conditions are set at the correct locations during the initialization process of your FMU. This is the recommended way of parameterizing your model, if you don't have very uncommon requirements regarding initialization.
 
@@ -64,6 +106,13 @@ If you are using the commands for simulation integrated in *FMI.jl*, the paramet
 dict = Dict{String, Any}()
 dict
 ```
+
+
+
+
+    Dict{String, Any}()
+
+
 
 ### Option B: Custom parameterization routine
 If you have special requirements for initialization and parameterization, you can write your very own parameterization routine.
@@ -77,12 +126,32 @@ Next it is necessary to create an instance of the FMU. This is achieved by the c
 fmiInstantiate!(fmu; loggingOn=true)
 ```
 
+
+
+
+    FMU:            IO
+    InstanceName:   IO
+    Address:        Ptr{Nothing} @0x0000019bb964ac80
+    State:          0
+    Logging:        1
+    FMU time:       -Inf
+    FMU states:     nothing
+
+
+
 In the following code block, start and end time for the simulation is set by the `fmiSetupExperiment()` command.
 
 
 ```julia
 fmiSetupExperiment(fmu, tStart, tStop)
 ```
+
+
+
+
+    0x00000000
+
+
 
 ### Parameterize FMU
 
@@ -93,12 +162,30 @@ In this example, for each data type (`real`, `boolean`, `integer` and `string`) 
 params = ["p_real", "p_boolean", "p_integer", "p_string"]
 ```
 
+
+
+
+    4-element Vector{String}:
+     "p_real"
+     "p_boolean"
+     "p_integer"
+     "p_string"
+
+
+
 At the beginning we want to display the initial state of these parameters, for which the FMU must be in initialization mode. The next function `fmiEnterInitializationMode()` informs the FMU to enter the initialization mode. Before calling this function, the variables can be set. Furthermore, `fmiSetupExperiment()` must be called at least once before calling `fmiEnterInitializationMode()`, in order that the start time is defined.
 
 
 ```julia
 fmiEnterInitializationMode(fmu)
 ```
+
+
+
+
+    0x00000000
+
+
 
 The initial state of these parameters are displayed with the function `fmiGet()`.
 
@@ -107,12 +194,30 @@ The initial state of these parameters are displayed with the function `fmiGet()`
 fmiGet(fmu, params)
 ```
 
+
+
+
+    4-element Vector{Any}:
+     0.0
+     0
+     0
+      "Hello World!"
+
+
+
 The initialization mode is terminated with the function `fmiExitInitializationMode()`. (For the model exchange FMU type, this function switches off all initialization equations, and enters the event mode implicitly.)
 
 
 ```julia
 fmiExitInitializationMode(fmu)
 ```
+
+
+
+
+    0x00000000
+
+
 
 In the next step, a function is defined that generates a random value for each parameter. For the parameter `p_string` a random number is inserted into the string. All parameters are combined to a tuple and output.
 
@@ -128,12 +233,26 @@ function generateRandomNumbers()
 end
 ```
 
+
+
+
+    generateRandomNumbers (generic function with 1 method)
+
+
+
 The previously defined function is called and the results are displayed in the console.
 
 
 ```julia
 paramsVal = generateRandomNumbers()
 ```
+
+
+
+
+    (20.133484774572917, false, 82, "Random number 74.99056812472703!")
+
+
 
 #### First variant
 
@@ -146,12 +265,30 @@ fmiReset(fmu)
 fmiSetupExperiment(fmu, tStart, tStop)
 ```
 
+
+
+
+    0x00000000
+
+
+
 In the next step it is possible to set the parameters for the FMU. With the first variant it is quickly possible to set all parameters at once. Even different data types can be set with only one command. The command `fmiSet()` selects itself which function is chosen for which data type.  As long as the output of the function gives the status code 0, setting the parameters has worked.
 
 
 ```julia
 fmiSet(fmu, params, collect(paramsVal))
 ```
+
+
+
+
+    4-element Vector{UInt32}:
+     0x00000000
+     0x00000000
+     0x00000000
+     0x00000000
+
+
 
 After setting the parameters, it can be checked whether the corresponding parameters were set correctly. For this the function `fmiGet()` can be used as above. To be able to call the function `fmiGet()` the FMU must be in initialization mode.
 
@@ -162,6 +299,13 @@ fmiEnterInitializationMode(fmu)
 fmiExitInitializationMode(fmu)
 ```
 
+
+
+
+    0x00000000
+
+
+
 Now the FMU has been initialized correctly, the FMU can be simulated. The `fmiSimulate()` command is used for this purpose. It must be pointed out that the keywords `instantiate=false`, `setup=false` must be set. The keyword `instantiate=false` prevents the simulation command from creating a new FMU instance, otherwise our parameterization will be lost. The keyword `setup=false` prevents the FMU from calling the initialization mode again. The additionally listed keyword `freeInstance=false` prevents that the instance is removed after the simulation. This is only needed in this example, because we want to continue working on the created instance. Another keyword is the `recordValues=parmas[1:3]`, which saves: `p_real`, `p_boolean` and `p_integer` as output. It should be noted that the `fmiSimulate()` function is not capable of outputting string values, so `p_string` is omitted.
 
 
@@ -169,6 +313,41 @@ Now the FMU has been initialized correctly, the FMU can be simulated. The `fmiSi
 simData = fmiSimulate(fmu, (tStart, tStop); recordValues=params[1:3], saveat=tSave, 
                         instantiate=false, setup=false, freeInstance=false, terminate=false, reset=false)
 ```
+
+
+
+
+    Model name:
+    	IO
+    Success:
+    	true
+    f(x)-Evaluations:
+    	In-place: 0
+    	Out-of-place: 0
+    Jacobian-Evaluations:
+    	∂ẋ_∂x: 0
+    	∂ẋ_∂u: 0
+    	∂y_∂x: 0
+    	∂y_∂u: 0
+    	∂e_∂x: 0
+    	∂e_∂u: 0
+    Gradient-Evaluations:
+    	∂ẋ_∂t: 0
+    	∂y_∂t: 0
+    	∂e_∂t: 0
+    Callback-Evaluations:
+    	Condition (event-indicators): 0
+    	Time-Choice (event-instances): 0
+    	Affect (event-handling): 0
+    	Save values: 0
+    	Steps completed: 0
+    Values [2]:
+    	0.0	(20.133484774572917, 0.0, 82.0)
+    	1.0	(20.133484774572917, 0.0, 82.0)
+    Events [0]:
+    
+
+
 
 #### Second variant
 
@@ -181,12 +360,26 @@ fmiReset(fmu)
 fmiSetupExperiment(fmu, tStart, tStop)
 ```
 
+
+
+
+    0x00000000
+
+
+
 To make sure that the functions work it is necessary to generate random numbers again. As shown already, we call the defined function `generateRandomNumbers()` and output the values.
 
 
 ```julia
 rndReal, rndBoolean, rndInteger, rndString = generateRandomNumbers()
 ```
+
+
+
+
+    (55.08386100710479, false, 95, "Random number 21.710541856029998!")
+
+
 
 In the second variant, the value for each data type is set separately by the corresponding command. By this variant one has the maximum control and can be sure that also the correct data type is set. 
 
@@ -197,6 +390,13 @@ fmiSetBoolean(fmu, "p_boolean", rndBoolean)
 fmiSetInteger(fmu, "p_integer", rndInteger)
 fmiSetString(fmu, "p_string", rndString)
 ```
+
+
+
+
+    0x00000000
+
+
 
 To illustrate the functionality of the parameterization with the separate functions, the corresponding get function can be also called separately for each data type:
 * `fmiSetReal()` &#8660; `fmiGetReal()`
@@ -216,6 +416,13 @@ fmiEnterInitializationMode(fmu)
 fmiExitInitializationMode(fmu)
 ```
 
+
+
+
+    0x00000000
+
+
+
 From here on, you may want to simulate the FMU. Please note, that with the default `executionConfig`, it is necessary to prevent a new instantiation using the keyword `instantiate=false`. Otherwise, a new instance is allocated for the simulation-call and the parameters set for the previous instance are not transfered.
 
 
@@ -223,6 +430,41 @@ From here on, you may want to simulate the FMU. Please note, that with the defau
 simData = fmiSimulate(fmu, (tStart, tStop); recordValues=params[1:3], saveat=tSave, 
                         instantiate=false, setup=false)
 ```
+
+
+
+
+    Model name:
+    	IO
+    Success:
+    	true
+    f(x)-Evaluations:
+    	In-place: 0
+    	Out-of-place: 0
+    Jacobian-Evaluations:
+    	∂ẋ_∂x: 0
+    	∂ẋ_∂u: 0
+    	∂y_∂x: 0
+    	∂y_∂u: 0
+    	∂e_∂x: 0
+    	∂e_∂u: 0
+    Gradient-Evaluations:
+    	∂ẋ_∂t: 0
+    	∂y_∂t: 0
+    	∂e_∂t: 0
+    Callback-Evaluations:
+    	Condition (event-indicators): 0
+    	Time-Choice (event-instances): 0
+    	Affect (event-handling): 0
+    	Save values: 0
+    	Steps completed: 0
+    Values [2]:
+    	0.0	(55.08386100710479, 0.0, 95.0)
+    	1.0	(55.08386100710479, 0.0, 95.0)
+    Events [0]:
+    
+
+
 
 ### Unload FMU
 
