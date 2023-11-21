@@ -224,7 +224,7 @@ fmiSetFctGetReal(fmu, myGetReal!)
 
 
 
-    Ptr{Nothing} @0x000001d730900fc0
+    Ptr{Nothing} @0x000001b014240fc0
 
 
 
