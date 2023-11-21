@@ -80,9 +80,13 @@ function runtestsFMI2(exportingTool)
             end
         end
 
-        @info "Performance (performance.jl)"
-        @testset "Performance" begin
-            include("FMI2/performance.jl")
+        if VERSION >= v"1.7.0"
+            @info "Performance (performance.jl)"
+            @testset "Performance" begin
+                include("FMI2/performance.jl")
+            end
+        else
+            @info "Julia Version $(VERSION), skipping performance tests ..."
         end
 
         @info "Plotting (plots.jl)"
