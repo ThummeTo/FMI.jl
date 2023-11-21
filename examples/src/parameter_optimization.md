@@ -54,13 +54,6 @@ tStep = 0.1
 tSave = tStart:tStep:tStop
 ```
 
-
-
-
-    0.0:0.1:5.0
-
-
-
 ### Import FMU
 
 In the next lines of code the FMU model from *FMIZoo.jl* is loaded and the information about the FMU is shown.
@@ -71,35 +64,6 @@ In the next lines of code the FMU model from *FMIZoo.jl* is loaded and the infor
 fmu = fmiLoad("SpringPendulum1D", "Dymola", "2022x"; type=:ME)
 fmiInfo(fmu)
 ```
-
-    #################### Begin information for FMU ####################
-    	Model name:			SpringPendulum1D
-    	FMI-Version:			2.0
-    	GUID:				{fc15d8c4-758b-48e6-b00e-5bf47b8b14e5}
-    	Generation tool:		Dymola Version 2022x (64-bit), 2021-10-08
-    	Generation time:		2022-05-19T06:54:23Z
-    	Var. naming conv.:		structured
-    	Event indicators:		0
-    	Inputs:				0
-    	Outputs:			0
-    	States:				2
-    		33554432 ["mass.s"]
-    		33554433 ["mass.v"]
-    	Supports Co-Simulation:		true
-    		Model identifier:	SpringPendulum1D
-    		Get/Set State:		true
-    		Serialize State:	true
-    		Dir. Derivatives:	true
-    		Var. com. steps:	true
-    		Input interpol.:	true
-    		Max order out. der.:	1
-    	Supports Model-Exchange:	true
-    		Model identifier:	SpringPendulum1D
-    		Get/Set State:		true
-    		Serialize State:	true
-    		Dir. Derivatives:	true
-    ##################### End information for FMU #####################
-
 
 Now, the optimization objective (the function to minimize) needs to be defined. In this case, we just want to do a simulation and compare it to a regular `sin` wave.
 
@@ -137,13 +101,6 @@ function objective(p)
 end
 ```
 
-
-
-
-    objective (generic function with 1 method)
-
-
-
 Now let's see how far we are away for our guess parameters:
 
 
@@ -157,19 +114,6 @@ p = [s0, v0, c, m]
 obj_before = objective(p) # not really good!
 ```
 
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
-    [33m[1m│ [22m[39mConsider using tuples instead.
-    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/wvDeR/src/performance_warnings.jl:32[39m
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:27[39m
-
-
-
-
-
-    54.43219974960283
-
-
-
 Let's have a look on the differences:
 
 
@@ -180,15 +124,6 @@ plot(tSave, s_fmu; label="FMU")
 plot!(tSave, s_tar; label="Optimization target")
 ```
 
-
-
-
-    
-![svg](parameter_optimization_files/parameter_optimization_14_0.svg)
-    
-
-
-
 Not that good. So let's do a bit of optimization!
 
 
@@ -197,17 +132,6 @@ opt = Optim.optimize(objective, p; iterations=250) # do max. 250 iterations
 obj_after = opt.minimum # much better!
 p_res = opt.minimizer # the optimized parameters
 ```
-
-
-
-
-    4-element Vector{Float64}:
-     1.000000090936486
-     0.9779757996615742
-     0.130860011492463
-     0.11402874395172038
-
-
 
 Looks promising, let's have a look on the results plot:
 
@@ -218,15 +142,6 @@ s_fmu = simulateFMU(p_res); # simulate the position
 plot(tSave, s_fmu; label="FMU")
 plot!(tSave, s_tar; label="Optimization target")
 ```
-
-
-
-
-    
-![svg](parameter_optimization_files/parameter_optimization_18_0.svg)
-    
-
-
 
 Actually a pretty fit! If you have higher requirements, check out the *Optim.jl* library.
 

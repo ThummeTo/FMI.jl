@@ -13,20 +13,17 @@ tStart = 0.0
 tStop = 8.0
 
 # we use an FMU from the FMIZoo.jl
-pathToFMU = get_model_filename("SpringFrictionPendulum1D", "Dymola", "2022x")
+fmu = fmiLoad("SpringFrictionPendulum1D", "Dymola", "2022x"; type=:ME)
 
-myFMU = fmiLoad(pathToFMU)
-
-fmiInfo(myFMU)
-
+# an array of value references... or just one
 vrs = ["mass.s"]
 
-simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
+simData = fmiSimulate(fmu, (tStart, tStop); recordValues=vrs)
 
-fig = fmiPlot(simData, states=false)
+fig = plot(simData, states=false)
 
 # save, where the original `fmi2GetReal` function was stored, so we can access it in our new function
-originalGetReal = myFMU.cGetReal
+originalGetReal = fmu.cGetReal
 
 function myGetReal!(c::fmi2Component, vr::Union{Array{fmi2ValueReference}, Ptr{fmi2ValueReference}}, 
                     nvr::Csize_t, value::Union{Array{fmi2Real}, Ptr{fmi2Real}})
@@ -48,9 +45,9 @@ function myGetReal!(c::fmi2Component, vr::Union{Array{fmi2ValueReference}, Ptr{f
 end
 
 # no we overwrite the original function
-fmiSetFctGetReal(myFMU, myGetReal!)
+fmiSetFctGetReal(fmu, myGetReal!)
 
-simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
-fmiPlot!(fig, simData; states=false, style=:dash)
+simData = fmiSimulate(fmu, (tStart, tStop); recordValues=vrs)
+plot!(fig, simData; states=false, style=:dash)
 
-fmiUnload(myFMU)
+fmiUnload(fmu)

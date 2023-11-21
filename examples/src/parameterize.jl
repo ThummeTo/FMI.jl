@@ -11,22 +11,26 @@ tStop = 1.0
 tSave = collect(tStart:tStop)
 
 # we use an FMU from the FMIZoo.jl
+# just replace this line with a local path if you want to use your own FMU
 pathToFMU = get_model_filename("IO", "Dymola", "2022x")
 
-myFMU = fmiLoad(pathToFMU)
-fmiInfo(myFMU)
+fmu = fmiLoad(pathToFMU)
+fmiInfo(fmu)
 
-fmiInstantiate!(myFMU; loggingOn=true)
+dict = Dict{String, Any}()
+dict
 
-fmiSetupExperiment(myFMU, tStart, tStop)
+fmiInstantiate!(fmu; loggingOn=true)
+
+fmiSetupExperiment(fmu, tStart, tStop)
 
 params = ["p_real", "p_boolean", "p_integer", "p_string"]
 
-fmiEnterInitializationMode(myFMU)
+fmiEnterInitializationMode(fmu)
 
-fmiGet(myFMU, params)
+fmiGet(fmu, params)
 
-fmiExitInitializationMode(myFMU)
+fmiExitInitializationMode(fmu)
 
 function generateRandomNumbers()
     rndReal = 100 * rand()
@@ -39,38 +43,38 @@ end
 
 paramsVal = generateRandomNumbers()
 
-fmiTerminate(myFMU)
-fmiReset(myFMU)
-fmiSetupExperiment(myFMU, tStart, tStop)
+fmiTerminate(fmu)
+fmiReset(fmu)
+fmiSetupExperiment(fmu, tStart, tStop)
 
-fmiSet(myFMU, params, collect(paramsVal))
+fmiSet(fmu, params, collect(paramsVal))
 
-fmiEnterInitializationMode(myFMU)
-# fmiGet(myFMU, params)
-fmiExitInitializationMode(myFMU)
+fmiEnterInitializationMode(fmu)
+# fmiGet(fmu, params)
+fmiExitInitializationMode(fmu)
 
-simData = fmiSimulate(myFMU, (tStart, tStop); recordValues=params[1:3], saveat=tSave, 
+simData = fmiSimulate(fmu, (tStart, tStop); recordValues=params[1:3], saveat=tSave, 
                         instantiate=false, setup=false, freeInstance=false, terminate=false, reset=false)
 
-fmiTerminate(myFMU)
-fmiReset(myFMU)
-fmiSetupExperiment(myFMU, tStart, tStop)
+fmiTerminate(fmu)
+fmiReset(fmu)
+fmiSetupExperiment(fmu, tStart, tStop)
 
 rndReal, rndBoolean, rndInteger, rndString = generateRandomNumbers()
 
-fmiSetReal(myFMU, "p_real", rndReal)
-fmiSetBoolean(myFMU, "p_boolean", rndBoolean)
-fmiSetInteger(myFMU, "p_integer", rndInteger)
-fmiSetString(myFMU, "p_string", rndString)
+fmiSetReal(fmu, "p_real", rndReal)
+fmiSetBoolean(fmu, "p_boolean", rndBoolean)
+fmiSetInteger(fmu, "p_integer", rndInteger)
+fmiSetString(fmu, "p_string", rndString)
 
-fmiEnterInitializationMode(myFMU)
-# fmiGetReal(myFMU, "u_real")
-# fmiGetBoolean(myFMU, "u_boolean")
-# fmiGetInteger(myFMU, "u_integer")
-# fmiGetString(myFMU, "p_string")
-fmiExitInitializationMode(myFMU)
+fmiEnterInitializationMode(fmu)
+# fmiGetReal(fmu, "u_real")
+# fmiGetBoolean(fmu, "u_boolean")
+# fmiGetInteger(fmu, "u_integer")
+# fmiGetString(fmu, "p_string")
+fmiExitInitializationMode(fmu)
 
-simData = fmiSimulate(myFMU, (tStart, tStop); recordValues=params[1:3], saveat=tSave, 
+simData = fmiSimulate(fmu, (tStart, tStop); recordValues=params[1:3], saveat=tSave, 
                         instantiate=false, setup=false)
 
-fmiUnload(myFMU)
+fmiUnload(fmu)

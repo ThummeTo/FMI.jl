@@ -1,5 +1,5 @@
 # Manipulate a function
-Tutorial by Johannes Stoljar, Tobias Thummerer
+Tutorial by Tobias Thummerer, Johannes Stoljar
 
 ## License
 
@@ -10,33 +10,14 @@ Tutorial by Johannes Stoljar, Tobias Thummerer
 # See LICENSE (https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.
 ```
 
-## Motivation
-This Julia Package *FMI.jl* is motivated by the use of simulation models in Julia. Here the FMI specification is implemented. FMI (*Functional Mock-up Interface*) is a free standard ([fmi-standard.org](http://fmi-standard.org/)) that defines a container and an interface to exchange dynamic models using a combination of XML files, binaries and C code zipped into a single file. The user can thus use simulation models in the form of an FMU (*Functional Mock-up Units*). Besides loading the FMU, the user can also set values for parameters and states and simulate the FMU both as co-simulation and model exchange simulation.
-
 ## Introduction to the example
-This example shows how to overwrite a library function with an own function. For this the FMU model is simulated first without changes. Then the function `fmi2GetReal()` is overwritten and simulated again. Both simulations are displayed in a graph to show the change caused by overwriting the function. The model used is a one-dimensional spring pendulum with friction. The object-orientated structure of the *SpringFrictionPendulum1D* can be seen in the following graphic.
+This example shows how to overwrite a FMI function with a custom C-function. For this the FMU model is simulated first without changes. Then the function `fmi2GetReal()` is overwritten and simulated again. Both simulations are displayed in a graph to show the change caused by overwriting the function. The model used is a one-dimensional spring pendulum with friction. The object-orientated structure of the *SpringFrictionPendulum1D* can be seen in the following graphic.
 
 ![svg](https://github.com/thummeto/FMI.jl/blob/main/docs/src/examples/pics/SpringFrictionPendulum1D.svg?raw=true)  
 
 
-## Target group
-The example is primarily intended for users who work in the field of simulations. The example wants to show how simple it is to use FMUs in Julia.
-
-
 ## Other formats
 Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/manipulation.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/manipulation.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/src/manipulation.md) corresponding to the notebook.  
-
-
-## Getting started
-
-### Installation prerequisites
-|     | Description                       | Command                   | Alternative                                    |   
-|:----|:----------------------------------|:--------------------------|:-----------------------------------------------|
-| 1.  | Enter Package Manager via         | ]                         |                                                |
-| 2.  | Install FMI via                   | add FMI                   | add " https://github.com/ThummeTo/FMI.jl "     |
-| 3.  | Install FMIZoo via                | add FMIZoo                | add " https://github.com/ThummeTo/FMIZoo.jl "  |
-| 4.  | Install FMICore via               | add FMICore               | add " https://github.com/ThummeTo/FMICore.jl " |
-| 5.  | Install Plots via                 | add Plots                 |                                                |
 
 ## Code section
 
@@ -62,55 +43,15 @@ tStart = 0.0
 tStop = 8.0
 ```
 
-
-
-
-    8.0
-
-
-
 ### Import FMU
 
-In the next lines of code the FMU model from *FMIZoo.jl* is loaded and the information about the FMU is shown.
+Next, the FMU model from *FMIZoo.jl* is loaded.
 
 
 ```julia
 # we use an FMU from the FMIZoo.jl
-pathToFMU = get_model_filename("SpringFrictionPendulum1D", "Dymola", "2022x")
-
-myFMU = fmiLoad(pathToFMU)
-
-fmiInfo(myFMU)
+fmu = fmiLoad("SpringFrictionPendulum1D", "Dymola", "2022x"; type=:ME)
 ```
-
-    #################### Begin information for FMU ####################
-    	Model name:			SpringFrictionPendulum1D
-    	FMI-Version:			2.0
-    	GUID:				{2e178ad3-5e9b-48ec-a7b2-baa5669efc0c}
-    	Generation tool:		Dymola Version 2022x (64-bit), 2021-10-08
-    	Generation time:		2022-05-19T06:54:12Z
-    	Var. naming conv.:		structured
-    	Event indicators:		24
-    	Inputs:				0
-    	Outputs:			0
-    	States:				2
-    		33554432 ["mass.s"]
-    		33554433 ["mass.v", "mass.v_relfric"]
-    	Supports Co-Simulation:		true
-    		Model identifier:	SpringFrictionPendulum1D
-    		Get/Set State:		true
-    		Serialize State:	true
-    		Dir. Derivatives:	true
-    		Var. com. steps:	true
-    		Input interpol.:	true
-    		Max order out. der.:	1
-    	Supports Model-Exchange:	true
-    		Model identifier:	SpringFrictionPendulum1D
-    		Get/Set State:		true
-    		Serialize State:	true
-    		Dir. Derivatives:	true
-    ##################### End information for FMU #####################
-
 
 ### Simulate FMU
 
@@ -118,75 +59,11 @@ In the next steps the recorded value is defined. The recorded value is the posit
 
 
 ```julia
+# an array of value references... or just one
 vrs = ["mass.s"]
 
-simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
+simData = fmiSimulate(fmu, (tStart, tStop); recordValues=vrs)
 ```
-
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mUsing arrays or dicts to store parameters of different types can hurt performance.
-    [33m[1m│ [22m[39mConsider using tuples instead.
-    [33m[1m└ [22m[39m[90m@ SciMLBase ~/.julia/packages/SciMLBase/wvDeR/src/performance_warnings.jl:32[39m
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:20[39m
-
-
-
-
-
-    Model name:
-    	SpringFrictionPendulum1D
-    Success:
-    	true
-    f(x)-Evaluations:
-    	In-place: 1377
-    	Out-of-place: 0
-    Jacobian-Evaluations:
-    	∂ẋ_∂x: 0
-    	∂ẋ_∂u: 0
-    	∂y_∂x: 0
-    	∂y_∂u: 0
-    Gradient-Evaluations:
-    	∂ẋ_∂t: 0
-    	∂y_∂t: 0
-    Callback-Evaluations:
-    	Condition (event-indicators): 1893
-    	Time-Choice (event-instances): 0
-    	Affect (event-handling): 6
-    	Save values: 131
-    	Steps completed: 131
-    States [131]:
-    	0.0	[0.5, 0.0]
-    	2.352941176471972e-11	[0.5, 1.0e-10]
-    	0.002306805098500577	[0.50001131604032, 0.009814511243552598]
-    	0.01777270244764722	[0.5006746897285066, 0.0761020888387732]
-    	0.05358198534179392	[0.5061791781920479, 0.231641032514133]
-    	0.11852691526990361	[0.5303834643745903, 0.5124206161359472]
-    	0.1848828094709355	[0.573492996354974, 0.7828256191561919]
-    	0.2648828094709355	[0.6478174725986621, 1.0657732960206507]
-    	0.3448828094709355	[0.7422425202486511, 1.2823803113750607]
-    	...
-    	8.0	[1.0666322778272936, -7.60398591662422e-5]
-    Values [131]:
-    	0.0	(0.5,)
-    	2.352941176471972e-11	(0.5,)
-    	0.002306805098500577	(0.50001131604032,)
-    	0.01777270244764722	(0.5006746897285066,)
-    	0.05358198534179392	(0.5061791781920479,)
-    	0.11852691526990361	(0.5303834643745903,)
-    	0.1848828094709355	(0.573492996354974,)
-    	0.2648828094709355	(0.6478174725986621,)
-    	0.3448828094709355	(0.7422425202486511,)
-    	...
-    	8.0	(1.0666322778272936,)
-    Events [6]:
-    	State-Event #11 @ 0.0s
-    	State-Event #11 @ 0.994s
-    	State-Event #19 @ 1.9883s
-    	State-Event #11 @ 2.9831s
-    	State-Event #19 @ 3.9789s
-    	State-Event #11 @ 4.977s
-
-
-
 
 ### Plotting FMU
 
@@ -194,17 +71,8 @@ After the simulation is finished, the result of the FMU for the model-exchange m
 
 
 ```julia
-fig = fmiPlot(simData, states=false)
+fig = plot(simData, states=false)
 ```
-
-
-
-
-    
-![svg](manipulation_files/manipulation_12_0.svg)
-    
-
-
 
 ### Override Function
 
@@ -213,15 +81,8 @@ After overwriting a function, the previous one is no longer accessible. The orig
 
 ```julia
 # save, where the original `fmi2GetReal` function was stored, so we can access it in our new function
-originalGetReal = myFMU.cGetReal
+originalGetReal = fmu.cGetReal
 ```
-
-
-
-
-    Ptr{Nothing} @0x00007f907748efaf
-
-
 
 To overwrite the function `fmi2GetReal!()`, the function header of the new custom function must be identical to the previous one. The function header looks like `fmi2GetReal!(cfunc::Ptr{Nothing}, c::fmi2Component, vr::Union{Array{fmi2ValueReference}, Ptr{fmi2ValueReference}}, nvr::Csize_t, value::Union{Array{fmi2Real}, Ptr{fmi2Real}})::fmi2Status`. The information how the FMI2 function are structured can be seen from [FMICore.jl](https://github.com/ThummeTo/FMICore.jl/blob/main/src/FMI2_c.jl#L718) or the FMI2.0.3-specification.
 
@@ -249,27 +110,13 @@ function myGetReal!(c::fmi2Component, vr::Union{Array{fmi2ValueReference}, Ptr{f
 end
 ```
 
-
-
-
-    myGetReal! (generic function with 1 method)
-
-
-
 In the next command the original function is overwritten with the new defined function, for which the command `fmiSetFctGetReal()` is called.
 
 
 ```julia
 # no we overwrite the original function
-fmiSetFctGetReal(myFMU, myGetReal!)
+fmiSetFctGetReal(fmu, myGetReal!)
 ```
-
-
-
-
-    Ptr{Nothing} @0x00007f917b41bfc0
-
-
 
 ### Simulate and Plot FMU with modified function
 
@@ -277,18 +124,9 @@ As before, the identical command is called here for simulation. This is also a m
 
 
 ```julia
-simData = fmiSimulateME(myFMU, (tStart, tStop); recordValues=vrs)
-fmiPlot!(fig, simData; states=false, style=:dash)
+simData = fmiSimulate(fmu, (tStart, tStop); recordValues=vrs)
+plot!(fig, simData; states=false, style=:dash)
 ```
-
-
-
-
-    
-![svg](manipulation_files/manipulation_20_0.svg)
-    
-
-
 
 As expected by overwriting the function, all values are doubled.
 
@@ -298,9 +136,9 @@ After plotting the data, the FMU is unloaded and all unpacked data on disc is re
 
 
 ```julia
-fmiUnload(myFMU)
+fmiUnload(fmu)
 ```
 
 ### Summary
 
-In this tutorial it is shown how an existing function of the library can be replaced by an own implementation. Through this possibility, there are almost no limits for the user, whereby the user can customize the function to his liking.
+In this tutorial it is shown how an existing function of the library can be replaced by an own implementation.
