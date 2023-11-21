@@ -1,4 +1,4 @@
-#
+     #
 # Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Cristof Baumgartner
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
@@ -22,7 +22,9 @@ include("cross_check_lib.jl")
 # Main Array that holds all information about the excecuted cross checks and results
 crossChecks = []
 
-getInputValues = t -> t
+getInputValues = function(t, u)
+    return nothing
+end
 
 function parse_commandline()
     s = ArgParseSettings()
@@ -91,11 +93,12 @@ function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCross
             if isfile(joinpath(checkPath, "$(check.fmuCheck)_in.csv"))
                 inputValues = CSV.File(joinpath(checkPath, "$(check.fmuCheck)_in.csv")) |> Tables.rowtable
                 hasInputValues = true
-                getInputValues = function(t)
+                getInputValues = function(t, u)
                     for (valIndex, val) in enumerate(inputValues)
                         if val.time >= t
-                            a = collect(inputValues[valIndex])[2:end] 
-                            return a
+                            u[:] = inputValues[valIndex][2:end] 
+                            # a = collect(inputValues[valIndex])[2:end] 
+                            # return a
                             break;
                         end
                     end
