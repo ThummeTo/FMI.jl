@@ -80,7 +80,7 @@ function runtestsFMI2(exportingTool)
             end
         end
 
-        if VERSION >= v"1"
+        if VERSION >= v"1.9.0"
             @info "Performance (performance.jl)"
             @testset "Performance" begin
                 include("FMI2/performance.jl")
