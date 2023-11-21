@@ -24,8 +24,6 @@ jobs:
     steps:
       - name: "Check out repository"
         uses: actions/checkout@v3
-        with:
-          ref: main
 
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
