@@ -24,13 +24,11 @@ jobs:
     steps:
       - name: "Check out repository"
         uses: actions/checkout@v3
-        with:
-          ref: main
 
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
-          version: '1.6'
+          version: '1.9'
           arch: x64
 
       - name: "Copy examples, readme"

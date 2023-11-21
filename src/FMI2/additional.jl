@@ -17,8 +17,11 @@ using FMIImport: fmi2CallbackFunctions, fmi2Component
 import FMIImport: fmi2VariableNamingConventionFlat, fmi2VariableNamingConventionStructured
 
 """
-Returns how a variable depends on another variable based on the model description.
+    fmi2VariableDependsOnVariable(fmu::FMU2, vr1::fmi2ValueReference, vr2::fmi2ValueReference)
+    
+Return the dependence of the variable described by `vr1` on another variable described by `vr2` based on the model description of the `fmu`.
 
+See also [`fmi2GetDependencies`](@ref).
 """
 function fmi2VariableDependsOnVariable(fmu::FMU2, vr1::fmi2ValueReference, vr2::fmi2ValueReference)
     i1 = fmu.modelDescription.valueReferenceIndicies[vr1]
@@ -27,23 +30,16 @@ function fmi2VariableDependsOnVariable(fmu::FMU2, vr1::fmi2ValueReference, vr2::
 end
 
 """
-
     fmi2GetDependencies(fmu::FMU2)
 
-Building dependency matrix `dim x dim` for fast look-ups on variable dependencies (`dim` is number of states).
-
-# Arguments
-- `fmu::FMU2`: Mutable Struct representing a FMU.
-
-# Retruns
-- `fmu.dependencies::Matrix{Union{fmi2DependencyKind, Nothing}}`: Returns the FMU's dependency-matrix for fast look-ups on dependencies between value references. Entries are from type fmi2DependencyKind.
+Build dependency `Matrix{Union{fmi2DependencyKind, Nothing}}` of dimension `n x n` for fast look-ups on dependencies between value references (`n` is number of states of the `fmu`).
 
 # Source
 - FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
 - FMISpec2.0.2[p.22]: 2.1.4 Inquire Platform and Version Number of Header Files
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
 
-See also [`fmi2GetDependencies`](@ref).
+See also [`fmi2PrintDependencies`](@ref), [`fmi2VariableDependsOnVariable`](@ref).
 """
 function fmi2GetDependencies(fmu::FMU2)
     if !isdefined(fmu, :dependencies)
@@ -85,6 +81,13 @@ function fmi2GetDependencies(fmu::FMU2)
     fmu.dependencies
 end
 
+"""
+    fmi2PrintDependencies(fmu::FMU2)
+
+Print the dependency matrix for `fmu` as returned by [`fmi2GetDependencies`](@ref).
+
+See also [`fmi2GetDependencies`](@ref).
+"""
 function fmi2PrintDependencies(fmu::FMU2)
     dep = fmi2GetDependencies(fmu)
     ni, nj = size(dep)
@@ -99,16 +102,9 @@ function fmi2PrintDependencies(fmu::FMU2)
 end
 
 """
-
      fmi2Info(fmu::FMU2)
 
-Prints FMU related information.
-
-# Arguments
-- `fmu::FMU2`: Mutable struct representing a FMU and all it instantiated instances in the FMI 2.0.2 Standard.
-
-# Returns
-- Prints FMU related information.
+Print information about the `fmu`.
 
 # Source
 - FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)

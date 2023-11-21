@@ -4,7 +4,7 @@
 #
 
 """
-
+DEPRECATED
 fmiInstantiate!(fmu::FMU2; pushComponents::Bool = true, visible::Bool = false, loggingOn::Bool = false, externalCallbacks::Bool = false,
                       logStatusOK::Bool=true, logStatusWarning::Bool=true, logStatusDiscard::Bool=true, logStatusError::Bool=true, logStatusFatal::Bool=true, logStatusPending::Bool=true)
 
@@ -35,15 +35,15 @@ Create a new instance of the given fmu, adds a logger if logginOn == true.
 - FMISpec2.0.2 Link: [https://fmi-standard.org/](https://fmi-standard.org/)
 - FMISpec2.0.2[p.19]: 2.1.5 Creation, Destruction and Logging of FMU Instances
 
-See also [`fmi2Instantiate!`](@ref), [`fmi2Instantiate`](@ref), [`FMU2`](@ref).
-"""
+
+""" 
 function fmiInstantiate!(fmu::FMU2, args...; kwargs...)
     fmi2Instantiate!(fmu, args...; kwargs...)
 end
 export fmiInstantiate!
 
 """
-
+DEPRECATED
    fmiFreeInstance!(str::fmi2Struct)
 
 Frees the allocated memory of the last instance of the FMU.
@@ -69,15 +69,15 @@ More detailed:
 - FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
-See also [fmi2FreeInstance](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
-"""
+
+""" 
 function fmiFreeInstance!(str::fmi2Struct)
     fmi2FreeInstance!(str)
 end
 export fmiFreeInstance!
 
 """
-    fmiSetDebugLogging(str::fmi2Struct)
+DEPRECATED    fmiSetDebugLogging(str::fmi2Struct)
 
 Control the use of the logging callback function, version independent.
 
@@ -103,15 +103,15 @@ More detailed:
 - FMISpec2.0.2[p.22]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
 - FMISpec2.0.2[p.22]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.22]: 2.1.5 Creation, Destruction and Logging of FMU Instances
-See also [`fmi2SetDebugLogging`](@ref).
-"""
+
+""" 
 function fmiSetDebugLogging(str::fmi2Struct)
     fmi2SetDebugLogging(str)
 end
 export fmiSetDebugLogging
 
 """
-
+DEPRECATED
     fmiSetupExperiment(str::fmi2Struct, c::FMU2Component, startTime::Union{Real, Nothing} = nothing, stopTime::Union{Real, Nothing} = nothing; tolerance::Union{Real, Nothing} = nothing)
 
 Initialize the Simulation boundries
@@ -143,15 +143,15 @@ More detailed:
 - FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
-See also [fmi2SetupExperiment](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
-"""
+
+""" 
 function fmiSetupExperiment(str::fmi2Struct, args...; kwargs...)
     fmi2SetupExperiment(str, args...; kwargs...)
 end
 export fmiSetupExperiment
 
 """
-
+DEPRECATED
     fmiEnterInitializationMode(str::fmi2Struct)
 
 Informs the FMU to enter initializaton mode, version independent.
@@ -178,15 +178,15 @@ More detailed:
 - FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
- See also [fmi2EnterInitializationMode](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
-"""
+ 
+""" 
 function fmiEnterInitializationMode(str::fmi2Struct)
     fmi2EnterInitializationMode(str)
 end
 export fmiEnterInitializationMode
 
 """
-
+DEPRECATED
     fmiExitInitializationMode(str::fmi2Struct)
 
 Informs the FMU to exit initialization mode, version independent.
@@ -213,15 +213,15 @@ More detailed:
 - FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
- See also [`fmi2ExitInitializationMode`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
-"""
+ 
+""" 
 function fmiExitInitializationMode(str::fmi2Struct)
     fmi2ExitInitializationMode(str)
 end
 export fmiExitInitializationMode
 
 """
-
+DEPRECATED
     fmiTerminate(str::fmi2Struct)
 
 Informs the FMU that the simulation run is terminated, version independent.
@@ -248,17 +248,17 @@ More detailed:
 - FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
- See also [`fmi2ExitInitializationMode`](@ref), [`fmi2Status`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
+ 
 
 
-"""
+""" 
 function fmiTerminate(str::fmi2Struct)
     fmi2Terminate(str)
 end
 export fmiTerminate
 
 """
-
+DEPRECATED
     fmiReset(str::fmi2Struct)
 
 Resets the FMU after a simulation run, version independent.
@@ -286,16 +286,16 @@ More detailed:
 - FMISpec2.0.2[p.23]: 2.1.6 Initialization, Termination, and Resetting an FMU
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
- See also [`fmi2Reset`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
+ 
 
-"""
+""" 
 function fmiReset(str::fmi2Struct)
     fmi2Reset(str)
 end
 export fmiReset
 
 """
-
+DEPRECATED
    fmi2GetRealOutputDerivatives(c::FMU2Component, vr::fmi2ValueReferenceFormat, order::AbstractArray{fmi2Integer})
 
 
@@ -319,16 +319,16 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.104]: 4.2.1 Transfer of Input / Output Values and Parameters
 
-See also [`fmi2SetRealInputDerivatives!`](@ref).
-"""
 
+"""
+DEPRECATED
 function fmiGetRealOutputDerivatives(str::fmi2Struct, args...; kwargs...)
     fmi2GetRealOutputDerivatives(str, args...; kwargs...)
 end
 export fmiGetRealOutputDerivatives
 
 """
-
+DEPRECATED
     fmiGetReal!(str::fmi2Struct, c::FMU2Component, vr::fmi2ValueReferenceFormat, values::Array{fmi2Real})
 
     fmiGetReal!(str::fmi2Struct, c::FMU2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Array{fmi2Real})
@@ -360,15 +360,15 @@ More detailed:
 - FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
- See also [`fmi2GetReal!`](@ref), [`fmi2GetReal`](@ref),[`fmi2ValueReferenceFormat`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
-"""
+ 
+""" 
 function fmiGetReal!(str::fmi2Struct, args...; kwargs...)
     fmi2GetReal!(str, args...; kwargs...)
 end
 export fmiGetReal!
 
 """
-
+DEPRECATED
     fmiSetReal(str::fmi2Struct, c::FMU2Component, vr::fmi2ValueReferenceFormat, values::Union{Array{<:Real}, <:Real})
 
     fmiSetReal(str::fmi2Struct, c::FMU2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Array{fmi2Real})
@@ -402,15 +402,15 @@ More detailed:
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
-See also [`fmi2SetReal`](@ref), [`fmi2GetReal`](@ref),[`fmi2ValueReferenceFormat`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref), [`fmi2ValueReference`](@ref).
-"""
+
+""" 
 function fmiSetReal(str::fmi2Struct, args...; kwargs...)
     fmi2SetReal(str, args...; kwargs...)
 end
 export fmiSetReal
 
 """
-#Todo: Add types according spec
+DEPRECATED#Todo: Add types according spec
 
     fmiSetRealInputDerivatives(str::fmi2Struct, c::FMU2Component, vr::fmi2ValueReferenceFormat, order, values)
 
@@ -446,15 +446,15 @@ More detailed:
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.104]: 4.2.1 Transfer of Input / Output Values and Parameters
 
-See also [`fmi2SetRealInputDerivatives`](@ref), [`fmi2GetReal`](@ref),[`fmi2ValueReferenceFormat`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref), [`fmi2ValueReference`](@ref).
-"""
+
+""" 
 function fmiSetRealInputDerivatives(str::fmi2Struct, args...; kwargs...)
     fmi2SetRealInputDerivatives(str, args...; kwargs...)
 end
 export fmiSetRealInputDerivatives
 
 """
-
+DEPRECATED
     fmiGetInteger(str::fmi2Struct,c::FMU2Component, vr::fmi2ValueReferenceFormat)
 
 Returns the integer values of an array of variables
@@ -476,16 +476,16 @@ More detailed: `fmi2ValueReferenceFormat = Union{Nothing, String, Array{String,1
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
-See also [`fmi2GetInteger`](@ref),[`fmi2ValueReferenceFormat`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 
-"""
+
+""" 
 function fmiGetInteger(str::fmi2Struct,args...; kwargs...)
     fmi2GetInteger(str, args...; kwargs...)
 end
 export fmiGetInteger
 
 """
-
+DEPRECATED
     function fmiGetInteger!(str::fmi2Struct, c::FMU2Component, vr::fmi2ValueReferenceFormat, values::Array{fmi2Integer})
 
     function fmiGetInteger!(str::fmi2Struct, c::FMU2Component, vr::fmi2ValueReferenceFormat, values::Array{fmi2Integer})
@@ -521,16 +521,16 @@ More detailed:
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
-See also [`fmi2GetInteger!`](@ref),[`fmi2ValueReferenceFormat`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 
-"""
+
+""" 
 function fmiGetInteger!(str::fmi2Struct, args...; kwargs...)
     fmi2GetInteger!(str, args...; kwargs...)
 end
 export fmiGetInteger!
 
 """
-
+DEPRECATED
     fmiSetInteger(str::fmi2Struct, c::FMU2Component, vr::fmi2ValueReferenceFormat, values::Union{Array{<:Integer}, <:Integer})
 
     fmiSetInteger(str::fmi2Struct, c::FMU2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Array{fmi2Integer})
@@ -557,15 +557,15 @@ More detailed: `fmi2ValueReferenceFormat = Union{Nothing, String, Array{String,1
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
 
-See also [`fmi2SetInteger`](@ref),[`fmi2ValueReferenceFormat`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
-"""
+
+""" 
 function fmiSetInteger(str::fmi2Struct, args...; kwargs...)
     fmi2SetInteger(str, args...; kwargs...)
 end
 export fmiSetInteger
 
 """
-
+DEPRECATED
     fmiGetBoolean(str::fmi2Struct, c::FMU2Component, vr::fmi2ValueReferenceFormat)
 
 Returns the boolean values of an array of variables
@@ -580,15 +580,15 @@ More detailed: `fmi2ValueReferenceFormat = Union{Nothing, String, Array{String,1
 
 # Returns
 - `values::Array{fmi2Boolean}`: Return `values` is an array with the actual values of these variables.
-See also [`fmi2GetBoolean`](@ref),[`fmi2ValueReferenceFormat`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
-"""
+
+""" 
 function fmiGetBoolean(str::fmi2Struct, args...; kwargs...)
     fmi2GetBoolean(str, args...; kwargs...)
 end
 export fmiGetBoolean
 
 """
-
+DEPRECATED
     fmiGetBoolean!(str::fmi2Struct, c::FMU2Component, vr::fmi2ValueReferenceFormat, values::Array{fmi2Boolean})
 
 Writes the boolean values of an array of variables in the given field
@@ -621,15 +621,15 @@ More detailed:
 - FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
-See also [`fmi2GetBoolean!`](@ref),[`fmi2ValueReferenceFormat`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
-"""
+
+""" 
 function fmiGetBoolean!(str::fmi2Struct, args...; kwargs...)
     fmi2GetBoolean!(str, args...; kwargs...)
 end
 export fmiGetBoolean!
 
 """
-
+DEPRECATED
     fmiSetBoolean(str::fmi2Struct, c::FMU2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Array{fmi2Boolean})
 
     fmiSetBoolean(str::fmi2Struct, c::FMU2Component, vr::fmi2ValueReferenceFormat, values::Union{Array{Bool}, Bool})
@@ -662,15 +662,15 @@ More detailed:
 - FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
-See also [`fmi2GetBoolean`](@ref),[`fmi2ValueReferenceFormat`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
-"""
+
+""" 
 function fmiSetBoolean(str::fmi2Struct, args...; kwargs...)
     fmi2SetBoolean(str, args...; kwargs...)
 end
 export fmiSetBoolean
 
 """
-
+DEPRECATED
     fmiGetString(str::fmi2Struct, c::FMU2Component, vr::fmi2ValueReferenceFormat)
 
 Returns the string values of an array of variables
@@ -691,16 +691,16 @@ More detailed: `fmi2ValueReferenceFormat = Union{Nothing, String, Array{String,1
 - FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
-See also [`fmi2GetBoolean!`](@ref),[`fmi2ValueReferenceFormat`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 
-"""
+
+""" 
 function fmiGetString(str::fmi2Struct, args...; kwargs...)
     fmi2GetString(str, args...; kwargs...)
 end
 export fmiGetString
 
 """
-
+DEPRECATED
     fmiGetString!(str::fmi2Struct, c::FMU2Component, vr::fmi2ValueReferenceFormat, values::Array{fmi2String})
 
     fmiGetString!(str::fmi2Struct, c::FMU2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Vector{Ptr{Cchar}})
@@ -736,15 +736,15 @@ More detailed:
 - FMISpec2.0.2[p.24]: 2.1.7 Getting and Setting Variable Values
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions
 - FMISpec2.0.2[p.18]: 2.1.3 Status Returned by Functions
-See also [`fmi2GetString!`](@ref),[`fmi2ValueReferenceFormat`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
-"""
+
+""" 
 function fmiGetString!(str::fmi2Struct, args...; kwargs...)
     fmi2GetString!(str, args...; kwargs...)
 end
 export fmiGetString!
 
 """
-
+DEPRECATED
     fmiSetString(str::fmi2Struct, c::FMU2Component, vr::fmi2ValueReferenceFormat, values::Union{Array{String}, String})
 
     fmiSetString(str::fmi2Struct, c::FMU2Component, vr::Array{fmi2ValueReference}, nvr::Csize_t, value::Union{Array{Ptr{Cchar}}, Array{Ptr{UInt8}}})
@@ -785,15 +785,15 @@ More detailed:
 - FMISpec2.0.2[p.46]: 2.2.7 Definition of Model Variables
 - FMISpec2.0.2[p.46]: 3.2.3 State Machine of Calling Sequence
 - FMISpec2.0.2[p.108]: 4.2.4 State Machine of Calling Sequence from Master to Slave
-See also [`fmi2SetString`](@ref),[`fmi2ValueReferenceFormat`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
-"""
+
+""" 
 function fmiSetString(str::fmi2Struct, args...; kwargs...)
     fmi2SetString(str, args...; kwargs...)
 end
 export fmiSetString
 
 """
-
+DEPRECATED
     fmiSerializedFMUstateSize(str::fmi2Struct, c::FMU2Component, state::fmi2FMUstate)
 
 
@@ -815,16 +815,16 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
 - FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.25]: 2.1.8 Getting and Setting the Complete FMU State
 
-See also [`fmi2SerializedFMUstateSize`](@ref),[`fmi2FMUstate`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 
-"""
+
+""" 
 function fmiSerializedFMUstateSize(str::fmi2Struct, args...; kwargs...)
     fmi2SerializedFMUstateSize(str, args...; kwargs...)
 end
 export fmiSerializedFMUstateSize
 
 """
-
+DEPRECATED
     fmiSerializeFMUstate(str::fmi2Struct, c::FMU2Component, state::fmi2FMUstate)
 
 Serializes the data referenced by the pointer FMUstate and copies this data into the byte vector serializedState of length size to be provided by the environment.
@@ -845,15 +845,15 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
 - FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.25]: 2.1.8 Getting and Setting the Complete FMU State
 
-See also [`fmi2SerializeFMUstate`](@ref),[`fmi2FMUstate`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
-"""
+
+""" 
 function fmiSerializeFMUstate(str::fmi2Struct, args...; kwargs...)
     fmi2SerializeFMUstate(str, args...; kwargs...)
 end
 export fmiSerializeFMUstate
 
 """
-TODO
+DEPRECATEDTODO
     fmiDeSerializeFMUstate(str::fmi2Struct, c::FMU2Component, serializedState::Array{fmi2Byte})
 
 Deserialize the data in the serializedState fmi2Byte field
@@ -874,15 +874,15 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
 - FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.25]: 2.1.8 Getting and Setting the Complete FMU State
 
-See also [`fmi2DeSerializeFMUstate`](@ref),[`fmi2FMUstate`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
-"""
+
+""" 
 function fmiDeSerializeFMUstate(str::fmi2Struct, args...; kwargs...)
     fmi2DeSerializeFMUstate(str, args...; kwargs...)
 end
 export fmiDeSerializeFMUstate
 
 """
-
+DEPRECATED
     fmiGetDirectionalDerivative(str::fmi2Struct, c::FMU2Component,
                                       vUnknown_ref::AbstractArray{fmi2ValueReference},
                                       vKnown_ref::AbstractArray{fmi2ValueReference},
@@ -930,15 +930,15 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
 - FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.25]: 2.1.9 Getting Partial Derivatives
-See also [`fmi2GetDirectionalDerivative`](@ref),[`fmi2FMUstate`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
-"""
+
+""" 
 function fmiGetDirectionalDerivative(str::fmi2Struct, args...; kwargs...)
     fmi2GetDirectionalDerivative(str, args...; kwargs...)
 end
 export fmiGetDirectionalDerivative
 
 """
-TODO -> Arguments
+DEPRECATEDTODO -> Arguments
     fmiGetDirectionalDerivative!(str::fmi2Struct, c::FMU2Component,
                                       vUnknown_ref::AbstractArray{fmi2ValueReference},
                                       vKnown_ref::AbstractArray{fmi2ValueReference},
@@ -999,15 +999,15 @@ More detailed:
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
 - FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.25]: 2.1.9 Getting Partial Derivatives
-See also [`fmi2GetDirectionalDerivative`](@ref).
-"""
+
+""" 
 function fmiGetDirectionalDerivative!(str::fmi2Struct, args...; kwargs...)
     fmi2GetDirectionalDerivative!(str, args...; kwargs...)
 end
 export fmiGetDirectionalDerivative!
 
 """
-
+DEPRECATED
     fmiDoStep(str::fmi2Struct, c::FMU2Component, communicationStepSize::Union{Real, Nothing} = nothing; currentCommunicationPoint::Union{Real, Nothing} = nothing, noSetFMUStatePriorToCurrentPoint::Bool = true)
 
     fmiDoStep(str::fmi2Struct, c::FMU2Component, currentCommunicationPoint::fmi2Real, communicationStepSize::fmi2Real, noSetFMUStatePriorToCurrentPoint::fmi2Boolean)
@@ -1043,16 +1043,16 @@ More detailed:
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
 - FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.104]: 4.2.2 Computation
-See also [`fmi2DoStep`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref).
 
-"""
+
+""" 
 function fmiDoStep(str::fmi2Struct, args...; kwargs...)
     fmi2DoStep(str, args...; kwargs...)
 end
 export fmiDoStep
 
 """
-
+DEPRECATED
     fmiSetTime(c::fmi2Struct, c::FMU2Component, time::fmi2Real)
 
     fmiSetTime(c::fmi2Struct, c::FMU2Component, t::Real)
@@ -1082,15 +1082,15 @@ More detailed:
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
 - FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.83]: 3.2.1 Providing Independent Variables and Re-initialization of Caching
-See also [`fmi2SetTime`](@ref), [`fmi2Struct`](@ref), [`FMU2`](@ref), [`FMU2Component`](@ref), [`fmi2ValueReference`](@ref).
-"""
+
+""" 
 function fmiSetTime(c::fmi2Struct, args...; kwargs...)
     fmi2SetTime(c, args...; kwargs...)
 end
 export fmiSetTime
 
 """
-
+DEPRECATED
     fmiSetContinuousStates(str::fmi2Struct, c::FMU2Component,
                                  x::AbstractArray{fmi2Real},
                                  nx::Csize_t)
@@ -1123,15 +1123,15 @@ More detailed:
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
 - FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.83]: 3.2.1 Providing Independent Variables and Re-initialization of Caching
-See also [`fmi2SetContinuousStates`](@ref).
-"""
+
+""" 
 function fmiSetContinuousStates(str::fmi2Struct, args...; kwargs...)
     fmi2SetContinuousStates(str, args...; kwargs...)
 end
 export fmiSetContinuousStates
 
 """
-
+DEPRECATED
     fmi2EnterEventMode(str::fmi2Struct)
 
 The model enters Event Mode from the Continuous-Time Mode and discrete-time equations may become active (and relations are not “frozen”).
@@ -1157,15 +1157,15 @@ More detailed:
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
 - FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.83]: 3.2.2 Evaluation of Model Equations
-See also [`fmi2EnterEventMode`](@ref).
-"""
+
+""" 
 function fmi2EnterEventMode(str::fmi2Struct)
     fmi2EnterEventMode(str)
 end
 export fmi2EnterEventMode
 
 """
-
+DEPRECATED
     fmiNewDiscreteStates(str::fmi2Struct)
 
 Returns the next discrete states
@@ -1191,15 +1191,15 @@ fmi2NewDiscreteStates again. If all FMUs return `newDiscreteStatesNeeded = fmi2F
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
 - FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.83]: 3.2.2 Evaluation of Model Equations
-See also [`fmi2NewDiscreteStates`](@ref).
-"""
+
+""" 
 function fmiNewDiscreteStates(str::fmi2Struct)
     fmi2NewDiscreteStates(str)
 end
 export fmiNewDiscreteStates
 
 """
-
+DEPRECATED
     fmiEnterContinuousTimeMode(str::fmi2Struct)
 
 The model enters Continuous-Time Mode and all discrete-time equations become inactive and all relations are “frozen”.
@@ -1226,15 +1226,15 @@ More detailed:
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
 - FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.83]: 3.2.2 Evaluation of Model Equations
-See also [`fmi2EnterContinuousTimeMode`](@ref).
-"""
+
+""" 
 function fmiEnterContinuousTimeMode(str::fmi2Struct)
     fmi2EnterContinuousTimeMode(str)
 end
 export fmiEnterContinuousTimeMode
 
 """
-
+DEPRECATED
     fmiCompletedIntegratorStep(str::fmi2Struct, c::FMU2Component, noSetFMUStatePriorToCurrentPoint::fmi2Boolean)
 
 This function must be called by the environment after every completed step
@@ -1262,15 +1262,15 @@ More detailed:
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
 - FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.83]: 3.2.2 Evaluation of Model Equations
-See also [`fmi2CompletedIntegratorStep`](@ref), [`fmi2SetFMUState`](@ref).
-"""
+
+""" 
 function fmiCompletedIntegratorStep(str::fmi2Struct, args...; kwargs...)
     fmi2CompletedIntegratorStep(str, args...; kwargs...)
 end
 export fmiCompletedIntegratorStep
 
 """
-
+DEPRECATED
     fmiGetDerivatives(str::fmi2Struct)
 
 Compute state derivatives at the current time instant and for the current states.
@@ -1289,16 +1289,16 @@ vector.
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
 - FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.83]: 3.2.2 Evaluation of Model Equations
-See also [`fmi2GetDerivatives`](@ref).
-"""
 
+"""
+DEPRECATED
 function fmiGetDerivatives(str::fmi2Struct)
     fmi2GetDerivatives(str)
 end
 export fmiGetDerivatives
 
 """
-
+DEPRECATED
     fmiGetEventIndicators(str::fmi2Struct)
 
 Returns the event indicators of the FMU
@@ -1315,15 +1315,15 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
 - FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.83]: 3.2.2 Evaluation of Model Equations
-See also [`fmi2GetEventIndicators`](@ref).
-"""
+
+""" 
 function fmiGetEventIndicators(str::fmi2Struct)
     fmi2GetEventIndicators(str)
 end
 export fmiGetEventIndicators
 
 """
-
+DEPRECATED
     fmiGetContinuousStates(s::fmi2Struct)
 
 Return the new (continuous) state vector x
@@ -1339,16 +1339,16 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
 - FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.83]: 3.2.2 Evaluation of Model Equations
-See also [`fmi2GetEventIndicators`](@ref).
 
-"""
+
+""" 
 function fmiGetContinuousStates(s::fmi2Struct)
     fmi2GetContinuousStates(s)
 end
 export fmiGetContinuousStates
 
 """
-
+DEPRECATED
     fmiGetNominalsOfContinuousStates(s::fmi2Struct)
 
 Return the new (continuous) state vector x
@@ -1365,8 +1365,8 @@ More detailed: `fmi2Struct = Union{FMU2, FMU2Component}`
 - FMISpec2.0.2[p.16]: 2.1.2 Platform Dependent Definitions (fmi2TypesPlatform.h)
 - FMISpec2.0.2[p.16]: 2.1.3 Status Returned by Functions
 - FMISpec2.0.2[p.83]: 3.2.2 Evaluation of Model Equations
-See also [`fmi2GetNominalsOfContinuousStates`](@ref).
-"""
+
+""" 
 function fmiGetNominalsOfContinuousStates(s::fmi2Struct)
     fmi2GetNominalsOfContinuousStates(s)
 end

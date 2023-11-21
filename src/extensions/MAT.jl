@@ -6,9 +6,13 @@
 using FMIImport: FMUSolution
 
 """
-ToDo: DocString.
+    fmiSaveSolutionMAT(solution::FMUSolution, filepath::AbstractString) 
 
-Saves a FMUSolution to a mat file.
+
+Save a `solution` of an FMU simulation as mat file at `filepath`. 
+(requires Package MAT in Julia Environment)
+
+See also [`fmiSaveSolutionCSV`](@ref), [`fmiSaveSolutionJLD2`](@ref), [`fmiLoadSolutionJLD2`](@ref).
 """
 function fmiSaveSolutionMAT(solution::FMUSolution, filepath::AbstractString) 
     file = MAT.matopen(filepath, "w")

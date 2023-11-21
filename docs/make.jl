@@ -3,15 +3,21 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-using Documenter, FMI
+import Pkg; Pkg.develop(path=joinpath(@__DIR__,"../../FMI.jl"))
+using Documenter, Plots, JLD2, DataFrames, CSV, MAT, FMI, FMIImport, FMICore
 using Documenter: GitHubActions
 
 makedocs(sitename="FMI.jl",
          format = Documenter.HTML(
             collapselevel = 1,
             sidebar_sitename = false,
-            edit_link = nothing
+            edit_link = nothing,
+            size_threshold_ignore = ["library.md","deprecated.md","fmi2_lowlevel_librarys.md","fmi3_lowlevel_librarys.md"]
          ),
+         modules = [FMI, FMIImport, FMICore],
+         checkdocs=:exports,
+         linkcheck=true,
+         linkcheck_ignore=["https://thummeto.github.io/FMI.jl/dev/examples/inputs/", "https://github.com/ThummeTo/FMICore.jl/blob/main/src/FMI2_c.jl#L718"], 
          pages= Any[
             "Introduction" => "index.md"
             "Features" => "features.md"
@@ -26,12 +32,23 @@ makedocs(sitename="FMI.jl",
                 "Multithreading" => "examples/multithreading.md"
                 "Multiprocessing" => "examples/multiprocessing.md"
             ]
-            "Library Functions" => "library.md"
-            "FMI Tool Information" => "fmi-tool-info.md"
+            "User Level API - FMI.jl" => "library.md"
+            "Developer Level API" => Any[
+                "fmi version independent content" => Any[
+                    "fmi_lowlevel_library_types.md",
+                    "fmi_lowlevel_library_constants.md",
+                    "fmi_lowlevel_library_functions.md"
+                ],
+                "FMI2 specific content" => "fmi2_lowlevel_librarys.md",
+                "FMI3 specific content" => "fmi3_lowlevel_librarys.md"
+            ]
+            "API Index" => "index_library.md"
+            "FMI Tool Information" => "fmi-tool-info.md"            
             "Related Publication" => "related.md"
             "Contents" => "contents.md"
-            ]
-         )
+            hide("Deprecated" => "deprecated.md")
+        ]
+    )
 
 function deployConfig()
     github_repository = get(ENV, "GITHUB_REPOSITORY", "")

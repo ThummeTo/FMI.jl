@@ -6,18 +6,24 @@
 using FMIImport: FMUSolution
 
 """
-ToDo: DocString.
+    fmiSaveSolutionJLD2(solution::FMUSolution, filepath::AbstractString; keyword="solution") 
 
-Saves a FMUSolution for later use.
+Save a `solution` of an FMU simulation under `keyword` in a jld2 file at `filepath`. 
+(requires Package JLD2 in Julia Environment)
+
+See also [`fmiSaveSolutionCSV`](@ref), [`fmiSaveSolutionMAT`](@ref), [`fmiLoadSolutionJLD2`](@ref).
 """
 function fmiSaveSolutionJLD2(solution::FMUSolution, filepath::AbstractString; keyword="solution") 
     return JLD2.save(filepath, Dict(keyword=>solution))
 end
 
 """
-ToDo: DocString.
+    fmiLoadSolutionJLD2(filepath::AbstractString; keyword="solution")
 
-Loads a FMUSolution. Returns a previously saved `FMUSolution`.
+Load a [`FMUSolution`](@ref) from jld2 file at `filepath` using `keyword` as jld2 keyword. 
+(requires Package JLD2 in Julia Environment)
+
+See also [`fmiSaveSolutionCSV`](@ref), [`fmiSaveSolutionMAT`](@ref), [`fmiSaveSolutionJLD2`](@ref).
 """
 function fmiLoadSolutionJLD2(filepath::AbstractString; keyword="solution")
     return JLD2.load(filepath, keyword)
