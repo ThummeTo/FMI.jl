@@ -21,7 +21,7 @@ import LinearAlgebra: eigvals
 import ProgressMeter
 import ThreadPools
 
-import FMIImport.FMICore: EMPTY_fmi2Real, EMPTY_fmi2ValueReference
+using FMIImport.FMICore: EMPTY_fmi2Real, EMPTY_fmi2ValueReference, ERR_MSG_CONT_TIME_MODE
 
 ############ Model-Exchange ############
 
@@ -50,7 +50,7 @@ end
 # Returns the event indicators for an FMU.
 function condition(c::FMU2Component, out, x, t, integrator, inputFunction) 
 
-    @assert c.state == fmi2ComponentStateContinuousTimeMode "condition(...):\n" * FMICore.ERR_MSG_CONT_TIME_MODE
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "condition(...):\n" * ERR_MSG_CONT_TIME_MODE
 
     indicators!(c, out, x, t, inputFunction)
 
@@ -61,7 +61,7 @@ end
 # Sets a new state for the solver from the FMU (if needed).
 function affectFMU!(c::FMU2Component, integrator, idx, inputFunction, solution::FMU2Solution)
 
-    @assert c.state == fmi2ComponentStateContinuousTimeMode "affectFMU!(...):\n" * FMICore.ERR_MSG_CONT_TIME_MODE
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "affectFMU!(...):\n" * ERR_MSG_CONT_TIME_MODE
 
     c.solution.evals_affect += 1
 
@@ -105,7 +105,7 @@ end
 # This callback is called every time the integrator finishes an (accpeted) integration step.
 function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, progressMeter, tStart, tStop, solution::FMU2Solution)
 
-    @assert c.state == fmi2ComponentStateContinuousTimeMode "stepCompleted(...):\n" * FMICore.ERR_MSG_CONT_TIME_MODE
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "stepCompleted(...):\n" * ERR_MSG_CONT_TIME_MODE
     
     c.solution.evals_stepcompleted += 1
 
@@ -137,7 +137,7 @@ end
 # save FMU values 
 function saveValues(c::FMU2Component, recordValues, x, t, integrator, inputFunction)
 
-    @assert c.state == fmi2ComponentStateContinuousTimeMode "saveValues(...):\n" * FMICore.ERR_MSG_CONT_TIME_MODE
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "saveValues(...):\n" * ERR_MSG_CONT_TIME_MODE
 
     c.solution.evals_savevalues += 1
 
@@ -149,7 +149,7 @@ end
 
 function saveEventIndicators(c::FMU2Component, recordEventIndicators, x, t, integrator, inputFunction)
 
-    @assert c.state == fmi2ComponentStateContinuousTimeMode "saveEventIndicators(...):\n" * FMICore.ERR_MSG_CONT_TIME_MODE
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "saveEventIndicators(...):\n" * ERR_MSG_CONT_TIME_MODE
 
     c.solution.evals_saveeventindicators += 1
 
@@ -162,7 +162,7 @@ end
 
 function saveEigenvalues(c::FMU2Component, x, t, integrator, inputFunction)
 
-    @assert c.state == fmi2ComponentStateContinuousTimeMode "saveEigenvalues(...):\n" * FMICore.ERR_MSG_CONT_TIME_MODE
+    @assert c.state == fmi2ComponentStateContinuousTimeMode "saveEigenvalues(...):\n" * ERR_MSG_CONT_TIME_MODE
 
     c.solution.evals_saveeigenvalues += 1
 

@@ -49,7 +49,7 @@ jobs:
           jupyter nbconvert --to markdown ${{ env.FILE }}
 
       - name: Archive examples artifacts
-        if: success() && matrix.os == 'ubuntu-latest'
+        if: success() && matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v3
         with:
           name: examples
