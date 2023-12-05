@@ -147,37 +147,82 @@ ec_idcs = zeros(fmi2ValueReference, 0)
 t = -1.0
 b = @benchmarkable eval!($cRef, $dx, $dx_refs, $y, $y_refs, $x, $u, $u_refs, $p, $p_refs, $ec, $ec_idcs, $t)
 min_time, memory, allocs = evalBenchmark(b)
-@test allocs <= 1
-@test memory <= 80     # ToDo: ?
+@test allocs <= 0
+@test memory <= 0
 
 b = @benchmarkable $c(dx=$dx, y=$y, y_refs=$y_refs, x=$x, u=$u, u_refs=$u_refs, p=$p, p_refs=$p_refs, ec=$ec, ec_idcs=$ec_idcs, t=$t)
 min_time, memory, allocs = evalBenchmark(b)
-@test allocs <= 8   # `ignore_derivatives` causes an extra 3 allocations (48 bytes)
-@test memory <= 272 # ToDo: What is the remaning 1 allocation (112 Bytes) compared to `eval!`?
+@test allocs <= 3   # `ignore_derivatives` causes an extra 3 allocations (48 bytes)
+@test memory <= 48  # ToDo
 
 _p = ()
 b = @benchmarkable FMI.fx($c, $dx, $x, $_p, $t, nothing)
 min_time, memory, allocs = evalBenchmark(b)
 # ToDo: This is too much, but currently necessary to be compatible with all AD-frameworks, as well as ForwardDiffChainRules
-@test allocs <= 8
-@test memory <= 272 # ToDo: What is the remaning 1 allocation (16 Bytes) compared to `c(...)`?
+@test allocs <= 3
+@test memory <= 48 # ToDo
 
-# using FMISensitivity
-# import FMISensitivity.ForwardDiff
-# import FMISensitivity.ReverseDiff
-# function fun(_x)
-#     eval!(cRef, dx, y, y_refs, _x, u, u_refs, p, p_refs, ec, ec_idcs, t)
-# end
-# config = ForwardDiff.JacobianConfig(fun, x, ForwardDiff.Chunk{length(x)}())
+# AD 
 
-# b = @benchmarkable ForwardDiff.jacobian($fun, $x, $config)
-# min_time, memory, allocs = evalBenchmark(b)
-# # ToDo: This is too much!
-# @test allocs <= 250
-# @test memory <= 13000
+using FMISensitivity
+import ChainRulesCore
+import ChainRulesCore: ZeroTangent, NoTangent
+import FMISensitivity.ForwardDiff
+import FMISensitivity.ReverseDiff
 
-# b = @benchmarkable ReverseDiff.jacobian($fun, $x)
-# min_time, memory, allocs = evalBenchmark(b)
-# # ToDo: This is too much!
-# @test allocs <= 150
-# @test memory <= 10000
+# frule 
+Δx = similar(x)
+Δtuple = (NoTangent(), NoTangent(), NoTangent(), NoTangent(), NoTangent(), NoTangent(), Δx, NoTangent(), NoTangent(), NoTangent(), NoTangent(), NoTangent(), NoTangent(), NoTangent())
+function fun(_x)
+    Ω, ∂Ω = ChainRulesCore.frule(Δtuple, eval!, cRef, dx, dx_refs, y, y_refs, _x, u, u_refs, p, p_refs, ec, ec_idcs, t)
+end
+
+b = @benchmarkable fun($x)
+min_time, memory, allocs = evalBenchmark(b)
+@test allocs <= 4
+@test memory <= 144
+
+# rrule 
+function fun(_x)
+    Ω, pullback = ChainRulesCore.rrule(eval!, cRef, dx, dx_refs, y, y_refs, _x, u, u_refs, p, p_refs, ec, ec_idcs, t)
+end
+
+b = @benchmarkable fun($x)
+min_time, memory, allocs = evalBenchmark(b)
+@test allocs <= 9
+@test memory <= 400
+
+# rrule pullback
+Ω, pullback = ChainRulesCore.rrule(eval!, cRef, dx, dx_refs, y, y_refs, x, u, u_refs, p, p_refs, ec, ec_idcs, t)
+r̄ = copy(dx)
+function fun(_r̄, _pullback)
+    _pullback(_r̄)
+end
+
+b = @benchmarkable fun($r̄, $pullback)
+min_time, memory, allocs = evalBenchmark(b)
+@test allocs <= 5
+@test memory <= 144
+
+# eval!
+function fun(_x)
+    eval!(cRef, dx, dx_refs, y, y_refs, _x, u, u_refs, p, p_refs, ec, ec_idcs, t)
+end
+
+b = @benchmarkable fun($x)
+min_time, memory, allocs = evalBenchmark(b)
+@test allocs <= 0
+@test memory <= 0
+
+config = ForwardDiff.JacobianConfig(fun, x, ForwardDiff.Chunk{length(x)}())
+b = @benchmarkable ForwardDiff.jacobian($fun, $x, $config)
+min_time, memory, allocs = evalBenchmark(b)
+# ToDo: This is way too much!
+@test allocs <= 240
+@test memory <= 13000
+
+b = @benchmarkable ReverseDiff.jacobian($fun, $x)
+min_time, memory, allocs = evalBenchmark(b)
+# ToDo: This is way too much!
+@test allocs <= 240
+@test memory <= 12000
