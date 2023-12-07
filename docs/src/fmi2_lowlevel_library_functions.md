@@ -5,95 +5,18 @@
 In both cases, FMI defines an input/output block of a dynamic model where the distribution of the block, the
 platform dependent header file, several access functions, as well as the schema files are identical.
 
-### Working with the FMI model description
-
-#### Loading/Parsing
-
-```@docs
-fmi2LoadModelDescription
-```
-
-#### general information about the FMU
-
-```@docs
-fmi2GetModelName
-fmi2GetGUID
-fmi2IsCoSimulation
-fmi2IsModelExchange
-fmi2GetGenerationTool
-fmi2GetGenerationDateAndTime
-```
-
-#### default experiment settings
-
-```@docs
-fmi2GetDefaultStartTime
-fmi2GetDefaultStopTime
-fmi2GetDefaultTolerance
-fmi2GetDefaultStepSize
-```
-
-#### FMU capabilities
-
-```@docs
-fmi2DependenciesSupported
-fmi2DerivativeDependenciesSupported
-fmi2CanGetSetState
-fmi2CanSerializeFMUstate
-fmi2ProvidesDirectionalDerivative
-```
-
-#### value references
-
-```@docs
-fmi2GetValueReferencesAndNames
-fmi2GetNames
-```
-
-#### States
-
-```@docs
-fmi2GetNumberOfStates
-
-```
-
 #### Getting entrys
 
 ```@docs
-fmi2GetModelIdentifier
 
-fmi2GetVariableNamingConvention
-
-fmi2GetNumberOfEventIndicators
-
-
-fmi2GetModelVariableIndices
-fmi2GetInputValueReferencesAndNames
-fmi2GetInputNames
-fmi2GetOutputValueReferencesAndNames
-fmi2GetOutputNames
-fmi2GetParameterValueReferencesAndNames
-fmi2GetParameterNames
-fmi2GetStateValueReferencesAndNames
-fmi2GetStateNames
-fmi2GetDerivateValueReferencesAndNames
-fmi2GetDerivativeNames
-fmi2GetNamesAndDescriptions
-fmi2GetNamesAndUnits
-fmi2GetNamesAndInitials
-fmi2GetInputNamesAndStarts
-
-fmi2DataTypeForValueReference
-
-
-fmi2GetVersion
-fmi2GetTypesPlatform
-fmi2GetSolutionDerivative
 fmi2StringToVariability
 fmi2VariabilityToString
 fmi2StatusToString
 fmi2DependencyKindToString
 fmi2StringToDependencyKind
+
+
+fmi2GetSolutionDerivative
 ```
 
 ###  Creation, Destruction and Logging of FMU Instances

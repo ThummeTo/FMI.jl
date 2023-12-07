@@ -42,7 +42,10 @@ makedocs(sitename="FMI.jl",
                 "FMI2 specific content" =>  Any[
                     "fmi2_lowlevel_library_types.md",
                     "fmi2_lowlevel_library_constants.md",
-                    "fmi2_lowlevel_library_functions.md"
+                    "FMI2 Functions in FMI Import/Core .jl" =>  Any[
+                        "fmi2_lowlevel_modeldescription_functions.md",
+                        "fmi2_lowlevel_library_functions.md",
+                    ]
                 ],
                 "FMI3 specific content" => "fmi3_lowlevel_librarys.md"
             ]
