@@ -1,79 +1,72 @@
 
-# [FMI Import/Core .jl Library Functions/Types for FMI2](@id fmi2importlibrary)
-```@docs
-FMU2
-FMU2Component
-FMU2ComponentEnvironment
-FMU2InputFunction
-fmi2Struct
-fmi2StructMD
-fmi2Initial
-FMU2Solution
-fmi2ScalarVariable
-fmi2SimpleType
-fmi2Type
-fmi2Unit
-fmi2Char
-fmi2True
-fmi2False
-FMIImport.fmi2ValueReferenceFormat
-fmi2Variability
-fmi2VariableDependency
-fmi2DependencyKind
-fmi2EventInfo
-FMU2Event
-FMU2ExecutionConfiguration
-fmi2Status
-fmi2StatusOK
-fmi2StatusWarning
-fmi2StatusPending
-fmi2StatusError
-fmi2StatusDiscard
-fmi2StatusFatal
-fmi2Annotation
-```
+# FMI2 Functions in FMI Import/Core .jl
 
 ## FMI Common Concepts for Model Exchange and Co-Simulation
 In both cases, FMI defines an input/output block of a dynamic model where the distribution of the block, the
 platform dependent header file, several access functions, as well as the schema files are identical.
 
-### [Reading the model description](@id fmi2importlibraryreadingthemodeldescription)
-This section documents functions to inquire information about the model description of an FMU.
+### Working with the FMI model description
 
-#### Load/Parse the FMI model description
+#### Loading/Parsing
+
 ```@docs
-fmi2ModelDescription
 fmi2LoadModelDescription
 ```
 
-#### Get value functions
+#### general information about the FMU
+
+```@docs
+fmi2GetModelName
+fmi2GetGUID
+fmi2IsCoSimulation
+fmi2IsModelExchange
+fmi2GetGenerationTool
+fmi2GetGenerationDateAndTime
+```
+
+#### default experiment settings
+
 ```@docs
 fmi2GetDefaultStartTime
 fmi2GetDefaultStopTime
 fmi2GetDefaultTolerance
 fmi2GetDefaultStepSize
-fmi2GetModelName
-fmi2GetGUID
-fmi2GetGenerationTool
-fmi2GetGenerationDateAndTime
-fmi2GetVariableNamingConvention
-fmi2GetNumberOfEventIndicators
-fmi2GetNumberOfStates
-fmi2IsCoSimulation
-fmi2IsModelExchange
 ```
 
-#### Information functions
+#### FMU capabilities
 
 ```@docs
 fmi2DependenciesSupported
 fmi2DerivativeDependenciesSupported
-fmi2GetModelIdentifier
 fmi2CanGetSetState
 fmi2CanSerializeFMUstate
 fmi2ProvidesDirectionalDerivative
+```
+
+#### value references
+
+```@docs
 fmi2GetValueReferencesAndNames
 fmi2GetNames
+```
+
+#### States
+
+```@docs
+fmi2GetNumberOfStates
+
+```
+
+#### Getting entrys
+
+```@docs
+fmi2GetModelIdentifier
+
+fmi2GetVariableNamingConvention
+
+fmi2GetNumberOfEventIndicators
+
+
 fmi2GetModelVariableIndices
 fmi2GetInputValueReferencesAndNames
 fmi2GetInputNames
@@ -89,13 +82,16 @@ fmi2GetNamesAndDescriptions
 fmi2GetNamesAndUnits
 fmi2GetNamesAndInitials
 fmi2GetInputNamesAndStarts
+
+fmi2DataTypeForValueReference
+
+
 fmi2GetVersion
 fmi2GetTypesPlatform
 fmi2GetSolutionDerivative
 fmi2StringToVariability
 fmi2VariabilityToString
 fmi2StatusToString
-fmi2DataTypeForValueReference
 fmi2DependencyKindToString
 fmi2StringToDependencyKind
 ```
@@ -151,7 +147,6 @@ fmi2SetString
 The FMU has an internal state consisting of all values that are needed to continue a simulation. This internal state consists especially of the values of the continuous-time states, iteration variables, parameter values, input values, delay buffers, file identifiers, and FMU internal status information. With the functions of this section, the internal FMU state can be copied and the pointer to this copy is returned to the environment. The FMU state copy can be set as actual FMU state, in order to continue the simulation from it.
 
 ```@docs
-fmi2FMUstate
 fmi2GetFMUstate
 fmi2GetFMUstate!
 fmi2SetFMUstate
@@ -234,7 +229,6 @@ fmi2GetRealOutputDerivatives
 The computation of time steps is controlled by the following function.
 
 ```@docs
-fmi2StatusKind
 fmi2DoStep
 fmi2CancelStep
 ```
@@ -267,7 +261,6 @@ fmi2Reload
 fmi2StringToValueReference
 fmi2ModelVariablesForValueReference
 fmi2ValueReferenceToString
-fmi2Causality
 fmi2StringToCausality
 fmi2CausalityToString
 fmi2InitialToString
