@@ -12,7 +12,8 @@ makedocs(sitename="FMI.jl",
             collapselevel = 1,
             sidebar_sitename = false,
             edit_link = nothing,
-            size_threshold_ignore = ["library.md","deprecated.md","fmi2_lowlevel_librarys.md","fmi3_lowlevel_librarys.md"]
+            size_threshold = 512000,
+            size_threshold_ignore = ["deprecated.md"]
          ),
          modules = [FMI, FMIImport, FMICore],
          checkdocs=:exports,
@@ -39,8 +40,27 @@ makedocs(sitename="FMI.jl",
                     "fmi_lowlevel_library_constants.md",
                     "fmi_lowlevel_library_functions.md"
                 ],
-                "FMI2 specific content" => "fmi2_lowlevel_librarys.md",
-                "FMI3 specific content" => "fmi3_lowlevel_librarys.md"
+                "FMI2 specific content" =>  Any[
+                    "fmi2_lowlevel_library_types.md",
+                    "fmi2_lowlevel_library_constants.md",
+                    "FMI2 Functions in FMI Import/Core .jl" =>  Any[
+                        "fmi2_lowlevel_modeldescription_functions.md",
+                        "fmi2_lowlevel_library_functions.md",
+                        "fmi2_lowlevel_ME_functions.md",
+                        "fmi2_lowlevel_CS_functions.md",
+                    ]
+                ],
+                "FMI3 specific content" =>  Any[
+                    "fmi3_lowlevel_library_types.md",
+                    "fmi3_lowlevel_library_constants.md",
+                    "FMI3 Functions in FMI Import/Core .jl" =>  Any[
+                        "fmi3_lowlevel_modeldescription_functions.md",
+                        "fmi3_lowlevel_library_functions.md",
+                        "fmi3_lowlevel_ME_functions.md",
+                        "fmi3_lowlevel_CS_functions.md",
+                        "fmi3_lowlevel_SE_functions.md",
+                    ]
+                ],
             ]
             "API Index" => "index_library.md"
             "FMI Tool Information" => "fmi-tool-info.md"            
