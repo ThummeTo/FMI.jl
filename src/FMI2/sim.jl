@@ -154,7 +154,7 @@ function saveEventIndicators(c::FMU2Component, recordEventIndicators, x, t, inte
     c.solution.evals_saveeventindicators += 1
 
     out = zeros(fmi2Real, c.fmu.modelDescription.numberOfEventIndicators)
-    condition!(c, out, x, t, inputFunction)
+    indicators!(c, out, x, t, inputFunction)
 
     # ToDo: Replace by inplace statement!
     return (out[recordEventIndicators]...,)
