@@ -20,3 +20,4 @@ function fmiSaveSolutionCSV(solution::FMUSolution, filepath::AbstractString)
     end
     CSV.write(filepath, df)
 end
+export fmiSaveSolutionCSV

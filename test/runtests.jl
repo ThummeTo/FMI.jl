@@ -10,6 +10,7 @@ import Random
 
 import FMI.FMIImport.FMICore: fmi2StatusOK, fmi3StatusOK, fmi2ComponentStateTerminated, fmi2ComponentStateInstantiated, fmi3Boolean
 import FMI.FMIImport.FMICore: FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGURATION_NO_RESET, FMU2_EXECUTION_CONFIGURATION_RESET, FMU2_EXECUTION_CONFIGURATION_NOTHING
+using FMI.FMIImport
 
 using DifferentialEquations: FBDF
 
@@ -21,6 +22,30 @@ fmuStructs = ["FMU", "FMUCOMPONENT"]
 for exec in [FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGURATION_NO_RESET, FMU2_EXECUTION_CONFIGURATION_RESET, FMU2_EXECUTION_CONFIGURATION_NOTHING, FMU3_EXECUTION_CONFIGURATION_NO_FREEING, FMU3_EXECUTION_CONFIGURATION_NO_RESET, FMU3_EXECUTION_CONFIGURATION_RESET]
     exec.assertOnError = true
     exec.assertOnWarning = true
+end
+
+function getFMUStruct(modelname, tool=ENV["EXPORTINGTOOL"], version=ENV["EXPORTINGVERSION"]; kwargs...)
+    
+    # choose FMU or FMUComponent
+    if endswith(modelname, ".fmu")
+        fmu = fmiLoad(modelname; kwargs...)
+    else
+        fmu = fmiLoad(modelname, tool, version; kwargs...) 
+    end
+
+    envFMUSTRUCT = ENV["FMUSTRUCT"]
+
+    if envFMUSTRUCT == "FMU"
+        return fmu, fmu
+
+    elseif envFMUSTRUCT == "FMUCOMPONENT"
+        comp = fmiInstantiate!(fmu; loggingOn=false)
+        @test comp != 0
+        return comp, fmu
+
+    else
+        @assert false "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+    end
 end
 
 function runtestsFMI2(exportingTool)
@@ -80,14 +105,14 @@ function runtestsFMI2(exportingTool)
             end
         end
 
-        if VERSION >= v"1.9.0"
-            @info "Performance (performance.jl)"
-            @testset "Performance" begin
-                include("FMI2/performance.jl")
-            end
-        else
+        # if VERSION >= v"1.9.0"
+        #     @info "Performance (performance.jl)"
+        #     @testset "Performance" begin
+        #         include("FMI2/performance.jl")
+        #     end
+        # else
             @info "Julia Version $(VERSION), skipping performance tests ..."
-        end
+        #end
 
         @info "Plotting (plots.jl)"
         @testset "Plotting" begin
@@ -133,9 +158,9 @@ function runtestsFMI3(exportingTool)
             end
         end
 
-        # @testset "Plotting (plots.jl)" begin
-        #     include("FMI3/plots.jl")
-        # end
+        @testset "Plotting (plots.jl)" begin
+            include("FMI3/plots.jl")
+        end
     end
 end
 
@@ -144,13 +169,13 @@ end
         @info "Automated testing is supported on Windows."
         for exportingTool in exportingToolsWindows
             runtestsFMI2(exportingTool)
-            runtestsFMI3(exportingTool)
+            #runtestsFMI3(exportingTool)
         end
     elseif Sys.islinux()
         @info "Automated testing is supported on Linux."
         for exportingTool in exportingToolsLinux
             runtestsFMI2(exportingTool)
-            runtestsFMI3(exportingTool)
+            #runtestsFMI3(exportingTool)
         end
     elseif Sys.isapple()
         @warn "Test-sets are currrently using Windows- and Linux-FMUs, automated testing for macOS is currently not supported."

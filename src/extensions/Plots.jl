@@ -19,6 +19,7 @@ function fmiPlot(solution::FMUSolution; kwargs...)
     fmiPlot!(fig, solution; kwargs...)
     return fig
 end
+export fmiPlot
 
 """
     fmiPlot!(fig::Plots.Plot, solution::FMUSolution; 
@@ -209,6 +210,7 @@ function fmiPlot!(fig::Plots.Plot, solution::FMUSolution;
 
     return fig
 end
+export fmiPlot!
 
 """
     Plots.plot(solution::FMUSolution; kwargs...)

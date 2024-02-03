@@ -9,7 +9,7 @@ using FMI.FMIImport
 # Prepare FMU #
 ###############
 
-myFMU = fmiLoad("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
+fmuStruct, myFMU = getFMUStruct("SpringPendulum1D")
 
 comp = fmi2Instantiate!(myFMU; loggingOn=true)
 @test comp != 0
