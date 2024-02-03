@@ -16,6 +16,7 @@ See also [`fmiSaveSolutionCSV`](@ref), [`fmiSaveSolutionMAT`](@ref), [`fmiLoadSo
 function fmiSaveSolutionJLD2(solution::FMUSolution, filepath::AbstractString; keyword="solution") 
     return JLD2.save(filepath, Dict(keyword=>solution))
 end
+export fmiSaveSolutionJLD2
 
 """
     fmiLoadSolutionJLD2(filepath::AbstractString; keyword="solution")
@@ -28,3 +29,4 @@ See also [`fmiSaveSolutionCSV`](@ref), [`fmiSaveSolutionMAT`](@ref), [`fmiSaveSo
 function fmiLoadSolutionJLD2(filepath::AbstractString; keyword="solution")
     return JLD2.load(filepath, keyword)
 end
+export fmiLoadSolutionJLD2

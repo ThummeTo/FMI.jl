@@ -5,20 +5,7 @@
 
 # case 1: CS-FMU Simulation
 
-myFMU = fmiLoad("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
-
-comp = fmiInstantiate!(myFMU; loggingOn=false)
-@test comp != 0
-
-# choose FMU or FMUComponent
-fmuStruct = nothing
-envFMUSTRUCT = ENV["FMUSTRUCT"]
-if envFMUSTRUCT == "FMU"
-    fmuStruct = myFMU
-elseif envFMUSTRUCT == "FMUCOMPONENT"
-    fmuStruct = comp
-end
-@assert fmuStruct !== nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+fmuStruct, myFMU = getFMUStruct("SpringPendulum1D")
 
 t_start = 0.0
 t_stop = 8.0
@@ -60,20 +47,7 @@ extForce_ct = function (c::Union{FMU2Component, Nothing}, t::Real, u::AbstractAr
     u[1] = sin(t)
 end  
 
-myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
-
-comp = fmiInstantiate!(myFMU; loggingOn=false)
-@test comp != 0
-
-# choose FMU or FMUComponent
-fmuStruct = nothing
-envFMUSTRUCT = ENV["FMUSTRUCT"]
-if envFMUSTRUCT == "FMU"
-    fmuStruct = myFMU
-elseif envFMUSTRUCT == "FMUCOMPONENT"
-    fmuStruct = comp
-end
-@assert fmuStruct !== nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+fmuStruct, myFMU = getFMUStruct("SpringPendulumExtForce1D")
 
 for inpfct in [extForce_ct, extForce_t]
     global solution

@@ -32,24 +32,13 @@ end
 
 for solver in solvers
 
+    global fmuStruct, fmu, solution
+
     @info "Testing solver: $(solver)"
 
     # case 1: ME-FMU with state events
 
-    fmu = fmiLoad("SpringFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
-
-    comp = fmiInstantiate!(fmu; loggingOn=false)
-    @test comp != 0
-
-    # choose FMU or FMUComponent
-    fmuStruct = nothing
-    envFMUSTRUCT = ENV["FMUSTRUCT"]
-    if envFMUSTRUCT == "FMU"
-        fmuStruct = fmu
-    elseif envFMUSTRUCT == "FMUCOMPONENT"
-        fmuStruct = comp
-    end
-    @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+    fmuStruct, fmu = getFMUStruct("SpringFrictionPendulum1D")
 
     solution = fmiSimulateME(fmuStruct, (t_start, t_stop); solver=solver, kwargs...)
     @test length(solution.states.u) > 0
@@ -65,20 +54,7 @@ for solver in solvers
 
     # case 2: ME-FMU with state and time events
 
-    fmu = fmiLoad("SpringTimeFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
-
-    comp = fmiInstantiate!(fmu; loggingOn=false)
-    @test comp != 0
-
-    # choose FMU or FMUComponent
-    fmuStruct = nothing
-    envFMUSTRUCT = ENV["FMUSTRUCT"]
-    if envFMUSTRUCT == "FMU"
-        fmuStruct = fmu
-    elseif envFMUSTRUCT == "FMUCOMPONENT"
-        fmuStruct = comp
-    end
-    @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+    fmuStruct, fmu = getFMUStruct("SpringTimeFrictionPendulum1D")
 
     ### test without recording values
 
@@ -144,20 +120,7 @@ for solver in solvers
 
     # case 3a: ME-FMU without events, but with input signal
 
-    fmu = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
-
-    comp = fmiInstantiate!(fmu; loggingOn=false)
-    @test comp != 0
-
-    # choose FMU or FMUComponent
-    fmuStruct = nothing
-    envFMUSTRUCT = ENV["FMUSTRUCT"]
-    if envFMUSTRUCT == "FMU"
-        fmuStruct = fmu
-    elseif envFMUSTRUCT == "FMUCOMPONENT"
-        fmuStruct = comp
-    end
-    @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+    fmuStruct, fmu = getFMUStruct("SpringPendulumExtForce1D")
 
     for inpfct in [extForce_cxt, extForce_t]
         
@@ -176,20 +139,7 @@ for solver in solvers
 
     # case 3b: ME-FMU without events, but with input signal (autodiff)
 
-    fmu = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
-
-    comp = fmiInstantiate!(fmu; loggingOn=false)
-    @test comp != 0
-
-    # choose FMU or FMUComponent
-    fmuStruct = nothing
-    envFMUSTRUCT = ENV["FMUSTRUCT"]
-    if envFMUSTRUCT == "FMU"
-        fmuStruct = fmu
-    elseif envFMUSTRUCT == "FMUCOMPONENT"
-        fmuStruct = comp
-    end
-    @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+    fmuStruct, fmu = getFMUStruct("SpringPendulumExtForce1D")
 
     # there are issues with AD in Julia < 1.7.0
     # ToDo: Fix Linux FMU
@@ -211,20 +161,7 @@ for solver in solvers
 
     # case 4: ME-FMU without events, but saving value interpolation
 
-    fmu = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
-
-    comp = fmiInstantiate!(fmu; loggingOn=false)
-    @test comp != 0
-
-    # choose FMU or FMUComponent
-    fmuStruct = nothing
-    envFMUSTRUCT = ENV["FMUSTRUCT"]
-    if envFMUSTRUCT == "FMU"
-        fmuStruct = fmu
-    elseif envFMUSTRUCT == "FMUCOMPONENT"
-        fmuStruct = comp
-    end
-    @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+    fmuStruct, fmu = getFMUStruct("SpringPendulumExtForce1D")
 
     solution = fmiSimulateME(fmuStruct, (t_start, t_stop); saveat=tData, recordValues=:states, solver=solver, kwargs...)
     @test length(solution.states.u) == length(tData)
@@ -242,20 +179,7 @@ for solver in solvers
 
     # case 5: ME-FMU with different (random) start state
 
-    fmu = fmiLoad("SpringFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
-
-    comp = fmiInstantiate!(fmu; loggingOn=false)
-    @test comp != 0
-
-    # choose FMU or FMUComponent
-    fmuStruct = nothing
-    envFMUSTRUCT = ENV["FMUSTRUCT"]
-    if envFMUSTRUCT == "FMU"
-        fmuStruct = fmu
-    elseif envFMUSTRUCT == "FMUCOMPONENT"
-        fmuStruct = comp
-    end
-    @assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+    fmuStruct, fmu = getFMUStruct("SpringFrictionPendulum1D")
 
     solution = fmiSimulateME(fmuStruct, (t_start, t_stop); x0=rand_x0, solver=solver, kwargs...)
     @test length(solution.states.u) > 0

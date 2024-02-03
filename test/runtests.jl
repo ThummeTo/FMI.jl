@@ -24,6 +24,30 @@ for exec in [FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGURATI
     exec.assertOnWarning = true
 end
 
+function getFMUStruct(modelname, tool=ENV["EXPORTINGTOOL"], version=ENV["EXPORTINGVERSION"]; kwargs...)
+    
+    # choose FMU or FMUComponent
+    if endswith(modelname, ".fmu")
+        fmu = fmiLoad(modelname; kwargs...)
+    else
+        fmu = fmiLoad(modelname, tool, version; kwargs...) 
+    end
+
+    envFMUSTRUCT = ENV["FMUSTRUCT"]
+
+    if envFMUSTRUCT == "FMU"
+        return fmu, fmu
+
+    elseif envFMUSTRUCT == "FMUCOMPONENT"
+        comp = fmiInstantiate!(fmu; loggingOn=false)
+        @test comp != 0
+        return comp, fmu
+
+    else
+        @assert false "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+    end
+end
+
 function runtestsFMI2(exportingTool)
     ENV["EXPORTINGTOOL"] = exportingTool[1]
     ENV["EXPORTINGVERSION"] = exportingTool[2]

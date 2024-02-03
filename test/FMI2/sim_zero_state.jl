@@ -14,7 +14,7 @@ extForce_t! = function(t, u)
     u[1] = sin(t)
 end 
 
-myFMU = fmiLoad("SpringPendulumExtForce1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
+fmuStruct, myFMU = getFMUStruct("SpringPendulumExtForce1D")
 
 # make a dummy zero-state FMU by overwriting the state field (ToDo: Use an actual zero state FMU from FMIZoo.jl)
 myFMU.modelDescription.stateValueReferences = []

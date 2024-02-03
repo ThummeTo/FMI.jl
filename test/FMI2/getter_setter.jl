@@ -7,19 +7,12 @@
 # Prepare FMU #
 ###############
 
-myFMU = fmiLoad("IO", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"]; type=:CS)
-comp = fmiInstantiate!(myFMU; loggingOn=false)
-@test comp != 0
+fmuStruct, myFMU = getFMUStruct("IO"; type=:CS)
 
-# choose FMU or FMUComponent
-fmuStruct = nothing
-envFMUSTRUCT = ENV["FMUSTRUCT"]
-if envFMUSTRUCT == "FMU"
-    fmuStruct = myFMU
-elseif envFMUSTRUCT == "FMUCOMPONENT"
-    fmuStruct = comp
+if isa(fmuStruct, FMU2)
+    # [Note] no instance allocated at this point 
+    fmi2Instantiate!(fmuStruct)
 end
-@assert fmuStruct != nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
 
 @test fmiSetupExperiment(fmuStruct, 0.0) == 0
 

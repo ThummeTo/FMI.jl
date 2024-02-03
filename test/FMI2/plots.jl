@@ -10,7 +10,7 @@ t_start = 0.0
 t_stop = 8.0
 
 # load the FMU container
-myFMU = fmiLoad("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
+fmuStruct, myFMU = getFMUStruct("SpringPendulum1D")
 
 # print some useful FMU-information into the REPL
 fmiInfo(myFMU)

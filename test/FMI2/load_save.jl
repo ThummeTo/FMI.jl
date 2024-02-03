@@ -13,7 +13,7 @@ t_start = 0.0
 t_stop = 8.0
 
 # load the FMU container
-myFMU = fmiLoad("SpringFrictionPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
+fmuStruct, myFMU = getFMUStruct("SpringFrictionPendulum1D")
 
 recordValues = ["mass.s", "mass.v"]
 solutionME = fmiSimulateME(myFMU, (t_start, t_stop); recordValues=recordValues, solver=FBDF(autodiff=false))

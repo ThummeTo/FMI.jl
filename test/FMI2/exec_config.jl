@@ -8,34 +8,27 @@ using FMI.FMIImport
 t_start = 0.0
 t_stop = 1.0
 
-myFMU = fmiLoad("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
+fmuStruct = Dict{Symbol, Union{FMU2, FMU2Component}}()
+myFMU = Dict{Symbol, FMU2}()
 
-comp = fmiInstantiate!(myFMU; loggingOn=false, type=fmi2TypeCoSimulation)
-@test comp != 0
-# choose FMU or FMUComponent
-fmuStruct = nothing
-envFMUSTRUCT = ENV["FMUSTRUCT"]
-if envFMUSTRUCT == "FMU"
-    fmuStruct = myFMU
-elseif envFMUSTRUCT == "FMUCOMPONENT"
-    fmuStruct = comp
-end
-@assert fmuStruct !== nothing "Unknown fmuStruct, environment variable `FMUSTRUCT` = `$envFMUSTRUCT`"
+fmuStruct[:ME], myFMU[:ME] = getFMUStruct("SpringPendulum1D"; type=:ME)
+fmuStruct[:CS], myFMU[:CS] = getFMUStruct("SpringPendulum1D"; type=:CS)
 
 for execConf in (FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGURATION_RESET, FMU2_EXECUTION_CONFIGURATION_NO_RESET) # ToDo: Add `FMU2_EXECUTION_CONFIGURATION_NOTHING`
     for mode in (:CS, :ME) 
-        global fmuStruct
+        global fmuStruct, myFMU
+
         @info "\t$(mode) | $(execConf)"
 
-        myFMU.executionConfig = execConf
+        myFMU[mode].executionConfig = execConf
 
         # sim test
-        numInst = length(myFMU.components)
+        numInst = length(myFMU[mode].components)
 
         if mode == :CS
-            fmiSimulateCS(fmuStruct, (t_start, t_stop))
+            fmiSimulateCS(fmuStruct[mode], (t_start, t_stop))
         elseif mode == :ME
-            fmiSimulateME(fmuStruct, (t_start, t_stop))
+            fmiSimulateME(fmuStruct[mode], (t_start, t_stop))
         else 
             @assert false "Unknown mode `$(mode)`."
         end
@@ -47,21 +40,26 @@ for execConf in (FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGU
             numInst -= 1
         end
 
-        @test length(myFMU.components) == numInst
+        @test length(myFMU[mode].components) == numInst
+
+        othermode = (mode == :CS ? :ME : :CS)
 
         # prepare next run start
-        if envFMUSTRUCT == "FMU"
+        if isa(fmuStruct[mode], FMU2)
             if !execConf.freeInstance
-                fmi2FreeInstance!(myFMU)
-            end
-            fmi2Instantiate!(myFMU; type=(mode==:CS ? fmi2TypeModelExchange : fmi2TypeCoSimulation))
+                fmi2FreeInstance!(myFMU[mode])
+            end 
+            
+            fmi2Instantiate!(myFMU[othermode]; type=(othermode==:ME ? fmi2TypeModelExchange : fmi2TypeCoSimulation))
 
-        elseif envFMUSTRUCT == "FMUCOMPONENT"
+        elseif isa(fmuStruct[mode], FMU2Component)
             if !execConf.freeInstance
-                fmi2FreeInstance!(fmuStruct)
+                fmi2FreeInstance!(fmuStruct[mode])
             end
-            fmuStruct = fmi2Instantiate!(myFMU; type=(mode==:CS ? fmi2TypeModelExchange : fmi2TypeCoSimulation))
+            fmuStruct[othermode] = fmi2Instantiate!(myFMU[othermode]; type=(othermode==:ME ? fmi2TypeModelExchange : fmi2TypeCoSimulation))
 
+        else
+            @assert false "Unknwon fmuStruct type `$(typeof(fmuStruct[mode]))`"
         end
         
         # prepare next run end
@@ -69,4 +67,5 @@ for execConf in (FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGU
     end
 end
 
-fmiUnload(myFMU)
+fmiUnload(myFMU[:ME])
+fmiUnload(myFMU[:CS])

@@ -27,3 +27,4 @@ function fmiSaveSolutionMAT(solution::FMUSolution, filepath::AbstractString)
     
     MAT.close(file)
 end
+export fmiSaveSolutionMAT

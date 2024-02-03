@@ -127,34 +127,34 @@ include("FMI3/sim.jl")
 include("deprecated.jl")
 
 # from FMI2_plot.jl
-function fmiPlot(solution::FMUSolution; kwargs...)
-    @assert false "fmiPlot(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`."
-end
-function fmiPlot!(fig, solution::FMUSolution; kwargs...)
-    @assert false "fmiPlot!(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`."
-end
-export fmiPlot, fmiPlot!
+# function fmiPlot(solution::FMUSolution; kwargs...)
+#     @assert false "fmiPlot(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`."
+# end
+# function fmiPlot!(fig, solution::FMUSolution; kwargs...)
+#     @assert false "fmiPlot!(...) needs `Plots` package. Please install `Plots` and do `using Plots` or `import Plots`."
+# end
+# export fmiPlot, fmiPlot!
 
 # from FMI2_JLD2.jl
-function fmiSaveSolutionJLD2(solution::FMUSolution, filepath::AbstractString; keyword="solution")
-    @assert false "fmiSave(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
-end
-function fmiLoadSolutionJLD2(path::AbstractString; keyword="solution")
-    @assert false "fmiLoad(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
-end
-export fmiSaveSolutionJLD2, fmiLoadSolutionJLD2
+# function fmiSaveSolutionJLD2(solution::FMUSolution, filepath::AbstractString; keyword="solution")
+#     @assert false "fmiSave(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
+# end
+# function fmiLoadSolutionJLD2(path::AbstractString; keyword="solution")
+#     @assert false "fmiLoad(...) needs `JLD2` package. Please install `JLD2` and do `using JLD2` or `import JLD2`."
+# end
+# export fmiSaveSolutionJLD2, fmiLoadSolutionJLD2
 
 # from CSV.jl
-function fmiSaveSolutionCSV(solution::FMUSolution, filepath::AbstractString)
-    @assert false "fmiSave(...) needs `CSV` and `DataFrames` package. Please install `CSV` and `DataFrames` and do `using CSV, DataFrames` or `import CSV, DataFrames`."
-end
-export fmiSaveSolutionCSV
+# function fmiSaveSolutionCSV(solution::FMUSolution, filepath::AbstractString)
+#     @assert false "fmiSave(...) needs `CSV` and `DataFrames` package. Please install `CSV` and `DataFrames` and do `using CSV, DataFrames` or `import CSV, DataFrames`."
+# end
+# export fmiSaveSolutionCSV
 
 # from MAT.jl
-function fmiSaveSolutionMAT(solution::FMUSolution, filepath::AbstractString)
-    @assert false "fmiSave(...) needs `MAT` package. Please install `MAT` and do `using MAT` or `import MAT`."
-end
-export fmiSaveSolutionMAT
+# function fmiSaveSolutionMAT(solution::FMUSolution, filepath::AbstractString)
+#     @assert false "fmiSave(...) needs `MAT` package. Please install `MAT` and do `using MAT` or `import MAT`."
+# end
+# export fmiSaveSolutionMAT
 
 # from FMI3_plot.jl
 # function fmiPlot(solution::FMU3Solution; kwargs...)

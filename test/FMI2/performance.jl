@@ -13,7 +13,7 @@ end
 using FMI, FMI.FMIImport, FMI.FMIImport.FMICore, FMIZoo
 using BenchmarkTools, Test
 
-fmu = fmiLoad("BouncingBall1D", "Dymola", "2022x"; type=:ME)
+fmuStruct, myFMU = getFMUStruct("BouncingBall1D", "Dymola", "2022x"; type=:ME)
 
 c = fmi2Instantiate!(fmu)
 
