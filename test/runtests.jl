@@ -34,50 +34,50 @@ function runtestsFMI2(exportingTool)
             @testset "Functions for $str" begin
                 ENV["FMUSTRUCT"] = str
 
-                # @info "Variable Getters / Setters (getter_setter.jl)"
-                # @testset "Variable Getters / Setters" begin
-                #     include("FMI2/getter_setter.jl")
-                # end
+                @info "Variable Getters / Setters (getter_setter.jl)"
+                @testset "Variable Getters / Setters" begin
+                    include("FMI2/getter_setter.jl")
+                end
 
-                # @info "Execution Configurations (exec_config.jl)"
-                # @testset "Execution Configurations" begin
-                #     include("FMI2/exec_config.jl")
-                # end
+                @info "Execution Configurations (exec_config.jl)"
+                @testset "Execution Configurations" begin
+                    include("FMI2/exec_config.jl")
+                end
 
-                # @info "State Manipulation (state.jl)"
-                # @testset "State Manipulation" begin
-                #     include("FMI2/state.jl")
-                # end
+                @info "State Manipulation (state.jl)"
+                @testset "State Manipulation" begin
+                    include("FMI2/state.jl")
+                end
 
-                # @info "Automatic Simulation (sim_auto.jl)"
-                # @testset "Automatic Simulation (CS or ME)" begin
-                #     include("FMI2/sim_auto.jl")
-                # end
+                @info "Automatic Simulation (sim_auto.jl)"
+                @testset "Automatic Simulation (CS or ME)" begin
+                    include("FMI2/sim_auto.jl")
+                end
 
-                # @info "CS Simulation (sim_CS.jl)"
-                # @testset "CS Simulation" begin
-                #     include("FMI2/sim_CS.jl")
-                # end
+                @info "CS Simulation (sim_CS.jl)"
+                @testset "CS Simulation" begin
+                    include("FMI2/sim_CS.jl")
+                end
 
                 @info "ME Simulation (sim_ME.jl)"
                 @testset "ME Simulation" begin
                     include("FMI2/sim_ME.jl")
                 end
 
-                # @info "Support CS and ME simultaneously (cs_me.jl)"
-                # @testset "Support CS and ME simultaneously" begin
-                #     include("FMI2/cs_me.jl")
-                # end
+                @info "Support CS and ME simultaneously (cs_me.jl)"
+                @testset "Support CS and ME simultaneously" begin
+                    include("FMI2/cs_me.jl")
+                end
 
-                # @info "Simulation FMU without states (sim_zero_state.jl)"
-                # @testset "Simulation FMU without states" begin
-                #     include("FMI2/sim_zero_state.jl")
-                # end
+                @info "Simulation FMU without states (sim_zero_state.jl)"
+                @testset "Simulation FMU without states" begin
+                    include("FMI2/sim_zero_state.jl")
+                end
 
-                # @info "Loading/Saving simulation results (load_save.jl)"
-                # @testset "Loading/Saving simulation results" begin
-                #     include("FMI2/load_save.jl")
-                # end
+                @info "Loading/Saving simulation results (load_save.jl)"
+                @testset "Loading/Saving simulation results" begin
+                    include("FMI2/load_save.jl")
+                end
             end
         end
 
@@ -87,13 +87,13 @@ function runtestsFMI2(exportingTool)
         #         include("FMI2/performance.jl")
         #     end
         # else
-        #     @info "Julia Version $(VERSION), skipping performance tests ..."
-        # end
+            @info "Julia Version $(VERSION), skipping performance tests ..."
+        #end
 
-        # @info "Plotting (plots.jl)"
-        # @testset "Plotting" begin
-        #     include("FMI2/plots.jl")
-        # end
+        @info "Plotting (plots.jl)"
+        @testset "Plotting" begin
+            include("FMI2/plots.jl")
+        end
     end
 end
 
@@ -134,9 +134,9 @@ function runtestsFMI3(exportingTool)
             end
         end
 
-        # @testset "Plotting (plots.jl)" begin
-        #     include("FMI3/plots.jl")
-        # end
+        @testset "Plotting (plots.jl)" begin
+            include("FMI3/plots.jl")
+        end
     end
 end
 

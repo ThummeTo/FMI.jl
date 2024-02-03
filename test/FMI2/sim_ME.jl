@@ -16,13 +16,13 @@ dtmax_inputs = 1e-3
 rand_x0 = rand(2)
 
 kwargs = Dict(:dtmin => 1e-64, :abstol => 1e-8, :reltol => 1e-6, :dt => 1e-32)
-solvers = [Rodas5()] # [Tsit5(), FBDF(autodiff=false), FBDF(autodiff=true), Rodas5(autodiff=false), Rodas5(autodiff=true)]
+solvers = [Tsit5(), Rodas5(autodiff=false)] # [Tsit5(), FBDF(autodiff=false), FBDF(autodiff=true), Rodas5(autodiff=false), Rodas5(autodiff=true)]
 
-function extForce_t(t::Real, u::AbstractArray{<:Real})
+extForce_t = function(t::Real, u::AbstractArray{<:Real})
     sense_setindex!(u, sin(t), 1)
 end 
 
-function extForce_cxt(c::Union{FMU2Component, Nothing}, x::Union{AbstractArray{<:Real}, Nothing}, t::Real, u::AbstractArray{<:Real})
+extForce_cxt = function(c::Union{FMU2Component, Nothing}, x::Union{AbstractArray{<:Real}, Nothing}, t::Real, u::AbstractArray{<:Real})
     x1 = 0.0
     if x != nothing 
         x1 = x[1] 
