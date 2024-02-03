@@ -131,7 +131,7 @@ fmiInstantiate!(fmu; loggingOn=true)
 
     FMU:            IO
     InstanceName:   IO
-    Address:        Ptr{Nothing} @0x0000029caed89b40
+    Address:        Ptr{Nothing} @0x000002a763a0f0c0
     State:          0
     Logging:        1
     FMU time:       -Inf
@@ -250,7 +250,7 @@ paramsVal = generateRandomNumbers()
 
 
 
-    (63.72822520935553, true, 96, "Random number 87.24586541350638!")
+    (92.20068774124326, false, 61, "Random number 58.626327800852664!")
 
 
 
@@ -314,6 +314,11 @@ simData = fmiSimulate(fmu, (tStart, tStop); recordValues=params[1:3], saveat=tSa
                         instantiate=false, setup=false, freeInstance=false, terminate=false, reset=false)
 ```
 
+    [34mSimulating CS-FMU ...   0%|█                             |  ETA: N/A[39m
+
+    [34mSimulating CS-FMU ... 100%|██████████████████████████████| Time: 0:00:01[39m
+    
+
 
 
 
@@ -325,12 +330,16 @@ simData = fmiSimulate(fmu, (tStart, tStop); recordValues=params[1:3], saveat=tSa
     	In-place: 0
     	Out-of-place: 0
     Jacobian-Evaluations:
+    	∂ẋ_∂p: 0
     	∂ẋ_∂x: 0
     	∂ẋ_∂u: 0
+    	∂y_∂p: 0
     	∂y_∂x: 0
     	∂y_∂u: 0
+    	∂e_∂p: 0
     	∂e_∂x: 0
     	∂e_∂u: 0
+    	∂xr_∂xl: 0
     Gradient-Evaluations:
     	∂ẋ_∂t: 0
     	∂y_∂t: 0
@@ -342,8 +351,8 @@ simData = fmiSimulate(fmu, (tStart, tStop); recordValues=params[1:3], saveat=tSa
     	Save values: 0
     	Steps completed: 0
     Values [2]:
-    	0.0	(63.72822520935553, 1.0, 96.0)
-    	1.0	(63.72822520935553, 1.0, 96.0)
+    	0.0	(92.20068774124326, 0.0, 61.0)
+    	1.0	(92.20068774124326, 0.0, 61.0)
     Events [0]:
     
 
@@ -377,7 +386,7 @@ rndReal, rndBoolean, rndInteger, rndString = generateRandomNumbers()
 
 
 
-    (65.71070569568393, false, 88, "Random number 76.02969973966232!")
+    (33.92892352785205, false, 26, "Random number 97.72885957174317!")
 
 
 
@@ -442,12 +451,16 @@ simData = fmiSimulate(fmu, (tStart, tStop); recordValues=params[1:3], saveat=tSa
     	In-place: 0
     	Out-of-place: 0
     Jacobian-Evaluations:
+    	∂ẋ_∂p: 0
     	∂ẋ_∂x: 0
     	∂ẋ_∂u: 0
+    	∂y_∂p: 0
     	∂y_∂x: 0
     	∂y_∂u: 0
+    	∂e_∂p: 0
     	∂e_∂x: 0
     	∂e_∂u: 0
+    	∂xr_∂xl: 0
     Gradient-Evaluations:
     	∂ẋ_∂t: 0
     	∂y_∂t: 0
@@ -459,8 +472,8 @@ simData = fmiSimulate(fmu, (tStart, tStop); recordValues=params[1:3], saveat=tSa
     	Save values: 0
     	Steps completed: 0
     Values [2]:
-    	0.0	(65.71070569568393, 0.0, 88.0)
-    	1.0	(65.71070569568393, 0.0, 88.0)
+    	0.0	(33.92892352785205, 0.0, 26.0)
+    	1.0	(33.92892352785205, 0.0, 26.0)
     Events [0]:
     
 
