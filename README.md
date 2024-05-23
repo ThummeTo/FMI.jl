@@ -15,6 +15,20 @@
 [![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
 [![FMI Downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/FMI)](https://pkgs.genieframework.com?packages=FMI)
 
+## Breaking Changes in FMI.jl v1.0.0
+If you want to migrate your project from FMI.jl < v1.0.0 to >= v1.0.0, you will face some breaking changes - but they are worth it as you will see!
+
+- Many functions, that are not part of the FMI-standard, had the prefix `fmi2...` or `fmi3...`. This wasn't corrected. Now, only functions that are defined by the standard itself, like e.g. `fmi2Instantiate` are allowed to keep the prefix. Other methods, like `fmi2ValueReferenceToString`, that where added to make this library more comfortable, are now cleaned to be more the Julia way: `valueReferenceToString`. If your code errors, the corresponding function might have lost it's prefix, so try this first.
+
+- Wrapper functions where removed, because that is not the Julia way. In most cases, this will not affect your code.
+
+- FMICore.jl and FMIImport.jl were divided into FMICore.jl, FMIImport.jl and FMIBase.jl. FMICore.jl now holds the pure standard definition (C-types and -functions), while FMIBase.jl holds everything that is needed on top of that in FMIImport.jl as well as in FMIExport.jl.
+
+- We tried to document every function, if you find undocumented user-level functions, please open an issue or PR.
+
+- Dependencies are reduced a little, to make the libraries more light-weight.
+
+- RAM is now auto-released, for maximum performance you can use FMUs in blocks (like file reading/writing).
 
 ## How can I use FMI.jl?
 1\. Open a Julia-REPL, switch to package mode using `]`, activate your preferred environment.
@@ -36,16 +50,16 @@
 using FMI, Plots
 
 # load and instantiate a FMU
-fmu = fmiLoad(pathToFMU) 
+fmu = loadFMU(pathToFMU) 
 
 # simulate from t=0.0s until t=10.0s and record the FMU variable named "mass.s"
-simData = fmiSimulate(fmu, (0.0, 10.0); recordValues=["mass.s"])
+simData = simulate(fmu, (0.0, 10.0); recordValues=["mass.s"])
 
 # plot it!
 plot(simData)
 
 # free memory
-fmiUnload(myFMU)
+unloadFMU(myFMU)
 ```
 
 ## What is currently supported in FMI.jl?
@@ -56,21 +70,21 @@ fmiUnload(myFMU)
 |                                   | **FMI2.0.3** |        | **FMI3.0** |        | **SSP1.0** |        |
 |-----------------------------------|--------------|--------|------------|--------|------------|--------|
 |                                   | Import       | Export | Import     | Export | Import     | Export |
-| CS                                | ✔️✔️         | 🚧     | ✔️          | 📅     | 📅         | 📅      |
-| ME (continuous)                   | ✔️✔️         | ✔️✔️   | 🚧          | 📅     | 📅         | 📅      |
-| ME (discontinuous)                | ✔️✔️         | ✔️✔️   | 🚧          | 📅     | 📅         | 📅      |
+| CS                                | ✔️✔️         | 🚧     | ✔️✔️        | 📅     | 📅         | 📅      |
+| ME (continuous)                   | ✔️✔️         | ✔️✔️   | ✔️✔️        | 📅     | 📅         | 📅      |
+| ME (discontinuous)                | ✔️✔️         | ✔️✔️   | ✔️✔️        | 📅     | 📅         | 📅      |
 | SE                 		    | 🚫           | 🚫     | 🚧          | 📅     | 🚫         | 🚫     |
-| Explicit solvers                  | ✔️✔️         | ✔️✔️   | ✔️          | 📅     | 📅         | 📅      |
-| Implicit solvers (autodiff=false) | ✔️✔️         | 🚧     | ✔️          | 📅     | 📅         | 📅      |
-| Implicit solvers (autodiff=true)  | ✔️✔️         | 🚧     | 🚧          | 📅     | 📅         | 📅      |
-| get/setState                      | ✔️✔️         | 📅     | ✔️          | 📅     | 🚫         | 🚫      |
-| getDirectionalDerivatives         | ✔️✔️         | 📅     | ✔️          | 📅     | 🚫         | 🚫      |
-| getAdjointDerivatives             | 🚫           | 🚫     | ✔️          | 📅     | 🚫         | 🚫     |
+| Explicit solvers                  | ✔️✔️         | ✔️✔️   | ✔️✔️        | 📅     | 📅         | 📅      |
+| Implicit solvers (autodiff=false) | ✔️✔️         | ✔️✔️   | ✔️✔️        | 📅     | 📅         | 📅      |
+| Implicit solvers (autodiff=true)  | ✔️           | ✔️✔️   | ✔️          | 📅     | 📅         | 📅      |
+| get/setState                      | ✔️✔️         | 📅     | ✔️✔️        | 📅     | 🚫         | 🚫      |
+| getDirectionalDerivatives         | ✔️✔️         | 📅     | ✔️✔️        | 📅     | 🚫         | 🚫      |
+| getAdjointDerivatives             | 🚫           | 🚫     | ✔️✔️        | 📅     | 🚫         | 🚫     |
 | FMI Cross Checks                  | ✔️✔️         | 📅     | 📅          | 📅     | 🚫         | 🚫      |
 
-✔️✔️ supported & tested
+✔️✔️ supported & CI-tested
 
-✔️  beta supported (implemented), but untested
+✔️  beta supported: implemented, but not CI-tested
 
 🚧 work in progress
 
@@ -86,6 +100,7 @@ To keep dependencies nice and clean, the original package [*FMI.jl*](https://git
 - [*FMI.jl*](https://github.com/ThummeTo/FMI.jl): High level loading, manipulating, saving or building entire FMUs from scratch
 - [*FMIImport.jl*](https://github.com/ThummeTo/FMIImport.jl): Importing FMUs into Julia
 - [*FMIExport.jl*](https://github.com/ThummeTo/FMIExport.jl): Exporting stand-alone FMUs from Julia Code
+- [*FMIBase.jl*](https://github.com/ThummeTo/FMIBase.jl): Common concepts for import and export of FMUs
 - [*FMICore.jl*](https://github.com/ThummeTo/FMICore.jl): C-code wrapper for the FMI-standard
 - [*FMISensitivity.jl*](https://github.com/ThummeTo/FMISensitivity.jl): Static and dynamic sensitivities over FMUs
 - [*FMIBuild.jl*](https://github.com/ThummeTo/FMIBuild.jl): Compiler/Compilation dependencies for FMIExport.jl
@@ -108,7 +123,7 @@ Contributors are welcome. Before contributing, please read, understand and follo
 During development of new implementations or optimizations on exisitng code, one will have to make design decissions that influence the library performance and usability. The following priorization should be the basis for decision-making:
 - **#1 Compliance with standard:** It is the highest priority to be compliant with the FMI standard ([fmi-standard.org](https://fmi-standard.org/)). Identifiers described in the standard must be used. Topologies should follow the specification as far as the possibilities of the Julia programming language allows.
 - **#2 Performance:** Because [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is a simulation tool, performance is very important. This applies to the efficient use of CPU and GPU, but also the conscientious use of RAM and disc space.
-- **#3 Usability:** The library should be as usable as possible, as long as being fully compliant with the FMI standard.
+- **#3 Usability:** The library should be as usable as possible and feel "the Julia way" (e.g. by using multiple dispatch instead of the "C coding style"), as long as being fully compliant with the FMI standard.
 
 ## Interested in Hybrid Modelling in Julia using FMUs?
 See [*FMIFlux.jl*](https://github.com/ThummeTo/FMIFlux.jl).
