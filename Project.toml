@@ -17,7 +17,7 @@ SciMLBase = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
 
 [compat]
 ChainRulesCore = "1.15.0"
-DiffEqCallbacks = "2.24.0"
+DiffEqCallbacks = "2.24.0, 3"
 DifferentialEquations = "7.5.0"
 FMIExport = "0.1.0"
 FMIImport = "0.12.1"
