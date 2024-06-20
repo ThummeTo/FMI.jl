@@ -76,7 +76,7 @@ function simulate(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, tspan::Uni
     end
 end
 simulate(c::FMUInstance, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...) = simulate(c.fmu, c, tspan; kwargs...)
-simulate(f::FMU, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...) = simulate(fmu, nothing, tspan; kwargs...)
+simulate(fmu::FMU, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...) = simulate(fmu, nothing, tspan; kwargs...)
 export simulate
 
 """

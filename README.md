@@ -16,9 +16,9 @@
 [![FMI Downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/FMI)](https://pkgs.genieframework.com?packages=FMI)
 
 ## Breaking Changes in FMI.jl v1.0.0
-If you want to migrate your project from FMI.jl < v1.0.0 to >= v1.0.0, you will face some breaking changes - but they are worth it as you will see!
+If you want to migrate your project from FMI.jl < v1.0.0 to >= v1.0.0, you will face some breaking changes - but they are worth it as 	you will see!
 
-- Many functions, that are not part of the FMI-standard, had the prefix `fmi2...` or `fmi3...`. This wasn't corrected. Now, only functions that are defined by the standard itself, like e.g. `fmi2Instantiate` are allowed to keep the prefix. Other methods, like `fmi2ValueReferenceToString`, that where added to make this library more comfortable, are now cleaned to be more the Julia way: `valueReferenceToString`. If your code errors, the corresponding function might have lost it's prefix, so try this first.
+- Many functions, that are not part of the FMI-standard, had the prefix `fmi2...` or `fmi3...`. This was corrected. Now, only functions that are defined by the standard itself, like e.g. `fmi2Instantiate` are allowed to keep the prefix. Other methods, like `fmi2ValueReferenceToString`, that where added to make this library more comfortable, are now cleaned to be more the Julia way: `valueReferenceToString`. If your code errors, the corresponding function might have lost it's prefix, so try this first.
 
 - Wrapper functions where removed, because that is not the Julia way. In most cases, this will not affect your code.
 
@@ -108,7 +108,7 @@ To keep dependencies nice and clean, the original package [*FMI.jl*](https://git
 - [*FMIZoo.jl*](https://github.com/ThummeTo/FMIZoo.jl): A collection of testing and example FMUs
 
 ## What Platforms are supported?
-[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is tested (and testing) under Julia Versions *1.6 LTS* (64-bit) and *latest* (64-bit) on Windows *latest* (64-bit) and Ubuntu *latest* (64-bit). Mac and Julia (32-bit) should work, but untested. For the best performance, we recommend using Julia >= 1.7.
+[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is tested (and testing) under Julia Versions *1.6 LTS* (64-bit) and *latest* (64-bit) on Windows *latest* (64-bit, 32-bit) and Ubuntu *latest* (64-bit). Mac (64-bit, 32-bit) and Ubuntu (32-bit) should work, but untested. For the best performance, we recommend using Julia >= 1.7, even if we support and test for the official LTS (1.6.7).
 
 ## How to cite?
 Tobias Thummerer, Lars Mikelsons and Josef Kircher. 2021. **NeuralFMU: towards structural integration of FMUs into neural networks.** Martin Sjölund, Lena Buffoni, Adrian Pop and Lennart Ochel (Ed.). Proceedings of 14th Modelica Conference 2021, Linköping, Sweden, September 20-24, 2021. Linköping University Electronic Press, Linköping (Linköping Electronic Conference Proceedings ; 181), 297-306. [DOI: 10.3384/ecp21181297](https://doi.org/10.3384/ecp21181297)
