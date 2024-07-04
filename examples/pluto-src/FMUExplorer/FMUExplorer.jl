@@ -588,7 +588,6 @@ PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 [compat]
 DifferentialEquations = "~7.13.0"
 FMI = "~0.13.3"
-FMIZoo = "~1.0.0"
 PlotlyJS = "~0.18.13"
 Plots = "~1.40.4"
 PlutoUI = "~0.7.59"
@@ -600,7 +599,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.3"
 manifest_format = "2.0"
-project_hash = "774c90ac27df4f2df05fc7287ad5967a5b80a2f5"
+project_hash = "9d301af976b87c2855da6d1e06ec4a3aa9b766e2"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "fa0822e5baee6e23081c2685ae27265dabee23d8"
@@ -1186,14 +1185,10 @@ uuid = "9fcbc62e-52a0-44e9-a616-1359a0008194"
 version = "0.16.4"
 
 [[deps.FMIZoo]]
-deps = ["Downloads", "FilePaths", "FilePathsBase", "Glob", "Interpolations", "MAT", "Optim", "PackageExtensionCompat", "Requires", "ZipFile"]
-git-tree-sha1 = "e312e077fccf2d844391398778622fceba3ccd12"
+deps = ["Downloads", "EzXML", "FilePaths", "FilePathsBase", "Glob", "Interpolations", "MAT", "Optim", "Requires", "ZipFile"]
+git-tree-sha1 = "47f7e240ab988c1a24cc028f668eb70f73af5bd3"
 uuid = "724179cf-c260-40a9-bd27-cccc6fe2f195"
-version = "1.0.0"
-weakdeps = ["DifferentialEquations", "FMI"]
-
-    [deps.FMIZoo.extensions]
-    DifferentialEquationsFMIExt = ["DifferentialEquations", "FMI"]
+version = "0.3.3"
 
 [[deps.FastAlmostBandedMatrices]]
 deps = ["ArrayInterface", "ArrayLayouts", "BandedMatrices", "ConcreteStructs", "LazyArrays", "LinearAlgebra", "MatrixFactorizations", "PrecompileTools", "Reexport"]
@@ -1435,9 +1430,9 @@ version = "0.1.16"
 
 [[deps.Hwloc_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "ca0f6bf568b4bfc807e7537f081c81e35ceca114"
+git-tree-sha1 = "1d334207121865ac8c1c97eb7f42d0339e4635bf"
 uuid = "e33a78d0-f292-5ffc-b300-72abe9b543c8"
-version = "2.10.0+0"
+version = "2.11.0+0"
 
 [[deps.HypergeometricFunctions]]
 deps = ["DualNumbers", "LinearAlgebra", "OpenLibm_jll", "SpecialFunctions"]
