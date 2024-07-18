@@ -108,7 +108,7 @@ export FMU3ExecutionConfiguration, FMU3_EXECUTION_CONFIGURATION_RESET, FMU3_EXEC
 
 using FMIImport: prepareValue, prepareValueReference
 
-export fmi2Real, fmi2Integer, fmi2String, fmi2Enumeration, fmi2Boolean
+export fmi2Real, fmi2Integer, fmi2String, fmi2Boolean
 export fmi2Info, fmi3Info
 export fmi2VariableDependsOnVariable, fmi2GetDependencies, fmi2PrintDependencies, fmi3VariableDependsOnVariable, fmi3GetDependencies, fmi3PrintDependencies
 
