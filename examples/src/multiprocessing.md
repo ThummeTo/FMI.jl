@@ -59,15 +59,6 @@ n_procs = 2
 addprocs(n_procs; exeflags=`--project=$(Base.active_project()) --threads=auto`, restrict=false)
 ```
 
-
-
-
-    2-element Vector{Int64}:
-     2
-     3
-
-
-
 To run the example, the previously installed packages must be included. 
 
 
@@ -94,12 +85,6 @@ workers()
 # @everywhere println(Threads.nthreads())
 ```
 
-    Hello World!
-    
-
-          From worker 2:	Hello World!
-          From worker 3:	Hello World!
-
 ### Simulation setup
 
 Next, the batch size and input values are defined.
@@ -113,32 +98,6 @@ batchSize = 16
 # Define an array of arrays randomly
 input_values = collect(collect.(eachrow(rand(batchSize,2))))
 ```
-
-    
-    
-
-
-
-
-    16-element Vector{Vector{Float64}}:
-     [0.7603816001721102, 0.3621069500686177]
-     [0.6393276809830932, 0.564376840966047]
-     [0.729763907114574, 0.3197434224476361]
-     [0.25120817858248157, 0.19027235427497025]
-     [0.9552512908552727, 0.8590028693340477]
-     [0.7863757965178038, 0.39611804587068045]
-     [0.836162085966167, 0.3596627251120167]
-     [0.9256768005091671, 0.35375453099454957]
-     [0.618717905634646, 0.5758202823151329]
-     [0.4628276049431772, 0.8001471443699522]
-     [0.370521033425084, 0.2729726079562895]
-     [0.10470077218478391, 0.7491496390505474]
-     [0.86494289165389, 0.787329438292403]
-     [0.7182096130797255, 0.09185537011356448]
-     [0.3055553167334262, 0.10263172462821912]
-     [0.7801197754858107, 0.7819625981259115]
-
-
 
 ### Shared Module
 For Distributed we need to embed the FMU into its own `module`. This prevents Distributed from trying to serialize and send the FMU over the network, as this can cause issues. This module needs to be made available on all processes using `@everywhere`.
@@ -176,22 +135,6 @@ Running a single evaluation is pretty quick, therefore the speed can be better t
 @benchmark data = runCalcFormatted(SharedModule.model_fmu, rand(2))
 ```
 
-
-
-
-    BenchmarkTools.Trial: 2 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m2.828 s[22m[39m … [35m  2.866 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m1.57% … 1.06%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m2.847 s              [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m1.31%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m2.847 s[22m[39m ± [32m26.928 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m1.31% ± 0.36%
-    
-      [34m█[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
-      [34m█[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      2.83 s[90m         Histogram: frequency by time[39m        2.87 s [0m[1m<[22m
-    
-     Memory estimate[90m: [39m[33m520.54 MiB[39m, allocs estimate[90m: [39m[33m14203445[39m.
-
-
-
 ### Single Threaded Batch Execution
 To compute a batch we can collect multiple evaluations. In a single threaded context we can use the same FMU for every call.
 
@@ -200,18 +143,6 @@ To compute a batch we can collect multiple evaluations. In a single threaded con
 println("Single Threaded")
 @benchmark collect(runCalcFormatted(SharedModule.model_fmu, i) for i in input_values)
 ```
-
-    Single Threaded
-    
-
-
-
-
-    BenchmarkTools.Trial: 1 sample with 1 evaluation.
-     Single result which took [34m45.513 s[39m (1.55% GC) to evaluate,
-     with a memory estimate of [33m8.13 GiB[39m, over [33m227255106[39m allocations.
-
-
 
 ### Multithreaded Batch Execution
 In a multithreaded context we have to provide each thread it's own fmu, as they are not thread safe.
@@ -222,18 +153,6 @@ To spread the execution of a function to multiple processes, the function `pmap`
 println("Multi Threaded")
 @benchmark pmap(i -> runCalcFormatted(SharedModule.model_fmu, i), input_values)
 ```
-
-    Multi Threaded
-    
-
-
-
-
-    BenchmarkTools.Trial: 1 sample with 1 evaluation.
-     Single result which took [34m26.054 s[39m (0.00% GC) to evaluate,
-     with a memory estimate of [33m94.89 KiB[39m, over [33m1754[39m allocations.
-
-
 
 As you can see, there is a significant speed-up in the median execution time. But: The speed-up is often much smaller than `n_procs` (or the number of physical cores of your CPU), this has different reasons. For a rule of thumb, the speed-up should be around `n/2` on a `n`-core-processor with `n` Julia processes.
 

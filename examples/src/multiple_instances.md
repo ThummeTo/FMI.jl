@@ -126,7 +126,7 @@ println(comp1)
 
     FMU:            SpringPendulum1D
     InstanceName:   SpringPendulum1D
-    Address:        Ptr{Nothing} @0x000001ff0f2bf250
+    Address:        Ptr{Nothing} @0x00000148949e0c90
     State:          0
     Logging:        1
     FMU time:       -Inf
@@ -145,15 +145,13 @@ fig = fmiPlot(data1)
     [34mSimulating CS-FMU ...   0%|█                             |  ETA: N/A[39m
 
     [34mSimulating CS-FMU ... 100%|██████████████████████████████| Time: 0:00:01[39m
-
-    
     
 
 
 
 
     
-![svg](multiple_instances_files/multiple_instances_12_3.svg)
+![svg](multiple_instances_files/multiple_instances_12_2.svg)
     
 
 
@@ -178,7 +176,7 @@ println(comp2)
 
     FMU:            SpringPendulum1D
     InstanceName:   SpringPendulum1D
-    Address:        Ptr{Nothing} @0x000001ff0f2bf5a0
+    Address:        Ptr{Nothing} @0x00000148949e19d0
     State:          0
     Logging:        1
     FMU time:       -Inf

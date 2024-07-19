@@ -67,13 +67,6 @@ First, check the amount of available threads:
 Threads.nthreads()
 ```
 
-
-
-
-    1
-
-
-
 If the number of available threads doesn't match your expections, you can increase the number of threads available to the Julia process like described [here](https://docs.julialang.org/en/v1/manual/multi-threading/#Starting-Julia-with-multiple-threads).
 
 ### Simulation setup
@@ -96,14 +89,6 @@ input_values = collect(collect.(eachrow(rand(batchSize,2))))
 
 ```
 
-
-
-
-    1-element Vector{Vector{Float64}}:
-     [0.30801610447309846, 0.0026095805406561867]
-
-
-
 We need to instantiate one FMU for each parallel execution, as they cannot be easily shared among different threads.
 
 
@@ -115,15 +100,6 @@ realFMU = fmiLoad("SpringPendulum1D", "Dymola", "2022x")
 realFMUBatch = [fmiLoad("SpringPendulum1D", "Dymola", "2022x") for _ in 1:batchSize]
 ```
 
-
-
-
-    1-element Vector{FMU2}:
-     Model name:	SpringPendulum1D
-    Type:		1
-
-
-
 We define a helper function to calculate the FMU solution and combine it into an Matrix.
 
 
@@ -134,35 +110,12 @@ function runCalcFormatted(fmu::FMU2, x0::Vector{Float64}, recordValues::Vector{S
 end
 ```
 
-
-
-
-    runCalcFormatted (generic function with 2 methods)
-
-
-
 Running a single evaluation is pretty quick, therefore the speed can be better tested with BenchmarkTools.
 
 
 ```julia
 @benchmark data = runCalcFormatted(realFMU, rand(2))
 ```
-
-
-
-
-    BenchmarkTools.Trial: 2 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m2.867 s[22m[39m … [35m  2.900 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m1.69% … 1.17%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m2.884 s              [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m1.43%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m2.884 s[22m[39m ± [32m23.666 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m1.43% ± 0.37%
-    
-      [34m█[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
-      [34m█[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      2.87 s[90m         Histogram: frequency by time[39m         2.9 s [0m[1m<[22m
-    
-     Memory estimate[90m: [39m[33m520.54 MiB[39m, allocs estimate[90m: [39m[33m14203445[39m.
-
-
 
 ### Single Threaded Batch Execution
 To compute a batch we can collect multiple evaluations. In a single threaded context we can use the same FMU for every call.
@@ -173,25 +126,6 @@ println("Single Threaded")
 @benchmark collect(runCalcFormatted(realFMU, i) for i in input_values)
 ```
 
-    Single Threaded
-    
-
-
-
-
-    BenchmarkTools.Trial: 2 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m2.849 s[22m[39m … [35m  2.885 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m1.15% … 2.40%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m2.867 s              [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m1.78%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m2.867 s[22m[39m ± [32m25.549 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m1.78% ± 0.89%
-    
-      [34m█[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
-      [34m█[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      2.85 s[90m         Histogram: frequency by time[39m        2.88 s [0m[1m<[22m
-    
-     Memory estimate[90m: [39m[33m520.54 MiB[39m, allocs estimate[90m: [39m[33m14203448[39m.
-
-
-
 ### Multithreaded Batch Execution
 In a multithreaded context we have to provide each thread it's own fmu, as they are not thread safe.
 To spread the execution of a function to multiple threads, the library `Folds` can be used.
@@ -201,27 +135,6 @@ To spread the execution of a function to multiple threads, the library `Folds` c
 println("Multi Threaded")
 @benchmark Folds.collect(runCalcFormatted(fmu, i) for (fmu, i) in zip(realFMUBatch, input_values))
 ```
-
-    Multi Threaded
-
-    
-    
-
-
-
-
-    BenchmarkTools.Trial: 2 samples with 1 evaluation.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m2.792 s[22m[39m … [35m 2.805 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m1.20% … 1.71%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m2.798 s             [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m1.46%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m2.798 s[22m[39m ± [32m9.584 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m1.46% ± 0.36%
-    
-      [34m█[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
-      [34m█[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      2.79 s[90m        Histogram: frequency by time[39m        2.81 s [0m[1m<[22m
-    
-     Memory estimate[90m: [39m[33m520.54 MiB[39m, allocs estimate[90m: [39m[33m14203463[39m.
-
-
 
 As you can see, there is a significant speed-up in the median execution time. But: The speed-up is often much smaller than `Threads.nthreads()`, this has different reasons. For a rule of thumb, the speed-up should be around `n/2` on a `n`-core-processor with `n` threads for the Julia process.
 
@@ -234,14 +147,6 @@ After calculating the data, the FMU is unloaded and all unpacked data on disc is
 fmiUnload(realFMU)
 fmiUnload.(realFMUBatch)
 ```
-
-
-
-
-    1-element Vector{Nothing}:
-     nothing
-
-
 
 ### Summary
 
