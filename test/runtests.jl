@@ -6,6 +6,7 @@
 using FMI
 using FMIZoo
 using Test
+using Aqua
 import Random
 
 import FMI.FMIImport.FMICore: fmi2StatusOK, fmi3StatusOK, fmi2ComponentStateTerminated, fmi2ComponentStateInstantiated, fmi3Boolean
@@ -179,5 +180,15 @@ end
         end
     elseif Sys.isapple()
         @warn "Test-sets are currrently using Windows- and Linux-FMUs, automated testing for macOS is currently not supported."
+    end
+    @testset "Aqua.jl" begin
+        # Ambiguities in external packages
+        @testset "Method ambiguity" begin
+            Aqua.test_ambiguities([FMI])
+        end
+        @testset "Piracy" begin
+            Aqua.test_piracies(FMI; broken = true)
+        end
+        Aqua.test_all(FMI; ambiguities = false, piracies = false)
     end
 end
