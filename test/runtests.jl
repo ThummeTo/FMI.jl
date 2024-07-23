@@ -179,7 +179,7 @@ end
             #runtestsFMI3(exportingTool)
         end
     elseif Sys.isapple()
-        @warn "Test-sets are currrently using Windows- and Linux-FMUs, automated testing for macOS is currently not supported."
+        @warn "Test-sets are currently using Windows- and Linux-FMUs, automated testing for macOS is currently not supported."
     end
     @testset "Aqua.jl" begin
         # Ambiguities in external packages

@@ -1,6 +1,6 @@
 # Working with the FMI model description
 
-The FMI model description provides all human readable information on the model. The following fuctions can be used to obtain all information provided by the model descripton, wich in turn can be extrated from the fmu.
+The FMI model description provides all human readable information on the model. The following functions can be used to obtain all information provided by the model description, which in turn can be extracted from the fmu.
 
 ## Loading/Parsing
 
@@ -19,7 +19,7 @@ fmi2GetGenerationTool
 fmi2GetGenerationDateAndTime
 ```
 
-## tecnical information about the FMU
+## technical information about the FMU
 
 ```@docs
 fmi2GetModelIdentifier
