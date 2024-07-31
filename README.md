@@ -13,7 +13,6 @@
 [![Run PkgEval](https://github.com/ThummeTo/FMI.jl/actions/workflows/Eval.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Eval.yml)
 [![Coverage](https://codecov.io/gh/ThummeTo/FMI.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ThummeTo/FMI.jl)
 [![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
-[![FMI Downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/FMI)](https://pkgs.genieframework.com?packages=FMI)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 
 

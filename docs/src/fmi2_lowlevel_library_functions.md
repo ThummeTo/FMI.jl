@@ -123,4 +123,7 @@ fmi2GetUnit
 fmi2GetDeclaredType
 fmi2GetInitial
 fmi2GetSimpleTypeAttributeStruct
+fmi2GetDiscreteStates
+fmi2GetDiscreteStates!
+fmi2SetDiscreteStates
 ```
