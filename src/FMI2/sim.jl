@@ -102,7 +102,7 @@ function affectFMU!(c::FMU2Component, integrator, idx, inputFunction, solution::
     #fmi2EnterContinuousTimeMode(c)
 end
 
-# This callback is called every time the integrator finishes an (accpeted) integration step.
+# This callback is called every time the integrator finishes an (accepted) integration step.
 function stepCompleted(c::FMU2Component, x, t, integrator, inputFunction, progressMeter, tStart, tStop, solution::FMU2Solution)
 
     @assert c.state == fmi2ComponentStateContinuousTimeMode "stepCompleted(...):\n" * ERR_MSG_CONT_TIME_MODE
@@ -219,7 +219,7 @@ function fx(c::FMU2Component,
     dx = zeros(fmi2Real, length(x))
 
     fx(c, dx, x, p, t)
-    c.solution.evals_fx_inplace -= 1 # correct statisitics, because fx-call above -> this was in fact an out-of-place evaluation
+    c.solution.evals_fx_inplace -= 1 # correct statistics, because fx-call above -> this was in fact an out-of-place evaluation
 
     return dx
 end
@@ -332,7 +332,7 @@ State- and Time-Events are handled correctly.
 - `recordEventIndicators::Union{AbstractArray{<:Integer, 1}, UnitRange{<:Integer}, Nothing} = nothing`: Array or Range of event indicators to record
 - `recordEigenvalues::Bool=false`: compute and record eigenvalues
 - `saveat = nothing`: Time points to save (interpolated) values at (default = nothing: save at each solver timestep)
-- `x0::Union{AbstractArray{<:Real}, Nothing} = nothing`: inital fmu State (default = nothing: use current or default-inital fmu state)
+- `x0::Union{AbstractArray{<:Real}, Nothing} = nothing`: initial fmu State (default = nothing: use current or default-initial fmu state)
 - `setup::Union{Bool, Nothing} = nothing`: call fmi2SetupExperiment, fmi2EnterInitializationMode and fmi2ExitInitializationMode before each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
 - `reset::Union{Bool, Nothing} = nothing`: call fmi2Reset before each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
 - `instantiate::Union{Bool, Nothing} = nothing`: call fmi2Instantiate! before each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
@@ -384,7 +384,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
     showProgress::Bool = true,
     kwargs...)
 
-    @assert fmi2IsModelExchange(fmu) "fmi2SimulateME(...): This function supports Model Excahnge FMUs only."
+    @assert fmi2IsModelExchange(fmu) "fmi2SimulateME(...): This function supports Model Exchange FMUs only."
     #@assert fmu.type == fmi2TypeModelExchange "fmi2SimulateME(...): This FMU supports Model Exchange, but was instantiated in CS mode. Use `fmiLoad(...; type=:ME)`."
 
     recordValues = prepareValueReference(fmu, recordValues)
@@ -409,7 +409,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
         
         if t_start === nothing 
             t_start = 0.0
-            @info "No `t_start` choosen, no `t_start` availabel in the FMU, auto-picked `t_start=0.0`."
+            @info "No `t_start` chosen, no `t_start` available in the FMU, auto-picked `t_start=0.0`."
         end
     end
     
@@ -418,7 +418,7 @@ function fmi2SimulateME(fmu::FMU2, c::Union{FMU2Component, Nothing}=nothing, tsp
 
         if t_stop === nothing
             t_stop = 1.0
-            @warn "No `t_stop` choosen, no `t_stop` availabel in the FMU, auto-picked `t_stop=1.0`."
+            @warn "No `t_stop` chosen, no `t_stop` availabel in the FMU, auto-picked `t_stop=1.0`."
         end
     end
 

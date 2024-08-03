@@ -59,7 +59,7 @@ for execConf in (FMU2_EXECUTION_CONFIGURATION_NO_FREEING, FMU2_EXECUTION_CONFIGU
             fmuStruct[othermode] = fmi2Instantiate!(myFMU[othermode]; type=(othermode==:ME ? fmi2TypeModelExchange : fmi2TypeCoSimulation))
 
         else
-            @assert false "Unknwon fmuStruct type `$(typeof(fmuStruct[mode]))`"
+            @assert false "Unknown fmuStruct type `$(typeof(fmuStruct[mode]))`"
         end
         
         # prepare next run end

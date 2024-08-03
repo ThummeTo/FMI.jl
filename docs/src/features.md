@@ -61,7 +61,7 @@ Of course, you have to use the same piece of memory (to write your return values
 **Views:** You can use [array-views](https://docs.julialang.org/en/v1/base/arrays/#Views-(SubArrays-and-other-view-types)) instead of array-slices as input for in-place-functions, which further reduces memory allocations.
 
 ## AD-Ecosystem (Differentiation over FMUs)
-Sensitivites over FMUs are fully integrated into *FMI.jl*, *FMIImport.jl* and *FMIFlux.jl*. Supported are *ForwardDiff.jl* together with all AD-frameworks, that use the interface of *ChainRules.jl* like e.g. *Zygote.jl*. As a result, you can use implicite solvers or you can use FMUs as part of machine learning applications.
+Sensitivities over FMUs are fully integrated into *FMI.jl*, *FMIImport.jl* and *FMIFlux.jl*. Supported are *ForwardDiff.jl* together with all AD-frameworks, that use the interface of *ChainRules.jl* like e.g. *Zygote.jl*. As a result, you can use implicit solvers or you can use FMUs as part of machine learning applications.
 
 ## Watch your progress
 When simulating FMUs with *FMI.jl*, a progress meter is shown per default. You can control the appearance via the keyword argument `showProgress` for `fmiSimulate`, `fmiSimulateME` and `fmiSimulateCS`. 

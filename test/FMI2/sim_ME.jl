@@ -88,7 +88,7 @@ for solver in solvers
     @test collect(s[1] for s in solution.values.saveval) == fmi2GetSolutionValue(solution, 1; isIndex=true)
     @test collect(u[1] for u in solution.states.u      ) == fmi2GetSolutionState(solution, 1; isIndex=true)
     @test isapprox(fmi2GetSolutionState(solution, 2; isIndex=true), fmi2GetSolutionDerivative(solution, 1; isIndex=true); atol=1e-1) # tolerance is large, because Rosenbrock23 solution derivative is not that accurate (other solvers reach 1e-4 for this example)
-    @info "Max error of solver polynominal derivative: $(max(abs.(fmi2GetSolutionState(solution, 2; isIndex=true) .- fmi2GetSolutionDerivative(solution, 1; isIndex=true))...))"
+    @info "Max error of solver polynomial derivative: $(max(abs.(fmi2GetSolutionState(solution, 2; isIndex=true) .- fmi2GetSolutionDerivative(solution, 1; isIndex=true))...))"
 
     # reference values from Simulation in Dymola2020x (Dassl)
     @test sum(abs.(solution.states.u[1] - [0.5, 0.0])) < 1e-4

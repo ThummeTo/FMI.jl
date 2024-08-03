@@ -1,8 +1,8 @@
 # deprecated Functions
 
-this doc page is necessary as all exported functions must be documented in the manual with documenter configred to check for missing documentation, therefor this hidden page exists
+this doc page is necessary as all exported functions must be documented in the manual with documenter configured to check for missing documentation, therefor this hidden page exists
 
-### internal funtions: remove export?
+### internal functions: remove export?
 ```@docs
 fmi2CallbackLogger
 fmi2CallbackAllocateMemory
