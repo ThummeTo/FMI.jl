@@ -76,7 +76,7 @@ function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCross
     fmuToCheck = nothing
     try 
         if !(check.notCompliant && skipnotcompliant)
-            fmuToCheck = fmiLoad(pathToFMU)
+            fmuToCheck = loadFMU(pathToFMU)
             fmiInfo(fmuToCheck)
             hasInputValues = false
 
@@ -107,17 +107,17 @@ function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCross
             
             if hasInputValues
                 if check.type == CS
-                    simData = fmiSimulateCS(fmuToCheck, (tStart, tStop); tolerance=relTol, saveat=fmuRefValues[1], inputFunction=getInputValues, inputValueReferences=:inputs, recordValues=fmuRecordValueNames)
+                    simData = simulateCS(fmuToCheck, (tStart, tStop); tolerance=relTol, saveat=fmuRefValues[1], inputFunction=getInputValues, inputValueReferences=:inputs, recordValues=fmuRecordValueNames)
                 elseif check.type == ME
-                    simData = fmiSimulateME(fmuToCheck, (tStart, tStop); reltol=relTol, saveat=fmuRefValues[1], inputFunction=getInputValues, inputValueReferences=:inputs, recordValues=fmuRecordValueNames)
+                    simData = simulateME(fmuToCheck, (tStart, tStop); reltol=relTol, saveat=fmuRefValues[1], inputFunction=getInputValues, inputValueReferences=:inputs, recordValues=fmuRecordValueNames)
                 else
                     @error "Unkown FMU Type. Only 'cs' and 'me' are valid types"
                 end
             else
                 if check.type == CS
-                    simData = fmiSimulateCS(fmuToCheck, (tStart, tStop); tolerance=relTol, saveat=fmuRefValues[1], recordValues=fmuRecordValueNames)
+                    simData = simulateCS(fmuToCheck, (tStart, tStop); tolerance=relTol, saveat=fmuRefValues[1], recordValues=fmuRecordValueNames)
                 elseif check.type == ME
-                    simData = fmiSimulateME(fmuToCheck, (tStart, tStop); reltol=relTol, saveat=fmuRefValues[1], recordValues=fmuRecordValueNames)
+                    simData = simulateME(fmuToCheck, (tStart, tStop); reltol=relTol, saveat=fmuRefValues[1], recordValues=fmuRecordValueNames)
                 else
                     @error "Unkown FMU Type. Only 'cs' and 'me' are valid types"
                 end
@@ -179,7 +179,7 @@ function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCross
         end
     finally
         try
-            fmiUnload(fmuToCheck)
+            unloadFMU(fmuToCheck)
         catch
         end
     end

@@ -78,12 +78,12 @@ Calculate the mean of all normalized root mean square errors for the different v
 It is normalized to the difference between the smallest and largest values of the respective variable
 # Arguments
 - `recordedVariables::Vector{String}`: List of all variable names that were recorded within the FMU simulation
-- `simData::FMU2Solution`: The solution data of the FMU (returned values of fmiSimulate())
+- `simData::FMUSolution`: The solution data of the FMU (returned values of fmiSimulate())
 - `referenceData::Table`: Reference data that was provided with the cross check FMU that is used as basis for the error calculation
 # Returns
 - `nrmse::Float64`: the mean of the nrmse of all recorded variables
 """
-function calucateNRMSE(recordedVariables::Vector{String}, simData::FMU2Solution, referenceData)::Float64
+function calucateNRMSE(recordedVariables::Vector{String}, simData::FMUSolution, referenceData)::Float64
     squaredErrorSums = zeros(length(recordedVariables))
     valueCount = zeros(length(recordedVariables))
     minimalValues = []

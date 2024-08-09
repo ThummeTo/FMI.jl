@@ -2,8 +2,10 @@
 
 ```@docs
 FMU
+FMUInstance
 FMUSolution
 FMUEvent
+FMUSnapshot
 FMUExecutionConfiguration
 FMULogLevel
 ```
