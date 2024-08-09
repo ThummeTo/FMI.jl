@@ -5,7 +5,7 @@ This list some common - often numerical - errors, that can be fixed by better un
 
 ----------
 
-## Solving non-linear system failes
+## Solving non-linear system fails
 ### Description
 Error message or warning, that solving of a non-linear system failed, close to the simulation start time.
 
@@ -60,6 +60,6 @@ This can be solved by allowing for more interpolation points during searching of
 fmu.executionConfig.rootSearchInterpolationPoints = 1000 # default value is 10
 ```
 This will have negative performance impact on systems with extreme amount of events (thousands per second). 
-For systems with only a few events there won't be a noticable slow down. 
+For systems with only a few events there won't be a noticeable slow down.
 
 ----------

@@ -18,7 +18,7 @@ For a more detailed overview, please see the `?FMUExecutionConfig`.
 ### Logging FMI-calls
 To log all FMI-calls that happen (including "hidden" calls e.g. if you are using `simulate`) you can enable debugging for *FMICore.jl* using `ENV["JULIA_DEBUG"] = "FMICore"`. This will log any `fmi2xxx`- and `fmi3xxx`-call, including the given parameters and return value. This can be *a lot* of calls, so you may want to redirect your REPL output to file.
 ### Printing internal FMU messages
-Many FMUs support for printing debugging messages. To force message printing, you can use the keyword `logginOn=true` either ...
+Many FMUs support for printing debugging messages. To force message printing, you can use the keyword `loggingOn=true` either ...
 - in the call `fmiInstantiate`, for example `fmiInstantiate(myFMU; loggingOn=true)` or
 - as part of the `executionConfig`, for example `myFMU.executionConfig.loggingOn=true`
 You can further control which message types - like `OK`, `Warning`, `Discard`, `Error`, `Fatal`, `Pending` - should be logged by using the keywords `logStatus{TYPE}=true` as part of `fmiInstantiate` or (soon) the execution configuration. By default, all are activated.
@@ -63,7 +63,7 @@ Of course, you have to use the same piece of memory (to write your return values
 **Views:** You can use [array-views](https://docs.julialang.org/en/v1/base/arrays/#Views-(SubArrays-and-other-view-types)) instead of array-slices as input for in-place-functions, which further reduces memory allocations.
 
 ## AD-Ecosystem (differentiation over FMUs)
-Sensitivites over FMUs are fully integrated into *FMI.jl*, *FMIImport.jl* and *FMIFlux.jl*. Supported are *ForwardDiff.jl* together with all AD-frameworks, that use the interface of *ChainRules.jl* like e.g. *Zygote.jl* and *ReverseDiff.jl*. As a result, you can use implicite solvers or you can use FMUs as part of machine learning applications.
+Sensitivites over FMUs are fully integrated into *FMI.jl*, *FMIImport.jl* and *FMIFlux.jl*. Supported are *ForwardDiff.jl* together with all AD-frameworks, that use the interface of *ChainRules.jl* like e.g. *Zygote.jl* and *ReverseDiff.jl*. As a result, you can use implicit solvers or you can use FMUs as part of machine learning applications.
 
 ## Watch your progress
 When simulating FMUs with *FMI.jl*, a progress meter is shown per default. You can control the appearance via the keyword argument `showProgress` for `simulate`, `simulateME`, `simulateCS` and `simulateSE`. 
