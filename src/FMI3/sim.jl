@@ -714,7 +714,7 @@ State- and Time-Events are handled correctly.
 - `customFx`: [deprecated] custom state derivative function ẋ=f(x,t)
 - `recordValues::fmi3ValueReferenceFormat` = nothing: Array of variables (Strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
 - `saveat = nothing`: Time points to save (interpolated) values at (default = nothing: save at each solver timestep)
-- `x0::Union{AbstractArray{<:Real}, Nothing} = nothing`: inital fmu State (default = nothing: use current or default-inital fmu state)
+- `x0::Union{AbstractArray{<:Real}, Nothing} = nothing`: initial fmu State (default = nothing: use current or default-initial fmu state)
 - `setup::Union{Bool, Nothing} = nothing`: call fmi3EnterInitializationMode and fmi3ExitInitializationMode before each step (default = nothing: use value from `fmu`'s `FMU3ExecutionConfiguration`)
 - `reset::Union{Bool, Nothing} = nothing`: call fmi3Reset before each step (default = nothing: use value from `fmu`'s `FMU3ExecutionConfiguration`)
 - `instantiate::Union{Bool, Nothing} = nothing`: call fmi3Instantiate<FMU-Type>! before each step (default = nothing: use value from `fmu`'s `FMU3ExecutionConfiguration`)
@@ -805,7 +805,7 @@ function fmi3SimulateME(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_st
         
         if t_start === nothing 
             t_start = 0.0
-            @info "No `t_start` choosen, no `t_start` availabel in the FMU, auto-picked `t_start=0.0`."
+            @info "No `t_start` chosen, no `t_start` available in the FMU, auto-picked `t_start=0.0`."
         end
     end
     
@@ -814,7 +814,7 @@ function fmi3SimulateME(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, t_st
 
         if t_stop === nothing
             t_stop = 1.0
-            @warn "No `t_stop` choosen, no `t_stop` availabel in the FMU, auto-picked `t_stop=1.0`."
+            @warn "No `t_stop` chosen, no `t_stop` available in the FMU, auto-picked `t_stop=1.0`."
         end
     end
 
