@@ -2,19 +2,42 @@
 # FMI.jl
 
 ## What is FMI.jl?
-[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is a free-to-use software library for the Julia programming language which integrates the **F**unctional **M**ock-Up **I**nterface ([fmi-standard.org](https://fmi-standard.org/)): load or create, parameterize, differentiate, simulate and plot FMUs seamlessly inside the Julia programming language!
+[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is a free-to-use software library for the Julia programming language which integrates the **F**unctional **M**ock-Up **I**nterface ([fmi-standard.org](https://fmi-standard.org/)): load or create, parameterize, differentiate, linearize, simulate and plot FMUs seamlessly inside the Julia programming language!
 
-[![Dev Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) 
-[![Test (latest)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLatest.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLatest.yml)
-[![Test (LTS)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLTS.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLTS.yml)
-[![FMI2 Cross Checks (latest)](https://github.com/ThummeTo/FMI.jl/actions/workflows/CrossChecks.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/CrossChecks.yml)
-[![Examples (latest)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Example.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Example.yml)
-[![Build Docs](https://github.com/ThummeTo/FMI.jl/actions/workflows/Documentation.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Documentation.yml)
-[![Run PkgEval](https://github.com/ThummeTo/FMI.jl/actions/workflows/Eval.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Eval.yml)
-[![Coverage](https://codecov.io/gh/ThummeTo/FMI.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ThummeTo/FMI.jl)
-[![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
-[![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
+| | |
+|---|---|
+| Documentation | [![Build Docs](https://github.com/ThummeTo/FMI.jl/actions/workflows/Documentation.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Documentation.yml) [![Dev Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) |
+| Examples | [![Examples (latest)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Example.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Example.yml) |
+| Tests | [![Test (latest)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLatest.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLatest.yml) [![Test (LTS)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLTS.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLTS.yml) [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl) |
+| FMI cross checks| [![FMI2 Cross Checks](https://github.com/ThummeTo/FMI.jl/actions/workflows/CrossChecks.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/CrossChecks.yml) |
+| Package evaluation| [![Run PkgEval](https://github.com/ThummeTo/FMI.jl/actions/workflows/Eval.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Eval.yml) |
+| Code coverage | [![Coverage](https://codecov.io/gh/ThummeTo/FMI.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ThummeTo/FMI.jl) |
+| Collaboration | [![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac) |
 
+## Breaking Changes in FMI.jl (starting from v0.14.0 until release of v1.0.0)
+If you want to migrate your project from [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) < v1.0.0 to >= v1.0.0, you will face some breaking changes - but they are worth it as you will see! We decided to do multiple smaller breaking changes starting with v0.14.0, instead of one big one. Some of them are already implemented (checked), some are still on the todo (unchecked) but will be implemented before releasing v1.0.0.
+
+- [x] Many functions, that are not part of the FMI-standard, had the prefix `fmi2...` or `fmi3...`. This was corrected. Now, only functions that are defined by the standard itself, like e.g. `fmi2Instantiate` are allowed to keep the prefix. Other methods, like `fmi2ValueReferenceToString`, that where added to make this library more comfortable, are now cleaned to be more the Julia way: `valueReferenceToString`. If your code errors, the corresponding function might have lost it's prefix, so try this first.
+
+- [x] Wrapper functions where removed, because that is not the Julia way. In most cases, this will not affect your code.
+
+- [x] [*FMICore.jl*](https://github.com/ThummeTo/FMICore.jl) and [*FMIImport.jl*](https://github.com/ThummeTo/FMIImport.jl) were divided into [*FMICore.jl*](https://github.com/ThummeTo/FMICore.jl), [*FMIImport.jl*](https://github.com/ThummeTo/FMIImport.jl) and [*FMIBase.jl*](https://github.com/ThummeTo/FMIBase.jl). [*FMICore.jl*](https://github.com/ThummeTo/FMICore.jl) now holds the pure standard definition (C-types and -functions), while [*FMIBase.jl*](https://github.com/ThummeTo/FMIBase.jl) holds everything that is needed on top of that in [*FMIImport.jl*](https://github.com/ThummeTo/FMIImport.jl) as well as in [*FMIExport.jl*](https://github.com/ThummeTo/FMIExport.jl).
+
+- [ ] Updated all library tests for a better code coverage.
+
+- [ ] We tried to document every function, if you find undocumented user-level functions, please open an issue or PR.
+
+- [ ] Allocations, type stability and code format where optimized and are monitored by CI now.
+
+- [ ] Dependencies are reduced a little, to make the libraries more light-weight.
+
+- [ ] RAM for allocated FMUs, their instances and states, is now auto-released. For maximum performance/safety you can use FMUs in blocks (like file reading/writing).
+
+- [ ] New low-level interfaces are introduced, that fit the SciML-ecosystem. For example, a FMU can still be simulated with `simulate(fmu)`, but one can also decide to create a `prob = FMUProblem(fmu)` (like an `ODEProblem`) and use `solve(prob)` to obtain a solution. Keywords will be adapted to have a fully consistent interface with the remaining SciML-ecosystem.
+
+- [ ] Optimization for new Julia LTS v1.10, removing code to keep downward compatibility with old LTS v1.6.
+
+🎉 After all listed features are implemented, v1.0.0 will be released! 🎉 
 
 ## How can I use FMI.jl?
 1\. Open a Julia-REPL, switch to package mode using `]`, activate your preferred environment.
@@ -36,16 +59,16 @@
 using FMI, Plots
 
 # load and instantiate a FMU
-fmu = fmiLoad(pathToFMU) 
+fmu = loadFMU(pathToFMU) 
 
 # simulate from t=0.0s until t=10.0s and record the FMU variable named "mass.s"
-simData = fmiSimulate(fmu, (0.0, 10.0); recordValues=["mass.s"])
+simData = simulate(fmu, (0.0, 10.0); recordValues=["mass.s"])
 
 # plot it!
 plot(simData)
 
 # free memory
-fmiUnload(myFMU)
+unloadFMU(myFMU)
 ```
 
 ## What is currently supported in FMI.jl?
@@ -56,21 +79,21 @@ fmiUnload(myFMU)
 |                                   | **FMI2.0.3** |        | **FMI3.0** |        | **SSP1.0** |        |
 |-----------------------------------|--------------|--------|------------|--------|------------|--------|
 |                                   | Import       | Export | Import     | Export | Import     | Export |
-| CS                                | ✔️✔️         | 🚧     | ✔️          | 📅     | 📅         | 📅      |
-| ME (continuous)                   | ✔️✔️         | ✔️✔️   | 🚧          | 📅     | 📅         | 📅      |
-| ME (discontinuous)                | ✔️✔️         | ✔️✔️   | 🚧          | 📅     | 📅         | 📅      |
+| CS                                | ✔️✔️         | 🚧     | ✔️✔️        | 📅     | 📅         | 📅      |
+| ME (continuous)                   | ✔️✔️         | ✔️✔️   | ✔️✔️        | 📅     | 📅         | 📅      |
+| ME (discontinuous)                | ✔️✔️         | ✔️✔️   | ✔️✔️        | 📅     | 📅         | 📅      |
 | SE                 		    | 🚫           | 🚫     | 🚧          | 📅     | 🚫         | 🚫     |
-| Explicit solvers                  | ✔️✔️         | ✔️✔️   | ✔️          | 📅     | 📅         | 📅      |
-| Implicit solvers (autodiff=false) | ✔️✔️         | 🚧     | ✔️          | 📅     | 📅         | 📅      |
-| Implicit solvers (autodiff=true)  | ✔️✔️         | 🚧     | 🚧          | 📅     | 📅         | 📅      |
-| get/setState                      | ✔️✔️         | 📅     | ✔️          | 📅     | 🚫         | 🚫      |
-| getDirectionalDerivatives         | ✔️✔️         | 📅     | ✔️          | 📅     | 🚫         | 🚫      |
-| getAdjointDerivatives             | 🚫           | 🚫     | ✔️          | 📅     | 🚫         | 🚫     |
+| Explicit solvers                  | ✔️✔️         | ✔️✔️   | ✔️✔️        | 📅     | 📅         | 📅      |
+| Implicit solvers (autodiff=false) | ✔️✔️         | ✔️✔️   | ✔️✔️        | 📅     | 📅         | 📅      |
+| Implicit solvers (autodiff=true)  | ✔️           | ✔️✔️   | ✔️          | 📅     | 📅         | 📅      |
+| get/setState                      | ✔️✔️         | 📅     | ✔️✔️        | 📅     | 🚫         | 🚫      |
+| getDirectionalDerivatives         | ✔️✔️         | 📅     | ✔️✔️        | 📅     | 🚫         | 🚫      |
+| getAdjointDerivatives             | 🚫           | 🚫     | ✔️✔️        | 📅     | 🚫         | 🚫     |
 | FMI Cross Checks                  | ✔️✔️         | 📅     | 📅          | 📅     | 🚫         | 🚫      |
 
-✔️✔️ supported & tested
+✔️✔️ supported & CI-tested
 
-✔️  beta supported (implemented), but untested
+✔️  beta supported: implemented, but not CI-tested
 
 🚧 work in progress
 
@@ -86,6 +109,7 @@ To keep dependencies nice and clean, the original package [*FMI.jl*](https://git
 - [*FMI.jl*](https://github.com/ThummeTo/FMI.jl): High level loading, manipulating, saving or building entire FMUs from scratch
 - [*FMIImport.jl*](https://github.com/ThummeTo/FMIImport.jl): Importing FMUs into Julia
 - [*FMIExport.jl*](https://github.com/ThummeTo/FMIExport.jl): Exporting stand-alone FMUs from Julia Code
+- [*FMIBase.jl*](https://github.com/ThummeTo/FMIBase.jl): Common concepts for import and export of FMUs
 - [*FMICore.jl*](https://github.com/ThummeTo/FMICore.jl): C-code wrapper for the FMI-standard
 - [*FMISensitivity.jl*](https://github.com/ThummeTo/FMISensitivity.jl): Static and dynamic sensitivities over FMUs
 - [*FMIBuild.jl*](https://github.com/ThummeTo/FMIBuild.jl): Compiler/Compilation dependencies for FMIExport.jl
@@ -93,7 +117,7 @@ To keep dependencies nice and clean, the original package [*FMI.jl*](https://git
 - [*FMIZoo.jl*](https://github.com/ThummeTo/FMIZoo.jl): A collection of testing and example FMUs
 
 ## What Platforms are supported?
-[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is tested (and testing) under Julia Versions *1.6 LTS* (64-bit) and *latest* (64-bit) on Windows *latest* (64-bit) and Ubuntu *latest* (64-bit). Mac and Julia (32-bit) should work, but untested. For the best performance, we recommend using Julia >= 1.7.
+[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is tested (and testing) under Julia Versions *1.6 LTS* (64-bit) and *latest* (64-bit) on Windows *latest* (64-bit, 32-bit) and Ubuntu *latest* (64-bit). Mac (64-bit, 32-bit) and Ubuntu (32-bit) should work, but untested. For the best performance, we recommend using Julia >= 1.7, even if we support and test for the official LTS (1.6.7).
 
 ## How to cite?
 Tobias Thummerer, Lars Mikelsons and Josef Kircher. 2021. **NeuralFMU: towards structural integration of FMUs into neural networks.** Martin Sjölund, Lena Buffoni, Adrian Pop and Lennart Ochel (Ed.). Proceedings of 14th Modelica Conference 2021, Linköping, Sweden, September 20-24, 2021. Linköping University Electronic Press, Linköping (Linköping Electronic Conference Proceedings ; 181), 297-306. [DOI: 10.3384/ecp21181297](https://doi.org/10.3384/ecp21181297)
@@ -108,7 +132,4 @@ Contributors are welcome. Before contributing, please read, understand and follo
 During development of new implementations or optimizations on exisitng code, one will have to make design decissions that influence the library performance and usability. The following priorization should be the basis for decision-making:
 - **#1 Compliance with standard:** It is the highest priority to be compliant with the FMI standard ([fmi-standard.org](https://fmi-standard.org/)). Identifiers described in the standard must be used. Topologies should follow the specification as far as the possibilities of the Julia programming language allows.
 - **#2 Performance:** Because [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is a simulation tool, performance is very important. This applies to the efficient use of CPU and GPU, but also the conscientious use of RAM and disc space.
-- **#3 Usability:** The library should be as usable as possible, as long as being fully compliant with the FMI standard.
-
-## Interested in Hybrid Modelling in Julia using FMUs?
-See [*FMIFlux.jl*](https://github.com/ThummeTo/FMIFlux.jl).
+- **#3 Usability:** The library should be as usable as possible and feel "the Julia way" (e.g. by using multiple dispatch instead of the "C coding style"), as long as being fully compliant with the FMI standard.
