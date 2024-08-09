@@ -9,7 +9,7 @@ FMIImport = "9fcbc62e-52a0-44e9-a616-1359a0008194"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [compat]
-FMIExport = "0.4.0, 0.3.0"
+FMIExport = "0.4.0"
 FMIImport = "1.0.0"
 LinearAlgebra = "1"
 julia = "1.6"
