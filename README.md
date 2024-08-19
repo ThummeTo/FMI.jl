@@ -13,6 +13,7 @@
 | Package evaluation| [![Run PkgEval](https://github.com/ThummeTo/FMI.jl/actions/workflows/Eval.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Eval.yml) |
 | Code coverage | [![Coverage](https://codecov.io/gh/ThummeTo/FMI.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ThummeTo/FMI.jl) |
 | Collaboration | [![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac) |
+| Formatting | [![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle) |
 
 ## Breaking Changes in FMI.jl (starting from v0.14.0 until release of v1.0.0)
 If you want to migrate your project from [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) < v1.0.0 to >= v1.0.0, you will face some breaking changes - but they are worth it as you will see! We decided to do multiple smaller breaking changes starting with v0.14.0, instead of one big one. Some of them are already implemented (checked), some are still on the todo (unchecked) but will be implemented before releasing v1.0.0.

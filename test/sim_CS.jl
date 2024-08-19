@@ -13,11 +13,12 @@ t_start = 0.0
 t_stop = 8.0
 
 # test without recording values (just for completeness)
-solution = simulateCS(fmuStruct, (t_start, t_stop); dt=1e-2)
+solution = simulateCS(fmuStruct, (t_start, t_stop); dt = 1e-2)
 @test solution.success
 
 # test with recording values
-solution = simulateCS(fmuStruct, (t_start, t_stop); dt=1e-2, recordValues=["mass.s", "mass.v"])
+solution =
+    simulateCS(fmuStruct, (t_start, t_stop); dt = 1e-2, recordValues = ["mass.s", "mass.v"])
 @test solution.success
 @test length(solution.values.saveval) == t_start:1e-2:t_stop |> length
 @test length(solution.values.saveval[1]) == 2
@@ -32,8 +33,8 @@ v = collect(d[2] for d in solution.values.saveval)
 @test s[1] == 0.5
 @test v[1] == 0.0
 
-@test isapprox(s[end], 0.509219; atol=1e-1)
-@test isapprox(v[end], 0.314074; atol=1e-1)
+@test isapprox(s[end], 0.509219; atol = 1e-1)
+@test isapprox(v[end], 0.314074; atol = 1e-1)
 
 unloadFMU(fmu)
 
@@ -41,18 +42,25 @@ unloadFMU(fmu)
 
 extForce_t! = function (t::Real, u::AbstractArray{<:Real})
     u[1] = sin(t)
-end 
+end
 
-extForce_ct! = function (c::Union{FMUInstance, Nothing}, t::Real, u::AbstractArray{<:Real})
+extForce_ct! = function (c::Union{FMUInstance,Nothing}, t::Real, u::AbstractArray{<:Real})
     u[1] = sin(t)
-end  
+end
 
 fmustruct, fmu = getFMUStruct("SpringPendulumExtForce1D", :CS)
 
 for inpfct! in [extForce_ct!, extForce_t!]
     global solution
 
-    solution = simulateCS(fmustruct, (t_start, t_stop); dt=1e-2, recordValues=["mass.s", "mass.v"], inputValueReferences=["extForce"], inputFunction=inpfct!)
+    solution = simulateCS(
+        fmustruct,
+        (t_start, t_stop);
+        dt = 1e-2,
+        recordValues = ["mass.s", "mass.v"],
+        inputValueReferences = ["extForce"],
+        inputFunction = inpfct!,
+    )
     @test solution.success
     @test length(solution.values.saveval) > 0
     @test length(solution.values.t) > 0

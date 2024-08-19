@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.43
+# v0.19.46
 
 using Markdown
 using InteractiveUtils
@@ -7,7 +7,14 @@ using InteractiveUtils
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
     quote
-        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
+        local iv = try
+            Base.loaded_modules[Base.PkgId(
+                Base.UUID("6e696c72-6542-2067-7265-42206c756150"),
+                "AbstractPlutoDingetjes",
+            )].Bonds.initial_value
+        catch
+            b -> missing
+        end
         local el = $(esc(element))
         global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
         el
@@ -48,18 +55,18 @@ FMUExplorer is a *Pluto.jl* notebook that allows - as the name suggests - to exp
 import PlotlyJS
 
 # ╔═╡ 57d2a3e8-835d-40bb-8e47-47ea5c0eedf0
-begin 
-	plotlyjs()
-	
-	function lastn(str, n::Integer)
-		if length(str) > n-3
-			return "..." * last(str, n-3) 
-		else
-			return str 
-		end
-	end
-	
-	md""" Source Code. """
+begin
+    plotlyjs()
+
+    function lastn(str, n::Integer)
+        if length(str) > n - 3
+            return "..." * last(str, n - 3)
+        else
+            return str
+        end
+    end
+
+    md""" Source Code. """
 end
 
 # ╔═╡ 92514cc6-a468-4d87-9104-d4459025de02
@@ -77,101 +84,104 @@ FMU source: $(@bind mode Select([:zoo => "FMIZoo.jl", :local => "Local file", :u
 
 # ╔═╡ 9aa11335-eb16-4310-9fc0-0672c64f3be1
 begin
-	if mode == :zoo
-		tools_path = joinpath((splitpath(FMIZoo.get_model_filename("BouncingBall1D", "Dymola", "2022x"))[1:end-4])...)
-		tools = readdir(tools_path)
-		md"""
-		Exporting-Tool: $(@bind zoo_pick_tool Select(tools))
-		"""
-	else
-		nothing
-	end
+    if mode == :zoo
+        tools_path = joinpath(
+            (splitpath(FMIZoo.get_model_filename("BouncingBall1D", "Dymola", "2022x"))[1:end-4])...,
+        )
+        tools = readdir(tools_path)
+        md"""
+        Exporting-Tool: $(@bind zoo_pick_tool Select(tools))
+        """
+    else
+        nothing
+    end
 end
 
 # ╔═╡ d4769552-4083-4a3e-a477-168ac288b742
 begin
-	if mode == :zoo
-		versions_path = joinpath(tools_path, zoo_pick_tool)
-		versions = readdir(versions_path)
-		md"""
-		Tool Version: $(@bind zoo_pick_version Select(versions))
-		"""
-	else
-		nothing
-	end
+    if mode == :zoo
+        versions_path = joinpath(tools_path, zoo_pick_tool)
+        versions = readdir(versions_path)
+        md"""
+        Tool Version: $(@bind zoo_pick_version Select(versions))
+        """
+    else
+        nothing
+    end
 end
 
 # ╔═╡ 876653d2-6a68-4c5a-a3c6-a3ca23629989
 begin
-	if mode == :zoo
-		fmivers_path = joinpath(versions_path, zoo_pick_version)
-		fmivers = readdir(fmivers_path)
-		filter!(e->e == "2.0", fmivers) # ToDo!
-		md"""
-		FMI version: $(@bind zoo_pick_fmiver Select(fmivers))
-		"""
-	else
-		nothing
-	end
+    if mode == :zoo
+        fmivers_path = joinpath(versions_path, zoo_pick_version)
+        fmivers = readdir(fmivers_path)
+        filter!(e -> e == "2.0", fmivers) # ToDo!
+        md"""
+        FMI version: $(@bind zoo_pick_fmiver Select(fmivers))
+        """
+    else
+        nothing
+    end
 end
 
 # ╔═╡ 445f18d6-66db-4cf2-9205-f98fc3dd8d83
 begin
-	if mode == :zoo
-		fmus_path = joinpath(fmivers_path, zoo_pick_fmiver)
-		fmus = readdir(fmus_path)
-		filter!(e->endswith(e, ".fmu"), fmus)
-		md"""
-		FMU: $(@bind zoo_pick_fmu Select(fmus))
-		"""
-	else
-		nothing
-	end
+    if mode == :zoo
+        fmus_path = joinpath(fmivers_path, zoo_pick_fmiver)
+        fmus = readdir(fmus_path)
+        filter!(e -> endswith(e, ".fmu"), fmus)
+        md"""
+        FMU: $(@bind zoo_pick_fmu Select(fmus))
+        """
+    else
+        nothing
+    end
 end
 
 # ╔═╡ cd8ddd20-2ce8-4b5e-a431-47078416bbc9
 begin
-	if mode == :local
-		md"""
-		Local file path: $(@bind fmu_path confirm(TextField(), label="Load"))
-		"""
-	elseif mode == :url
-		md"""
-		Online URL: $(@bind fmu_path confirm(TextField(), label="Load"))
-		"""
-	elseif mode == :zoo
-		fmu_path = joinpath(fmus_path, zoo_pick_fmu)
-		nothing
-	else
-		md"""
-		Fatal error. Unknown mode `$(mode)`.
-		"""
-	end
+    if mode == :local
+        md"""
+        Local file path: $(@bind fmu_path confirm(TextField(), label="Load"))
+        """
+    elseif mode == :url
+        md"""
+        Online URL: $(@bind fmu_path confirm(TextField(), label="Load"))
+        """
+    elseif mode == :zoo
+        fmu_path = joinpath(fmus_path, zoo_pick_fmu)
+        nothing
+    else
+        md"""
+        Fatal error. Unknown mode `$(mode)`.
+        """
+    end
 end
 
 # ╔═╡ 6d0232ef-b181-42d4-9160-b2f0ffcee84b
-if (mode ∈ (:local, :zoo) && isfile(fmu_path)) || (mode == :url && startswith(fmu_path, "http"))
-	if endswith(fmu_path, ".fmu")
-		fmu = fmiLoad(fmu_path)
-		fmu.executionConfig.loggingOn = true
-		fmu.executionConfig.externalCallbacks = true
-		descr = fmu.modelDescription
-		md"""
-		✔️ Sucessfully loaded FMU *$(fmu.modelName)*. 
-		"""
-	else
-		fmu = nothing
-		descr = nothing
-		md"""❌ *$(fmu_path)* does not end with `.fmu`"""
-	end
+if (mode ∈ (:local, :zoo) && isfile(fmu_path)) ||
+   (mode == :url && startswith(fmu_path, "http"))
+    if endswith(fmu_path, ".fmu")
+        fmu = fmiLoad(fmu_path)
+        fmu.executionConfig.loggingOn = true
+        fmu.executionConfig.externalCallbacks = true
+        descr = fmu.modelDescription
+        md"""
+        ✔️ Sucessfully loaded FMU *$(fmu.modelName)*. 
+        """
+    else
+        fmu = nothing
+        descr = nothing
+        md"""❌ *$(fmu_path)* does not end with `.fmu`"""
+    end
 else
-	fmu = nothing
-	descr = nothing
-	if mode == :url
-		md"""❌ *$(fmu_path)* is not a valid URL!"""
-	else
-		md"""❌ *$(fmu_path)* is not a valid file path!"""
-	end
+    fmu = nothing
+    descr = nothing
+    if mode == :url
+        md"""❌ *$(fmu_path)* is not a valid URL!"""
+    else
+        md"""❌ *$(fmu_path)* is not a valid file path!"""
+    end
 end
 
 # ╔═╡ 98663a7e-69a0-4938-9ac2-b7d8f248592d
@@ -182,22 +192,22 @@ md"""
 
 # ╔═╡ dfaee7a3-03af-45b2-a2e4-84c103b0001a
 if !isnothing(fmu)
-	md"""
-	|  |  |
-	| -------- | ------- |
-	| File path  | $(lastn(fmu_path, 48)) |
-	| File size | $(round(filesize(fmu_path) / 2^20; digits=1))MB |
-	| Model name  | $(lastn(fmu.modelName, 48)) |
-	| Number of variables | $(length(descr.valueReferences)) |
-	| Number of continuous states / derivatives | $(length(descr.stateValueReferences)) |
-	| Number of inputs | $(length(descr.inputValueReferences)) |
-	| Number of outputs | $(length(descr.outputValueReferences)) |
-	| Number of parameters | $(length(descr.parameterValueReferences)) |
-	"""
+    md"""
+    |  |  |
+    | -------- | ------- |
+    | File path  | $(lastn(fmu_path, 48)) |
+    | File size | $(round(filesize(fmu_path) / 2^20; digits=1))MB |
+    | Model name  | $(lastn(fmu.modelName, 48)) |
+    | Number of variables | $(length(descr.valueReferences)) |
+    | Number of continuous states / derivatives | $(length(descr.stateValueReferences)) |
+    | Number of inputs | $(length(descr.inputValueReferences)) |
+    | Number of outputs | $(length(descr.outputValueReferences)) |
+    | Number of parameters | $(length(descr.parameterValueReferences)) |
+    """
 else
-	md"""
-	⚠️ No FMU loaded.
-	"""
+    md"""
+    ⚠️ No FMU loaded.
+    """
 end
 
 # ╔═╡ a41ce5ae-4e0c-40de-b63f-e469c982367b
@@ -207,17 +217,17 @@ md"""
 
 # ╔═╡ 1ab6b2c8-d58e-48c5-95cb-cc35936413a9
 if !isnothing(fmu)
-	md"""
-	|  |  |
-	| -------- | ------- |
-	| ME supported  | $(!isnothing(descr.modelExchange) ? "✔️" : "❌") |
-	| Model identifier | $(!isnothing(descr.modelExchange) ? lastn(descr.modelExchange.modelIdentifier, 48) : "n.a.") |
-	| Directional derivatives | $(!isnothing(descr.modelExchange) && descr.modelExchange.providesDirectionalDerivative == FMI.fmi2True ? "✔️" : "❌") |
-	"""
+    md"""
+    |  |  |
+    | -------- | ------- |
+    | ME supported  | $(!isnothing(descr.modelExchange) ? "✔️" : "❌") |
+    | Model identifier | $(!isnothing(descr.modelExchange) ? lastn(descr.modelExchange.modelIdentifier, 48) : "n.a.") |
+    | Directional derivatives | $(!isnothing(descr.modelExchange) && descr.modelExchange.providesDirectionalDerivative == FMI.fmi2True ? "✔️" : "❌") |
+    """
 else
-	md"""
-	⚠️ No FMU loaded.
-	"""
+    md"""
+    ⚠️ No FMU loaded.
+    """
 end
 
 # ╔═╡ 6472cac2-cd31-4272-95cd-8e8e7245058d
@@ -227,76 +237,76 @@ md"""
 
 # ╔═╡ 0cd23f48-18c7-4012-ae77-4a9f77934b60
 if !isnothing(fmu)
-	md"""
-	|  |  |
-	| -------- | ------- |
-	| CS supported  | $(!isnothing(descr.coSimulation) ? "✔️" : "❌") |
-	| Model identifier | $(!isnothing(descr.coSimulation) ? lastn(descr.coSimulation.modelIdentifier, 48) : "n.a.") |
-	| Directional derivatives | $(!isnothing(descr.coSimulation) && descr.coSimulation.providesDirectionalDerivative == FMI.fmi2True ? "✔️" : "❌") |
-	"""
+    md"""
+    |  |  |
+    | -------- | ------- |
+    | CS supported  | $(!isnothing(descr.coSimulation) ? "✔️" : "❌") |
+    | Model identifier | $(!isnothing(descr.coSimulation) ? lastn(descr.coSimulation.modelIdentifier, 48) : "n.a.") |
+    | Directional derivatives | $(!isnothing(descr.coSimulation) && descr.coSimulation.providesDirectionalDerivative == FMI.fmi2True ? "✔️" : "❌") |
+    """
 else
-	md"""
-	⚠️ No FMU loaded.
-	"""
+    md"""
+    ⚠️ No FMU loaded.
+    """
 end
 
 # ╔═╡ 1eb6c4fc-be1b-491b-95e0-bc6ca060216c
 begin
-	state_vrs = fmu.modelDescription.stateValueReferences
-	ders_vrs = fmu.modelDescription.derivativeValueReferences
-	input_vrs = fmu.modelDescription.inputValueReferences
-	output_vrs = fmu.modelDescription.outputValueReferences
-	param_vrs = fmu.modelDescription.parameterValueReferences
-	
-	internal_vrs = copy(fmu.modelDescription.valueReferences)
-	filter!(e->e∉state_vrs, internal_vrs)
-	filter!(e->e∉ders_vrs, internal_vrs)
-	filter!(e->e∉input_vrs, internal_vrs)
-	filter!(e->e∉output_vrs, internal_vrs)
-	filter!(e->e∉param_vrs, internal_vrs)
+    state_vrs = fmu.modelDescription.stateValueReferences
+    ders_vrs = fmu.modelDescription.derivativeValueReferences
+    input_vrs = fmu.modelDescription.inputValueReferences
+    output_vrs = fmu.modelDescription.outputValueReferences
+    param_vrs = fmu.modelDescription.parameterValueReferences
 
-	modes = Vector{Pair{Symbol, String}}()
-	if !isnothing(descr.modelExchange)
-		push!(modes, :ME => "Model Exchange (ME)")
-	end
-	if !isnothing(descr.coSimulation)
-		push!(modes, :CS => "Co-Simulation (CS)")
-	end
-	if hasproperty(descr, :scheduledExecution) && !isnothing(descr.scheduledExecution)
-		push!(modes, :SE => "Scheduled Execution (SE)")
-	end
+    internal_vrs = copy(fmu.modelDescription.valueReferences)
+    filter!(e -> e ∉ state_vrs, internal_vrs)
+    filter!(e -> e ∉ ders_vrs, internal_vrs)
+    filter!(e -> e ∉ input_vrs, internal_vrs)
+    filter!(e -> e ∉ output_vrs, internal_vrs)
+    filter!(e -> e ∉ param_vrs, internal_vrs)
 
-	def_start = FMI.fmi2GetDefaultStartTime(descr)
-	if isnothing(def_start)
-		def_start = 0.0
-	end
+    modes = Vector{Pair{Symbol,String}}()
+    if !isnothing(descr.modelExchange)
+        push!(modes, :ME => "Model Exchange (ME)")
+    end
+    if !isnothing(descr.coSimulation)
+        push!(modes, :CS => "Co-Simulation (CS)")
+    end
+    if hasproperty(descr, :scheduledExecution) && !isnothing(descr.scheduledExecution)
+        push!(modes, :SE => "Scheduled Execution (SE)")
+    end
 
-	def_stop = FMI.fmi2GetDefaultStopTime(descr)
-	if isnothing(def_stop)
-		def_stop = 0.0
-	end
-	
-	md"""
-	# Simulation
-	## General Setup
-	Select simulation mode: $(@bind sim_mode Select(modes))
-	
-	Simulate from $(@bind t_start_str TextField(default=string(def_start)))s to $(@bind t_stop_str TextField(default=string(def_stop)))s.
-	"""
+    def_start = FMI.fmi2GetDefaultStartTime(descr)
+    if isnothing(def_start)
+        def_start = 0.0
+    end
+
+    def_stop = FMI.fmi2GetDefaultStopTime(descr)
+    if isnothing(def_stop)
+        def_stop = 0.0
+    end
+
+    md"""
+    # Simulation
+    ## General Setup
+    Select simulation mode: $(@bind sim_mode Select(modes))
+
+    Simulate from $(@bind t_start_str TextField(default=string(def_start)))s to $(@bind t_stop_str TextField(default=string(def_stop)))s.
+    """
 end
 
 # ╔═╡ 831e1919-9ac8-4934-80ce-03a691ea1a41
-if sim_mode == :CS 
-	solver_sym = :none
-	md"""
-	ℹ️ For CS, the ODE solver is part of the compiled FMU. Choose ME or SE if you want to pick solvers.
-	"""
+if sim_mode == :CS
+    solver_sym = :none
+    md"""
+    ℹ️ For CS, the ODE solver is part of the compiled FMU. Choose ME or SE if you want to pick solvers.
+    """
 else
-	md"""
-	Solver: $(@bind solver_sym Select([:Tsit5 => "Tsit5"]))
-	ℹ️ Additional solvers will be deployed soon.
-	""" # :auto => "auto (DifferentialEquations.jl heurisitc)", 
-	#:Rosenbrock23 => "Rosenbrock23" 
+    md"""
+    Solver: $(@bind solver_sym Select([:Tsit5 => "Tsit5"]))
+    ℹ️ Additional solvers will be deployed soon.
+    """ # :auto => "auto (DifferentialEquations.jl heurisitc)", 
+    #:Rosenbrock23 => "Rosenbrock23" 
 end
 
 # ╔═╡ 43021052-25b4-43a9-a9e6-47f3c56d1341
@@ -307,34 +317,39 @@ Select parameters to change parameterization (select multiple by holding *Ctrl*)
 
 # ╔═╡ df122e2a-f4af-4ac7-b332-4c07e7aa4b0e
 if length(param_vrs) > 0
-	@bind changeParameters MultiSelect(collect(param_vrs[i] => FMI.fmi2ValueReferenceToString(fmu, param_vrs[i])[1] for i in 1:length(param_vrs)))
+    @bind changeParameters MultiSelect(
+        collect(
+            param_vrs[i] => FMI.fmi2ValueReferenceToString(fmu, param_vrs[i])[1] for
+            i = 1:length(param_vrs)
+        ),
+    )
 else
-	changeParameters = []
-	md"""
-	ℹ️ The FMU doesn't contain parameters.
-	"""
+    changeParameters = []
+    md"""
+    ℹ️ The FMU doesn't contain parameters.
+    """
 end
 
 # ╔═╡ dbaf5ff3-9ee2-4355-aad2-e48c25eee514
-begin 
-	function parameter_input(ps::Vector)
-	
-		return PlutoUI.combine() do Child
-			
-			inputs = [
-				md""" $(FMI.fmi2ValueReferenceToString(fmu, vr)[1]): $(
-					Child(string(vr), TextField(default=string(FMI.fmi2GetStartValue(fmu, vr)))) 
-				) default: $(FMI.fmi2GetStartValue(fmu, vr))"""
-				
-				for vr in ps
-			]
-			
-			md"""
-			$(inputs)
-			"""
-		end
-	end
-	nothing
+begin
+    function parameter_input(ps::Vector)
+
+        return PlutoUI.combine() do Child
+
+            inputs = [
+                md""" $(FMI.fmi2ValueReferenceToString(fmu, vr)[1]): $(
+                	Child(string(vr), TextField(default=string(FMI.fmi2GetStartValue(fmu, vr)))) 
+                ) default: $(FMI.fmi2GetStartValue(fmu, vr))"""
+
+                for vr in ps
+            ]
+
+            md"""
+            $(inputs)
+            """
+        end
+    end
+    nothing
 end
 
 # ╔═╡ 942e6e27-04a1-4dce-9364-ccafd105facb
@@ -344,11 +359,11 @@ Change parameter values:
 
 # ╔═╡ 095b6d5a-58af-4e3a-8ce0-b08a25629b38
 if length(changeParameters) == 0
-	md"""
-	ℹ️ No parameters selected above.
-	"""
+    md"""
+    ℹ️ No parameters selected above.
+    """
 else
-	@bind params parameter_input(changeParameters)
+    @bind params parameter_input(changeParameters)
 end
 
 # ╔═╡ 43cab175-38df-42dd-b012-e28deec442b0
@@ -357,26 +372,26 @@ Changed parameters:
 """
 
 # ╔═╡ 21178414-11ae-479b-9aae-b495f3c9c76e
-begin 
-	if length(changeParameters) == 0
-		parameters = nothing
-		md"""
-		ℹ️ No parameters selected above.
-		"""
-	else
-		# parse named tuple to Dict
-		parameters = Dict{FMI.fmi2ValueReference, Any}()
-		for i in 1:length(params)
-			k = parse(FMI.fmi2ValueReference, string(keys(params)[i]))
-			v = values(params)[i]
-			typ = FMI.fmi2DataTypeForValueReference(descr, k)
-			if typ != FMI.fmi2String
-				v = parse(typ, v)
-			end
-			parameters[k] = v
-		end
-		parameters
-	end
+begin
+    if length(changeParameters) == 0
+        parameters = nothing
+        md"""
+        ℹ️ No parameters selected above.
+        """
+    else
+        # parse named tuple to Dict
+        parameters = Dict{FMI.fmi2ValueReference,Any}()
+        for i = 1:length(params)
+            k = parse(FMI.fmi2ValueReference, string(keys(params)[i]))
+            v = values(params)[i]
+            typ = FMI.fmi2DataTypeForValueReference(descr, k)
+            if typ != FMI.fmi2String
+                v = parse(typ, v)
+            end
+            parameters[k] = v
+        end
+        parameters
+    end
 end
 
 # ╔═╡ 82c6de3e-66f2-4965-8bad-2faae667fb7e
@@ -402,76 +417,94 @@ $(@bind recordInternals MultiSelect(collect(internal_vrs[i] => FMI.fmi2ValueRefe
 """
 
 # ╔═╡ d28612f7-1405-4f6b-87db-56e3ebb852ff
-begin 
-	fmu_path;
+begin
+    fmu_path
 
-	solver_sym;
-	sim_mode;
-	t_start_str;
-	t_stop_str;
+    solver_sym
+    sim_mode
+    t_start_str
+    t_stop_str
 
-	recordStates;
-	recordDerivatives;
-	recordInputs;
-	recordOutputs;
-	recordParameters;
-	recordInternals;
+    recordStates
+    recordDerivatives
+    recordInputs
+    recordOutputs
+    recordParameters
+    recordInternals
 
-	parameters;
-	
-	md"""
-	## Run Simulation
-	Select to start simulation: $(@bind simulation_trigger CheckBox(default=false))
-	"""
+    parameters
+
+    md"""
+    ## Run Simulation
+    Select to start simulation: $(@bind simulation_trigger CheckBox(default=false))
+    """
 end
 
 # ╔═╡ 05d51ac1-4804-4641-b8b1-f4f4e10dcae6
-begin 
-	t_start = parse(Float64, t_start_str)
-	t_stop = parse(Float64, t_stop_str)
+begin
+    t_start = parse(Float64, t_start_str)
+    t_stop = parse(Float64, t_stop_str)
 
-	recordValues = Vector{FMI.fmi2ValueReference}([recordStates..., recordDerivatives..., recordInputs..., recordOutputs..., recordParameters..., recordInternals...])
+    recordValues = Vector{FMI.fmi2ValueReference}([
+        recordStates...,
+        recordDerivatives...,
+        recordInputs...,
+        recordOutputs...,
+        recordParameters...,
+        recordInternals...,
+    ])
 
-	if sim_mode == :ME || sim_mode == :SE
-		if solver_sym == :auto
-			solver = nothing
-		elseif solver_sym == :Tsit5
-			solver = Tsit5()
-		elseif solver_sym == :Rosenbrock23
-			solver = Rosenbrock23(autodiff=false)
-		else
-			md"""
-			⛔ Unknwon solver `$(solver_sym)`.
-			"""
-			return nothing
-		end
-	end
-	
-	if simulation_trigger
-		try
-			global solution
-			if sim_mode == :ME
-				solution = fmiSimulateME(fmu, (t_start, t_stop); recordValues=recordValues, parameters=parameters, solver=solver)
-				nothing
-			elseif sim_mode == :CS
-				solution = fmiSimulateCS(fmu, (t_start, t_stop); recordValues=recordValues, parameters=parameters)
-				nothing
-			elseif sim_mode == :SE
-				solution = nothing
-				md"""🚧 SE not supported for now."""
-			else
-				solution = nothing
-				md"""⛔ Unknown simulation mode."""
-			end
-		catch e
-			global solution
-			solution = nothing
-			md"""⛔ Simulation failed. Reasons might be $br - the FMU couldn't be initialized because of insufficient default values $br - ... $br The error message is: $br $(e)"""
-		end
-	else
-		solution = nothing
-		md"""ℹ️ Start simulation to show results."""
-	end
+    if sim_mode == :ME || sim_mode == :SE
+        if solver_sym == :auto
+            solver = nothing
+        elseif solver_sym == :Tsit5
+            solver = Tsit5()
+        elseif solver_sym == :Rosenbrock23
+            solver = Rosenbrock23(autodiff = false)
+        else
+            md"""
+            ⛔ Unknwon solver `$(solver_sym)`.
+            """
+            return nothing
+        end
+    end
+
+    if simulation_trigger
+        try
+            global solution
+            if sim_mode == :ME
+                solution = fmiSimulateME(
+                    fmu,
+                    (t_start, t_stop);
+                    recordValues = recordValues,
+                    parameters = parameters,
+                    solver = solver,
+                )
+                nothing
+            elseif sim_mode == :CS
+                solution = fmiSimulateCS(
+                    fmu,
+                    (t_start, t_stop);
+                    recordValues = recordValues,
+                    parameters = parameters,
+                )
+                nothing
+            elseif sim_mode == :SE
+                solution = nothing
+                md"""🚧 SE not supported for now."""
+            else
+                solution = nothing
+                md"""⛔ Unknown simulation mode."""
+            end
+        catch e
+            global solution
+            solution = nothing
+            md"""⛔ Simulation failed. Reasons might be $br - the FMU couldn't be initialized because of insufficient default values $br - ... $br The error message is: $br $(e)"""
+        end
+    else
+        solution = nothing
+        md"""ℹ️ Start simulation to show results."""
+    end
 end
 
 # ╔═╡ 5058777f-beb6-43f4-b3d2-1127abbe1ac9
@@ -487,76 +520,102 @@ x-axis: $(@bind xaxis Select([0 => "time", collect(recordValues[i] => FMI.fmi2Va
 
 # ╔═╡ a8b53f45-5ff7-41dd-89d9-040dcf0e9898
 begin
-	function get_xaxis(xaxis, recordValues)
-		xaxis_vals = nothing
-		for i in 1:length(recordValues)
-			rv = recordValues[i]
-			if xaxis == rv
-				xaxis_vals = collect(vals[i] for vals in solution.values.saveval)
-				break;
-			end
-		end
-		return xaxis_vals
-	end
+    function get_xaxis(xaxis, recordValues)
+        xaxis_vals = nothing
+        for i = 1:length(recordValues)
+            rv = recordValues[i]
+            if xaxis == rv
+                xaxis_vals = collect(vals[i] for vals in solution.values.saveval)
+                break
+            end
+        end
+        return xaxis_vals
+    end
 
-	if isnothing(solution)
-		md"""ℹ️ Please run simulation in order to plot."""
-	elseif isnothing(solution.values) || length(solution.values.saveval) == 0 || length(solution.values.saveval[1]) == 0
-		md"""ℹ️ Simulation successfull, but no values recorded. Please select at least one value to be recorded in order to plot some results."""
-	else
-		if xaxis == 0 # time
-			xaxis_vals = solution.values.t
-			nothing
-		else
-			xaxis_vals = get_xaxis(xaxis, recordValues)
-			md"""
-			ℹ️ Plotting of events is disabled if x-axis is not `time`.
-			"""
-		end
-	end
+    if isnothing(solution)
+        md"""ℹ️ Please run simulation in order to plot."""
+    elseif isnothing(solution.values) ||
+           length(solution.values.saveval) == 0 ||
+           length(solution.values.saveval[1]) == 0
+        md"""ℹ️ Simulation successfull, but no values recorded. Please select at least one value to be recorded in order to plot some results."""
+    else
+        if xaxis == 0 # time
+            xaxis_vals = solution.values.t
+            nothing
+        else
+            xaxis_vals = get_xaxis(xaxis, recordValues)
+            md"""
+            ℹ️ Plotting of events is disabled if x-axis is not `time`.
+            """
+        end
+    end
 end
 
 # ╔═╡ 28026b82-83ba-42cc-89f9-a521daef717a
-begin 
-	function plotResults()
-		fig = Plots.plot()
-		_min = Inf
-		_max = -Inf
-		for i in 1:length(recordValues)
-			rv = recordValues[i]
-			if xaxis != rv
-				vals = collect(vals[i] for vals in solution.values.saveval)
-				_min = min(_min, vals...)
-				_max = max(_max, vals...)
-				Plots.plot!(fig, xaxis_vals, vals; label=FMI.fmi2ValueReferenceToString(fmu, rv)[1] * " [" * string(rv) * "]")
-			end
-		end
+begin
+    function plotResults()
+        fig = Plots.plot()
+        _min = Inf
+        _max = -Inf
+        for i = 1:length(recordValues)
+            rv = recordValues[i]
+            if xaxis != rv
+                vals = collect(vals[i] for vals in solution.values.saveval)
+                _min = min(_min, vals...)
+                _max = max(_max, vals...)
+                Plots.plot!(
+                    fig,
+                    xaxis_vals,
+                    vals;
+                    label = FMI.fmi2ValueReferenceToString(fmu, rv)[1] *
+                            " [" *
+                            string(rv) *
+                            "]",
+                )
+            end
+        end
 
-		if xaxis == 0
-			firstTime = true
-			firstState = true
-			for i in 1:length(solution.events)
-				event = solution.events[i]
-				if event.indicator == 0
-					plot!(fig, [event.t, event.t], [_min, _max]; label=(firstTime ? "Time-Event" : :none), style=:dash, color=:red)
-					firstTime = false
-				else
-					plot!(fig, [event.t, event.t], [_min, _max]; label=(firstState ? "State-Event" : :none), style=:dash, color=:blue)
-					firstState = false
-				end
-			end
-		end
-		
-		fig
-	end
-	
-	if isnothing(solution)
-		md"""ℹ️ Please run simulation in order to plot."""
-	elseif isnothing(solution.values) || length(solution.values.saveval) == 0 || length(solution.values.saveval[1]) == 0
-		md"""ℹ️ Simulation successfull, but no values recorded. Please select at least one value to be recorded in order to plot some results."""
-	else
-		plotResults()
-	end
+        if xaxis == 0
+            firstTime = true
+            firstState = true
+            for i = 1:length(solution.events)
+                event = solution.events[i]
+                if event.indicator == 0
+                    plot!(
+                        fig,
+                        [event.t, event.t],
+                        [_min, _max];
+                        label = (firstTime ? "Time-Event" : :none),
+                        style = :dash,
+                        color = :red,
+                    )
+                    firstTime = false
+                else
+                    plot!(
+                        fig,
+                        [event.t, event.t],
+                        [_min, _max];
+                        label = (firstState ? "State-Event" : :none),
+                        style = :dash,
+                        color = :blue,
+                    )
+                    firstState = false
+                end
+            end
+        end
+
+        fig
+    end
+
+    if isnothing(solution)
+        md"""ℹ️ Please run simulation in order to plot."""
+    elseif isnothing(solution.values) ||
+           length(solution.values.saveval) == 0 ||
+           length(solution.values.saveval[1]) == 0
+        md"""ℹ️ Simulation successfull, but no values recorded. Please select at least one value to be recorded in order to plot some results."""
+    else
+        plotResults()
+    end
 end
 
 # ╔═╡ c7cceb40-ff26-4d3d-912a-199c6ddd49d2
@@ -566,13 +625,13 @@ md"""
 
 # ╔═╡ ca0ba941-8eb1-4641-ae4b-0925df73dedd
 if isnothing(solution) || isnothing(solution.states)
-	if sim_mode == :ME
-		md"""ℹ️ Please run simulation in order to display statistics."""
-	else
-		md"""ℹ️ Please switch simulation mode to ME to show solver statistics."""
-	end
+    if sim_mode == :ME
+        md"""ℹ️ Please run simulation in order to display statistics."""
+    else
+        md"""ℹ️ Please switch simulation mode to ME to show solver statistics."""
+    end
 else
-	solution.states.destats
+    solution.states.destats
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
