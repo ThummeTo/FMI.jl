@@ -1,36 +1,14 @@
-name: Formatter
-
+name: Format suggestions
 on:
   pull_request:
-  push:
-    branches:
-      - 'main'
-    tags: '*'
-
+    # this argument is not required if you don't use the `suggestion-label` input
+    types: [ opened, reopened, synchronize, labeled, unlabeled ]
 jobs:
-  build:
+  code-style:
     runs-on: ubuntu-latest
     steps:
-      - name: "Check out repository"
-        uses: actions/checkout@v4
-
-      - name: "Set up Julia"
-        uses: julia-actions/setup-julia@v2
+      - uses: julia-actions/julia-format@v3
         with:
-          version: '1'
-          arch: x64
+          version: '1' # Set `version` to '1.0.54' if you need to use JuliaFormatter.jl v1.0.54 (default: '1')
+          suggestion-label: 'format-suggest' # leave this unset or empty to show suggestions for all PRs
 
-      - name: Install JuliaFormatter and format
-        run: julia  -e 'using Pkg; Pkg.add(PackageSpec(name="JuliaFormatter")); using JuliaFormatter; format(".", verbose=true)'
-      
-      - name: Format check
-        run: |
-          julia -e '
-          out = Cmd(`git diff`) |> read |> String
-          if out == ""
-              exit(0)
-          else
-              @error "Some files are not formatted! Please use the SciMLStyle to format your files!"
-              write(stdout, out)
-              exit(1)
-          end'

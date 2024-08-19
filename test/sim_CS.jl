@@ -73,4 +73,3 @@ end
 @test [solution.values.saveval[1]...] == [0.5, 0.0]
 @test sum(abs.([solution.values.saveval[end]...] - [0.613371, 0.188633])) < 0.2
 unloadFMU(fmu)
-
