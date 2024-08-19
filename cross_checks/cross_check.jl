@@ -77,7 +77,7 @@ function runCrossCheckFmu(checkPath::String, resultPath::String, check::FmuCross
     try 
         if !(check.notCompliant && skipnotcompliant)
             fmuToCheck = loadFMU(pathToFMU)
-            fmiInfo(fmuToCheck)
+            info(fmuToCheck)
             hasInputValues = false
 
             # Read Options

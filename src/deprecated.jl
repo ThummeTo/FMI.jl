@@ -83,7 +83,7 @@ function fmiInfo(args...; kwargs...)
     warnDeprecated("fmiInfo", "info")
     info(args...; kwargs...)
 end
-export fmi2Info
+export fmiInfo
 
 function fmi2Info(args...; kwargs...)
     warnDeprecated("fmi2Info", "info", "FMI version is determined automatically.")
