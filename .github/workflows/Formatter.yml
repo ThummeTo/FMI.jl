@@ -1,0 +1,36 @@
+name: Formatter
+
+on:
+  pull_request:
+  push:
+    branches:
+      - 'main'
+    tags: '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Check out repository"
+        uses: actions/checkout@v4
+
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.10'
+          arch: x64
+
+      - name: Install JuliaFormatter and format
+        run: julia  -e 'using Pkg; Pkg.add(PackageSpec(name="JuliaFormatter")); using JuliaFormatter; format(".", verbose=true)'
+      
+      - name: Format check
+        run: |
+          julia -e '
+          out = Cmd(`git diff`) |> read |> String
+          if out == ""
+              exit(0)
+          else
+              @error "Some files are not formatted! Please use the SciMLStyle to format your files!"
+              write(stdout, out)
+              exit(1)
+          end'
