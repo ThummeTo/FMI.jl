@@ -98,17 +98,23 @@ end
                 end
             end
         end
+
+        @testset "Aqua.jl" begin
+            @info "Aqua: Method ambiguity"
+            @testset "Method ambiguities" begin
+                Aqua.test_ambiguities([FMI])
+            end
+    
+            @info "Aqua: Piracies"
+            @testset "Piracies" begin
+                Aqua.test_piracies(FMI) # ; broken = true)
+            end
+    
+            @info "Aqua: Testing all (method ambiguities and piracies are tested separately)"
+            Aqua.test_all(FMI; ambiguities = false, piracies = false)
+        end
+
     elseif Sys.isapple()
         @warn "Test-sets are currently using Windows- and Linux-FMUs, automated testing for macOS is currently not supported."
-    end
-    @testset "Aqua.jl" begin
-        # Ambiguities in external packages
-        @testset "Method ambiguity" begin
-            Aqua.test_ambiguities([FMI])
-        end
-        @testset "Piracy" begin
-            Aqua.test_piracies(FMI; broken = true)
-        end
-        Aqua.test_all(FMI; ambiguities = false, piracies = false)
     end
 end

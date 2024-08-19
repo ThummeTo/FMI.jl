@@ -75,8 +75,8 @@ function simulate(fmu::FMU3, c::Union{FMU3Instance, Nothing}=nothing, tspan::Uni
         error(unknownFMUType)
     end
 end
-simulate(c::FMUInstance, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...) = simulate(c.fmu, c, tspan; kwargs...)
-simulate(fmu::FMU, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...) = simulate(fmu, nothing, tspan; kwargs...)
+simulate(c::FMUInstance, tspan::Tuple{Float64, Float64}; kwargs...) = simulate(c.fmu, c, tspan; kwargs...)
+simulate(fmu::FMU, tspan::Tuple{Float64, Float64}; kwargs...) = simulate(fmu, nothing, tspan; kwargs...)
 export simulate
 
 """
@@ -125,7 +125,7 @@ State- and Time-Events are handled correctly.
 
 See also [`simulate`](@ref), [`simulateCS`](@ref), [`simulateSE`](@ref).
 """
-function simulateME(fmu::FMU, c::Union{FMUInstance, Nothing}, tspan::Tuple{Real, Real};
+function simulateME(fmu::FMU, c::Union{FMUInstance, Nothing}, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing;
     solver = nothing, # [ToDo] type
     recordValues::fmi2ValueReferenceFormat = nothing,
     recordEventIndicators::Union{AbstractArray{<:Integer, 1}, UnitRange{<:Integer}, Nothing} = nothing,
@@ -240,8 +240,8 @@ function simulateME(fmu::FMU, c::Union{FMUInstance, Nothing}, tspan::Tuple{Real,
 
     return c.solution
 end
-simulateME(c::FMUInstance, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...) = simulateME(c.fmu, c, tspan; kwargs...)
-simulateME(fmu::FMU, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...) = simulateME(fmu, nothing, tspan; kwargs...)
+simulateME(c::FMUInstance, tspan::Tuple{Float64, Float64}; kwargs...) = simulateME(c.fmu, c, tspan; kwargs...)
+simulateME(fmu::FMU, tspan::Tuple{Float64, Float64}; kwargs...) = simulateME(fmu, nothing, tspan; kwargs...)
 export simulateME
 
 ############ Co-Simulation ############
@@ -438,8 +438,8 @@ function simulateCS(fmu::FMU, c::Union{FMUInstance, Nothing}, tspan::Union{Tuple
 
     return fmusol
 end
-simulateCS(c::FMUInstance, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...) = simulateCS(c.fmu, c, tspan; kwargs...)
-simulateCS(fmu::FMU, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...) = simulateCS(fmu, nothing, tspan; kwargs...)
+simulateCS(c::FMUInstance, tspan::Tuple{Float64, Float64}; kwargs...) = simulateCS(c.fmu, c, tspan; kwargs...)
+simulateCS(fmu::FMU, tspan::Tuple{Float64, Float64}; kwargs...) = simulateCS(fmu, nothing, tspan; kwargs...)
 export simulateCS
 
 # [TODO] simulate ScheduledExecution
@@ -463,13 +463,13 @@ To be implemented ...
 
 See also [`simulate`](@ref), [`simulateME`](@ref), [`simulateCS`](@ref).
 """
-function simulateSE(fmu::FMU2, c::Union{FMU2Component, Nothing})    
+function simulateSE(fmu::FMU2, c::Union{FMU2Component, Nothing}, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing)    
     @assert false "This is a FMI2-FMU, scheduled execution is not supported in FMI2."
 end
-function simulateSE(fmu::FMU3, c::Union{FMU3Instance, Nothing}) 
+function simulateSE(fmu::FMU3, c::Union{FMU3Instance, Nothing}, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing) 
     # [ToDo]   
     @assert false "Not implemented yet. Please open an issue if this is needed."
 end
-simulateSE(c::FMUInstance, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...) = simulateSE(c.fmu, c, tspan; kwargs...)
-simulateSE(fmu::FMU, tspan::Union{Tuple{Float64, Float64}, Nothing}=nothing; kwargs...) = simulateSE(fmu, nothing, tspan; kwargs...)
+simulateSE(c::FMUInstance, tspan::Tuple{Float64, Float64}; kwargs...) = simulateSE(c.fmu, c, tspan; kwargs...)
+simulateSE(fmu::FMU, tspan::Tuple{Float64, Float64}; kwargs...) = simulateSE(fmu, nothing, tspan; kwargs...)
 export simulateSE

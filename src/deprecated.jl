@@ -8,7 +8,7 @@ function warnDeprecated(oldStr, newStr, additional="")
 end
 
 function fmi2Simulate(args...; kwargs...)
-    warnDeprecated("fmi2Simulate", "simulate")
+    warnDeprecated("fmi2Simulate", "simulate", "FMI version is determined automatically.")
     simulate(args...; kwargs...)
 end
 export fmi2Simulate
