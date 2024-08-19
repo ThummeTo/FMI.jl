@@ -1,7 +1,49 @@
+# FMI2 Types in FMI Import/Core .jl 
+
+```@docs
+FMU2
+FMU2Component
+FMU2ComponentEnvironment
+FMI2Struct
+fmi2Initial
+fmi2ScalarVariable
+fmi2SimpleType
+fmi2Type
+fmi2BaseUnit
+fmi2Unit
+fmi2DisplayUnit
+fmi2Char
+fmi2Variability
+fmi2VariableDependency
+fmi2DependencyKind
+fmi2EventInfo
+fmi2Status
+fmi2Annotation
+fmi2ModelDescription
+fmi2FMUstate
+fmi2StatusKind
+fmi2VariableNamingConvention
+fmi2Causality
+fmi2ComponentState
+```
+fmi2StructMD
+FMU2Solution
+FMIImport.fmi2ValueReferenceFormat
+FMU2Event
+FMU2ExecutionConfiguration
+
 # FMI2 Constants in FMI Import/Core .jl 
 
 ```@docs
 fmi2True
+fmi2ComponentStateInstantiated
+fmi2ComponentStateInitializationMode
+fmi2ComponentStateEventMode
+fmi2ComponentStateContinuousTimeMode
+fmi2ComponentStateTerminated
+fmi2ComponentStateError
+fmi2ComponentStateFatal
+```
 fmi2False
 fmi2StatusOK
 fmi2StatusWarning
@@ -9,4 +51,3 @@ fmi2StatusPending
 fmi2StatusError
 fmi2StatusDiscard
 fmi2StatusFatal
-```

@@ -9,6 +9,8 @@ Depending on the situation, different variables need to be computed. In order to
 ```@docs
 fmi3SetTime
 fmi3SetContinuousStates
+fmi3GetEventIndicators
+fmi3GetEventIndicators!
 ```
 
 ## Evaluation of Model Equations
@@ -16,11 +18,12 @@ fmi3SetContinuousStates
 ```@docs
 fmi3EnterEventMode
 fmi3EnterContinuousTimeMode
-fmi3CompletedIntegratorStep
 fmi3CompletedIntegratorStep!
-fmi3GetEventIndicators!
+fmi3GetContinuousStates
 fmi3GetContinuousStates!
+fmi3GetNominalsOfContinuousStates
 fmi3GetNominalsOfContinuousStates!
 fmi3GetNumberOfContinuousStates
 fmi3GetNumberOfContinuousStates!
 ```
+fmi3CompletedIntegratorStep

@@ -5,18 +5,18 @@ platform dependent header file, several access functions, as well as the schema 
 ## Opening and closing FMUs
 
 ```@docs
+```
 fmi2Unzip
 fmi2Load
 fmi2Reload
 fmi2Unload
-```
 
 ##  Creation, Destruction and Logging of FMU Instances
 
 ```@docs
 fmi2Instantiate!
 fmi2Instantiate
-fmi2FreeInstance!
+fmi2FreeInstance
 fmi2SetDebugLogging
 ```
 
@@ -39,9 +39,6 @@ have identical values but other parts of the variable definition might be differ
 attributes).
 
 ```@docs
-fmi2Get
-fmi2Get!
-fmi2Set
 fmi2GetReal
 fmi2GetReal!
 fmi2GetInteger
@@ -55,6 +52,9 @@ fmi2SetInteger
 fmi2SetBoolean
 fmi2SetString
 ```
+fmi2Get
+fmi2Get!
+fmi2Set
 
 ## Getting and Setting the Complete FMU State
 The FMU has an internal state consisting of all values that are needed to continue a simulation. This internal state consists especially of the values of the continuous-time states, iteration variables, parameter values, input values, delay buffers, file identifiers, and FMU internal status information. With the functions of this section, the internal FMU state can be copied and the pointer to this copy is returned to the environment. The FMU state copy can be set as actual FMU state, in order to continue the simulation from it.
@@ -63,6 +63,7 @@ The FMU has an internal state consisting of all values that are needed to contin
 fmi2GetFMUstate
 fmi2GetFMUstate!
 fmi2SetFMUstate
+fmi2FreeFMUstate
 fmi2FreeFMUstate!
 fmi2SerializedFMUstateSize
 fmi2SerializedFMUstateSize!
@@ -83,47 +84,29 @@ fmi2GetDirectionalDerivative
 fmi2GetDirectionalDerivative!
 fmi2SetRealInputDerivatives
 fmi2GetRealOutputDerivatives!
+```
 fmi2SampleJacobian
 fmi2SampleJacobian!
-```
 
 ## Conversion functions
 
 ```@docs
-fmi2StringToValueReference
-fmi2ValueReferenceToString
-fmi2StringToCausality
-fmi2CausalityToString
-fmi2StringToVariability
-fmi2VariabilityToString
-
-fmi2StatusToString
-fmi2StringToDependencyKind
-fmi2DependencyKindToString
-fmi2StringToInitial
-fmi2InitialToString
 ```
 
 ## External/Additional functions
 
 ```@docs
+setDiscreteStates
+getDiscreteStates
+getDiscreteStates!
+getSimpleTypeAttributeStruct
+getDeclaredType
+```
 fmi2GetSolutionDerivative
 fmi2GetSolutionState
 fmi2GetSolutionValue
 fmi2GetSolutionTime
-fmi2ModelVariablesForValueReference
-getCurrentComponent
-hasCurrentComponent
 fmi2GetJacobian
 fmi2GetJacobian!
 fmi2GetFullJacobian
 fmi2GetFullJacobian!
-fmi2GetStartValue
-fmi2GetUnit
-fmi2GetDeclaredType
-fmi2GetInitial
-fmi2GetSimpleTypeAttributeStruct
-fmi2GetDiscreteStates
-fmi2GetDiscreteStates!
-fmi2SetDiscreteStates
-```

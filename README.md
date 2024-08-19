@@ -6,12 +6,12 @@
 
 | | |
 |---|---|
-| Documentation | [![Build Docs](https://github.com/ThummeTo/FMI.jl/actions/workflows/Documentation.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Documentation.yml) [![Dev Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://ThummeTo.github.io/FMI.jl/dev) |
+| Documentation | [![Build Docs](https://github.com/ThummeTo/FMI.jl/actions/workflows/Documentation.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Documentation.yml) [![Dev Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://thummeto.github.io/FMI.jl/dev/) |
 | Examples | [![Examples (latest)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Example.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Example.yml) |
 | Tests | [![Test (latest)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLatest.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLatest.yml) [![Test (LTS)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLTS.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/TestLTS.yml) [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl) |
 | FMI cross checks| [![FMI2 Cross Checks](https://github.com/ThummeTo/FMI.jl/actions/workflows/CrossChecks.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/CrossChecks.yml) |
 | Package evaluation| [![Run PkgEval](https://github.com/ThummeTo/FMI.jl/actions/workflows/Eval.yml/badge.svg)](https://github.com/ThummeTo/FMI.jl/actions/workflows/Eval.yml) |
-| Code coverage | [![Coverage](https://codecov.io/gh/ThummeTo/FMI.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ThummeTo/FMI.jl) |
+| Code coverage | [![Coverage](https://codecov.io/gh/ThummeTo/FMI.jl/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ThummeTo/FMI.jl) |
 | Collaboration | [![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac) |
 
 ## Breaking Changes in FMI.jl (starting from v0.14.0 until release of v1.0.0)

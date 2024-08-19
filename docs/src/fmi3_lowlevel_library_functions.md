@@ -5,11 +5,11 @@ platform dependent header file, several access functions, as well as the schema 
 ## Opening and closing FMUs
 
 ```@docs
+```
 fmi3Unzip
 fmi3Load
 fmi3Reload
 fmi3Unload
-```
 
 ##  Creation, Destruction and Logging of FMU Instances
 
@@ -20,6 +20,7 @@ fmi3InstantiateModelExchange
 fmi3InstantiateModelExchange!
 fmi3InstantiateScheduledExecution
 fmi3InstantiateScheduledExecution!
+fmi3FreeInstance
 fmi3FreeInstance!
 fmi3SetDebugLogging
 ```
@@ -45,8 +46,6 @@ have identical values but other parts of the variable definition might be differ
 attributes).
 
 ```@docs
-fmi3Get
-fmi3Get!
 fmi3GetFloat32
 fmi3GetFloat32!
 fmi3GetFloat64
@@ -73,7 +72,6 @@ fmi3GetString
 fmi3GetString!
 fmi3GetBinary
 fmi3GetBinary!
-fmi3Set
 fmi3SetFloat32
 fmi3SetFloat64
 fmi3SetInt8
@@ -88,6 +86,9 @@ fmi3SetBoolean
 fmi3SetString
 fmi3SetBinary
 ```
+fmi3Get
+fmi3Get!
+fmi3Set
 
 ## Getting and Setting the Complete FMU State
 The FMU has an internal state consisting of all values that are needed to continue a simulation. This internal state consists especially of the values of the continuous-time states, iteration variables, parameter values, input values, delay buffers, file identifiers, and FMU internal status information. With the functions of this section, the internal FMU state can be copied and the pointer to this copy is returned to the environment. The FMU state copy can be set as actual FMU state, in order to continue the simulation from it.
@@ -96,7 +97,7 @@ The FMU has an internal state consisting of all values that are needed to contin
 fmi3GetFMUState
 fmi3GetFMUState!
 fmi3SetFMUState
-fmi3FreeFMUState!
+fmi3FreeFMUState
 fmi3SerializeFMUState
 fmi3SerializeFMUState!
 fmi3SerializedFMUStateSize
@@ -116,18 +117,19 @@ directional derivatives. This function can be used to construct the desired part
 ```@docs
 fmi3GetDirectionalDerivative
 fmi3GetDirectionalDerivative!
-fmi3SampleDirectionalDerivative
-fmi3SampleDirectionalDerivative!
 fmi3GetContinuousStateDerivatives
 fmi3GetContinuousStateDerivatives!
+fmi3GetAdjointDerivative
 fmi3GetAdjointDerivative!
 fmi3GetOutputDerivatives
 fmi3GetOutputDerivatives!
+```
+fmi3SampleDirectionalDerivative
+fmi3SampleDirectionalDerivative!
 fmi3GetJacobian
 fmi3GetJacobian!
 fmi3GetFullJacobian
 fmi3GetFullJacobian!
-```
 
 ## TODO: Clockstuff
 
@@ -142,38 +144,27 @@ fmi3GetClock
 fmi3GetClock!
 fmi3SetClock
 fmi3ActivateModelPartition
-fmi3CallbackClockUpdate
 ```
+fmi3CallbackClockUpdate
 
 ## Conversion functions
 
 ```@docs
-fmi3StringToValueReference
-fmi3ValueReferenceToString
-fmi3StringToCausality
-fmi3CausalityToString
-fmi3StringToVariability
-fmi3VariabilityToString
-fmi3StringToStatus
-fmi3StatusToString
-fmi3StringToDependencyKind
-fmi3DependencyKindToString
-fmi3StringToInitial
-fmi3InitialToString
-fmi3IntervalQualifierToString
-fmi3StringToIntervalQualifier
-fmi3StringToType
-fmi3TypeToString
-fmi3VariableNamingConventionToString
-fmi3StringToVariableNamingConvention
+stringToType
+typeToString
+stringToVariableNamingConvention
+variableNamingConventionToString
+intervalQualifierToString
 ```
+fmi3StringToCausality
+fmi3StatusToString
+fmi3StringToInitial
 
 ## External/Additional functions
 
 ```@docs
-fmi3ModelVariablesForValueReference
-fmi3GetStartValue
-
+fmi3GetNumberOfVariableDependencies
 fmi3GetNumberOfVariableDependencies!
+fmi3GetVariableDependencies
 fmi3GetVariableDependencies!
 ```

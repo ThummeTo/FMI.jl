@@ -4,7 +4,7 @@
 #
 
 import Pkg; Pkg.develop(path=joinpath(@__DIR__,"../../FMI.jl"))
-using Documenter, Plots, JLD2, DataFrames, CSV, MAT, FMI, FMIImport, FMICore
+using Documenter, Plots, JLD2, DataFrames, CSV, MAT, FMI, FMIBase, FMIImport, FMICore
 using Documenter: GitHubActions
 
 makedocs(sitename="FMI.jl",
@@ -15,10 +15,10 @@ makedocs(sitename="FMI.jl",
             size_threshold = 512000,
             size_threshold_ignore = ["deprecated.md"]
          ),
-         modules = [FMI, FMIImport, FMICore],
+         modules = [FMI, FMIImport, FMICore, FMIBase],
          checkdocs=:exports,
          linkcheck=true,
-         linkcheck_ignore=["https://thummeto.github.io/FMI.jl/dev/examples/inputs/", "https://github.com/ThummeTo/FMICore.jl/blob/main/src/FMI2_c.jl#L718"], 
+         #linkcheck_ignore=["https://thummeto.github.io/FMI.jl/dev/examples/inputs/", "https://github.com/ThummeTo/FMICore.jl/blob/main/src/FMI2_c.jl#L718"], 
          pages= Any[
             "Introduction" => "index.md"
             "Features" => "features.md"
@@ -36,12 +36,11 @@ makedocs(sitename="FMI.jl",
             "User Level API - FMI.jl" => "library.md"
             "Developer Level API" => Any[
                 "fmi version independent content" => Any[
-                    "fmi_lowlevel_library_types.md",
                     "fmi_lowlevel_library_constants.md",
+                    "fmi_lowlevel_modeldescription_functions.md",
                     "fmi_lowlevel_library_functions.md"
                 ],
                 "FMI2 specific content" =>  Any[
-                    "fmi2_lowlevel_library_types.md",
                     "fmi2_lowlevel_library_constants.md",
                     "FMI2 Functions in FMI Import/Core .jl" =>  Any[
                         "fmi2_lowlevel_modeldescription_functions.md",
@@ -51,7 +50,6 @@ makedocs(sitename="FMI.jl",
                     ]
                 ],
                 "FMI3 specific content" =>  Any[
-                    "fmi3_lowlevel_library_types.md",
                     "fmi3_lowlevel_library_constants.md",
                     "FMI3 Functions in FMI Import/Core .jl" =>  Any[
                         "fmi3_lowlevel_modeldescription_functions.md",

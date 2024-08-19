@@ -10,7 +10,6 @@ Examples are subdevided into *Basics*, *Advanced* and *Publication appendices*.
 
 - [__Simulate__](https://thummeto.github.io/FMI.jl/dev/examples/simulate/): Showing how you can simulate a CS-FMU and a ME-FMU.
 - [__Parameterize__](https://thummeto.github.io/FMI.jl/dev/examples/parameterize/): A short example explaining how to parameterize a FMU before simulation.
-- [__Inputs__](https://thummeto.github.io/FMI.jl/dev/examples/inputs/): A short example explaining how to simulate a FMU with inputs.
 
 
 **Advanced examples:**
