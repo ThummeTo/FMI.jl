@@ -16,8 +16,8 @@ import FMIImport.FMIBase: doStep
 
 """
     simulate(fmu, instance=nothing, tspan=nothing; kwargs...)
-    simulate(fmu, tspan=nothing; kwargs...)
-    simulate(instance, tspan=nothing; kwargs...)
+    simulate(fmu, tspan; kwargs...)
+    simulate(instance, tspan; kwargs...)
 
 Starts a simulation of the `FMU2` for the instantiated type: CS, ME or SE (this is selected automatically or during loading of the FMU).
 You can force a specific simulation mode by calling [`simulateCS`](@ref), [`simulateME`](@ref) or [`simulateSE`](@ref) directly.
@@ -93,8 +93,8 @@ export simulate
 
 """
     simulateME(fmu, instance=nothing, tspan=nothing; kwargs...)
-    simulateME(fmu, tspan=nothing; kwargs...)
-    simulateME(instance, tspan=nothing; kwargs...)
+    simulateME(fmu, tspan; kwargs...)
+    simulateME(instance, tspan; kwargs...)
 
 Simulate ME-FMU for the given simulation time interval.
 State- and Time-Events are handled correctly.
@@ -294,8 +294,8 @@ export simulateME
 
 """
     simulateCS(fmu, instance=nothing, tspan=nothing; kwargs...)
-    simulateCS(fmu, tspan=nothing; kwargs...)
-    simulateCS(instance, tspan=nothing; kwargs...)
+    simulateCS(fmu, tspan; kwargs...)
+    simulateCS(instance, tspan; kwargs...)
 
 Simulate CS-FMU for the given simulation time interval.
 State- and Time-Events are handled internally by the FMU.
@@ -517,8 +517,8 @@ export simulateCS
 # [TODO] simulate ScheduledExecution
 """
     simulateSE(fmu, instance=nothing, tspan=nothing; kwargs...)
-    simulateSE(fmu, tspan=nothing; kwargs...)
-    simulateSE(instance, tspan=nothing; kwargs...)
+    simulateSE(fmu, tspan; kwargs...)
+    simulateSE(instance, tspan; kwargs...)
 
 To be implemented ...
 
