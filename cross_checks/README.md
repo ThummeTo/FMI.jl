@@ -36,7 +36,7 @@ optional arguments:
   --os OS               The operating system for which the cross
                         checks should be excecuted (default:
                         "windows-latest")
-  --ccrepo CCREPO       The Url to the git repository that contains
+  --ccrepo CCREPO       The URL to the git repository that contains
                         the cross checks. (default:
                         "https://github.com/modelica/fmi-cross-check")
   --ccbranch CCBRANCH   The name of the branch in which the results
@@ -49,9 +49,9 @@ optional arguments:
   --includefatals       Include FMUs that have caused the cross check
                         runner to fail and exit
   --skipnotcompliant    Reject officially not compliant FMUs and don't
-                        excecute them
+                        execute them
   --commitrejected      Also commit the result file for FMUs that
-                        hasn't been excecuted (e.g. officially not
+                        hasn't been executed (e.g. officially not
                         compliant FMUs if they are not skipped)
   --commitfailed        Also commit the result file for failed FMUs
   -h, --help            show this help message and exit

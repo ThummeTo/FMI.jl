@@ -6,14 +6,14 @@
 """ 
 Returns the path where the FMU cross checks are saved locally.
 This will also checkout the repository from a specified URL if they are not yet present in the specified path.
-Hint: This will not check the cross check repository for integrety
+Hint: This will not check the cross check repository for integrity
 # Arguments
 - `crossCheckRepo::String`: URL to the FMU Cross check repository that should be used. Note, if you want to push your results later, this should be a fork that you have access to
 - `unpackPath::Union{String, Nothing}`:  optional path that is used to checkout the the fmu cross check repository. If no path is specified, a temporary path is created
 # Returns
 - `repoPath::String`: The path where the repository can be found locally (including the repository name)
 """
-function getFmuCrossCheckRepo(
+function getFMICrossCheckRepo(
     crossCheckRepo::String,
     unpackPath::Union{String,Nothing} = nothing,
 )::String
