@@ -74,4 +74,4 @@ jobs:
           --os ${{ matrix.os }}
           --ccrepo https://github.com/${{ env.CROSS_CHECK_REPO_USER }}/${{ env.CROSS_CHECK_REPO_NAME}}
           --ccbranch ${{ env.CROSS_CHECK_BRANCH }}
-          --skipnotcompliant true
+          --skipnotcompliant

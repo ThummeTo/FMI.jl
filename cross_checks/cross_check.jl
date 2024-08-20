@@ -258,7 +258,7 @@ function main()
         os = "linux64"
     end
     includeFatals = parsed_args["includefatals"]
-    skipnotcompliant = haskey(ENV, "crosscheck_skipnotcompliant") ? parse(Bool, ENV["crosscheck_skipnotcompliant"]) : parsed_args["skipnotcompliant"]
+    skipnotcompliant = haskey(ENV, "crosscheck_skipnotcompliant") ? true : parsed_args["skipnotcompliant"]
     commitrejected = parsed_args["commitrejected"]
     commitfailed = parsed_args["commitfailed"]
 
