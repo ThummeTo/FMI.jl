@@ -32,7 +32,7 @@ jobs:
 
      # Set up cache
       - name: "Set up cache"
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         env:
           cache-name: cache-artifacts
         with:
