@@ -36,7 +36,7 @@ optional arguments:
   --os OS               The operating system for which the cross
                         checks should be excecuted (default:
                         "windows-latest")
-  --ccrepo CCREPO       The Url to the git repository that contains
+  --ccrepo CCREPO       The URL to the git repository that contains
                         the cross checks. (default:
                         "https://github.com/modelica/fmi-cross-check")
   --ccbranch CCBRANCH   The name of the branch in which the results

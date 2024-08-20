@@ -13,17 +13,22 @@ using CSV
 using DelimitedFiles
 using Tables
 using Statistics
+using DifferentialEquations
 
 import Base64
 
 include("cross_check_config.jl")
 include("cross_check_lib.jl")
 
-# Main Array that holds all information about the excecuted cross checks and results
+# Main Array that holds all information about the executed cross checks and results
 crossChecks = []
 
 getInputValues = function (t, u)
     return nothing
+end
+
+getSolver = function()
+    return Tsit5() # CVODE_BDF() # Rosenbrock23(autodiff=false)
 end
 
 function parse_commandline()
@@ -31,7 +36,7 @@ function parse_commandline()
 
     @add_arg_table s begin
         "--os"
-        help = "The operating system for which the cross checks should be excecuted"
+        help = "The operating system for which the cross checks should be executed"
         arg_type = String
         default = "windows-latest"
         "--ccrepo"
@@ -53,10 +58,10 @@ function parse_commandline()
         help = "Include FMUs that have caused the cross check runner to fail and exit"
         action = :store_true
         "--skipnotcompliant"
-        help = "Reject officially not compliant FMUs and don't excecute them"
+        help = "Reject officially not compliant FMUs and don't execute them"
         action = :store_true
         "--commitrejected"
-        help = "Also commit the result file for FMUs that hasn't been excecuted (e.g. officially not compliant FMUs if they are not skipped)"
+        help = "Also commit the result file for FMUs that hasn't been executed (e.g. officially not compliant FMUs if they are not skipped)"
         action = :store_true
         "--commitfailed"
         help = "Also commit the result file for failed FMUs"
@@ -118,7 +123,7 @@ function runCrossCheckFmu(
                 getInputValues = function (t, u)
                     for (valIndex, val) in enumerate(inputValues)
                         if val.time >= t
-                            u[:] = inputValues[valIndex][2:end]
+                            u[:] = collect(inputValues[valIndex])[2:end]
                             # a = collect(inputValues[valIndex])[2:end] 
                             # return a
                             break
@@ -142,6 +147,7 @@ function runCrossCheckFmu(
                     simData = simulateME(
                         fmuToCheck,
                         (tStart, tStop);
+                        solver=getSolver(),
                         reltol = relTol,
                         saveat = fmuRefValues[1],
                         inputFunction = getInputValues,
@@ -164,6 +170,7 @@ function runCrossCheckFmu(
                     simData = simulateME(
                         fmuToCheck,
                         (tStart, tStop);
+                        solver=getSolver(),
                         reltol = relTol,
                         saveat = fmuRefValues[1],
                         recordValues = fmuRecordValueNames,
@@ -241,7 +248,7 @@ function main()
     println("#################### Start FMI Cross checks Run ####################")
     # parsing of cli arguments and setting of configuration
     parsed_args = parse_commandline()
-    unpackPath = parsed_args["tempdir"]
+    unpackPath = haskey(ENV, "crosscheck_tempdir") ? ENV["crosscheck_tempdir"] : parsed_args["tempdir"]
     fmiVersion = parsed_args["fmiversion"]
     crossCheckRepo = parsed_args["ccrepo"]
     crossCheckBranch = parsed_args["ccbranch"]
@@ -261,7 +268,7 @@ function main()
     end
 
     # Loading all available cross checks
-    fmiCrossCheckRepoPath = getFmuCrossCheckRepo(crossCheckRepo, unpackPath)
+    fmiCrossCheckRepoPath = getFMICrossCheckRepo(crossCheckRepo, unpackPath)
 
     # set up the github access for the fmi-cross-checks repo and checkout the respective branch
     github_token = get(ENV, "GITHUB_TOKEN", "")
@@ -346,7 +353,7 @@ function main()
     # Write Summary of Cross Check run
     println("#################### Start FMI Cross check Summary ####################")
     println("\tTotal Cross checks:\t\t\t$(count(c -> (true), crossChecks))")
-    println("\tSuccessfull Cross checks:\t\t$(count(c -> (c.success), crossChecks))")
+    println("\tSuccessful Cross checks:\t\t$(count(c -> (c.success), crossChecks))")
     println(
         "\tFailed Cross checks:\t\t\t$(count(c -> (!c.success && c.error === nothing && !c.skipped), crossChecks))",
     )
@@ -354,7 +361,7 @@ function main()
         "\tCross checks with errors:\t\t$(count(c -> (c.error !== nothing), crossChecks))",
     )
     println("\tSkipped Cross checks:\t\t\t$(count(c -> (c.skipped), crossChecks))")
-    println("\tList of successfull Cross checks")
+    println("\tList of successful Cross checks")
     for (index, success) in enumerate(filter(c -> (c.success), crossChecks))
         println("\u001B[32m\t\t$(index):\t$(success)\u001B[0m")
     end
