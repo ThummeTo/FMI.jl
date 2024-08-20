@@ -258,7 +258,7 @@ function main()
         os = "linux64"
     end
     includeFatals = parsed_args["includefatals"]
-    skipnotcompliant = parsed_args["skipnotcompliant"]
+    skipnotcompliant = haskey(ENV, "crosscheck_skipnotcompliant") ? parse(Bool, ENV["crosscheck_skipnotcompliant"]) : parsed_args["skipnotcompliant"]
     commitrejected = parsed_args["commitrejected"]
     commitfailed = parsed_args["commitfailed"]
 
@@ -353,21 +353,21 @@ function main()
     # Write Summary of Cross Check run
     println("#################### Start FMI Cross check Summary ####################")
     println("\tTotal Cross checks:\t\t\t$(count(c -> (true), crossChecks))")
-    println("\tSuccessful Cross checks:\t\t$(count(c -> (c.success), crossChecks))")
+    println("\tSuccessful Cross checks:\t\t$(count(c -> (c.success === true), crossChecks))")
     println(
-        "\tFailed Cross checks:\t\t\t$(count(c -> (!c.success && c.error === nothing && !c.skipped), crossChecks))",
+        "\tFailed Cross checks:\t\t\t$(count(c -> (c.success === false && c.error === nothing && c.skipped === false), crossChecks))",
     )
     println(
         "\tCross checks with errors:\t\t$(count(c -> (c.error !== nothing), crossChecks))",
     )
-    println("\tSkipped Cross checks:\t\t\t$(count(c -> (c.skipped), crossChecks))")
+    println("\tSkipped Cross checks:\t\t\t$(count(c -> (c.skipped === true), crossChecks))")
     println("\tList of successful Cross checks")
-    for (index, success) in enumerate(filter(c -> (c.success), crossChecks))
+    for (index, success) in enumerate(filter(c -> (c.success === true), crossChecks))
         println("\u001B[32m\t\t$(index):\t$(success)\u001B[0m")
     end
     println("\tList of failed Cross checks")
     for (index, success) in enumerate(
-        filter(c -> (!c.success && c.error === nothing && !c.skipped), crossChecks),
+        filter(c -> (c.success === false && c.error === nothing && c.skipped === false), crossChecks),
     )
         println("\u001B[33m\t\t$(index):\t$(success)\u001B[0m")
     end
