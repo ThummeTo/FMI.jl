@@ -14,6 +14,7 @@ using DelimitedFiles
 using Tables
 using Statistics
 using DifferentialEquations
+using Plots, Colors
 
 import Base64
 
@@ -66,6 +67,9 @@ function parse_commandline()
         "--commitfailed"
         help = "Also commit the result file for failed FMUs"
         action = :store_true
+        "--plotfailed"
+        help = "Plot result for failed FMUs"
+        action = :store_true
 
     end
     println("Arguments used for cross check:")
@@ -75,18 +79,19 @@ function parse_commandline()
     return parse_args(s)
 end
 
-function runCrossCheckFmu(
+function runCrossCheckFMU(
     checkPath::String,
     resultPath::String,
     check::FmuCrossCheck,
     skipnotcompliant::Bool,
     commitrejected::Bool,
     commitfailed::Bool,
+    plotfailed::Bool
 )::FmuCrossCheck
     pathToFMU = joinpath(checkPath, "$(check.fmuCheck).fmu")
 
     fmuToCheck = nothing
-    try
+    #try
         if !(check.notCompliant && skipnotcompliant)
             fmuToCheck = loadFMU(pathToFMU)
             info(fmuToCheck)
@@ -200,11 +205,34 @@ function runCrossCheckFmu(
                 if commitfailed
                     mkpath(resultPath)
                     cd(resultPath)
+
                     rm("passed", force = true)
                     rm("rejected", force = true)
                     rm("README.md", force = true)
                     touch("failed")
                 end
+                if plotfailed
+                    mkpath(resultPath)
+                    cd(resultPath)
+
+                    names = keys(GfmuRefValues)
+                    num = length(names)-1
+                    colors = distinguishable_colors(num, [RGB(1,1,1), RGB(0,0,0)])
+                    
+                    fig = plot()
+                    for j in 1:num 
+                        ts = GfmuRefValues[1]
+                        vals = GfmuRefValues[1+j]
+                        plot!(fig, ts, vals; style=:solid, color=colors[j], label="$(names[j])")
+
+                        ts = GsimData.values.t
+                        vals = collect(u[j] for u in GsimData.values.saveval)
+                        plot!(fig, ts, vals; style=:dash, color=colors[j], label=:none)
+                    end
+                    display(fig)
+                    @assert false
+                end
+
             end
         else
             check.skipped = true
@@ -218,28 +246,28 @@ function runCrossCheckFmu(
             end
         end
         check.error = nothing
-    catch e
-        @warn e
-        check.result = nothing
-        check.skipped = false
-        io = IOBuffer()
-        showerror(io, e)
-        check.error = String(take!(io))
-        check.success = false
-        mkpath(resultPath)
-        cd(resultPath)
-        rm("rejected", force = true)
-        rm("passed", force = true)
-        rm("README.md", force = true)
-        if commitfailed
-            touch("failed")
-        end
-    finally
-        try
-            unloadFMU(fmuToCheck)
-        catch
-        end
-    end
+    # catch e
+    #     @warn e
+    #     check.result = nothing
+    #     check.skipped = false
+    #     io = IOBuffer()
+    #     showerror(io, e)
+    #     check.error = String(take!(io))
+    #     check.success = false
+    #     mkpath(resultPath)
+    #     cd(resultPath)
+    #     rm("rejected", force = true)
+    #     rm("passed", force = true)
+    #     rm("README.md", force = true)
+    #     if commitfailed
+    #         touch("failed")
+    #     end
+    # finally
+    #     try
+    #         unloadFMU(fmuToCheck)
+    #     catch
+    #     end
+    # end
     return check
 
 end
@@ -261,6 +289,7 @@ function main()
     skipnotcompliant = haskey(ENV, "crosscheck_skipnotcompliant") ? true : parsed_args["skipnotcompliant"]
     commitrejected = parsed_args["commitrejected"]
     commitfailed = parsed_args["commitfailed"]
+    plotfailed = haskey(ENV, "crosscheck_plotfailed") ? true : parsed_args["plotfailed"]
 
     # checking of inputs
     if fmiVersion != "2.0"
@@ -307,7 +336,7 @@ function main()
     end
 
     #   Excecute FMUs
-    crossChecks = getFmusToTest(fmiCrossCheckRepoPath, fmiVersion, os)
+    crossChecks = getFMUsToTest(fmiCrossCheckRepoPath, fmiVersion, os)
     if !includeFatals
         crossChecks = filter(c -> (!(c.system in EXCLUDED_SYSTEMS)), crossChecks)
     end
@@ -338,13 +367,14 @@ function main()
         cd(checkPath)
         println("Checking $check for $checkPath and expecting $resultPath")
 
-        check = runCrossCheckFmu(
+        check = runCrossCheckFMU(
             checkPath,
             resultPath,
             check,
             skipnotcompliant,
             commitrejected,
             commitfailed,
+            plotfailed,
         )
         crossChecks[index] = check
     end
