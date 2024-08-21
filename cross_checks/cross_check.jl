@@ -4,8 +4,8 @@
 #
 
 using FMI
+using FMI.FMIImport.FMIBase.FMICore
 using FMIZoo
-using FMICore
 using Plots
 using ArgParse
 using Git
@@ -215,25 +215,25 @@ function runCrossCheckFMU(
                     mkpath(resultPath)
                     cd(resultPath)
 
-                    names = keys(GfmuRefValues)
+                    names = keys(fmuRefValues)
                     num = length(names) - 1
-                    colors = distinguishable_colors(num, [RGB(1, 1, 1), RGB(0, 0, 0)])
+                    colors = distinguishable_colors(num)
 
                     fig = plot()
                     for j = 1:num
-                        ts = GfmuRefValues[1]
-                        vals = GfmuRefValues[1+j]
+                        ts = fmuRefValues[1]
+                        vals = fmuRefValues[1+j]
                         plot!(
                             fig,
                             ts,
                             vals;
                             style = :solid,
                             color = colors[j],
-                            label = "$(names[j])",
+                            label = "$(names[j+1])",
                         )
 
-                        ts = GsimData.values.t
-                        vals = collect(u[j] for u in GsimData.values.saveval)
+                        ts = simData.values.t
+                        vals = collect(u[j] for u in simData.values.saveval)
                         plot!(
                             fig,
                             ts,
