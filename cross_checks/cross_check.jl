@@ -4,8 +4,8 @@
 #
 
 using FMI
+using FMI.FMIImport.FMIBase.FMICore
 using FMIZoo
-using FMICore
 using Plots
 using ArgParse
 using Git
@@ -14,6 +14,7 @@ using DelimitedFiles
 using Tables
 using Statistics
 using DifferentialEquations
+using Plots, Colors
 
 import Base64
 
@@ -27,7 +28,7 @@ getInputValues = function (t, u)
     return nothing
 end
 
-getSolver = function()
+getSolver = function ()
     return Tsit5() # CVODE_BDF() # Rosenbrock23(autodiff=false)
 end
 
@@ -66,6 +67,9 @@ function parse_commandline()
         "--commitfailed"
         help = "Also commit the result file for failed FMUs"
         action = :store_true
+        "--plotfailed"
+        help = "Plot result for failed FMUs"
+        action = :store_true
 
     end
     println("Arguments used for cross check:")
@@ -75,13 +79,14 @@ function parse_commandline()
     return parse_args(s)
 end
 
-function runCrossCheckFmu(
+function runCrossCheckFMU(
     checkPath::String,
     resultPath::String,
     check::FmuCrossCheck,
     skipnotcompliant::Bool,
     commitrejected::Bool,
     commitfailed::Bool,
+    plotfailed::Bool,
 )::FmuCrossCheck
     pathToFMU = joinpath(checkPath, "$(check.fmuCheck).fmu")
 
@@ -147,7 +152,7 @@ function runCrossCheckFmu(
                     simData = simulateME(
                         fmuToCheck,
                         (tStart, tStop);
-                        solver=getSolver(),
+                        solver = getSolver(),
                         reltol = relTol,
                         saveat = fmuRefValues[1],
                         inputFunction = getInputValues,
@@ -170,7 +175,7 @@ function runCrossCheckFmu(
                     simData = simulateME(
                         fmuToCheck,
                         (tStart, tStop);
-                        solver=getSolver(),
+                        solver = getSolver(),
                         reltol = relTol,
                         saveat = fmuRefValues[1],
                         recordValues = fmuRecordValueNames,
@@ -200,11 +205,47 @@ function runCrossCheckFmu(
                 if commitfailed
                     mkpath(resultPath)
                     cd(resultPath)
+
                     rm("passed", force = true)
                     rm("rejected", force = true)
                     rm("README.md", force = true)
                     touch("failed")
                 end
+                if plotfailed
+                    mkpath(resultPath)
+                    cd(resultPath)
+
+                    names = keys(fmuRefValues)
+                    num = length(names) - 1
+                    colors = distinguishable_colors(num)
+
+                    fig = plot()
+                    for j = 1:num
+                        ts = fmuRefValues[1]
+                        vals = fmuRefValues[1+j]
+                        plot!(
+                            fig,
+                            ts,
+                            vals;
+                            style = :solid,
+                            color = colors[j],
+                            label = "$(names[j+1])",
+                        )
+
+                        ts = simData.values.t
+                        vals = collect(u[j] for u in simData.values.saveval)
+                        plot!(
+                            fig,
+                            ts,
+                            vals;
+                            style = :dash,
+                            color = colors[j],
+                            label = :none,
+                        )
+                    end
+                    display(fig)
+                end
+
             end
         else
             check.skipped = true
@@ -248,7 +289,9 @@ function main()
     println("#################### Start FMI Cross checks Run ####################")
     # parsing of cli arguments and setting of configuration
     parsed_args = parse_commandline()
-    unpackPath = haskey(ENV, "crosscheck_tempdir") ? ENV["crosscheck_tempdir"] : parsed_args["tempdir"]
+    unpackPath =
+        haskey(ENV, "crosscheck_tempdir") ? ENV["crosscheck_tempdir"] :
+        parsed_args["tempdir"]
     fmiVersion = parsed_args["fmiversion"]
     crossCheckRepo = parsed_args["ccrepo"]
     crossCheckBranch = parsed_args["ccbranch"]
@@ -258,9 +301,11 @@ function main()
         os = "linux64"
     end
     includeFatals = parsed_args["includefatals"]
-    skipnotcompliant = haskey(ENV, "crosscheck_skipnotcompliant") ? true : parsed_args["skipnotcompliant"]
+    skipnotcompliant =
+        haskey(ENV, "crosscheck_skipnotcompliant") ? true : parsed_args["skipnotcompliant"]
     commitrejected = parsed_args["commitrejected"]
     commitfailed = parsed_args["commitfailed"]
+    plotfailed = haskey(ENV, "crosscheck_plotfailed") ? true : parsed_args["plotfailed"]
 
     # checking of inputs
     if fmiVersion != "2.0"
@@ -307,7 +352,7 @@ function main()
     end
 
     #   Excecute FMUs
-    crossChecks = getFmusToTest(fmiCrossCheckRepoPath, fmiVersion, os)
+    crossChecks = getFMUsToTest(fmiCrossCheckRepoPath, fmiVersion, os)
     if !includeFatals
         crossChecks = filter(c -> (!(c.system in EXCLUDED_SYSTEMS)), crossChecks)
     end
@@ -338,13 +383,14 @@ function main()
         cd(checkPath)
         println("Checking $check for $checkPath and expecting $resultPath")
 
-        check = runCrossCheckFmu(
+        check = runCrossCheckFMU(
             checkPath,
             resultPath,
             check,
             skipnotcompliant,
             commitrejected,
             commitfailed,
+            plotfailed,
         )
         crossChecks[index] = check
     end
@@ -353,7 +399,9 @@ function main()
     # Write Summary of Cross Check run
     println("#################### Start FMI Cross check Summary ####################")
     println("\tTotal Cross checks:\t\t\t$(count(c -> (true), crossChecks))")
-    println("\tSuccessful Cross checks:\t\t$(count(c -> (c.success === true), crossChecks))")
+    println(
+        "\tSuccessful Cross checks:\t\t$(count(c -> (c.success === true), crossChecks))",
+    )
     println(
         "\tFailed Cross checks:\t\t\t$(count(c -> (c.success === false && c.error === nothing && c.skipped === false), crossChecks))",
     )
@@ -367,7 +415,10 @@ function main()
     end
     println("\tList of failed Cross checks")
     for (index, success) in enumerate(
-        filter(c -> (c.success === false && c.error === nothing && c.skipped === false), crossChecks),
+        filter(
+            c -> (c.success === false && c.error === nothing && c.skipped === false),
+            crossChecks,
+        ),
     )
         println("\u001B[33m\t\t$(index):\t$(success)\u001B[0m")
     end

@@ -54,6 +54,7 @@ optional arguments:
                         hasn't been executed (e.g. officially not
                         compliant FMUs if they are not skipped)
   --commitfailed        Also commit the result file for failed FMUs
+  --plotfailed          Plot result for failed FMUs (e.g. debugging)
   -h, --help            show this help message and exit
 
 ```

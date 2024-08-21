@@ -42,7 +42,7 @@ Returns a array of all available FMI Cross Checks
 - `fmiVersion::String`: FMI Version used for running the FMUs. Note: Currently only 2.0 officially supported
 - `os::String`: The operating system that is used for running the FMUs
 """
-function getFmusToTest(
+function getFMUsToTest(
     repoPath::String,
     fmiVersion::String,
     os::String,
