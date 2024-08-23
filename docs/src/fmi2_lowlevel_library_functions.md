@@ -64,7 +64,6 @@ fmi2GetFMUstate
 fmi2GetFMUstate!
 fmi2SetFMUstate
 fmi2FreeFMUstate
-fmi2FreeFMUstate!
 fmi2SerializedFMUstateSize
 fmi2SerializedFMUstateSize!
 fmi2SerializeFMUstate
