@@ -13,23 +13,23 @@ on:
       - 'Project.toml'
   
 jobs:
-  sync-files:
+  jupyter:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [windows-latest] # ubuntu-latest
         file-name: [manipulation, modelica_conference_2021, multiple_instances, multiprocessing, multithreading, parameterize, simulate, parameter_optimization]
-        julia-version: ['1.8']
+        julia-version: ['1.10']
         julia-arch: [x64]
         experimental: [false]
 
     steps:
       - name: "Check out repository"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "Set up Julia"
-        uses: julia-actions/setup-julia@v1
+        uses: julia-actions/setup-julia@latest
         with:
             version: ${{ matrix.julia-version }}
             arch: ${{ matrix.julia-arch }}
@@ -44,59 +44,47 @@ jobs:
         env:
           FILE: examples/src/${{ matrix.file-name }}.ipynb
         run: |
-          jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-1.8" --to notebook --inplace --execute ${{ env.FILE }}
+          jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-${{ matrix.julia-version }}" --to notebook --inplace --execute ${{ env.FILE }}
           jupyter nbconvert --to script ${{ env.FILE }}
           jupyter nbconvert --to markdown ${{ env.FILE }}
 
-      - name: Archive examples artifacts
-        if: success() && matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v3
-        with:
-          name: examples
-          path: examples/src/${{ matrix.file-name }}*
+      - name: "run generated jl script to determine success of example building"
+        run: julia --project=examples/ examples/${{ matrix.file-name }}.jl
 
-  auto-commit:
-    needs: sync-files
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
-
-      - name: Download examples
-        uses: actions/download-artifact@v3
-        with:
-          name: examples
-          path: examples/src/
-      
-      - name: auto-commit
+      - name: "auto-commit (retry on merge)"
+        if: success() && github.event_name != 'pull_request' && github.branch == 'main'
+        uses: nick-fields/retry@v3
         env: 
-          CI_COMMIT_MESSAGE: Jupyter nbconvert synch - modified, paired .ipynb files
+          CI_COMMIT_MESSAGE: example-${{ matrix.os }}-${{ matrix.file-name }}-${{ matrix.julia-version }}-${{ matrix.julia-arch }}-${{ matrix.experimental }}[${{ github.ref }}]
           CI_COMMIT_AUTHOR: github-actions[bot]
-          EXAMPLES_PATH: examples/src
-        # Fetch all and clear the stash list. Include all files from the examples/src folder to the stash and switch the branch.
-        # Reset the branch and remove all current files in the examples/src folder. 
+          EXAMPLES_PATH: examples
+        # Fetch all and clear the stash list. Include all files from the examples folder to the stash and switch the branch.
+        # Reset the branch and remove all current files in the examples folder. 
         # Checkout the last stash to restore the new notebooks and apply the stash index to restore all other new files in the folder.
-        run: |
-          git fetch --all
-          git stash clear
-          git stash --include-untracked -- ${{ env.EXAMPLES_PATH }}
-          git switch examples
-          git reset --hard origin/examples
-          rm -rf ${{ env.EXAMPLES_PATH }}
-          git checkout stash -f -- ${{ env.EXAMPLES_PATH }}
-          git stash apply --index
-          git stash drop
-          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
-          git config --global user.email "${{ env.CI_COMMIT_AUTHOR }}@users.noreply.github.com"
-          git config --global core.autocrlf false
-          git add ${{ env.EXAMPLES_PATH }}
-          git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
-          git push origin examples 
+        with:
+          timeout_minutes: 999
+          max_attempts: 10
+          warning_on_retry: false
+          shell: bash
+          command: |
+            git fetch --all
+            git stash clear
+            git stash --include-untracked -- ${{ env.EXAMPLES_PATH }}
+            git switch examples
+            git reset --hard origin/examples
+            git checkout stash -f -- ${{ env.EXAMPLES_PATH }}
+            git stash apply --index
+            git stash drop
+            git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+            git config --global user.email "${{ env.CI_COMMIT_AUTHOR }}@users.noreply.github.com"
+            git config --global core.autocrlf false
+            git add ${{ env.EXAMPLES_PATH }}
+            git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
+            git push origin examples || (git reset --soft HEAD~1 && (exit 1))
 
   call-docu:
-    needs: auto-commit
-    if: github.event_name != 'pull_request'
+    needs: jupyter
+    if: github.event_name != 'pull_request' && github.branch == 'main'
     runs-on: ubuntu-latest
     steps:
       # Trigger an repoisitory dispath event
