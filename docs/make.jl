@@ -32,6 +32,7 @@ makedocs(sitename="FMI.jl",
                 "Manipulation" => "examples/manipulation.md"
                 "Multithreading" => "examples/multithreading.md"
                 "Multiprocessing" => "examples/multiprocessing.md"
+                "Pluto Workshops" => "examples/workshops.md"
             ]
             "User Level API - FMI.jl" => "library.md"
             "Developer Level API" => Any[
