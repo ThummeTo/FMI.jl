@@ -59,14 +59,15 @@ makedocs(sitename="FMI.jl",
                         "fmi3_lowlevel_SE_functions.md",
                     ]
                 ],
-            ]
-            "API Index" => "index_library.md"
-            "FMI Tool Information" => "fmi-tool-info.md"            
-            "Related Publication" => "related.md"
-            "Contents" => "contents.md"
-            hide("Deprecated" => "deprecated.md")
+            ],
         ]
-    )
+        "API Index" => "index_library.md"
+        "FMI Tool Information" => "fmi-tool-info.md"
+        "Related Publication" => "related.md"
+        "Contents" => "contents.md"
+        hide("Deprecated" => "deprecated.md")
+    ],
+)
 
 function deployConfig()
     github_repository = get(ENV, "GITHUB_REPOSITORY", "")
@@ -78,4 +79,8 @@ function deployConfig()
     return GitHubActions(github_repository, github_event_name, github_ref)
 end
 
-deploydocs(repo = "github.com/ThummeTo/FMI.jl.git", devbranch = "main", deploy_config = deployConfig())
+deploydocs(
+    repo = "github.com/ThummeTo/FMI.jl.git",
+    devbranch = "main",
+    deploy_config = deployConfig(),
+)

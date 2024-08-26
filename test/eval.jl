@@ -2,9 +2,9 @@ using PkgEval
 using FMI
 using Test
 
-config = Configuration(; julia="1.10", time_limit=120*60);
+config = Configuration(; julia = "1.10", time_limit = 120 * 60);
 
-package = Package(; name="FMI");
+package = Package(; name = "FMI");
 
 @info "PkgEval"
 result = evaluate([config], [package])

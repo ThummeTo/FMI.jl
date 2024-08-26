@@ -27,20 +27,28 @@ for exec in FMU_EXECUTION_CONFIGURATIONS
     exec.assertOnWarning = true
 end
 
-function getFMUStruct(modelname, mode, tool=ENV["EXPORTINGTOOL"], version=ENV["EXPORTINGVERSION"], fmiversion=ENV["FMIVERSION"], fmustruct=ENV["FMUSTRUCT"]; kwargs...)
-    
+function getFMUStruct(
+    modelname,
+    mode,
+    tool = ENV["EXPORTINGTOOL"],
+    version = ENV["EXPORTINGVERSION"],
+    fmiversion = ENV["FMIVERSION"],
+    fmustruct = ENV["FMUSTRUCT"];
+    kwargs...,
+)
+
     # choose FMU or FMUComponent
     if endswith(modelname, ".fmu")
         fmu = loadFMU(modelname; kwargs...)
     else
-        fmu = loadFMU(modelname, tool, version, fmiversion; kwargs...) 
+        fmu = loadFMU(modelname, tool, version, fmiversion; kwargs...)
     end
 
     if fmustruct == "FMU"
         return fmu, fmu
 
     elseif fmustruct == "FMUCOMPONENT"
-        inst, _ = FMI.prepareSolveFMU(fmu, nothing, mode; loggingOn=true)
+        inst, _ = FMI.prepareSolveFMU(fmu, nothing, mode; loggingOn = true)
         @test !isnothing(inst)
         return inst, fmu
 
@@ -52,7 +60,7 @@ end
 @testset "FMI.jl" begin
     if Sys.iswindows() || Sys.islinux()
         @info "Automated testing is supported on Windows/Linux."
-        
+
         ENV["EXPORTINGTOOL"] = "Dymola"
         ENV["EXPORTINGVERSION"] = "2023x"
 
@@ -65,12 +73,12 @@ end
                     ENV["FMUSTRUCT"] = fmustruct
 
                     @testset "Functions for $(ENV["FMUSTRUCT"])" begin
-        
+
                         @info "CS Simulation (sim_CS.jl)"
                         @testset "CS Simulation" begin
                             include("sim_CS.jl")
                         end
-        
+
                         @info "ME Simulation (sim_ME.jl)"
                         @testset "ME Simulation" begin
                             include("sim_ME.jl")
@@ -80,7 +88,7 @@ end
                         @testset "SE Simulation" begin
                             include("sim_SE.jl")
                         end
-        
+
                         @info "Simulation FMU without states (sim_zero_state.jl)"
                         @testset "Simulation FMU without states" begin
                             include("sim_zero_state.jl")
@@ -93,22 +101,28 @@ end
                     #         include("FMI2/performance.jl")
                     #     end
                     # else
-                        @info "Julia Version $(VERSION), skipping performance tests ..."
+                    @info "Julia Version $(VERSION), skipping performance tests ..."
                     #end
                 end
             end
         end
+
+        @testset "Aqua.jl" begin
+            @info "Aqua: Method ambiguity"
+            @testset "Method ambiguities" begin
+                Aqua.test_ambiguities([FMI])
+            end
+
+            @info "Aqua: Piracies"
+            @testset "Piracies" begin
+                Aqua.test_piracies(FMI) # ; broken = true)
+            end
+
+            @info "Aqua: Testing all (method ambiguities and piracies are tested separately)"
+            Aqua.test_all(FMI; ambiguities = false, piracies = false)
+        end
+
     elseif Sys.isapple()
         @warn "Test-sets are currently using Windows- and Linux-FMUs, automated testing for macOS is currently not supported."
-    end
-    @testset "Aqua.jl" begin
-        # Ambiguities in external packages
-        @testset "Method ambiguity" begin
-            Aqua.test_ambiguities([FMI])
-        end
-        @testset "Piracy" begin
-            Aqua.test_piracies(FMI; broken = true)
-        end
-        Aqua.test_all(FMI; ambiguities = false, piracies = false)
     end
 end

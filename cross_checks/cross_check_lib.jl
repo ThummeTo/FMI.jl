@@ -13,11 +13,14 @@ Hint: This will not check the cross check repository for integrety
 # Returns
 - `repoPath::String`: The path where the repository can be found locally (including the repository name)
 """
-function getFmuCrossCheckRepo(crossCheckRepo::String, unpackPath::Union{String, Nothing} = nothing)::String
+function getFmuCrossCheckRepo(
+    crossCheckRepo::String,
+    unpackPath::Union{String,Nothing} = nothing,
+)::String
     @info "Create temporary working directory"
     if unpackPath === nothing
         # cleanup=true leads to issues with automatic testing on linux server.
-        unpackPath = mktempdir(; prefix="fmicrosschecks_", cleanup=false)
+        unpackPath = mktempdir(; prefix = "fmicrosschecks_", cleanup = false)
         @info "temporary working directory created at $(unpackPath)"
     end
 
@@ -25,7 +28,7 @@ function getFmuCrossCheckRepo(crossCheckRepo::String, unpackPath::Union{String, 
     fmiCrossCheckRepoPath = joinpath(unpackPath, FMI_CROSS_CHECK_REPO_NAME)
     if !isdir(fmiCrossCheckRepoPath)
         println("Checking out cross-checks from $(crossCheckRepo)...")
-        run(Cmd(`$(git()) clone $(crossCheckRepo)`, dir=unpackPath))
+        run(Cmd(`$(git()) clone $(crossCheckRepo)`, dir = unpackPath))
     else
         println("Using existing cross-checks at $(fmiCrossCheckRepoPath)")
     end
@@ -39,7 +42,11 @@ Returns a array of all available FMI Cross Checks
 - `fmiVersion::String`: FMI Version used for running the FMUs. Note: Currently only 2.0 officially supported
 - `os::String`: The operating system that is used for running the FMUs
 """
-function getFmusToTest(repoPath::String, fmiVersion::String, os::String)::Vector{FmuCrossCheck}
+function getFmusToTest(
+    repoPath::String,
+    fmiVersion::String,
+    os::String,
+)::Vector{FmuCrossCheck}
     results = []
     fmiTypes = [ME, CS]
     for type in fmiTypes
@@ -65,7 +72,22 @@ function getFmusToTest(repoPath::String, fmiVersion::String, os::String)::Vector
                         @info "$checkPath is not compliant with latest rules"
                         notCompliant = true
                     end
-                    push!(results, FmuCrossCheck(fmiVersion, type, os, system, version, check, notCompliant, missing, missing, missing, missing)) 
+                    push!(
+                        results,
+                        FmuCrossCheck(
+                            fmiVersion,
+                            type,
+                            os,
+                            system,
+                            version,
+                            check,
+                            notCompliant,
+                            missing,
+                            missing,
+                            missing,
+                            missing,
+                        ),
+                    )
                 end
             end
         end
@@ -83,7 +105,11 @@ It is normalized to the difference between the smallest and largest values of th
 # Returns
 - `nrmse::Float64`: the mean of the nrmse of all recorded variables
 """
-function calucateNRMSE(recordedVariables::Vector{String}, simData::FMUSolution, referenceData)::Float64
+function calucateNRMSE(
+    recordedVariables::Vector{String},
+    simData::FMUSolution,
+    referenceData,
+)::Float64
     squaredErrorSums = zeros(length(recordedVariables))
     valueCount = zeros(length(recordedVariables))
     minimalValues = []
@@ -96,16 +122,26 @@ function calucateNRMSE(recordedVariables::Vector{String}, simData::FMUSolution, 
                     if (length(minimalValues) < nameIndex + 1)
                         push!(minimalValues, referenceData[nameIndex+1][valIndex])
                     else
-                        minimalValues[nameIndex] = min(minimalValues[nameIndex], referenceData[nameIndex+1][valIndex])
+                        minimalValues[nameIndex] = min(
+                            minimalValues[nameIndex],
+                            referenceData[nameIndex+1][valIndex],
+                        )
                     end
                     if (length(maximalValues) < nameIndex + 1)
                         push!(maximalValues, referenceData[nameIndex+1][valIndex])
                     else
-                        maximalValues[nameIndex] = max(maximalValues[nameIndex], referenceData[nameIndex+1][valIndex])
+                        maximalValues[nameIndex] = max(
+                            maximalValues[nameIndex],
+                            referenceData[nameIndex+1][valIndex],
+                        )
                     end
-                    squaredErrorSums[nameIndex] += ((simData.values.saveval[simIndex][nameIndex] - referenceData[nameIndex+1][valIndex]))^2
+                    squaredErrorSums[nameIndex] +=
+                        ((
+                            simData.values.saveval[simIndex][nameIndex] -
+                            referenceData[nameIndex+1][valIndex]
+                        ))^2
                 end
-                break;
+                break
             end
         end
     end
@@ -115,13 +151,18 @@ function calucateNRMSE(recordedVariables::Vector{String}, simData::FMUSolution, 
         if (valueRange == 0)
             valueRange = 1
         end
-        value = (sqrt(squaredErrorSums[recordValue]/valueCount[recordValue])/(valueRange))
+        value =
+            (sqrt(squaredErrorSums[recordValue] / valueCount[recordValue]) / (valueRange))
         push!(errors, value)
     end
     return mean(errors)
 end
 
-function create_ssh_private_key(dir::AbstractString, ssh_pkey::AbstractString, os::AbstractString)::String
+function create_ssh_private_key(
+    dir::AbstractString,
+    ssh_pkey::AbstractString,
+    os::AbstractString,
+)::String
     is_linux = occursin("linux", os)
     if is_linux
         run(`chmod 700 $dir`)
@@ -158,10 +199,8 @@ function decode_ssh_private_key(content::AbstractString)::String
         return content
     end
 
-    @info(
-        "This doesn't look like a raw SSH private key. 
-        I will assume that it is a Base64-encoded SSH private key."
-    )
+    @info("This doesn't look like a raw SSH private key. 
+          I will assume that it is a Base64-encoded SSH private key.")
     decoded_content = String(Base64.base64decode(content))
     return decoded_content
 end
