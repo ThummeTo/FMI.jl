@@ -4,35 +4,35 @@
 #
 
 import Pkg;
-Pkg.develop(path = joinpath(@__DIR__, "../../FMI.jl"));
+Pkg.develop(path=joinpath(@__DIR__, "../../FMI.jl"));
 using Documenter, Plots, JLD2, DataFrames, CSV, MAT, FMI, FMIBase, FMIImport, FMICore
 using Documenter: GitHubActions
 
 example_pages = [
-            "Overview" => "examples/overview.md"
-            "Simulate" => "examples/simulate.md"
-            "Parameterize" => "examples/parameterize.md"
-            "Inputs" => "examples/inputs.md"
-            "Multiple instances" => "examples/multiple_instances.md"
-            "Modelica conference 2021" => "examples/modelica_conference_2021.md"
-            "Manipulation" => "examples/manipulation.md"
-            "Multithreading" => "examples/multithreading.md"
-            "Multiprocessing" => "examples/multiprocessing.md"
-        ]
+    "Overview" => "examples/overview.md"
+    "Simulate" => "examples/simulate.md"
+    "Parameterize" => "examples/parameterize.md"
+    "Inputs" => "examples/inputs.md"
+    "Multiple instances" => "examples/multiple_instances.md"
+    "Modelica conference 2021" => "examples/modelica_conference_2021.md"
+    "Manipulation" => "examples/manipulation.md"
+    "Multithreading" => "examples/multithreading.md"
+    "Multiprocessing" => "examples/multiprocessing.md"
+]
 
 makedocs(
-    sitename = "FMI.jl",
-    format = Documenter.HTML(
-        collapselevel = 1,
-        sidebar_sitename = false,
-        edit_link = nothing,
-        size_threshold = 512000,
-        size_threshold_ignore = ["deprecated.md"],
+    sitename="FMI.jl",
+    format=Documenter.HTML(
+        collapselevel=1,
+        sidebar_sitename=false,
+        edit_link=nothing,
+        size_threshold=512000,
+        size_threshold_ignore=["deprecated.md"],
     ),
-    modules = [FMI, FMIImport, FMICore, FMIBase],
-    checkdocs = :exports,
-    linkcheck = true,
-    pages = Any[
+    modules=[FMI, FMIImport, FMICore, FMIBase],
+    checkdocs=:exports,
+    linkcheck=true,
+    pages=Any[
         "Introduction" => "index.md"
         "Features" => "features.md"
         "FAQ" => "faq.md"
@@ -84,7 +84,7 @@ function deployConfig()
 end
 
 deploydocs(
-    repo = "github.com/ThummeTo/FMI.jl.git",
-    devbranch = "main",
-    deploy_config = deployConfig(),
+    repo="github.com/ThummeTo/FMI.jl.git",
+    devbranch="main",
+    deploy_config=deployConfig(),
 )
