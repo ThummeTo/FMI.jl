@@ -49,7 +49,7 @@ jobs:
           jupyter nbconvert --to markdown ${{ env.FILE }}
 
       - name: "run generated jl script to determine success of example building"
-        run: julia --project=examples/ examples/${{ matrix.file-name }}.jl
+        run: julia --project=examples/ examples/src/${{ matrix.file-name }}.jl
 
       - name: "auto-commit (retry on merge)"
         if: success() && github.event_name != 'pull_request' && github.branch == 'main'
