@@ -55,13 +55,3 @@ jobs:
       # Run the tests
       - name: "Run tests"
         uses: julia-actions/julia-runtest@v1
-
-      # Preprocess Coverage
-      - name: "Preprocess Coverage"
-        uses: julia-actions/julia-processcoverage@v1
-
-      # Run codecov
-      - name: "Run CodeCov"
-        uses: codecov/codecov-action@v3
-        with:
-          file: lcov.info
