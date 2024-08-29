@@ -3,7 +3,7 @@
 This section discusses the included examples of the FMI.jl library.
 If you require further information about the function calls, see the function sections of the [library](https://thummeto.github.io/FMI.jl/dev/library/).
 
-Examples are subdevided into *Basics*, *Advanced* and *Publication appendices*.
+Examples are subdevided into *Basics*, *Advanced*, *Pluto workshops* and *Publication appendices*.
 
 
 **Basic examples:**
@@ -19,6 +19,11 @@ Examples are subdevided into *Basics*, *Advanced* and *Publication appendices*.
 - [__Manipulation__](https://thummeto.github.io/FMI.jl/dev/examples/manipulation/): Showing how to redefine a linked C-library function of FMU.
 - [__Multithreading__](https://thummeto.github.io/FMI.jl/dev/examples/multithreading/): Shows how to use multithreading to simulate multiple FMUs.
 - [__Multiprocessing__](https://thummeto.github.io/FMI.jl/dev/examples/multiprocessing/): Shows how to use multiprocessing to simulate multiple FMUs.
+
+
+**Pluto workshops:**
+
+- [__Pluto workshops__](https://thummeto.github.io/FMI.jl/dev/examples/workshops/): [Pluto](https://plutojl.org/) based notebooks, that can easyly be executed on your own Pluto-Setup.
 
 
 **Publication appendices:**

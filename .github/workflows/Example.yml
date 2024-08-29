@@ -129,7 +129,7 @@ jobs:
             git push origin examples || (git reset --soft HEAD~1 && (exit 1))
 
   call-docu:
-    needs: [jypiter, pluto]
+    needs: [jupyter, pluto]
     if: github.event_name != 'pull_request' && github.branch == 'main'
     runs-on: ubuntu-latest
     steps:
