@@ -30,7 +30,7 @@ jobs:
 
       # Set up Julia
       - name: "Set up Julia"
-        uses: julia-actions/setup-julia@v1
+        uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.julia-version }}
           arch: ${{ matrix.julia-arch }}
