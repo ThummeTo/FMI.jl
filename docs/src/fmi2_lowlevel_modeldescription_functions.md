@@ -48,20 +48,3 @@ fmi2GetNames
 ```@docs
 ```
 fmi2GetOutputValueReferencesAndNames
-
-
-## States
-
-```@docs
-```
-
-## Derivatives
-
-```@docs
-```
-
-## Variables
-
-```@docs
-```
-

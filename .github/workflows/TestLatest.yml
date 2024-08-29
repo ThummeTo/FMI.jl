@@ -26,7 +26,7 @@ jobs:
     steps:
       # Checks-out your repository
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Set up Julia
       - name: "Set up Julia"
@@ -37,7 +37,7 @@ jobs:
 
      # Set up cache
       - name: "Set up cache"
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: cache-artifacts
         with:
@@ -62,6 +62,8 @@ jobs:
 
       # Run codecov
       - name: "Run CodeCov"
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           file: lcov.info

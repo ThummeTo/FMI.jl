@@ -8,9 +8,9 @@ More information: https://github.com/modelica/fmi-cross-check
 
 ### Automated run using github actions
 
-The `..\.github\workflow` folder contains a `CrossChecks.yml` file that configures the excecution of the fmi cross checks using a github action.
+The `..\.github\workflow` folder contains a `CrossChecks.yml` file that configures the execution of the FMI cross checks using a github action.
 
-This action pulls the fmi cross checks from a repository, excecutes them and pushes the result files back to the repository. These specified repository needs to be forked before from https://github.com/modelica/fmi-cross-check. After forking the fmi-cross-check repository, a access token with repo rights needs to be generated (https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+This action pulls the FMI cross checks from a repository, executes them and pushes the result files back to the repository. These specified repository needs to be forked before from https://github.com/modelica/fmi-cross-check. After forking the fmi-cross-check repository, a access token with repo rights needs to be generated (https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 
 In order to use the action you need to be set the following information about your fmi-cross-check repository the FMI.jl repository as secrets and variables.
 
@@ -18,7 +18,7 @@ In order to use the action you need to be set the following information about yo
 * (Variable) `CROSS_CHECK_REPO_USER`: The user that has write access to the fmi-cross-check repository and for which the token was created. (Example: `johndoe`)
 * (Secret) `CROSS_CHECK_REPO_TOKEN`: The github token that was created for the fmi-cross-check repository (Example: `ghp_IqHJF673SD...`)
 
-Not setting these values correctly will prevent the results to be pushed to your fmi-cross-check repositoy. However you will still be able to see the result summary of your run in the github action logs.
+Not setting these values correctly will prevent the results to be pushed to your fmi-cross-check repository. However you will still be able to see the result summary of your run in the github action logs.
 
 ### Manual run
 
@@ -36,7 +36,7 @@ optional arguments:
   --os OS               The operating system for which the cross
                         checks should be excecuted (default:
                         "windows-latest")
-  --ccrepo CCREPO       The Url to the git repository that contains
+  --ccrepo CCREPO       The URL to the git repository that contains
                         the cross checks. (default:
                         "https://github.com/modelica/fmi-cross-check")
   --ccbranch CCBRANCH   The name of the branch in which the results
@@ -49,11 +49,12 @@ optional arguments:
   --includefatals       Include FMUs that have caused the cross check
                         runner to fail and exit
   --skipnotcompliant    Reject officially not compliant FMUs and don't
-                        excecute them
+                        execute them
   --commitrejected      Also commit the result file for FMUs that
-                        hasn't been excecuted (e.g. officially not
+                        hasn't been executed (e.g. officially not
                         compliant FMUs if they are not skipped)
   --commitfailed        Also commit the result file for failed FMUs
+  --plotfailed          Plot result for failed FMUs (e.g. debugging)
   -h, --help            show this help message and exit
 
 ```

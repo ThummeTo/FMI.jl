@@ -26,7 +26,7 @@ jobs:
     steps:
       # Checks-out your repository
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Set up Julia
       - name: "Set up Julia"
@@ -37,7 +37,7 @@ jobs:
 
      # Set up cache
       - name: "Set up cache"
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: cache-artifacts
         with:
@@ -55,13 +55,3 @@ jobs:
       # Run the tests
       - name: "Run tests"
         uses: julia-actions/julia-runtest@v1
-
-      # Preprocess Coverage
-      - name: "Preprocess Coverage"
-        uses: julia-actions/julia-processcoverage@v1
-
-      # Run codecov
-      - name: "Run CodeCov"
-        uses: codecov/codecov-action@v3
-        with:
-          file: lcov.info

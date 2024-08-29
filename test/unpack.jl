@@ -5,7 +5,8 @@
 
 # test different unpacking path options for FMUs
 
-pathToFMU = get_model_filename("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
+pathToFMU =
+    get_model_filename("SpringPendulum1D", ENV["EXPORTINGTOOL"], ENV["EXPORTINGVERSION"])
 
 # load FMU in temporary directory
 fmuStruct, myFMU = getFMUStruct(pathToFMU)
@@ -15,6 +16,6 @@ fmiUnload(myFMU)
 
 # load FMU in source directory 
 fmuDir = joinpath(splitpath(pathToFMU)[1:end-1]...)
-fmuStruct, myFMU = getFMUStruct(pathToFMU; unpackPath=fmuDir)
+fmuStruct, myFMU = getFMUStruct(pathToFMU; unpackPath = fmuDir)
 @test isfile(splitext(pathToFMU)[1] * ".zip") == true
 @test isdir(splitext(pathToFMU)[1]) == true

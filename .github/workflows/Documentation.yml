@@ -23,12 +23,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Check out repository"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
-          version: '1.9'
+          version: '1'
           arch: x64
 
       - name: "Copy examples, readme"

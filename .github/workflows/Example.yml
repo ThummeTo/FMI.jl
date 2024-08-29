@@ -1,4 +1,4 @@
-name: Examples v1 (latest)
+name: Examples
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest] # ubuntu-latest
-        file-name: [manipulation, modelica_conference_2021, multiple_instances, multiprocessing, multithreading, parameterize, simulate, parameter_optimization]
+        file-name: [inputs, manipulation, modelica_conference_2021, multiple_instances, multiprocessing, multithreading, parameterize, simulate, parameter_optimization]
         julia-version: ['1.10']
         julia-arch: [x64]
         experimental: [false]
@@ -49,13 +49,13 @@ jobs:
           jupyter nbconvert --to markdown ${{ env.FILE }}
 
       - name: "run generated jl script to determine success of example building"
-        run: julia --project=examples/ examples/${{ matrix.file-name }}.jl
+        run: julia --project=examples/ examples/src/${{ matrix.file-name }}.jl
 
       - name: "auto-commit (retry on merge)"
         if: success() && github.event_name != 'pull_request' && github.branch == 'main'
         uses: nick-fields/retry@v3
         env: 
-          CI_COMMIT_MESSAGE: example-${{ matrix.os }}-${{ matrix.file-name }}-${{ matrix.julia-version }}-${{ matrix.julia-arch }}-${{ matrix.experimental }}[${{ github.ref }}]
+          CI_COMMIT_MESSAGE: example-jupyter-${{ matrix.file-name }}-${{ matrix.os }}-${{ matrix.julia-version }}-${{ matrix.julia-arch }}-${{ matrix.experimental }}[${{ github.ref }}]
           CI_COMMIT_AUTHOR: github-actions[bot]
           EXAMPLES_PATH: examples
         # Fetch all and clear the stash list. Include all files from the examples folder to the stash and switch the branch.
@@ -78,6 +78,7 @@ jobs:
             git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
             git config --global user.email "${{ env.CI_COMMIT_AUTHOR }}@users.noreply.github.com"
             git config --global core.autocrlf false
+            git pull
             git add ${{ env.EXAMPLES_PATH }}
             git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
             git push origin examples || (git reset --soft HEAD~1 && (exit 1))
@@ -99,7 +100,7 @@ jobs:
         if: success() && github.event_name != 'pull_request' && github.branch == 'main'
         uses: nick-fields/retry@v3
         env: 
-          CI_COMMIT_MESSAGE: pluto-examples[${{ github.ref }}]
+          CI_COMMIT_MESSAGE: examples-pluto[${{ github.ref }}]
           CI_COMMIT_AUTHOR: github-actions[bot]
           EXAMPLES_PATH: examples
         # Fetch all and clear the stash list. Include all files from the examples folder to the stash and switch the branch.
@@ -134,6 +135,6 @@ jobs:
     steps:
       # Trigger an repoisitory dispath event
       - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v2
+        uses: peter-evans/repository-dispatch@v3
         with:
           event-type: trigger-docu

@@ -3,12 +3,13 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-function warnDeprecated(oldStr, newStr, additional="")
-    @warn "`$(oldStr)` is deprecated, use `$(newStr)` instead. $(additional)\n(this message is printed 3 times)." maxlog=3
+function warnDeprecated(oldStr, newStr, additional = "")
+    @warn "`$(oldStr)` is deprecated, use `$(newStr)` instead. $(additional)\n(this message is printed 3 times)." maxlog =
+        3
 end
 
 function fmi2Simulate(args...; kwargs...)
-    warnDeprecated("fmi2Simulate", "simulate")
+    warnDeprecated("fmi2Simulate", "simulate", "FMI version is determined automatically.")
     simulate(args...; kwargs...)
 end
 export fmi2Simulate
@@ -20,7 +21,11 @@ end
 export fmiSimulate
 
 function fmi2SimulateME(args...; kwargs...)
-    warnDeprecated("fmi2SimulateME", "simulateME", "FMI version is determined automatically.")
+    warnDeprecated(
+        "fmi2SimulateME",
+        "simulateME",
+        "FMI version is determined automatically.",
+    )
     simulateME(args...; kwargs...)
 end
 export fmi2SimulateME
@@ -32,7 +37,11 @@ end
 export fmiSimulateME
 
 function fmi2SimulateCS(args...; kwargs...)
-    warnDeprecated("fmi2SimulateCS", "simulateCS", "FMI version is determined automatically.")
+    warnDeprecated(
+        "fmi2SimulateCS",
+        "simulateCS",
+        "FMI version is determined automatically.",
+    )
     simulateCS(args...; kwargs...)
 end
 export fmi2SimulateCS
@@ -83,7 +92,7 @@ function fmiInfo(args...; kwargs...)
     warnDeprecated("fmiInfo", "info")
     info(args...; kwargs...)
 end
-export fmi2Info
+export fmiInfo
 
 function fmi2Info(args...; kwargs...)
     warnDeprecated("fmi2Info", "info", "FMI version is determined automatically.")
