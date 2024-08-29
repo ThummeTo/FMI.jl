@@ -24,7 +24,7 @@ jobs:
 
       # Set up Julia
       - name: "Set up Julia"
-        uses: julia-actions/setup-julia@latest
+        uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
           arch: ${{ matrix.julia-arch }}
