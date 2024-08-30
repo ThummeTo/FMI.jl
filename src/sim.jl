@@ -30,15 +30,15 @@ You can force a specific simulation mode by calling [`simulateCS`](@ref), [`simu
 # Keyword arguments
 - `recordValues::fmi2ValueReferenceFormat` = nothing: Array of variables (Strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
 - `saveat = nothing`: Time points to save (interpolated) values at (default = nothing: save at each solver timestep)
-- `setup::Bool`: call fmi2SetupExperiment, fmi2EnterInitializationMode and fmi2ExitInitializationMode before each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
-- `reset::Bool`: call fmi2Reset before each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
-- `instantiate::Bool`: call fmi2Instantiate! before each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
-- `freeInstance::Bool`: call fmi2FreeInstance after each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
-- `terminate::Bool`: call fmi2Terminate after each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
+- `setup::Bool`: call fmi2SetupExperiment, fmi2EnterInitializationMode and fmi2ExitInitializationMode before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `reset::Bool`: call fmi2Reset before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `instantiate::Bool`: call fmi2Instantiate! before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `freeInstance::Bool`: call fmi2FreeInstance after each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `terminate::Bool`: call fmi2Terminate after each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
 - `inputValueReferences::fmi2ValueReferenceFormat = nothing`: Input variables (Strings or variableIdentifiers) to set at each simulation step 
 - `inputFunction = nothing`: Function to get values for the input variables at each simulation step. 
 - `parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing`: Dict of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization
-- `showProgress::Bool = true`: print simulation progressmeter in REPL
+- `showProgress::Bool = true`: print simulation progress meter in REPL
 
 ## Input function pattern 
 [`c`: current component, `u`: current state ,`t`: current time, returning array of values to be passed to `fmi2SetReal(..., inputValueReferences, inputFunction(...))` or `fmi3SetFloat64`]:
@@ -110,18 +110,18 @@ State- and Time-Events are handled correctly.
 - `recordEventIndicators::Union{AbstractArray{<:Integer, 1}, UnitRange{<:Integer}, Nothing} = nothing`: Array or Range of event indicators to record
 - `recordEigenvalues::Bool=false`: compute and record eigenvalues
 - `saveat = nothing`: Time points to save (interpolated) values at (default = nothing: save at each solver timestep)
-- `x0::Union{AbstractArray{<:Real}, Nothing} = nothing`: inital fmu State (default = nothing: use current or default-inital fmu state)
-- `setup::Bool`: call fmi2SetupExperiment, fmi2EnterInitializationMode and fmi2ExitInitializationMode before each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
-- `reset::Bool`: call fmi2Reset before each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
-- `instantiate::Bool`: call fmi2Instantiate! before each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
-- `freeInstance::Bool`: call fmi2FreeInstance after each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
-- `terminate::Bool`: call fmi2Terminate after each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
+- `x0::Union{AbstractArray{<:Real}, Nothing} = nothing`: initial fmu State (default = nothing: use current or default-initial fmu state)
+- `setup::Bool`: call fmi2SetupExperiment, fmi2EnterInitializationMode and fmi2ExitInitializationMode before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `reset::Bool`: call fmi2Reset before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `instantiate::Bool`: call fmi2Instantiate! before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `freeInstance::Bool`: call fmi2FreeInstance after each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `terminate::Bool`: call fmi2Terminate after each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
 - `inputValueReferences::fmi2ValueReferenceFormat = nothing`: Input variables (Strings or variableIdentifiers) to set at each simulation step 
 - `inputFunction = nothing`: Function to get values for the input variables at each simulation step. 
 - `parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing`: Dict of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization
 - `callbacksBefore = []`: callbacks to call *before* the internal callbacks for state- and time-events are called
 - `callbacksAfter = []`: callbacks to call *after* the internal callbacks for state- and time-events are called
-- `showProgress::Bool = true`: print simulation progressmeter in REPL
+- `showProgress::Bool = true`: print simulation progress meter in REPL
 - `solveKwargs...`: keyword arguments that get passed onto the solvers solve call
 
 ## Input function pattern 
@@ -161,7 +161,7 @@ function simulateME(
     solveKwargs...,
 )
 
-    @assert isModelExchange(fmu) "simulateME(...): This function supports Model Excahnge FMUs only."
+    @assert isModelExchange(fmu) "simulateME(...): This function supports Model Exchange FMUs only."
 
     recordValues = prepareValueReference(fmu, recordValues)
     inputValueReferences = prepareValueReference(fmu, inputValueReferences)
@@ -309,15 +309,15 @@ State- and Time-Events are handled internally by the FMU.
 - `tolerance::Union{Real, Nothing} = nothing`: The tolerance for the internal FMU solver.
 - `recordValues::fmi2ValueReferenceFormat` = nothing: Array of variables (Strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
 - `saveat = nothing`: Time points to save (interpolated) values at (default = nothing: save at each solver timestep)
-- `setup::Bool`: call fmi2SetupExperiment, fmi2EnterInitializationMode and fmi2ExitInitializationMode before each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
-- `reset::Bool`: call fmi2Reset before each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
-- `instantiate::Bool`: call fmi2Instantiate! before each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
-- `freeInstance::Bool`: call fmi2FreeInstance after each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
-- `terminate::Bool`: call fmi2Terminate after each step (default = nothing: use value from `fmu`'s `FMU2ExecutionConfiguration`)
+- `setup::Bool`: call fmi2SetupExperiment, fmi2EnterInitializationMode and fmi2ExitInitializationMode before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `reset::Bool`: call fmi2Reset before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `instantiate::Bool`: call fmi2Instantiate! before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `freeInstance::Bool`: call fmi2FreeInstance after each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `terminate::Bool`: call fmi2Terminate after each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
 - `inputValueReferences::fmi2ValueReferenceFormat = nothing`: Input variables (Strings or variableIdentifiers) to set at each simulation step 
 - `inputFunction = nothing`: Function to get values for the input variables at each simulation step. 
 - `parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing`: Dict of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization
-- `showProgress::Bool = true`: print simulation progressmeter in REPL
+- `showProgress::Bool = true`: print simulation progress meter in REPL
 
 ## Input function pattern 
 [`c`: current component, `u`: current state ,`t`: current time, returning array of values to be passed to `fmi2SetReal(..., inputValueReferences, inputFunction(...))` or `fmi3SetFloat64`]:
