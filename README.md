@@ -24,6 +24,8 @@ If you want to migrate your project from [*FMI.jl*](https://github.com/ThummeTo/
 
 - [x] [*FMICore.jl*](https://github.com/ThummeTo/FMICore.jl) and [*FMIImport.jl*](https://github.com/ThummeTo/FMIImport.jl) were divided into [*FMICore.jl*](https://github.com/ThummeTo/FMICore.jl), [*FMIImport.jl*](https://github.com/ThummeTo/FMIImport.jl) and [*FMIBase.jl*](https://github.com/ThummeTo/FMIBase.jl). [*FMICore.jl*](https://github.com/ThummeTo/FMICore.jl) now holds the pure standard definition (C-types and -functions), while [*FMIBase.jl*](https://github.com/ThummeTo/FMIBase.jl) holds everything that is needed on top of that in [*FMIImport.jl*](https://github.com/ThummeTo/FMIImport.jl) as well as in [*FMIExport.jl*](https://github.com/ThummeTo/FMIExport.jl).
 
+- [ ] Updated all library examples.
+
 - [ ] Updated all library tests for a better code coverage.
 
 - [ ] We tried to document every function, if you find undocumented user-level functions, please open an issue or PR.
@@ -76,6 +78,7 @@ unloadFMU(myFMU)
 - importing the full FMI 2.0.3 and FMI 3.0.0 command set, including optional specials like `fmi2GetState`, `fmi2SetState` and `fmi2GetDirectionalDerivatives`
 - parameterization, simulation & plotting of CS- and ME-FMUs
 - event-handling for imported discontinuous ME-FMUs
+- 64-bit and 32-bit FMUs
 
 |                                   | **FMI2.0.3** |        | **FMI3.0** |        | **SSP1.0** |        |
 |-----------------------------------|--------------|--------|------------|--------|------------|--------|
