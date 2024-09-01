@@ -64,7 +64,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download examples
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: examples
           path: examples/src/
