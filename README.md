@@ -75,7 +75,7 @@ unloadFMU(myFMU)
 ```
 
 ## What is currently supported in FMI.jl?
-- importing the full FMI 2.0.3 and FMI 3.0.0 command set, including optional specials like `fmi2GetState`, `fmi2SetState` and `fmi2GetDirectionalDerivatives`
+- importing the full FMI 2.0.3 and FMI 3.0.0 command set, including optional specials like `fmi2GetFMUstate`, `fmi2SetFMUstate` and `fmi2GetDirectionalDerivatives`
 - parameterization, simulation & plotting of CS- and ME-FMUs
 - event-handling for imported discontinuous ME-FMUs
 
@@ -89,9 +89,9 @@ unloadFMU(myFMU)
 | Explicit solvers                  | ✔️✔️         | ✔️✔️  | ✔️✔️      | 📅     | 📅         | 📅      |
 | Implicit solvers (autodiff=false) | ✔️✔️         | ✔️✔️  | ✔️✔️      | 📅     | 📅         | 📅      |
 | Implicit solvers (autodiff=true)  | ✔️           | ✔️✔️   | ✔️        | 📅     | 📅         | 📅      |
-| get/setState                      | ✔️✔️         | 📅     | ✔️✔️     | 📅     | 🚫         | 🚫      |
+| get/setFMUstate                   | ✔️✔️         | 📅     | ✔️✔️     | 📅     | 🚫         | 🚫      |
 | getDirectionalDerivatives         | ✔️✔️         | 📅     | ✔️✔️     | 📅     | 🚫         | 🚫      |
-| getAdjointDerivatives             | 🚫           | 🚫     | ✔️✔️     | 📅     | 🚫         | 🚫     |
+| getAdjointDerivatives             | 🚫           | 🚫     | ✔️✔️      | 📅     | 🚫         | 🚫     |
 | FMI Cross Checks                  | ✔️✔️         | 📅     | 📅        | 📅     | 🚫         | 🚫      |
 | 64-bit binaries in FMUs           | ✔️✔️         | ✔️✔️  | ✔️✔️      | 📅     | 🚫         | 🚫     |
 | 32-bit binaries in FMUs           | ✔️            | 📅     | 📅        | 📅     | 🚫         | 🚫      |
