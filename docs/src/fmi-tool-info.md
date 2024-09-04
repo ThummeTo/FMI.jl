@@ -27,5 +27,5 @@ Detailed export information and automatically generated FMUs will be deployed so
 | NeuralFMU | [ME](https://github.com/ThummeTo/FMIExport.jl/tree/main/examples/FMI2/NeuralFMU) | coming soon |
 
 ## Validation tools
-- [Dassault Dymola 2022X](https://www.3ds.com/de/produkte-und-services/catia/produkte/dymola/)
+- [Dassault Dymola 2022X](https://www.3ds.com/products/catia/dymola)
 - [FMU Check](https://fmu-check.herokuapp.com/)

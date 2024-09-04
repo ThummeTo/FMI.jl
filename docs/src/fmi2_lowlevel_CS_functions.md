@@ -26,6 +26,7 @@ fmi2CancelStep
 Status information is retrieved from the slave by the following functions:
 
 ```@docs
+fmi2GetStatus
 fmi2GetStatus!
 fmi2GetRealStatus!
 fmi2GetIntegerStatus!

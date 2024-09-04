@@ -11,8 +11,8 @@ derivatives of the inputs with respect to time can be provided. Also, higher der
 higher order interpolation.
 
 ```@docs
-fmi3CallbackIntermediateUpdate
 ```
+fmi3CallbackIntermediateUpdate
 
 ## Computation
 The computation of time steps is controlled by the following function.

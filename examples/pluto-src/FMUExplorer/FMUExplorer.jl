@@ -162,7 +162,7 @@ end
 if (mode ∈ (:local, :zoo) && isfile(fmu_path)) ||
    (mode == :url && startswith(fmu_path, "http"))
     if endswith(fmu_path, ".fmu")
-        fmu = fmiLoad(fmu_path)
+        fmu = loadFMU(fmu_path)
         fmu.executionConfig.loggingOn = true
         fmu.executionConfig.externalCallbacks = true
         descr = fmu.modelDescription
