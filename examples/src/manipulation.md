@@ -1,6 +1,8 @@
 # Manipulate a function
 Tutorial by Tobias Thummerer, Johannes Stoljar
 
+🚧 This tutorial is under revision and will be replaced by an up-to-date version soon 🚧
+
 ## License
 
 

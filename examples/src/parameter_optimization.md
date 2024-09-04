@@ -61,8 +61,8 @@ In the next lines of code the FMU model from *FMIZoo.jl* is loaded and the infor
 
 ```julia
 # we use an FMU from the FMIZoo.jl
-fmu = fmiLoad("SpringPendulum1D", "Dymola", "2022x"; type=:ME)
-fmiInfo(fmu)
+fmu = loadFMU("SpringPendulum1D", "Dymola", "2022x"; type=:ME)
+info(fmu)
 ```
 
 Now, the optimization objective (the function to minimize) needs to be defined. In this case, we just want to do a simulation and compare it to a regular `sin` wave.
@@ -84,10 +84,10 @@ function simulateFMU(p)
     x0 = [s0, v0]
 
     # simulate with given start stae and parameters
-    sol = fmiSimulate(fmu, (tStart, tStop); x0=x0, parameters=paramDict, saveat=tSave)
+    sol = simulate(fmu, (tStart, tStop); x0=x0, parameters=paramDict, saveat=tSave)
 
     # get state with index 1 (the position) from the solution
-    s_res = fmiGetSolutionState(sol, 1; isIndex=true) 
+    s_res = getState(sol, 1; isIndex=true) 
 
     return s_res
 end
