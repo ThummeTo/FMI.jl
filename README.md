@@ -24,6 +24,8 @@ If you want to migrate your project from [*FMI.jl*](https://github.com/ThummeTo/
 
 - [x] [*FMICore.jl*](https://github.com/ThummeTo/FMICore.jl) and [*FMIImport.jl*](https://github.com/ThummeTo/FMIImport.jl) were divided into [*FMICore.jl*](https://github.com/ThummeTo/FMICore.jl), [*FMIImport.jl*](https://github.com/ThummeTo/FMIImport.jl) and [*FMIBase.jl*](https://github.com/ThummeTo/FMIBase.jl). [*FMICore.jl*](https://github.com/ThummeTo/FMICore.jl) now holds the pure standard definition (C-types and -functions), while [*FMIBase.jl*](https://github.com/ThummeTo/FMIBase.jl) holds everything that is needed on top of that in [*FMIImport.jl*](https://github.com/ThummeTo/FMIImport.jl) as well as in [*FMIExport.jl*](https://github.com/ThummeTo/FMIExport.jl).
 
+- [ ] Updated all library examples.
+
 - [ ] Updated all library tests for a better code coverage.
 
 - [ ] We tried to document every function, if you find undocumented user-level functions, please open an issue or PR.
@@ -73,24 +75,26 @@ unloadFMU(myFMU)
 ```
 
 ## What is currently supported in FMI.jl?
-- importing the full FMI 2.0.3 and FMI 3.0.0 command set, including optional specials like `fmi2GetState`, `fmi2SetState` and `fmi2GetDirectionalDerivatives`
+- importing the full FMI 2.0.3 and FMI 3.0.0 command set, including optional specials like `fmi2GetFMUstate`, `fmi2SetFMUstate` and `fmi2GetDirectionalDerivatives`
 - parameterization, simulation & plotting of CS- and ME-FMUs
 - event-handling for imported discontinuous ME-FMUs
 
 |                                   | **FMI2.0.3** |        | **FMI3.0** |        | **SSP1.0** |        |
 |-----------------------------------|--------------|--------|------------|--------|------------|--------|
 |                                   | Import       | Export | Import     | Export | Import     | Export |
-| CS                                | ✔️✔️         | 🚧     | ✔️✔️        | 📅     | 📅         | 📅      |
-| ME (continuous)                   | ✔️✔️         | ✔️✔️   | ✔️✔️        | 📅     | 📅         | 📅      |
-| ME (discontinuous)                | ✔️✔️         | ✔️✔️   | ✔️✔️        | 📅     | 📅         | 📅      |
-| SE                 		    | 🚫           | 🚫     | 🚧          | 📅     | 🚫         | 🚫     |
-| Explicit solvers                  | ✔️✔️         | ✔️✔️   | ✔️✔️        | 📅     | 📅         | 📅      |
-| Implicit solvers (autodiff=false) | ✔️✔️         | ✔️✔️   | ✔️✔️        | 📅     | 📅         | 📅      |
-| Implicit solvers (autodiff=true)  | ✔️           | ✔️✔️   | ✔️          | 📅     | 📅         | 📅      |
-| get/setState                      | ✔️✔️         | 📅     | ✔️✔️        | 📅     | 🚫         | 🚫      |
-| getDirectionalDerivatives         | ✔️✔️         | 📅     | ✔️✔️        | 📅     | 🚫         | 🚫      |
-| getAdjointDerivatives             | 🚫           | 🚫     | ✔️✔️        | 📅     | 🚫         | 🚫     |
-| FMI Cross Checks                  | ✔️✔️         | 📅     | 📅          | 📅     | 🚫         | 🚫      |
+| CS                                | ✔️✔️         | 🚧    | ✔️✔️      | 📅     | 📅         | 📅      |
+| ME (continuous)                   | ✔️✔️         | ✔️✔️ | ✔️✔️      | 📅     | 📅         | 📅      |
+| ME (discontinuous)                | ✔️✔️         | ✔️✔️  | ✔️✔️     | 📅     | 📅         | 📅      |
+| SE                 		        | 🚫           | 🚫     | 🚧        | 📅     | 🚫         | 🚫     |
+| Explicit solvers                  | ✔️✔️         | ✔️✔️  | ✔️✔️      | 📅     | 📅         | 📅      |
+| Implicit solvers (autodiff=false) | ✔️✔️         | ✔️✔️  | ✔️✔️      | 📅     | 📅         | 📅      |
+| Implicit solvers (autodiff=true)  | ✔️           | ✔️✔️   | ✔️        | 📅     | 📅         | 📅      |
+| get/setFMUstate                   | ✔️✔️         | 📅     | ✔️✔️     | 📅     | 🚫         | 🚫      |
+| getDirectionalDerivatives         | ✔️✔️         | 📅     | ✔️✔️     | 📅     | 🚫         | 🚫      |
+| getAdjointDerivatives             | 🚫           | 🚫     | ✔️✔️      | 📅     | 🚫         | 🚫     |
+| FMI Cross Checks                  | ✔️✔️         | 📅     | 📅        | 📅     | 🚫         | 🚫      |
+| 64-bit binaries in FMUs           | ✔️✔️         | ✔️✔️  | ✔️✔️      | 📅     | 🚫         | 🚫     |
+| 32-bit binaries in FMUs           | ✔️            | 📅     | 📅        | 📅     | 🚫         | 🚫      |
 
 ✔️✔️ supported & CI-tested
 
@@ -130,7 +134,7 @@ Tobias Thummerer, Johannes Tintenherr, Lars Mikelsons. 2021 **Hybrid modeling of
 
 ## Notes for contributors
 Contributors are welcome. Before contributing, please read, understand and follow the [Contributor's Guide on Collaborative Practices for Community Packages](https://github.com/SciML/ColPrac). 
-During development of new implementations or optimizations on exisitng code, one will have to make design decissions that influence the library performance and usability. The following priorization should be the basis for decision-making:
+During development of new implementations or optimizations on existing code, one will have to make design decisions that influence the library performance and usability. The following prioritization should be the basis for decision-making:
 - **#1 Compliance with standard:** It is the highest priority to be compliant with the FMI standard ([fmi-standard.org](https://fmi-standard.org/)). Identifiers described in the standard must be used. Topologies should follow the specification as far as the possibilities of the Julia programming language allows.
 - **#2 Performance:** Because [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is a simulation tool, performance is very important. This applies to the efficient use of CPU and GPU, but also the conscientious use of RAM and disc space.
 - **#3 Usability:** The library should be as usable as possible and feel "the Julia way" (e.g. by using multiple dispatch instead of the "C coding style"), as long as being fully compliant with the FMI standard.

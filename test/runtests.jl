@@ -19,7 +19,7 @@ using FMI.FMIImport
 
 using DifferentialEquations: FBDF
 
-fmuStructs = ("FMU", "FMUCOMPONENT")
+fmuStructs = ("FMU", "INSTANCE")
 
 # enable assertions for warnings/errors for all default execution configurations 
 for exec in FMU_EXECUTION_CONFIGURATIONS
@@ -37,7 +37,7 @@ function getFMUStruct(
     kwargs...,
 )
 
-    # choose FMU or FMUComponent
+    # choose FMU or FMUInstance
     if endswith(modelname, ".fmu")
         fmu = loadFMU(modelname; kwargs...)
     else
@@ -47,7 +47,7 @@ function getFMUStruct(
     if fmustruct == "FMU"
         return fmu, fmu
 
-    elseif fmustruct == "FMUCOMPONENT"
+    elseif fmustruct == "INSTANCE"
         inst, _ = FMI.prepareSolveFMU(fmu, nothing, mode; loggingOn = true)
         @test !isnothing(inst)
         return inst, fmu
@@ -57,52 +57,52 @@ function getFMUStruct(
     end
 end
 
+toolversions = [("Dymola", "2023x")] # ("SimulationX", "4.5.2")
+
 @testset "FMI.jl" begin
     if Sys.iswindows() || Sys.islinux()
         @info "Automated testing is supported on Windows/Linux."
 
-        ENV["EXPORTINGTOOL"] = "Dymola"
-        ENV["EXPORTINGVERSION"] = "2023x"
+        for (tool, version) in toolversions
 
-        for fmiversion in (2.0, 3.0)
-            ENV["FMIVERSION"] = fmiversion
+            ENV["EXPORTINGTOOL"] = tool
+            ENV["EXPORTINGVERSION"] = version
 
-            @testset "Testing FMI $(ENV["FMIVERSION"]) FMUs exported from $(ENV["EXPORTINGTOOL"]) $(ENV["EXPORTINGVERSION"])" begin
+            for fmiversion in (2.0, 3.0)
+                ENV["FMIVERSION"] = fmiversion
 
-                for fmustruct in fmuStructs
-                    ENV["FMUSTRUCT"] = fmustruct
+                @testset "Testing FMI $(ENV["FMIVERSION"]) FMUs exported from $(ENV["EXPORTINGTOOL"]) $(ENV["EXPORTINGVERSION"])" begin
 
-                    @testset "Functions for $(ENV["FMUSTRUCT"])" begin
+                    for fmustruct in fmuStructs
+                        ENV["FMUSTRUCT"] = fmustruct
 
-                        @info "CS Simulation (sim_CS.jl)"
-                        @testset "CS Simulation" begin
-                            include("sim_CS.jl")
-                        end
+                        @testset "Functions for $(ENV["FMUSTRUCT"])" begin
 
-                        @info "ME Simulation (sim_ME.jl)"
-                        @testset "ME Simulation" begin
-                            include("sim_ME.jl")
-                        end
+                            @info "CS Simulation (sim_CS.jl)"
+                            @testset "CS Simulation" begin
+                                include("sim_CS.jl")
+                            end
 
-                        @info "SE Simulation (sim_SE.jl)"
-                        @testset "SE Simulation" begin
-                            include("sim_SE.jl")
-                        end
+                            @info "ME Simulation (sim_ME.jl)"
+                            @testset "ME Simulation" begin
+                                include("sim_ME.jl")
+                            end
 
-                        @info "Simulation FMU without states (sim_zero_state.jl)"
-                        @testset "Simulation FMU without states" begin
-                            include("sim_zero_state.jl")
+                            @info "SE Simulation (sim_SE.jl)"
+                            if fmiversion == 3.0
+                                @testset "SE Simulation" begin
+                                    include("sim_SE.jl")
+                                end
+                            else
+                                @info "Skipping SE tests for FMI $(fmiversion), because this is not supported by the corresponding FMI version."
+                            end
+
+                            @info "Simulation FMU without states (sim_zero_state.jl)"
+                            @testset "Simulation FMU without states" begin
+                                include("sim_zero_state.jl")
+                            end
                         end
                     end
-
-                    # if VERSION >= v"1.9.0"
-                    #     @info "Performance (performance.jl)"
-                    #     @testset "Performance" begin
-                    #         include("FMI2/performance.jl")
-                    #     end
-                    # else
-                    @info "Julia Version $(VERSION), skipping performance tests ..."
-                    #end
                 end
             end
         end
