@@ -8,7 +8,7 @@ on:
       - main
     paths:
       - 'src/**'
-      - 'examples/src/**'
+      - 'examples/**'
       - '.github/workflows/Example.yml'
       - 'Project.toml'
   
@@ -81,9 +81,55 @@ jobs:
             git add ${{ env.EXAMPLES_PATH }}
             git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
             git push origin examples || (git reset --soft HEAD~1 && (exit 1))
-            
+
+  pluto:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Check out repository"
+        uses: actions/checkout@v3
+
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@v1
+        with:
+            version: '1.10'
+
+      - run: julia -e 'using Pkg; Pkg.add("PlutoSliderServer"); Pkg.add("FMI")'
+      - run: julia -e 'using PlutoSliderServer; PlutoSliderServer.export_directory("examples/pluto-src")'
+
+      - name: "auto-commit (retry on merge)"
+        if: success() && github.event_name != 'pull_request' && github.branch == 'main'
+        uses: nick-fields/retry@v3
+        env: 
+          CI_COMMIT_MESSAGE: examples-pluto[${{ github.ref }}]
+          CI_COMMIT_AUTHOR: github-actions[bot]
+          EXAMPLES_PATH: examples
+        # Fetch all and clear the stash list. Include all files from the examples folder to the stash and switch the branch.
+        # Reset the branch and remove all current files in the examples folder. 
+        # Checkout the last stash to restore the new notebooks and apply the stash index to restore all other new files in the folder.
+        with:
+          timeout_minutes: 999
+          max_attempts: 10
+          warning_on_retry: false
+          shell: bash
+          command: |
+            git fetch --all
+            git stash clear
+            git stash --include-untracked -- ${{ env.EXAMPLES_PATH }}
+            git switch examples
+            git reset --hard origin/examples
+            git checkout stash -f -- ${{ env.EXAMPLES_PATH }}
+            git stash apply --index
+            git stash drop
+            git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+            git config --global user.email "${{ env.CI_COMMIT_AUTHOR }}@users.noreply.github.com"
+            git config --global core.autocrlf false
+            git pull
+            git add ${{ env.EXAMPLES_PATH }}
+            git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
+            git push origin examples || (git reset --soft HEAD~1 && (exit 1))          
+  
   call-docu:
-    needs: jupyter
+    needs: [jupyter, pluto]
     if: github.event_name != 'pull_request' && github.branch == 'main'
     runs-on: ubuntu-latest
     steps:
