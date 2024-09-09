@@ -55,7 +55,6 @@ makedocs(
                 ],
             ],
             "FMI3 specific content"=>Any[
-                "fmi3_lowlevel_library_types.md",
                 "fmi3_lowlevel_library_constants.md",
                 "FMI3 Functions in FMI Import/Core .jl"=>Any[
                     "fmi3_lowlevel_modeldescription_functions.md",
