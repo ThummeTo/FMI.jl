@@ -5,8 +5,20 @@
 
 import Pkg;
 Pkg.develop(path = joinpath(@__DIR__, "../../FMI.jl"));
-using Documenter, Plots, JLD2, DataFrames, CSV, MAT, FMI, FMIImport, FMICore
+using Documenter, Plots, JLD2, DataFrames, CSV, MAT, FMI, FMIBase, FMIImport, FMICore
 using Documenter: GitHubActions
+
+example_pages = [
+    "Overview" => "examples/overview.md",
+    "Simulate" => "examples/simulate.md",
+    "Parameterize" => "examples/parameterize.md",
+    "Inputs" => "examples/inputs.md",
+    "Multiple instances" => "examples/multiple_instances.md",
+    "Modelica conference 2021" => "examples/modelica_conference_2021.md",
+    "Manipulation" => "examples/manipulation.md",
+    "Multithreading" => "examples/multithreading.md",
+    "Multiprocessing" => "examples/multiprocessing.md",
+]
 
 makedocs(
     sitename = "FMI.jl",
@@ -17,36 +29,22 @@ makedocs(
         size_threshold = 512000,
         size_threshold_ignore = ["deprecated.md"],
     ),
-    modules = [FMI, FMIImport, FMICore],
+    modules = [FMI, FMIImport, FMICore, FMIBase],
     checkdocs = :exports,
     linkcheck = true,
-    linkcheck_ignore = [
-        "https://thummeto.github.io/FMI.jl/dev/examples/inputs/",
-        "https://github.com/ThummeTo/FMICore.jl/blob/main/src/FMI2_c.jl#L718",
-    ],
     pages = Any[
         "Introduction" => "index.md"
         "Features" => "features.md"
         "FAQ" => "faq.md"
-        "Examples" => [
-            "Overview" => "examples/overview.md"
-            "Simulate" => "examples/simulate.md"
-            "Parameterize" => "examples/parameterize.md"
-            "Multiple instances" => "examples/multiple_instances.md"
-            "Modelica conference 2021" => "examples/modelica_conference_2021.md"
-            "Manipulation" => "examples/manipulation.md"
-            "Multithreading" => "examples/multithreading.md"
-            "Multiprocessing" => "examples/multiprocessing.md"
-        ]
+        "Examples" => example_pages
         "User Level API - FMI.jl" => "library.md"
         "Developer Level API" => Any[
             "fmi version independent content"=>Any[
-                "fmi_lowlevel_library_types.md",
                 "fmi_lowlevel_library_constants.md",
+                "fmi_lowlevel_modeldescription_functions.md",
                 "fmi_lowlevel_library_functions.md",
             ],
             "FMI2 specific content"=>Any[
-                "fmi2_lowlevel_library_types.md",
                 "fmi2_lowlevel_library_constants.md",
                 "FMI2 Functions in FMI Import/Core .jl"=>Any[
                     "fmi2_lowlevel_modeldescription_functions.md",
