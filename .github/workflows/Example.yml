@@ -52,7 +52,7 @@ jobs:
         run: julia --project=examples/ examples/src/${{ matrix.file-name }}.jl
 
       - name: "auto-commit (retry on merge)"
-        if: success() && github.event_name != 'pull_request' && github.branch == 'main'
+        if: success() && github.event_name != 'pull_request' && github.ref_name == 'main'
         uses: nick-fields/retry@v3
         env: 
           CI_COMMIT_MESSAGE: example-${{ matrix.os }}-${{ matrix.file-name }}-${{ matrix.julia-version }}-${{ matrix.julia-arch }}-${{ matrix.experimental }}[${{ github.ref }}]
@@ -97,7 +97,7 @@ jobs:
       - run: julia -e 'using PlutoSliderServer; PlutoSliderServer.export_directory("examples/pluto-src")'
 
       - name: "auto-commit (retry on merge)"
-        if: success() && github.event_name != 'pull_request' && github.branch == 'main'
+        if: success() && github.event_name != 'pull_request' && github.ref_name == 'main'
         uses: nick-fields/retry@v3
         env: 
           CI_COMMIT_MESSAGE: examples-pluto[${{ github.ref }}]
@@ -130,7 +130,7 @@ jobs:
   
   call-docu:
     needs: [jupyter, pluto]
-    if: github.event_name != 'pull_request' && github.branch == 'main'
+    if: github.event_name != 'pull_request' && github.ref_name == 'main'
     runs-on: ubuntu-latest
     steps:
       # Trigger an repoisitory dispath event
