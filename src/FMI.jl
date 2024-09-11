@@ -7,8 +7,11 @@ module FMI
 
 @debug "Debugging messages enabled for FMI.jl ..."
 
+# reexport
 using FMIImport.FMIBase.Reexport
 @reexport using FMIImport
+@reexport using FMIImport.FMIBase 
+@reexport using FMIImport.FMIBase.FMICore
 @reexport using FMIExport
 
 include("sim.jl")
