@@ -10,6 +10,6 @@ LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [compat]
 FMIExport = "0.4.0"
-FMIImport = "1.0.0"
+FMIImport = "1.0.6"
 LinearAlgebra = "1"
 julia = "1.6"
