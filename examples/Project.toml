@@ -2,6 +2,7 @@ name = "Examples"
 
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
 FMI = "14a09403-18e3-468f-ad8a-74f8dda2d9ac"
 FMICore = "8af89139-c281-408e-bce2-3005eb87462f"
 FMIZoo = "724179cf-c260-40a9-bd27-cccc6fe2f195"
