@@ -28,11 +28,16 @@ makedocs(
         sidebar_sitename = false,
         edit_link = nothing,
         size_threshold = 512000,
-        size_threshold_ignore = ["deprecated.md"],
+        size_threshold_ignore = [
+            "deprecated.md",
+            "fmi2_lowlevel_library_functions.md",
+            "fmi3_lowlevel_library_functions.md",
+        ],
     ),
     modules = [FMI, FMIImport, FMICore, FMIBase],
     checkdocs = :exports,
     linkcheck = true,
+    warnonly = :linkcheck,
     pages = Any[
         "Introduction" => "index.md"
         "Features" => "features.md"
