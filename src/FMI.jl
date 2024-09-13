@@ -10,7 +10,7 @@ module FMI
 # reexport
 using FMIImport.FMIBase.Reexport
 @reexport using FMIImport
-@reexport using FMIImport.FMIBase 
+@reexport using FMIImport.FMIBase
 @reexport using FMIImport.FMIBase.FMICore
 @reexport using FMIExport
 
