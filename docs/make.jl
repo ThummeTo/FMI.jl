@@ -93,16 +93,16 @@ output = ""
 try
     global output = @capture_err begin
         my_makedocs()
-    end;
+    end
 catch e
     my_makedocs() # if it fails, re-run without capturing, so that its stderr appears in the console/logs
-end 
+end
 
 # errors = findall(r"Error:.*", output)
 warns = findall(r"Warning:.*", output)
 
 for w in warns
-    s = string("::warning title=Documenter-Warning::",output[w],"\r\n")
+    s = string("::warning title=Documenter-Warning::", output[w], "\r\n")
     print(s)
 end
 
