@@ -2,15 +2,6 @@
 In both cases, FMI defines an input/output block of a dynamic model where the distribution of the block, the
 platform dependent header file, several access functions, as well as the schema files are identical.
 
-## Opening and closing FMUs
-
-```@docs
-```
-fmi3Unzip
-fmi3Load
-fmi3Reload
-fmi3Unload
-
 ##  Creation, Destruction and Logging of FMU Instances
 
 ```@docs
@@ -106,6 +97,7 @@ fmi3DeSerializeFMUState
 fmi3DeSerializeFMUState!
 fmi3UpdateDiscreteStates
 fmi3EvaluateDiscreteStates
+fmi3GetNominalsOfContinuousStates
 ```
 
 ## Getting Partial Dervatives
@@ -144,8 +136,8 @@ fmi3GetClock
 fmi3GetClock!
 fmi3SetClock
 fmi3ActivateModelPartition
-fmi3CallbackClockUpdate
 ```
+fmi3CallbackClockUpdate
 
 ## Conversion functions
 

@@ -87,23 +87,6 @@ fmi2GetRealOutputDerivatives!
 fmi2SampleJacobian
 fmi2SampleJacobian!
 
-## Conversion functions
-
-```@docs
-fmi2StringToValueReference
-fmi2ValueReferenceToString
-fmi2StringToCausality
-fmi2CausalityToString
-fmi2StringToVariability
-fmi2VariabilityToString
-
-fmi2StatusToString
-fmi2StringToDependencyKind
-fmi2DependencyKindToString
-fmi2StringToInitial
-fmi2InitialToString
-```
-
 ## External/Additional functions
 
 ```@docs
