@@ -22,6 +22,35 @@ example_pages = [
     "Pluto Workshops" => "examples/workshops.md",
 ]
 
+#check if all md files in examples are included in docs
+for md in readdir("docs/src/examples")
+    if endswith(md, ".md") &&
+       !occursin("README", md) &&
+       all([!endswith(file, md) for (x, file) in example_pages])
+        print(
+            string(
+                "::warning title=Example-Warning::example \"",
+                md,
+                "\" is not included in the doc-manual\r\n",
+            ),
+        )
+    end
+end
+
+#remove any example pages, for witch the example can not be found
+for (x, md) in deepcopy(example_pages)
+    if !(any([occursin(file, md) for file in readdir("docs/src/examples")]))
+        print(
+            string(
+                "::warning title=Example-Warning::example-page \"",
+                md,
+                "\" is to be included in the doc-manual, but could not be found on the examples branch or in \"docs/src/examples\"\r\n",
+            ),
+        )
+        filter!(e -> e ≠ (x => md), example_pages)
+    end
+end
+
 my_makedocs() = makedocs(
     sitename = "FMI.jl",
     format = Documenter.HTML(
