@@ -27,4 +27,4 @@ LocalPreferences.toml
 # Custom
 tmp/
 .vscode/settings.json
-examples/src/.ipynb_checkpoints/
+examples/jupyter-src/.ipynb_checkpoints/
