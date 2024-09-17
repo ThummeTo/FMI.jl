@@ -96,7 +96,7 @@ jobs:
         with:
             version: '1.10'
 
-      - run: julia -e 'using Pkg; Pkg.add("PlutoSliderServer"); Pkg.add("FMI")'
+      - run: julia -e 'using Pkg; Pkg.add("PlutoSliderServer");'
       - run: julia -e 'using PlutoSliderServer; PlutoSliderServer.export_directory("examples/pluto-src")'
 
       - name: "auto-commit (retry on merge)"
