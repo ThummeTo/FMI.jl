@@ -42,14 +42,14 @@ jobs:
                         
       - name: "Execute and synchronize all files"
         env:
-          FILE: examples/src/${{ matrix.file-name }}.ipynb
+          FILE: examples/jupyter-src/${{ matrix.file-name }}.ipynb
         run: |
           jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-${{ matrix.julia-version }}" --to notebook --inplace --execute ${{ env.FILE }}
           jupyter nbconvert --to script ${{ env.FILE }}
           jupyter nbconvert --to markdown ${{ env.FILE }}
 
       - name: "run generated jl script to determine success of example building"
-        run: julia --project=examples/ examples/src/${{ matrix.file-name }}.jl
+        run: julia --project=examples/ examples/jupyter-src/${{ matrix.file-name }}.jl
 
       - name: "auto-commit (retry on merge)"
         if: success() && github.event_name != 'pull_request' && github.ref_name == 'main'
@@ -57,7 +57,7 @@ jobs:
         env: 
           CI_COMMIT_MESSAGE: example-${{ matrix.os }}-${{ matrix.file-name }}-${{ matrix.julia-version }}-${{ matrix.julia-arch }}-${{ matrix.experimental }}[${{ github.ref }}]
           CI_COMMIT_AUTHOR: github-actions[bot]
-          EXAMPLES_PATH: examples
+          EXAMPLES_PATH: examples/jupyter-src
         # Fetch all and clear the stash list. Include all files from the examples folder to the stash and switch the branch.
         # Reset the branch and remove all current files in the examples folder. 
         # Checkout the last stash to restore the new notebooks and apply the stash index to restore all other new files in the folder.
@@ -72,6 +72,7 @@ jobs:
             git stash --include-untracked -- ${{ env.EXAMPLES_PATH }}
             git switch examples
             git reset --hard origin/examples
+            rm -r ${{ env.EXAMPLES_PATH }}/${{ matrix.file-name }}*
             git checkout stash -f -- ${{ env.EXAMPLES_PATH }}
             git stash apply --index
             git stash drop
@@ -102,7 +103,7 @@ jobs:
         env: 
           CI_COMMIT_MESSAGE: examples-pluto[${{ github.ref }}]
           CI_COMMIT_AUTHOR: github-actions[bot]
-          EXAMPLES_PATH: examples
+          EXAMPLES_PATH: examples/pluto-src
         # Fetch all and clear the stash list. Include all files from the examples folder to the stash and switch the branch.
         # Reset the branch and remove all current files in the examples folder. 
         # Checkout the last stash to restore the new notebooks and apply the stash index to restore all other new files in the folder.
@@ -117,6 +118,7 @@ jobs:
             git stash --include-untracked -- ${{ env.EXAMPLES_PATH }}
             git switch examples
             git reset --hard origin/examples
+            rm -r ${{ env.EXAMPLES_PATH }}/*
             git checkout stash -f -- ${{ env.EXAMPLES_PATH }}
             git stash apply --index
             git stash drop
