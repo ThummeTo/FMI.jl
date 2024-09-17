@@ -39,7 +39,7 @@ jobs:
         # copy the examples from the examples branch (.md, .svg) and copy the readme in the docs folder
         run: |
           git fetch
-          git --work-tree=$WORK_TREE/.. checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.md $SRC_FOLDER_PATH/jupyter-src/*.svg $SRC_FOLDER_PATH/jupyter-src/*.html
+          git --work-tree=$WORK_TREE/.. checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.md $SRC_FOLDER_PATH/jupyter-src/*.svg $SRC_FOLDER_PATH/pluto-src/*.html
           mv $WORK_TREE/jupyter-src/* $WORK_TREE 
           rm -r $WORK_TREE/jupyter-src
           cp ./README.md ./docs/src/index.md
