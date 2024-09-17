@@ -69,7 +69,7 @@ jobs:
           command: |
             git fetch --all
             git stash clear
-            git stash --include-untracked -- ${{ env.EXAMPLES_PATH }}
+            git stash --include-untracked -- ${{ env.EXAMPLES_PATH }}/${{ matrix.file-name }}*
             git switch examples
             git reset --hard origin/examples
             rm -r ${{ env.EXAMPLES_PATH }}/${{ matrix.file-name }}*
@@ -79,7 +79,7 @@ jobs:
             git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
             git config --global user.email "${{ env.CI_COMMIT_AUTHOR }}@users.noreply.github.com"
             git config --global core.autocrlf false
-            git add ${{ env.EXAMPLES_PATH }}
+            git add ${{ env.EXAMPLES_PATH }}/${{ matrix.file-name }}*
             git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
             git push origin examples || (git reset --soft HEAD~1 && (exit 1))
 
