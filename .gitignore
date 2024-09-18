@@ -24,6 +24,8 @@ docs/site/
 Manifest.toml
 LocalPreferences.toml
 
-# Custom
+# custom
 tmp/
+build/
 .vscode/
+examples/jupyter-src/.ipynb_checkpoints/

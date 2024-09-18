@@ -1,3 +1,6 @@
+*.svg
+*.pdf
+*.gif
 *.jld2
 *.csv
 *.mat
