@@ -7,14 +7,60 @@ using FMIZoo
 using Plots</code></pre><h3 id="Simulation-setup"><a class="docs-heading-anchor" href="#Simulation-setup">Simulation setup</a><a id="Simulation-setup-1"></a><a class="docs-heading-anchor-permalink" href="#Simulation-setup" title="Permalink"></a></h3><p>Next, the start time and end time of the simulation are set. Finally, a step size is specified to store the results of the simulation at these time steps.</p><pre><code class="language-julia hljs">tStart = 0.0
 tStep = 0.1
 tStop = 8.0
-tSave = tStart:tStep:tStop</code></pre><h3 id="Simple-FMU-Simulation"><a class="docs-heading-anchor" href="#Simple-FMU-Simulation">Simple FMU Simulation</a><a id="Simple-FMU-Simulation-1"></a><a class="docs-heading-anchor-permalink" href="#Simple-FMU-Simulation" title="Permalink"></a></h3><p>Next, the FMU model from <em>FMIZoo.jl</em> is loaded and the information about the FMU is shown.</p><pre><code class="language-julia hljs"># we use an FMU from the FMIZoo.jl
-fmu = fmiLoad(&quot;SpringFrictionPendulum1D&quot;, &quot;Dymola&quot;, &quot;2022x&quot;)
-fmiInfo(fmu)</code></pre><h3 id="Easy-Simulation"><a class="docs-heading-anchor" href="#Easy-Simulation">Easy Simulation</a><a id="Easy-Simulation-1"></a><a class="docs-heading-anchor-permalink" href="#Easy-Simulation" title="Permalink"></a></h3><p>In the next commands the FMU is simulated, for which the start and end time and recorded variables are declared. Afterwards the simulation result is plotted. In the plot for the FMU, it can be seen that the oscillation keeps decreasing due to the effect of friction. If one simulates long enough, the oscillation comes to a standstill after a certain time.</p><pre><code class="language-julia hljs">simData = fmiSimulate(fmu, (tStart, tStop); recordValues=[&quot;mass.s&quot;], saveat=tSave)
-plot(simData)</code></pre><p>After plotting the data, the FMU is unloaded and all unpacked data on disc is removed.</p><pre><code class="language-julia hljs">fmiUnload(fmu)</code></pre><h3 id="Custom-Simulation"><a class="docs-heading-anchor" href="#Custom-Simulation">Custom Simulation</a><a id="Custom-Simulation-1"></a><a class="docs-heading-anchor-permalink" href="#Custom-Simulation" title="Permalink"></a></h3><p>In the following type of simulation a more advanced variant is presented, which allows intervening more in the simulation process. Analogous to the simple variant, an FMU model must be loaded.</p><pre><code class="language-julia hljs">fmu = fmiLoad(pathToFMU)</code></pre><p>Next, it is necessary to create an instance of the FMU, this is achieved by the command <code>fmi2Instantiate!()</code>.  </p><pre><code class="language-julia hljs">instanceFMU = fmi2Instantiate!(fmu)</code></pre><p>In the following code block, start and end time for the simulation is set by the <code>fmi2SetupExperiment()</code> command. Next, the FMU is initialized by the calls of <code>fmi2EnterInitializationMode()</code> and <code>fmi2ExitInitializationMode()</code>. It would also be possible to set initial states, parameters or inputs at this place in code.</p><pre><code class="language-julia hljs">fmi2SetupExperiment(instanceFMU, tStart, tStop)
+tSave = tStart:tStep:tStop</code></pre><pre><code class="nohighlight hljs">0.0:0.1:8.0</code></pre><h3 id="Simple-FMU-Simulation"><a class="docs-heading-anchor" href="#Simple-FMU-Simulation">Simple FMU Simulation</a><a id="Simple-FMU-Simulation-1"></a><a class="docs-heading-anchor-permalink" href="#Simple-FMU-Simulation" title="Permalink"></a></h3><p>Next, the FMU model from <em>FMIZoo.jl</em> is loaded and the information about the FMU is shown.</p><pre><code class="language-julia hljs"># we use an FMU from the FMIZoo.jl
+fmu = loadFMU(&quot;SpringFrictionPendulum1D&quot;, &quot;Dymola&quot;, &quot;2022x&quot;)
+info(fmu)</code></pre><pre><code class="nohighlight hljs">#################### Begin information for FMU ####################
+	Model name:			SpringFrictionPendulum1D
+	FMI-Version:			2.0
+	GUID:				{2e178ad3-5e9b-48ec-a7b2-baa5669efc0c}
+	Generation tool:		Dymola Version 2022x (64-bit), 2021-10-08
+	Generation time:		2022-05-19T06:54:12Z
+	Var. naming conv.:		structured
+	Event indicators:		24
+	Inputs:				0
+	Outputs:			0
+	States:				2
+
+
+		33554432 [&quot;mass.s&quot;]
+		33554433 [&quot;mass.v&quot;, &quot;mass.v_relfric&quot;]
+	Parameters:			12
+		16777216 [&quot;fricScale&quot;]
+		16777217 [&quot;s0&quot;]
+		16777218 [&quot;v0&quot;]
+		16777219 [&quot;fixed.s0&quot;]
+		...
+		16777223 [&quot;mass.smin&quot;]
+		16777224 [&quot;mass.v_small&quot;]
+		16777225 [&quot;mass.L&quot;]
+		16777226 [&quot;mass.m&quot;]
+		16777227 [&quot;mass.fexp&quot;]
+	Supports Co-Simulation:		true
+		Model identifier:	SpringFrictionPendulum1D
+		Get/Set State:		true
+		Serialize State:	true
+		Dir. Derivatives:	true
+		Var. com. steps:	true
+		Input interpol.:	true
+		Max order out. der.:	1
+	Supports Model-Exchange:	true
+		Model identifier:	SpringFrictionPendulum1D
+		Get/Set State:		true
+		Serialize State:	true
+		Dir. Derivatives:	true
+##################### End information for FMU #####################</code></pre><h3 id="Easy-Simulation"><a class="docs-heading-anchor" href="#Easy-Simulation">Easy Simulation</a><a id="Easy-Simulation-1"></a><a class="docs-heading-anchor-permalink" href="#Easy-Simulation" title="Permalink"></a></h3><p>In the next commands the FMU is simulated, for which the start and end time and recorded variables are declared. Afterwards the simulation result is plotted. In the plot for the FMU, it can be seen that the oscillation keeps decreasing due to the effect of friction. If one simulates long enough, the oscillation comes to a standstill after a certain time.</p><pre><code class="language-julia hljs">simData = simulate(fmu, (tStart, tStop); recordValues=[&quot;mass.s&quot;], saveat=tSave)
+plot(simData)</code></pre><p>After plotting the data, the FMU is unloaded and all unpacked data on disc is removed.</p><pre><code class="language-julia hljs">unloadFMU(fmu)</code></pre><h3 id="Custom-Simulation"><a class="docs-heading-anchor" href="#Custom-Simulation">Custom Simulation</a><a id="Custom-Simulation-1"></a><a class="docs-heading-anchor-permalink" href="#Custom-Simulation" title="Permalink"></a></h3><p>In the following type of simulation a more advanced variant is presented, which allows intervening more in the simulation process. Analogous to the simple variant, an FMU model must be loaded.</p><pre><code class="language-julia hljs">fmu = loadFMU(&quot;SpringFrictionPendulum1D&quot;, &quot;Dymola&quot;, &quot;2022x&quot;)</code></pre><pre><code class="nohighlight hljs">Model name:	SpringFrictionPendulum1D
+Type:		1</code></pre><p>Next, it is necessary to create an instance of the FMU, this is achieved by the command <code>fmi2Instantiate!()</code>.  </p><pre><code class="language-julia hljs">instanceFMU = fmi2Instantiate!(fmu)</code></pre><pre><code class="nohighlight hljs">FMU:            SpringFrictionPendulum1D
+    InstanceName:   SpringFrictionPendulum1D
+    Address:        Ptr{Nothing} @0x000001bb78171a50
+    State:          0
+    Logging:        false
+    FMU time:       -Inf
+    FMU states:     nothing</code></pre><p>In the following code block, start and end time for the simulation is set by the <code>fmi2SetupExperiment()</code> command. Next, the FMU is initialized by the calls of <code>fmi2EnterInitializationMode()</code> and <code>fmi2ExitInitializationMode()</code>. It would also be possible to set initial states, parameters or inputs at this place in code.</p><pre><code class="language-julia hljs">fmi2SetupExperiment(instanceFMU, tStart, tStop)
 # set initial model states
 fmi2EnterInitializationMode(instanceFMU)
 # get initial model states
-fmi2ExitInitializationMode(instanceFMU)</code></pre><p>The actual simulation loop is shown in the following block. Here a simulation step <code>fmi2DoStep()</code> with the fixed step size <code>tStep</code> is executed. As indicated in the code by the comments, the input values and output values of the FMU could be changed in the simulation loop as desired, whereby the higher possibility of adjustments arises.</p><pre><code class="language-julia hljs">values = []
+fmi2ExitInitializationMode(instanceFMU)</code></pre><pre><code class="nohighlight hljs">0x00000000</code></pre><p>The actual simulation loop is shown in the following block. Here a simulation step <code>fmi2DoStep()</code> with the fixed step size <code>tStep</code> is executed. As indicated in the code by the comments, the input values and output values of the FMU could be changed in the simulation loop as desired, whereby the higher possibility of adjustments arises.</p><pre><code class="language-julia hljs">values = []
 
 for t in tSave
     # set model inputs if any
@@ -29,4 +75,4 @@ end
 
 plot(tSave, values)</code></pre><p>The instantiated FMU must be terminated and then the memory area for the instance can also be deallocated. The last step is to unload the FMU to remove all unpacked data on disc. </p><pre><code class="language-julia hljs">fmi2Terminate(instanceFMU)
 fmi2FreeInstance!(instanceFMU)
-fmi2Unload(fmu)</code></pre><h3 id="Summary"><a class="docs-heading-anchor" href="#Summary">Summary</a><a id="Summary-1"></a><a class="docs-heading-anchor-permalink" href="#Summary" title="Permalink"></a></h3><p>The tutorial has shown how to use the default simulation command and how to deploy a custom simulation loop.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../multiple_instances/">« Multiple instances</a><a class="docs-footer-nextpage" href="../manipulation/">Manipulation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.7.0 on <span class="colophon-date" title="Monday 16 September 2024 07:48">Monday 16 September 2024</span>. Using Julia version 1.10.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+unloadFMU(fmu)</code></pre><h3 id="Summary"><a class="docs-heading-anchor" href="#Summary">Summary</a><a id="Summary-1"></a><a class="docs-heading-anchor-permalink" href="#Summary" title="Permalink"></a></h3><p>The tutorial has shown how to use the default simulation command and how to deploy a custom simulation loop.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../multiple_instances/">« Multiple instances</a><a class="docs-footer-nextpage" href="../manipulation/">Manipulation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.7.0 on <span class="colophon-date" title="Thursday 19 September 2024 13:54">Thursday 19 September 2024</span>. Using Julia version 1.10.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
