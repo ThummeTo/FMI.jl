@@ -35,13 +35,13 @@ jobs:
         env:
           WORK_TREE: './docs/src/examples'
           SRC_BRANCH: 'origin/examples'
-          SRC_FOLDER_PATH: 'examples/src'
+          SRC_FOLDER_PATH: 'examples'
         # copy the examples from the examples branch (.md, .svg) and copy the readme in the docs folder
         run: |
           git fetch
-          git --work-tree=$WORK_TREE/.. checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/*.md $SRC_FOLDER_PATH/*.svg
-          mv $WORK_TREE/src/* $WORK_TREE 
-          rm -r $WORK_TREE/src
+          git --work-tree=$WORK_TREE/.. checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.md $SRC_FOLDER_PATH/jupyter-src/*.svg $SRC_FOLDER_PATH/pluto-src/*.html
+          mv $WORK_TREE/jupyter-src/* $WORK_TREE 
+          rm -r $WORK_TREE/jupyter-src
           cp ./README.md ./docs/src/index.md
 
       - name: "Install dependencies"

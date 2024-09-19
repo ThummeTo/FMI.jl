@@ -1,0 +1,4 @@
+FMI_*_Benchmark/
+tmp/
+.ipynb_checkpoints/
+*.png
