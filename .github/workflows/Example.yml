@@ -43,8 +43,15 @@ jobs:
       - name: "Execute notebook"
         env:
           FILE: examples/jupyter-src/${{ matrix.file-name }}.ipynb
+        run: jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-${{ matrix.julia-version }}" --to notebook --inplace --execute ${{ env.FILE }}
+
+      - name: "Fix SVGs" # on notebook (json) level: removes all cells, that have the tag "text/html" AND have "<?xml " within their content
+        run: julia -e 'using Pkg; Pkg.add("JSON"); using JSON; data = JSON.parsefile(joinpath("examples", "jupyter-src", "${{ matrix.file-name }}.ipynb"); use_mmap=false); function search_and_remove!(json, tag, content=""); if typeof(json) == Vector{Any}; for e in json; search_and_remove!(e, tag, content); end; elseif typeof(json) == Dict{String, Any}; for (t, c) in json; if contains(t, tag) && (content == "" || any([contains(line, content) for line in c])); pop!(json, t); else; search_and_remove!(c, tag, content); end; end; end; end; search_and_remove!(data, "text/html", "<?xml "); open(joinpath("examples", "jupyter-src", "tmp_${{ matrix.file-name }}.ipynb"),"w") do f; JSON.print(f, data, 1); end; mv(joinpath("examples", "jupyter-src", "tmp_${{ matrix.file-name }}.ipynb"), joinpath("examples", "jupyter-src", "${{ matrix.file-name }}.ipynb"); force=true);'
+
+      - name: "Export notebook to jl and md"
+        env:
+          FILE: examples/jupyter-src/${{ matrix.file-name }}.ipynb
         run: |
-          jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-${{ matrix.julia-version }}" --to notebook --inplace --execute ${{ env.FILE }}
           jupyter nbconvert --to script ${{ env.FILE }}
           jupyter nbconvert --to markdown ${{ env.FILE }}
 
