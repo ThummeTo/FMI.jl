@@ -1,4 +1,4 @@
-name: Test v1.6 (LTS)
+name: Test v1.10 (LTS)
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        julia-version: ['1.6']
+        julia-version: ['lts']
         julia-arch: [x64]
         os: [ubuntu-latest, windows-latest]
         experimental: [false]
