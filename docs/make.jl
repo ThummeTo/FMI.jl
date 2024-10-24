@@ -5,7 +5,9 @@
 
 import Pkg;
 Pkg.develop(path = joinpath(@__DIR__, "../../FMI.jl"));
-using Documenter, Plots, JLD2, DataFrames, CSV, MAT, FMI, FMIBase, FMIImport, FMICore
+using Plots, JLD2, DataFrames, CSV, MAT # need to be loaded, as they enable optional features in FMI.jl
+using FMI, FMIBase, FMIImport, FMICore, FMIExport
+using Documenter
 using Documenter: GitHubActions
 using Suppressor
 
@@ -97,7 +99,7 @@ my_makedocs() = makedocs(
             "fmi3_lowlevel_library_functions.md",
         ],
     ),
-    modules = [FMI, FMIImport, FMICore, FMIBase],
+    modules = [FMI, FMIImport, FMIExport, FMICore, FMIBase],
     checkdocs = :exports,
     linkcheck = true,
     warnonly = :linkcheck,
