@@ -38,7 +38,7 @@ If you want to migrate your project from [*FMI.jl*](https://github.com/ThummeTo/
 
 - [ ] New low-level interfaces are introduced, that fit the SciML-ecosystem. For example, a FMU can still be simulated with `simulate(fmu)`, but one can also decide to create a `prob = FMUProblem(fmu)` (like an `ODEProblem`) and use `solve(prob)` to obtain a solution. Keywords will be adapted to have a fully consistent interface with the remaining SciML-ecosystem.
 
-- [ ] Optimization for new Julia LTS v1.10, removing code to keep downward compatibility with old LTS v1.6.
+- [x] Optimization for new Julia LTS v1.10, removing code to keep downward compatibility with old LTS v1.6.
 
 🎉 After all listed features are implemented, v1.0.0 will be released! 🎉 
 
