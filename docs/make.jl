@@ -22,13 +22,44 @@ example_pages = [
     "Multithreading" => joinpath("examples", "multithreading.md"),
     "Multiprocessing" => joinpath("examples", "multiprocessing.md"),
     "Pluto Workshops" => joinpath("examples", "workshops.md"),
+    "FMIExport Examples" => [
+        "Bouncing Ball" => joinpath("examples", "fmiexport_examples", "BouncingBall.md"),
+        "Manipulation" => joinpath("examples", "fmiexport_examples", "Manipulation.md"),
+    ]
 ]
 
+function recursive_second(vec)
+    s = []
+    for e in vec
+        if typeof(e[2]) == String
+            push!(s, e[2])
+        else
+            append!(s, recursive_second(e[2]))
+        end
+    end
+    return s 
+end
+function recursive_second_filter!(f, a)
+    deleteat = []
+    for i in keys(a)
+        if typeof(a[i][2]) == String
+            if f(a[i]) == false
+                push!(deleteat, i)
+            end
+        else
+            recursive_second_filter!(f, a[i][2])
+            if length(a[i][2]) == 0
+                push!(deleteat, i)
+            end
+        end
+    end
+    deleteat!(a, deleteat)
+    return a
+end
+mdFilesInExampleDir = filter(f -> endswith(f, ".md"), collect(Iterators.flatten([(length(item[3]) > 0) ? [joinpath(item[1],f) for f in item[3]] : [] for item in walkdir(joinpath("docs", "src", "examples"))])))
 #check if all md files in examples are included in docs
-for md in readdir(joinpath("docs", "src", "examples"))
-    if endswith(md, ".md") &&
-       !occursin("README", md) &&
-       all([!endswith(file, md) for (x, file) in example_pages])
+for md in mdFilesInExampleDir
+    if !occursin("README", md) && all([!endswith(md, file) for file in recursive_second(example_pages)])
         print(
             string(
                 "::warning title=Example-Warning::example \"",
@@ -41,9 +72,9 @@ end
 
 #remove any example pages, for witch the example can not be found
 # and remove svgs if md building failed
-for (x, md) in deepcopy(example_pages)
+for md in recursive_second(example_pages)
     # check if file is missing
-    if !(any([occursin(file, md) for file in readdir(joinpath("docs", "src", "examples"))]))
+    if !(any([occursin(md, file) for file in mdFilesInExampleDir]))
         print(
             string(
                 "::warning title=Example-Warning::example-page \"",
@@ -51,7 +82,8 @@ for (x, md) in deepcopy(example_pages)
                 "\" is to be included in the doc-manual, but could not be found on the examples branch or in \"docs/src/examples\"\r\n",
             ),
         )
-        filter!(e -> e ≠ (x => md), example_pages)
+        println(md)
+        recursive_second_filter!(e -> e[2] ≠ md, example_pages)
     else
         # removal of svgs is here if there is xml data in the md
         r = open(joinpath("docs", "src", md), "r")
