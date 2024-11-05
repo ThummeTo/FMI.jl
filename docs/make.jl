@@ -23,8 +23,7 @@ example_pages = [
     "Multiprocessing" => joinpath("examples", "multiprocessing.md"),
     "Pluto Workshops" => joinpath("examples", "workshops.md"),
     "FMIExport Examples" => [
-        "Bouncing Ball" => joinpath("examples", "fmiexport_examples", "BouncingBall.md"),
-        "Manipulation" => joinpath("examples", "fmiexport_examples", "Manipulation.md"),
+        "Export Bouncing Ball" => joinpath("examples", "fmiexport_examples", "Export-BouncingBall.md"),
     ]
 ]
 
