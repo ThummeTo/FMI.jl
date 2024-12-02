@@ -294,6 +294,7 @@ export simulateME
 function auto_interval(t)
     """
     Find a nice interval that divides t into 500 - 1000 steps
+    from https://github.com/CATIA-Systems/FMPy/blob/4166f08dd991cb6b5df2522ba125669e635327fe/fmpy/util.py#L1042
     """
     # Initial interval estimation
     h = 10 ^ (round(log10(t)) - 3)
