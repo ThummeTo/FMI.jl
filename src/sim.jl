@@ -30,11 +30,11 @@ You can force a specific simulation mode by calling [`simulateCS`](@ref), [`simu
 # Keyword arguments
 - `recordValues::fmi2ValueReferenceFormat` = nothing: Array of variables (Strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
 - `saveat = nothing`: Time points to save (interpolated) values at (default = nothing: save at each solver timestep)
-- `setup::Bool`: call fmi2SetupExperiment, fmi2EnterInitializationMode and fmi2ExitInitializationMode before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
-- `reset::Bool`: call fmi2Reset before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
-- `instantiate::Bool`: call fmi2Instantiate! before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
-- `freeInstance::Bool`: call fmi2FreeInstance after each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
-- `terminate::Bool`: call fmi2Terminate after each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `setup::Bool`: call fmi2SetupExperiment, fmi2EnterInitializationMode and fmi2ExitInitializationMode before the simulation (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `reset::Bool`: call fmi2Reset before each the simulation (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `instantiate::Bool`: call fmi2Instantiate! simulate on a new created instance (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `freeInstance::Bool`: call fmi2FreeInstance at the end of the simulation (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `terminate::Bool`: call fmi2Terminate at the end of the simulation (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
 - `inputValueReferences::fmi2ValueReferenceFormat = nothing`: Input variables (Strings or variableIdentifiers) to set at each simulation step 
 - `inputFunction = nothing`: Function to get values for the input variables at each simulation step. 
 - `parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing`: Dict of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization
@@ -111,11 +111,11 @@ State- and Time-Events are handled correctly.
 - `recordEigenvalues::Bool=false`: compute and record eigenvalues
 - `saveat = nothing`: Time points to save (interpolated) values at (default = nothing: save at each solver timestep)
 - `x0::Union{AbstractArray{<:Real}, Nothing} = nothing`: initial fmu State (default = nothing: use current or default-initial fmu state)
-- `setup::Bool`: call fmi2SetupExperiment, fmi2EnterInitializationMode and fmi2ExitInitializationMode before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
-- `reset::Bool`: call fmi2Reset before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
-- `instantiate::Bool`: call fmi2Instantiate! before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
-- `freeInstance::Bool`: call fmi2FreeInstance after each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
-- `terminate::Bool`: call fmi2Terminate after each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `setup::Bool`: call fmi2SetupExperiment, fmi2EnterInitializationMode and fmi2ExitInitializationMode before the simulation (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `reset::Bool`: call fmi2Reset before each the simulation (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `instantiate::Bool`: call fmi2Instantiate! simulate on a new created instance (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `freeInstance::Bool`: call fmi2FreeInstance at the end of the simulation (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `terminate::Bool`: call fmi2Terminate at the end of the simulation (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
 - `inputValueReferences::fmi2ValueReferenceFormat = nothing`: Input variables (Strings or variableIdentifiers) to set at each simulation step 
 - `inputFunction = nothing`: Function to get values for the input variables at each simulation step. 
 - `parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing`: Dict of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization
@@ -206,6 +206,11 @@ function simulateME(
         t_stop = t_stop,
         x0 = x0,
         inputs = inputs,
+        instantiate = instantiate,
+        freeInstance = freeInstance,
+        terminate= terminate,
+        reset = reset,
+        setup = setup,
     )
 
     # Zero state FMU: add dummy state
@@ -309,11 +314,11 @@ State- and Time-Events are handled internally by the FMU.
 - `tolerance::Union{Real, Nothing} = nothing`: The tolerance for the internal FMU solver.
 - `recordValues::fmi2ValueReferenceFormat` = nothing: Array of variables (Strings or variableIdentifiers) to record. Results are returned as `DiffEqCallbacks.SavedValues`
 - `saveat = nothing`: Time points to save (interpolated) values at (default = nothing: save at each solver timestep)
-- `setup::Bool`: call fmi2SetupExperiment, fmi2EnterInitializationMode and fmi2ExitInitializationMode before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
-- `reset::Bool`: call fmi2Reset before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
-- `instantiate::Bool`: call fmi2Instantiate! before each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
-- `freeInstance::Bool`: call fmi2FreeInstance after each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
-- `terminate::Bool`: call fmi2Terminate after each step (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `setup::Bool`: call fmi2SetupExperiment, fmi2EnterInitializationMode and fmi2ExitInitializationMode before the simulation (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `reset::Bool`: call fmi2Reset before each the simulation (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `instantiate::Bool`: call fmi2Instantiate! simulate on a new created instance (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `freeInstance::Bool`: call fmi2FreeInstance at the end of the simulation (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
+- `terminate::Bool`: call fmi2Terminate at the end of the simulation (default = nothing: use value from `fmu`'s `FMUExecutionConfiguration`)
 - `inputValueReferences::fmi2ValueReferenceFormat = nothing`: Input variables (Strings or variableIdentifiers) to set at each simulation step 
 - `inputFunction = nothing`: Function to get values for the input variables at each simulation step. 
 - `parameters::Union{Dict{<:Any, <:Any}, Nothing} = nothing`: Dict of parameter variables (strings or variableIdentifiers) and values (Real, Integer, Boolean, String) to set parameters during initialization
