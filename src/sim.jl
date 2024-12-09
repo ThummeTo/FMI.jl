@@ -291,7 +291,34 @@ simulateME(fmu::FMU, tspan::Tuple{Float64,Float64}; kwargs...) =
 export simulateME
 
 ############ Co-Simulation ############
-
+function auto_interval(t)
+    """
+    Find a nice interval that divides t into 500 - 1000 steps
+    from https://github.com/CATIA-Systems/FMPy/blob/4166f08dd991cb6b5df2522ba125669e635327fe/fmpy/util.py#L1042
+    """
+    # Initial interval estimation
+    h = 10 ^ (round(log10(t)) - 3)
+    
+    # Number of samples
+    n_samples = t / h
+    
+    # Adjust interval based on number of samples
+    if n_samples >= 2500
+        h *= 5
+    elseif n_samples >= 2000
+        h *= 4
+    elseif n_samples >= 1000
+        h *= 2
+    elseif n_samples <= 200
+        h /= 5
+    elseif n_samples <= 250
+        h /= 4
+    elseif n_samples <= 500
+        h /= 2
+    end
+    
+    return h
+end
 """
     simulateCS(fmu, instance=nothing, tspan=nothing; kwargs...)
     simulateCS(fmu, tspan; kwargs...)
@@ -394,7 +421,7 @@ function simulateCS(
     tolerance = tolerance === nothing ? 0.0 : tolerance
 
     dt = dt === nothing ? getDefaultStepSize(fmu.modelDescription) : dt
-    dt = dt === nothing ? 1e-3 : dt
+    dt = dt === nothing ? auto_interval(t_stop-t_start) : dt
 
     @debug "Simulating CS-FMU: Preparing inputs ..."
     inputs = nothing
