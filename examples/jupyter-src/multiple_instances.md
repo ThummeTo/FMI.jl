@@ -93,6 +93,8 @@ info(myFMU)
     	Var. naming conv.:		structured
     	Event indicators:		0
     	Inputs:				0
+
+    
     	Outputs:			0
     	States:				2
     		33554432 ["mass.s"]
@@ -134,7 +136,7 @@ println(c1)
 
     FMU:            SpringPendulum1D
         InstanceName:   SpringPendulum1D
-        Address:        Ptr{Nothing} @0x0000017a22d0f490
+        Address:        Ptr{Nothing} @0x000002504631f450
         State:          0
         Logging:        true
         FMU time:       -Inf
@@ -179,7 +181,7 @@ println(c2)
 
     FMU:            SpringPendulum1D
         InstanceName:   SpringPendulum1D
-        Address:        Ptr{Nothing} @0x0000017a22d0edf0
+        Address:        Ptr{Nothing} @0x000002504631edb0
         State:          0
         Logging:        true
         FMU time:       -Inf
