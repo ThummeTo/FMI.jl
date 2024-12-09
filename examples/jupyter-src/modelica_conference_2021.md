@@ -72,8 +72,6 @@ info(fmu)
     	Var. naming conv.:		structured
     	Event indicators:		24
     	Inputs:				0
-    
-
     	Outputs:			0
     	States:				2
     		33554432 ["mass.s"]
@@ -89,6 +87,8 @@ info(fmu)
     		16777225 ["mass.L"]
     		16777226 ["mass.m"]
     		16777227 ["mass.fexp"]
+
+    
     	Supports Co-Simulation:		true
     		Model identifier:	SpringFrictionPendulum1D
     		Get/Set State:		true
@@ -159,7 +159,7 @@ instanceFMU = fmi2Instantiate!(fmu)
 
     FMU:            SpringFrictionPendulum1D
         InstanceName:   SpringFrictionPendulum1D
-        Address:        Ptr{Nothing} @0x00000239a4a8c9c0
+        Address:        Ptr{Nothing} @0x00000242178238e0
         State:          0
         Logging:        false
         FMU time:       -Inf
