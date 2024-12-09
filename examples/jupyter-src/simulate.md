@@ -98,8 +98,6 @@ info(myFMU)
     	Outputs:			0
     	States:				2
     		33554432 ["mass.s"]
-    
-
     		33554433 ["mass.v", "mass.v_relfric"]
     	Parameters:			12
     		16777216 ["fricScale"]
@@ -117,6 +115,8 @@ info(myFMU)
     		Get/Set State:		true
     		Serialize State:	true
     		Dir. Derivatives:	true
+
+    
     		Var. com. steps:	true
     		Input interpol.:	true
     		Max order out. der.:	1
@@ -202,7 +202,7 @@ dataME = simulateME(myFMU, (tStart, tStop); saveat=tSave)
 
     [34mSimulating ME-FMU ...   0%|█                             |  ETA: N/A[39m
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:14[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:10[39m
     
 
 
