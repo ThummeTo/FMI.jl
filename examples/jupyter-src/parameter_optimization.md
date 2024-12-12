@@ -82,10 +82,10 @@ info(fmu)
     	Var. naming conv.:		structured
     	Event indicators:		0
     	Inputs:				0
-
-    
     	Outputs:			0
     	States:				2
+
+    
     		33554432 ["mass.s"]
     		33554433 ["mass.v"]
     	Parameters:			7
@@ -207,10 +207,10 @@ p_res = opt.minimizer # the optimized parameters
 
 
     4-element Vector{Float64}:
-     1.0016097832257336
-     0.9774424426380773
-     0.169611867883516
-     0.14771834710443343
+     1.0016096746025418
+     0.9774441115332585
+     0.27841944395944973
+     0.24248103185469333
 
 
 
