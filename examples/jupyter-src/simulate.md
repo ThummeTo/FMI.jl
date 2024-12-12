@@ -97,6 +97,8 @@ info(myFMU)
     	Inputs:				0
     	Outputs:			0
     	States:				2
+
+    
     		33554432 ["mass.s"]
     		33554433 ["mass.v", "mass.v_relfric"]
     	Parameters:			12
@@ -115,8 +117,6 @@ info(myFMU)
     		Get/Set State:		true
     		Serialize State:	true
     		Dir. Derivatives:	true
-
-    
     		Var. com. steps:	true
     		Input interpol.:	true
     		Max order out. der.:	1
