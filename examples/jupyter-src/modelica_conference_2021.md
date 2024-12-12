@@ -87,8 +87,6 @@ info(fmu)
     		16777225 ["mass.L"]
     		16777226 ["mass.m"]
     		16777227 ["mass.fexp"]
-
-    
     	Supports Co-Simulation:		true
     		Model identifier:	SpringFrictionPendulum1D
     		Get/Set State:		true
@@ -97,6 +95,8 @@ info(fmu)
     		Var. com. steps:	true
     		Input interpol.:	true
     		Max order out. der.:	1
+
+    
     	Supports Model-Exchange:	true
     		Model identifier:	SpringFrictionPendulum1D
     		Get/Set State:		true
@@ -159,7 +159,7 @@ instanceFMU = fmi2Instantiate!(fmu)
 
     FMU:            SpringFrictionPendulum1D
         InstanceName:   SpringFrictionPendulum1D
-        Address:        Ptr{Nothing} @0x00000242178238e0
+        Address:        Ptr{Nothing} @0x000001f7425eebd0
         State:          0
         Logging:        false
         FMU time:       -Inf
