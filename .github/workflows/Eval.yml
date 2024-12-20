@@ -51,9 +51,11 @@ jobs:
       - name: "Run PkgEval"
         run: |
           git clone https://github.com/JuliaCI/PkgEval.jl.git
+          cp -rf test/PkgEvalDbg/* PkgEval.jl
+          ls -a -l PkgEval.jl/src
           julia --project=. -e '
             import Pkg;
             Pkg.instantiate();
             Pkg.add("Test");
-            Pkg.add(path="./PkgEval.jl")'
+            Pkg.develop(path="./PkgEval.jl")'
           julia --project=. ./test/eval.jl
