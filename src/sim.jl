@@ -238,7 +238,7 @@ function simulateME(
     #setupSolver(fmu, solveKwargs)
 
     for cb in callbacksBefore
-        insertAt!(cbs, cb, 1)
+        insert!(cbs, 1, cb)
     end
 
     for cb in callbacksAfter
