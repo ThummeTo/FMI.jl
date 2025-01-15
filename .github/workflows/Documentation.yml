@@ -59,7 +59,7 @@ jobs:
         # $SRC_FOLDER_PATH/jupyter-src/*.svg $SRC_FOLDER_PATH/pluto-src/*.html
         run: | 
           mkdir $WORK_TREE
-          mv $SRC_FOLDER_PATH/*.md $WORK_TREE 
+          mv $SRC_FOLDER_PATH/jupyter-src/*.md $WORK_TREE 
           rm -r $SRC_FOLDER_PATH/*
 
       - name: "Install dependencies"
