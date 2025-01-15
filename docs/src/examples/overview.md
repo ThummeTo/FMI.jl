@@ -24,7 +24,7 @@ Examples are subdevided into *Basics*, *Advanced*, *Export*, *Pluto workshops* a
 
 **FMIExport.jl examples:**
 
-- [__Export-BouncingBall__](https://thummeto.github.io/FMI.jl/dev/examples/fmiexport_examples/Export-BouncingBall/): Export an FMU of a BouncingBall, that is implemented in Julia
+- [__Export__](https://thummeto.github.io/FMI.jl/dev/examples/fmiexport_examples/Export/): Export an FMU of a BouncingBall, that is implemented in Julia
 
 **Pluto workshops:**
 
