@@ -60,6 +60,7 @@ jobs:
 
       - name: "auto-commit (retry on merge)"
         if: success() && github.event_name != 'pull_request' && github.ref_name == 'main'
+        # retrying is required, as a race condition can occur: all parallel example builds try to push to the same branch. Instead of merging, retrying is the cleanest solution
         uses: nick-fields/retry@v3
         env: 
           CI_COMMIT_MESSAGE: jupyter-example-${{ matrix.file-name }}-${{ matrix.os }}-${{ matrix.julia-version }}-${{ matrix.julia-arch }}-${{ matrix.experimental }}[${{ github.ref_name }}]
@@ -108,6 +109,7 @@ jobs:
 
       - name: "auto-commit (retry on merge)"
         if: success() && github.event_name != 'pull_request' && github.ref_name == 'main'
+        # retrying is required, as a race condition can occur: all parallel example builds try to push to the same branch. Instead of merging, retrying is the cleanest solution
         uses: nick-fields/retry@v3
         env: 
           CI_COMMIT_MESSAGE: pluto-examples[${{ github.ref_name }}]
