@@ -23,8 +23,9 @@ example_pages = [
     "Multiprocessing" => joinpath("examples", "multiprocessing.md"),
     "Pluto Workshops" => joinpath("examples", "workshops.md"),
     "FMIExport Examples" => [
-        "Export Bouncing Ball" => joinpath("examples", "fmiexport_examples", "Export-BouncingBall.md"),
-    ]
+        "Export Bouncing Ball" =>
+            joinpath("examples", "fmiexport_examples", "Export-BouncingBall.md"),
+    ],
 ]
 
 function recursive_second(vec)
@@ -36,7 +37,7 @@ function recursive_second(vec)
             append!(s, recursive_second(e[2]))
         end
     end
-    return s 
+    return s
 end
 function recursive_second_filter!(f, a)
     deleteat = []
@@ -55,10 +56,19 @@ function recursive_second_filter!(f, a)
     deleteat!(a, deleteat)
     return a
 end
-mdFilesInExampleDir = filter(f -> endswith(f, ".md"), collect(Iterators.flatten([(length(item[3]) > 0) ? [joinpath(item[1],f) for f in item[3]] : [] for item in walkdir(joinpath("docs", "src", "examples"))])))
+mdFilesInExampleDir = filter(
+    f -> endswith(f, ".md"),
+    collect(
+        Iterators.flatten([
+            (length(item[3]) > 0) ? [joinpath(item[1], f) for f in item[3]] : [] for
+            item in walkdir(joinpath("docs", "src", "examples"))
+        ]),
+    ),
+)
 #check if all md files in examples are included in docs
 for md in mdFilesInExampleDir
-    if !occursin("README", md) && all([!endswith(md, file) for file in recursive_second(example_pages)])
+    if !occursin("README", md) &&
+       all([!endswith(md, file) for file in recursive_second(example_pages)])
         print(
             string(
                 "::warning title=Example-Warning::example \"",
