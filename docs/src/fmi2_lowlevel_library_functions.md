@@ -104,3 +104,15 @@ fmi2GetJacobian
 fmi2GetJacobian!
 fmi2GetFullJacobian
 fmi2GetFullJacobian!
+
+## Export functions
+
+```@docs
+fmi2ModelDescriptionAddModelStructureOutputs
+fmi2CreateEmbedded
+fmi2ModelDescriptionAddModelStructureInitialUnknowns
+fmi2ModelDescriptionAddModelVariable
+fmi2CreateSimple
+fmi2Create
+fmi2ModelDescriptionAddModelStructureDerivatives
+```

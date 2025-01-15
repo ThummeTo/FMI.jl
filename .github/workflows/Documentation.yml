@@ -44,6 +44,24 @@ jobs:
           rm -r $WORK_TREE/jupyter-src
           cp ./README.md ./docs/src/index.md
 
+      - name: "Check out fmi-export repository"
+        uses: actions/checkout@v4
+        with:
+          repository: 'ThummeTo/FMIExport.jl'
+          ref: 'examples'
+          path: 'FMIExport.jl'
+
+      - name: "Copy fmi-export examples"
+        env:
+          WORK_TREE: './docs/src/examples/fmiexport_examples'
+          SRC_FOLDER_PATH: 'FMIExport.jl/examples'
+        # copy the examples from the examples branch (.md, .svg) and copy the readme in the docs folder
+        # $SRC_FOLDER_PATH/jupyter-src/*.svg $SRC_FOLDER_PATH/pluto-src/*.html
+        run: | 
+          mkdir $WORK_TREE
+          mv $SRC_FOLDER_PATH/jupyter-src/*.md $WORK_TREE 
+          rm -r $SRC_FOLDER_PATH/*
+
       - name: "Install dependencies"
         run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
 
