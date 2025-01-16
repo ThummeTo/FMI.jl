@@ -18,6 +18,10 @@ jobs:
         julia-arch: [x64]
     
     steps:
+      # Required by PkgEval.jl as xvfb runs into issues with ubuntu 24. See ci.yml workflow of PkgEval.jl repo
+      - name: "Allow unprivileged user namespaces"
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+    
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Check out repository
         uses: actions/checkout@v4
@@ -30,7 +34,11 @@ jobs:
           arch: ${{ matrix.julia-arch }}
         id: version
 
-     # Set up cache
+      # Set up julia-cache
+      - name: Set up julia-cache
+        uses: julia-actions/cache@v2
+
+      # Set up cache
       - name: "Set up cache"
         uses: actions/cache@v4
         env:
