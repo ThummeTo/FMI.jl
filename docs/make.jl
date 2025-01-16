@@ -28,6 +28,7 @@ example_pages = [
     ],
 ]
 
+# helper functions for geneartion of github-action-warnings
 function recursive_second(vec)
     s = []
     for e in vec
@@ -56,6 +57,7 @@ function recursive_second_filter!(f, a)
     deleteat!(a, deleteat)
     return a
 end
+
 mdFilesInExampleDir = filter(
     f -> endswith(f, ".md"),
     collect(
@@ -65,7 +67,10 @@ mdFilesInExampleDir = filter(
         ]),
     ),
 )
-#check if all md files in examples are included in docs
+
+### geneartion of github-action-warnings:
+
+#check if all md-files in "docs/src/examples" are included in docs (if those examples exist, they sould be part of the documentation...)
 for md in mdFilesInExampleDir
     if !occursin("README", md) &&
        all([!endswith(md, file) for file in recursive_second(example_pages)])
@@ -73,13 +78,13 @@ for md in mdFilesInExampleDir
             string(
                 "::warning title=Example-Warning::example \"",
                 md,
-                "\" is not included in the doc-manual\r\n",
+                "\" is not included in the doc-manual. Either include it in the docs by adding it to example_pages in docs/make.jl and the overwiev.md page or remove it from the examples branch and examples-CI-bulids\r\n",
             ),
         )
     end
 end
 
-#remove any example pages, for witch the example can not be found
+# remove any example pages from example_pages, for witch the example can not be found (otherwise, there will be an error and doc build would fail)
 # and remove svgs if md building failed
 for md in recursive_second(example_pages)
     # check if file is missing
@@ -88,7 +93,7 @@ for md in recursive_second(example_pages)
             string(
                 "::warning title=Example-Warning::example-page \"",
                 md,
-                "\" is to be included in the doc-manual, but could not be found on the examples branch or in \"docs/src/examples\"\r\n",
+                "\" is to be included in the doc-manual, but could not be found on the examples branch or in \"docs/src/examples\". Either add it to the example-CI-buliding pipeline or remoce it from the example_pages in docs/make.jl\r\n",
             ),
         )
         println(md)
@@ -187,6 +192,7 @@ my_makedocs() = makedocs(
 function deployConfig()
     github_repository = get(ENV, "GITHUB_REPOSITORY", "")
     github_event_name = get(ENV, "GITHUB_EVENT_NAME", "")
+    # doc deployment not only for pushes but also for manual triggering or triggering by other action (eg. example action)
     if github_event_name == "workflow_run" || github_event_name == "repository_dispatch"
         github_event_name = "push"
     end
@@ -194,13 +200,14 @@ function deployConfig()
     return GitHubActions(github_repository, github_event_name, github_ref)
 end
 
+# make the docs but capture output to convert it to warnings that are displayed in github-actions
 output = ""
 try
     global output = @capture_err begin
         my_makedocs()
     end
 catch e
-    my_makedocs() # if it fails, re-run without capturing, so that its stderr appears in the console/logs
+    my_makedocs() # if it fails, re-run without capturing, so that its stderr appears in the console/logs for debugging
 end
 
 # errors = findall(r"Error:.*", output)

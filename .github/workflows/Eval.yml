@@ -34,7 +34,11 @@ jobs:
           arch: ${{ matrix.julia-arch }}
         id: version
 
-     # Set up cache
+      # Set up julia-cache
+      - name: Set up julia-cache
+        uses: julia-actions/cache@v2
+
+      # Set up cache
       - name: "Set up cache"
         uses: actions/cache@v4
         env:
