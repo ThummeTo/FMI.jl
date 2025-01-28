@@ -48,19 +48,25 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: 'ThummeTo/FMIExport.jl'
-          ref: 'examples'
           path: 'FMIExport.jl'
 
       - name: "Copy fmi-export examples from examples branch"
         env:
-          WORK_TREE: './docs/src/examples/fmiexport_examples'
-          SRC_FOLDER_PATH: 'FMIExport.jl/examples'
-        # copy the examples from the examples branch (jupyter: .md) and copy the readme in the docs folder
-        # $SRC_FOLDER_PATH/jupyter-src/*.svg $SRC_FOLDER_PATH/pluto-src/*.html
+          WORK_TREE: 'docs/src/examples/fmiexport_examples'
+          SRC_BRANCH: 'origin/examples'
+          SRC_FOLDER_PATH_A: 'FMIExport.jl'
+          SRC_FOLDER_PATH_B: 'examples'
+        # copy the examples from the examples branch (jupyter: .md, .fmu) and copy the readme in the docs folder
+        # if export examples are expanded in the future to include plots or pluto notbooks, add ../$SRC_FOLDER_PATH/jupyter-src/*.svg and/or ../$SRC_FOLDER_PATH/pluto-src/*.html
+        # if export examples are expanded in the future to include pluto notbooks add the following commands between moving the jupyter files and removing the examples dir:
+        # mv ../$WORK_TREE/$SRC_FOLDER_PATH_B/pluto-src ../$WORK_TREE/pluto-src
         run: | 
-          mkdir $WORK_TREE
-          mv $SRC_FOLDER_PATH/jupyter-src/*.md $WORK_TREE 
-          rm -r $SRC_FOLDER_PATH/*
+          cd FMIExport.jl
+          mkdir ../$WORK_TREE
+          git fetch
+          git --work-tree=../$WORK_TREE checkout $SRC_BRANCH -- ../$SRC_FOLDER_PATH_A/$SRC_FOLDER_PATH_B/jupyter-src/*.md ../$SRC_FOLDER_PATH_A/$SRC_FOLDER_PATH_B/jupyter-src/*.fmu
+          mv ../$WORK_TREE/$SRC_FOLDER_PATH_B/jupyter-src/* ../$WORK_TREE 
+          rm -r ../$WORK_TREE/$SRC_FOLDER_PATH_B
 
       - name: "Install dependencies"
         run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
