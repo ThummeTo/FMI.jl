@@ -39,17 +39,16 @@ jobs:
           WORK_TREE: './docs/src/examples'
           SRC_BRANCH: 'origin/examples'
           SRC_FOLDER_PATH: 'examples'
-        # copy the examples from the examples branch (jupyter: .md, .fmu, .svg, .gif; pluto: .html) and the readme (|| true for optional files)
+        # copy the examples from the examples branch (jupyter: .md, .fmu, .svg, .gif; pluto: .html) (|| true for optional files) and the readme 
         run: |
           git fetch
-          git --work-tree=$WORK_TREE/.. checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.md 
-          git --work-tree=$WORK_TREE/.. checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.fmu || true
-          git --work-tree=$WORK_TREE/.. checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.svg 
-          git --work-tree=$WORK_TREE/.. checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.gif || true
-          git --work-tree=$WORK_TREE/.. checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/pluto-src/*.html || true
-          mv $WORK_TREE/jupyter-src/* $WORK_TREE 
-          rm -r $WORK_TREE/jupyter-src
-          ls $WORK_TREE
+          git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.md 
+          git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.svg 
+          git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.gif || true
+          git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.fmu || true
+          git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/pluto-src/*.html || true
+          mv $WORK_TREE/$SRC_FOLDER_PATH/jupyter-src/* $WORK_TREE 
+          rm -r $WORK_TREE/$SRC_FOLDER_PATH/jupyter-src
           cp ./README.md ./docs/src/index.md
 
       - name: "Check out fmi-export repository"
@@ -65,7 +64,7 @@ jobs:
         continue-on-error: true
         env:
           WORK_TREE: 'fmiexport_examples'
-          DOC_LOC: 'FMI.jl/docs/src/examples'
+          DOC_LOC: 'docs/src/examples'
           SRC_BRANCH: 'origin/examples'
           SRC_FOLDER_PATH: 'examples'
         # copy the examples from the examples branch (jupyter: .md, .fmu, .svg, .gif; pluto: .html) and copy the readme in the docs folder
@@ -81,9 +80,34 @@ jobs:
           echo "$PWD"
           ls ../$SRC_FOLDER_PATH
           echo "$PWD"
-          git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- ../$SRC_FOLDER_PATH/jupyter-src/*.md ../$SRC_FOLDER_PATH/jupyter-src/*.fmu ../$SRC_FOLDER_PATH/jupyter-src/*.svg ../$SRC_FOLDER_PATH/jupyter-src/*.gif ../$SRC_FOLDER_PATH/pluto-src/*.html
-          mv $WORK_TREE/$SRC_FOLDER_PATH/jupyter-src/* $WORK_TREE/$SRC_FOLDER_PATH
-          mv  $WORK_TREE/$SRC_FOLDER_PATH ../$DOC_LOC
+          git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.md 
+          git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.svg 
+          git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.gif || true
+          git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.fmu || true
+          git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/pluto-src/*.html || true
+          echo "$PWD"
+          ls .
+          echo "$PWD"
+          ls ..
+          echo "$PWD"
+          ls ../$SRC_FOLDER_PATH
+          echo "$PWD"
+          mv $WORK_TREE/$SRC_FOLDER_PATH/jupyter-src/* $WORK_TREE
+          echo "$PWD"
+          ls .
+          echo "$PWD"
+          ls ..
+          echo "$PWD"
+          ls ../$SRC_FOLDER_PATH
+          echo "$PWD"
+          mv  $WORK_TREE ../$DOC_LOC/$WORK_TREE
+          echo "$PWD"
+          ls .
+          echo "$PWD"
+          ls ..
+          echo "$PWD"
+          ls ../$SRC_FOLDER_PATH
+          echo "$PWD"
           cd ..
 
       - name: "Install dependencies"
