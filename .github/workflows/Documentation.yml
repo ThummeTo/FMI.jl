@@ -80,11 +80,11 @@ jobs:
           echo "$PWD"
           mv $WORK_TREE/$SRC_FOLDER_PATH/jupyter-src/* $WORK_TREE
           echo "$PWD"
-          ls $WORK_TREE/$SRC_FOLDER_PATH
+          ls $WORK_TREE
           echo "$PWD"
           mv  $WORK_TREE ../$DOC_LOC/$WORK_TREE
           echo "$PWD"
-          ls $WORK_TREE/$SRC_FOLDER_PATH
+          ls $WORK_TREE
           echo "$PWD"
           cd ..
           echo "$PWD"
