@@ -22,7 +22,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - name: "Check out repository"
         uses: actions/checkout@v4
@@ -34,7 +33,6 @@ jobs:
           arch: x64
 
       - name: "Copy examples and readme from FMI examples branch"
-        continue-on-error: true
         env:
           WORK_TREE: './docs/src/examples'
           SRC_BRANCH: 'origin/examples'
@@ -52,16 +50,12 @@ jobs:
           cp ./README.md ./docs/src/index.md
 
       - name: "Check out fmi-export repository"
-        if: always()
-        continue-on-error: true
         uses: actions/checkout@v4
         with:
           repository: 'ThummeTo/FMIExport.jl'
           path: 'FMIExport.jl'
 
       - name: "Copy fmi-export examples from examples branch"
-        if: always()
-        continue-on-error: true
         env:
           WORK_TREE: 'fmiexport_examples'
           DOC_LOC: 'docs/src/examples'
@@ -74,7 +68,7 @@ jobs:
           git fetch
           mkdir $WORK_TREE
           echo "$PWD"
-          ls $WORK_TREE/$SRC_FOLDER_PATH
+          ls .
           echo "$PWD"
           git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.md || true
           git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.svg || true
@@ -107,3 +101,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication with GitHub Actions token
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} # For authentication with SSH deploy key
         run: julia --project=docs/ docs/make.jl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: my-artifact
+          path: docs/build/
