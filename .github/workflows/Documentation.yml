@@ -44,9 +44,8 @@ jobs:
           git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.svg 
           git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.gif || true
           git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.fmu || true
-          git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/pluto-src/*.html || true
+          git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/pluto-src/*.html && mkdir -p $WORK_TREE/pluto-src && mv $WORK_TREE/$SRC_FOLDER_PATH/pluto-src/* $WORK_TREE/pluto-src || true
           mv $WORK_TREE/$SRC_FOLDER_PATH/jupyter-src/* $WORK_TREE 
-          mv $WORK_TREE/$SRC_FOLDER_PATH/pluto-src/* $WORK_TREE/pluto-src 
           rm -r $WORK_TREE/$SRC_FOLDER_PATH
           cp ./README.md ./docs/src/index.md
 
@@ -67,7 +66,7 @@ jobs:
         run: | 
           cd FMIExport.jl
           git fetch
-          mkdir $WORK_TREE
+          mkdir -p $WORK_TREE
           echo "$PWD"
           ls .
           echo "$PWD"
