@@ -11,7 +11,6 @@ on:
   push:
     branches: 
       - main
-      - patches-2
     paths:
       - 'docs/**'
       - 'README.md'
@@ -32,12 +31,12 @@ jobs:
           version: '1'
           arch: x64
 
-      - name: "Copy examples and readme from FMI examples branch"
+      - name: "Copy examples from FMI examples branch and readme from main"
         env:
           WORK_TREE: './docs/src/examples'
           SRC_BRANCH: 'origin/examples'
           SRC_FOLDER_PATH: 'examples'
-        # copy the examples from the examples branch (jupyter: .md, .fmu, .svg, .gif; pluto: .html) (|| true for optional files) and the readme 
+        # copy the examples from the examples branch (jupyter: .md, .fmu, .svg, .gif; pluto: .html) ("|| true" for optional files, else command will fail) and the readme from main
         run: |
           git fetch
           git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.md 
@@ -85,7 +84,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication with GitHub Actions token
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} # For authentication with SSH deploy key
         run: julia --project=docs/ docs/make.jl
-      - uses: actions/upload-artifact@v4
-        with:
-          name: my-artifact
-          path: docs/build/
