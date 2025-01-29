@@ -11,6 +11,7 @@ on:
   push:
     branches: 
       - main
+      - patches-2
     paths:
       - 'docs/**'
       - 'README.md'
@@ -33,6 +34,7 @@ jobs:
           arch: x64
 
       - name: "Copy examples and readme from FMI examples branch"
+        continue-on-error: true
         env:
           WORK_TREE: './docs/src/examples'
           SRC_BRANCH: 'origin/examples'
@@ -41,18 +43,22 @@ jobs:
         run: |
           git fetch
           echo "$PWD"
-          git --work-tree=$WORK_TREE/.. checkout $SRC_BRANCH -- ../$SRC_FOLDER_PATH/jupyter-src/*.md ../$SRC_FOLDER_PATH/jupyter-src/*.fmu ../$SRC_FOLDER_PATH/jupyter-src/*.svg ../$SRC_FOLDER_PATH/jupyter-src/*.gif ../$SRC_FOLDER_PATH/pluto-src/*.html
+          git --work-tree=$WORK_TREE/.. checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.md $SRC_FOLDER_PATH/jupyter-src/*.fmu $SRC_FOLDER_PATH/jupyter-src/*.svg $SRC_FOLDER_PATH/jupyter-src/*.gif $SRC_FOLDER_PATH/pluto-src/*.html
           mv $WORK_TREE/jupyter-src/* $WORK_TREE 
           rm -r $WORK_TREE/jupyter-src
           cp ./README.md ./docs/src/index.md
 
       - name: "Check out fmi-export repository"
+        if: always()
+        continue-on-error: true
         uses: actions/checkout@v4
         with:
           repository: 'ThummeTo/FMIExport.jl'
           path: 'FMIExport.jl'
 
       - name: "Copy fmi-export examples from examples branch"
+        if: always()
+        continue-on-error: true
         env:
           WORK_TREE: 'docs/src/examples/fmiexport_examples/examples'
           SRC_BRANCH: 'origin/examples'
