@@ -46,7 +46,8 @@ jobs:
           git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.fmu || true
           git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/pluto-src/*.html || true
           mv $WORK_TREE/$SRC_FOLDER_PATH/jupyter-src/* $WORK_TREE 
-          rm -r $WORK_TREE/$SRC_FOLDER_PATH/jupyter-src
+          mv $WORK_TREE/$SRC_FOLDER_PATH/pluto-src/* $WORK_TREE/pluto-src 
+          rm -r $WORK_TREE/$SRC_FOLDER_PATH
           cp ./README.md ./docs/src/index.md
 
       - name: "Check out fmi-export repository"
@@ -77,8 +78,6 @@ jobs:
           git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/pluto-src/*.html || true
           echo "$PWD"
           ls $WORK_TREE/$SRC_FOLDER_PATH
-          echo "$PWD"
-          ls $WORK_TREE/$SRC_FOLDER_PATH/jupyter-src/examples
           echo "$PWD"
           tree $WORK_TREE
           echo "$PWD"
