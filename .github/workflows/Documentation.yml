@@ -74,11 +74,7 @@ jobs:
           git fetch
           mkdir $WORK_TREE
           echo "$PWD"
-          ls .
-          echo "$PWD"
-          ls ..
-          echo "$PWD"
-          ls ../$SRC_FOLDER_PATH
+          ls $WORK_TREE/$SRC_FOLDER_PATH
           echo "$PWD"
           git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.md || true
           git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.svg || true
@@ -86,29 +82,22 @@ jobs:
           git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.fmu || true
           git --work-tree=$WORK_TREE checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/pluto-src/*.html || true
           echo "$PWD"
-          ls .
-          echo "$PWD"
-          ls ..
-          echo "$PWD"
-          ls ../$SRC_FOLDER_PATH
+          ls $WORK_TREE/$SRC_FOLDER_PATH
           echo "$PWD"
           mv $WORK_TREE/$SRC_FOLDER_PATH/jupyter-src/* $WORK_TREE
           echo "$PWD"
-          ls .
-          echo "$PWD"
-          ls ..
-          echo "$PWD"
-          ls ../$SRC_FOLDER_PATH
+          ls $WORK_TREE/$SRC_FOLDER_PATH
           echo "$PWD"
           mv  $WORK_TREE ../$DOC_LOC/$WORK_TREE
           echo "$PWD"
-          ls .
-          echo "$PWD"
-          ls ..
-          echo "$PWD"
-          ls ../$SRC_FOLDER_PATH
+          ls $WORK_TREE/$SRC_FOLDER_PATH
           echo "$PWD"
           cd ..
+          echo "$PWD"
+          ls $DOC_LOC
+          echo "$PWD"
+          ls $DOC_LOC/$WORK_TREE
+          echo "$PWD"
 
       - name: "Install dependencies"
         run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
