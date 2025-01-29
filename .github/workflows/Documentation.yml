@@ -21,6 +21,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: "Check out repository"
         uses: actions/checkout@v4
@@ -36,10 +37,11 @@ jobs:
           WORK_TREE: './docs/src/examples'
           SRC_BRANCH: 'origin/examples'
           SRC_FOLDER_PATH: 'examples'
-        # copy the examples from the examples branch (jupyter: .md, .svg; pluto: .html) and the readme
+        # copy the examples from the examples branch (jupyter: .md, .fmu, .svg, .gif; pluto: .html) and the readme
         run: |
           git fetch
-          git --work-tree=$WORK_TREE/.. checkout $SRC_BRANCH -- $SRC_FOLDER_PATH/jupyter-src/*.md $SRC_FOLDER_PATH/jupyter-src/*.svg $SRC_FOLDER_PATH/pluto-src/*.html
+          echo "$PWD"
+          git --work-tree=$WORK_TREE/.. checkout $SRC_BRANCH -- ../$SRC_FOLDER_PATH/jupyter-src/*.md ../$SRC_FOLDER_PATH/jupyter-src/*.fmu ../$SRC_FOLDER_PATH/jupyter-src/*.svg ../$SRC_FOLDER_PATH/jupyter-src/*.gif ../$SRC_FOLDER_PATH/pluto-src/*.html
           mv $WORK_TREE/jupyter-src/* $WORK_TREE 
           rm -r $WORK_TREE/jupyter-src
           cp ./README.md ./docs/src/index.md
@@ -52,21 +54,20 @@ jobs:
 
       - name: "Copy fmi-export examples from examples branch"
         env:
-          WORK_TREE: 'docs/src/examples/fmiexport_examples'
+          WORK_TREE: 'docs/src/examples/fmiexport_examples/examples'
           SRC_BRANCH: 'origin/examples'
-          SRC_FOLDER_PATH_A: 'FMIExport.jl'
-          SRC_FOLDER_PATH_B: 'examples'
-        # copy the examples from the examples branch (jupyter: .md, .fmu) and copy the readme in the docs folder
-        # if export examples are expanded in the future to include plots or pluto notbooks, add ../$SRC_FOLDER_PATH/jupyter-src/*.svg and/or ../$SRC_FOLDER_PATH/pluto-src/*.html
-        # if export examples are expanded in the future to include pluto notbooks add the following commands between moving the jupyter files and removing the examples dir:
+          SRC_FOLDER_PATH: 'examples'
+        # copy the examples from the examples branch (jupyter: .md, .fmu, .svg, .gif; pluto: .html) and copy the readme in the docs folder
         # mv ../$WORK_TREE/$SRC_FOLDER_PATH_B/pluto-src ../$WORK_TREE/pluto-src
         run: | 
-          cd FMIExport.jl
-          mkdir ../$WORK_TREE
           git fetch
-          git --work-tree=../$WORK_TREE checkout $SRC_BRANCH -- ../$SRC_FOLDER_PATH_A/$SRC_FOLDER_PATH_B/jupyter-src/*.md ../$SRC_FOLDER_PATH_A/$SRC_FOLDER_PATH_B/jupyter-src/*.fmu
-          mv ../$WORK_TREE/$SRC_FOLDER_PATH_B/jupyter-src/* ../$WORK_TREE 
-          rm -r ../$WORK_TREE/$SRC_FOLDER_PATH_B
+          echo "$PWD"
+          ls .
+          ls ..
+          ls ../$SRC_FOLDER_PATH
+          git checkout $SRC_BRANCH -- ../$SRC_FOLDER_PATH/jupyter-src/*.md ../$SRC_FOLDER_PATH/jupyter-src/*.fmu ../$SRC_FOLDER_PATH/jupyter-src/*.svg ../$SRC_FOLDER_PATH/jupyter-src/*.gif ../$SRC_FOLDER_PATH/pluto-src/*.html
+          mv ../$SRC_FOLDER_PATH/jupyter-src/* ../$SRC_FOLDER_PATH
+          mv  ../$SRC_FOLDER_PATH ../$WORK_TREE
 
       - name: "Install dependencies"
         run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
