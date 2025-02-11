@@ -43,6 +43,15 @@ using Plots
 using DifferentialEquations
 ```
 
+    [32m[1mPrecompiling[22m[39m packages...
+
+    
+    
+
+       3174.7 ms[32m  ✓ [39m[90mFMIBase → PlotsExt[39m
+      1 dependency successfully precompiled in 5 seconds. 267 already precompiled.
+    
+
 ### Simulation setup
 
 Next, the start time and end time of the simulation are set.
@@ -82,6 +91,8 @@ info(fmu)
     	Var. naming conv.:		structured
     	Event indicators:		0
     	Inputs:				0
+
+    
     	Outputs:			0
     	States:				2
     		33554432 ["mass.s"]
@@ -106,8 +117,6 @@ info(fmu)
     		Model identifier:	SpringPendulum1D
     		Get/Set State:		true
     		Serialize State:	true
-    
-
     		Dir. Derivatives:	true
     ##################### End information for FMU #####################
     
@@ -171,7 +180,7 @@ obj_before = objective(p) # not really good!
 
 
 
-    54.43219974960283
+    54.43232454106065
 
 
 
@@ -207,10 +216,10 @@ p_res = opt.minimizer # the optimized parameters
 
 
     4-element Vector{Float64}:
-     1.0001000174642045
-     0.9803602238013136
-     0.04653440865332943
-     0.04045972924085013
+     1.001607442195743
+     0.9774413450248616
+     0.28059832558351366
+     0.24437837961845005
 
 
 
