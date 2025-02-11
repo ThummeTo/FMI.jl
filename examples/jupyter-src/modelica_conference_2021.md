@@ -34,6 +34,15 @@ using FMIZoo
 using Plots
 ```
 
+    [32m[1mPrecompiling[22m[39m packages...
+
+    
+    
+
+       3117.0 ms[32m  ✓ [39m[90mFMIBase → PlotsExt[39m
+      1 dependency successfully precompiled in 5 seconds. 267 already precompiled.
+    
+
 ### Simulation setup
 
 Next, the start time and end time of the simulation are set. Finally, a step size is specified to store the results of the simulation at these time steps.
@@ -72,6 +81,8 @@ info(fmu)
     	Var. naming conv.:		structured
     	Event indicators:		24
     	Inputs:				0
+
+    
     	Outputs:			0
     	States:				2
     		33554432 ["mass.s"]
@@ -80,8 +91,6 @@ info(fmu)
     		16777216 ["fricScale"]
     		16777217 ["s0"]
     		16777218 ["v0"]
-
-    
     		16777219 ["fixed.s0"]
     		...
     		16777223 ["mass.smin"]
@@ -159,7 +168,7 @@ instanceFMU = fmi2Instantiate!(fmu)
 
     FMU:            SpringFrictionPendulum1D
         InstanceName:   SpringFrictionPendulum1D
-        Address:        Ptr{Nothing} @0x0000019041ab9c70
+        Address:        Ptr{Nothing} @0x0000016fb6ac1020
         State:          0
         Logging:        false
         FMU time:       -Inf
