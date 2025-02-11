@@ -52,6 +52,15 @@ using Plots
 using DifferentialEquations
 ```
 
+    [32m[1mPrecompiling[22m[39m packages...
+    
+
+       3110.2 ms[32m  ✓ [39m[90mFMIBase → PlotsExt[39m
+      1 dependency successfully precompiled in 5 seconds. 267 already precompiled.
+
+    
+    
+
 ### Simulation setup
 
 Next, the start time and end time of the simulation are set. Finally, a step size is specified to store the results of the simulation at these time steps.
@@ -95,6 +104,8 @@ info(myFMU)
     	Var. naming conv.:		structured
     	Event indicators:		24
     	Inputs:				0
+    
+
     	Outputs:			0
     	States:				2
     		33554432 ["mass.s"]
@@ -103,8 +114,6 @@ info(myFMU)
     		16777216 ["fricScale"]
     		16777217 ["s0"]
     		16777218 ["v0"]
-
-    
     		16777219 ["fixed.s0"]
     		...
     		16777223 ["mass.smin"]
@@ -202,7 +211,7 @@ dataME = simulateME(myFMU, (tStart, tStop); saveat=tSave)
 
     [34mSimulating ME-FMU ...   0%|█                             |  ETA: N/A[39m
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:15[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:09[39m
     
 
 
