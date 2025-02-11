@@ -29,6 +29,17 @@ using Plots
 using DifferentialEquations
 ```
 
+    [32m[1mPrecompiling[22m[39m packages...
+
+    
+    
+
+       3062.9 ms[32m  ✓ [39m[90mFMIBase → PlotsExt[39m
+      1 dependency successfully precompiled in 5 seconds. 267 already precompiled.
+
+    
+    
+
 ### Simulation setup
 
 Next, the start time and end time of the simulation are set. Finally, a step size is specified to store the results of the simulation at these time steps.
