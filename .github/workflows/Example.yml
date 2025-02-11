@@ -13,6 +13,7 @@ on:
       - 'Project.toml'
   
 jobs:
+  # we need to provide all examples seperately, as they are computed in parallel by this action
   jupyter:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -45,6 +46,9 @@ jobs:
           FILE: examples/jupyter-src/${{ matrix.file-name }}.ipynb
         run: jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-${{ matrix.julia-version }}" --to notebook --inplace --execute ${{ env.FILE }}
 
+      # required, as newer versions of nbconvert create multiple ouput cells for graphics outputs (eg. plots). 
+      # "--to markdown" fails to select the correct way to include those afterwards and prints the svg contents directly into the md file instead of linking them as !(svg)[...]
+      # if the text/html output of the plot is removed, "--to markdown" links the svgs correctly afterwards
       - name: "Fix SVGs" # on notebook (json) level: removes all cells, that have the tag "text/html" AND have "<?xml " within their content
         run: julia -e 'using Pkg; Pkg.add("JSON"); using JSON; data = JSON.parsefile(joinpath("examples", "jupyter-src", "${{ matrix.file-name }}.ipynb"); use_mmap=false); function search_and_remove!(json, tag, content=""); if typeof(json) == Vector{Any}; for e in json; search_and_remove!(e, tag, content); end; elseif typeof(json) == Dict{String, Any}; for (t, c) in json; if contains(t, tag) && (content == "" || any([contains(line, content) for line in c])); pop!(json, t); else; search_and_remove!(c, tag, content); end; end; end; end; search_and_remove!(data, "text/html", "<?xml "); open(joinpath("examples", "jupyter-src", "tmp_${{ matrix.file-name }}.ipynb"),"w") do f; JSON.print(f, data, 1); end; mv(joinpath("examples", "jupyter-src", "tmp_${{ matrix.file-name }}.ipynb"), joinpath("examples", "jupyter-src", "${{ matrix.file-name }}.ipynb"); force=true);'
 
@@ -55,19 +59,25 @@ jobs:
           jupyter nbconvert --to script ${{ env.FILE }}
           jupyter nbconvert --to markdown ${{ env.FILE }}
 
+      # required, as nbconvert does not fail, if the notbook contains errors in the julia cells. We do not want broken examples to push and be reported as successful
       - name: "run generated jl script to determine success of example building"
         run: julia --project=examples/ examples/jupyter-src/${{ matrix.file-name }}.jl
 
       - name: "auto-commit (retry on merge)"
+        # only push to examples branch, if we execute on the current main branch of this repo and the example build successfully!
         if: success() && github.event_name != 'pull_request' && github.ref_name == 'main'
+        # retrying is required, as a race condition can occur: all parallel example builds try to push to the same branch. Instead of merging, retrying is the cleanest solution
+        # successful termination is guaranteed, if max_attemts is >= the number of jupyter-examples plus one (pluto-slider-server) as each race condition ends with one example successfully pushing, as long as ONLY ONE PUSHING ACTION-RUN IS RUNNING AT THE SAME TIME (only pushing for runs on main branch)
+        # successful termination is still likely, even if max_attemts is < number of examples, as long as runtimes of most examples do not match eachother. This is also why there is no prevention of simultaneous runs of this action implemented.
         uses: nick-fields/retry@v3
         env: 
           CI_COMMIT_MESSAGE: jupyter-example-${{ matrix.file-name }}-${{ matrix.os }}-${{ matrix.julia-version }}-${{ matrix.julia-arch }}-${{ matrix.experimental }}[${{ github.ref_name }}]
           CI_COMMIT_AUTHOR: github-actions[bot]
           EXAMPLES_PATH: examples/jupyter-src
-        # Fetch all and clear the stash list. Include all files from the examples folder to the stash and switch the branch.
-        # Reset the branch and remove all current files in the examples folder. 
+        # Fetch all and clear the stash. Include all files from the examples folder (just generated those) to the stash and switch the branch.
+        # Reset the branch and remove all old files of "this" example in the examples folder. 
         # Checkout the last stash to restore the new notebooks and apply the stash index to restore all other new files in the folder.
+        # Commit changes and try to push. If another example was faster and pushed just before us, we undo our commit to not have to deal with the merge, but keep our generated files and just retry (fetching the commit from the faster push at the beginning).
         with:
           timeout_minutes: 999
           max_attempts: 10
@@ -92,6 +102,7 @@ jobs:
             git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
             git push origin examples || (git reset --soft HEAD~1 && (exit 1))
 
+  # we do not need to provide all examples seperately, as pluto slider server just compiles everything in the pluto-src folder
   pluto:
     runs-on: ubuntu-latest
     steps:
@@ -107,7 +118,9 @@ jobs:
       - run: julia -e 'using PlutoSliderServer; PlutoSliderServer.export_directory("examples/pluto-src")'
 
       - name: "auto-commit (retry on merge)"
+        # only push to examples branch, if we execute on the current main branch of this repo and the examples build successfully!
         if: success() && github.event_name != 'pull_request' && github.ref_name == 'main'
+        # retrying is required, as a race condition can occur: all parallel example builds (one pluto and multiple jupyter) try to push to the same branch. Instead of merging, retrying is the cleanest solution
         uses: nick-fields/retry@v3
         env: 
           CI_COMMIT_MESSAGE: pluto-examples[${{ github.ref_name }}]
@@ -115,7 +128,7 @@ jobs:
           EXAMPLES_PATH: examples/pluto-src
         # Fetch all and clear the stash list. Include all files from the examples folder to the stash and switch the branch.
         # Reset the branch and remove all current files in the examples folder. 
-        # Checkout the last stash to restore the new notebooks and apply the stash index to restore all other new files in the folder.
+        # Checkout the last stash and apply the stash index to restore all new files in the folder.
         with:
           timeout_minutes: 999
           max_attempts: 10
@@ -142,6 +155,7 @@ jobs:
             
   call-docu:
     needs: [jupyter, pluto]
+    # only trigger docu if examples branch contents could have changes (see jupyter and pluto job "auto-commit" restrictions)
     if: github.event_name != 'pull_request' && github.ref_name == 'main'
     runs-on: ubuntu-latest
     steps:
