@@ -51,6 +51,15 @@ using FMIZoo
 using Plots
 ```
 
+    [32m[1mPrecompiling[22m[39m packages...
+
+    
+    
+
+       3374.5 ms[32m  ✓ [39m[90mFMIBase → PlotsExt[39m
+      1 dependency successfully precompiled in 5 seconds. 267 already precompiled.
+    
+
 ### Simulation setup
 
 Next, the start time and end time of the simulation are set. Finally, the recorded values are specified to store the results of the simulation.
@@ -93,6 +102,8 @@ info(myFMU)
     	Var. naming conv.:		structured
     	Event indicators:		0
     	Inputs:				0
+
+    
     	Outputs:			0
     	States:				2
     		33554432 ["mass.s"]
@@ -119,8 +130,6 @@ info(myFMU)
     		Serialize State:	true
     		Dir. Derivatives:	true
     ##################### End information for FMU #####################
-
-    
     
 
 ### First Instance
@@ -136,7 +145,7 @@ println(c1)
 
     FMU:            SpringPendulum1D
         InstanceName:   SpringPendulum1D
-        Address:        Ptr{Nothing} @0x0000025b9605d2f0
+        Address:        Ptr{Nothing} @0x0000023bdfeaa840
         State:          0
         Logging:        true
         FMU time:       -Inf
@@ -181,7 +190,7 @@ println(c2)
 
     FMU:            SpringPendulum1D
         InstanceName:   SpringPendulum1D
-        Address:        Ptr{Nothing} @0x0000025b9605cfa0
+        Address:        Ptr{Nothing} @0x0000023bdfea97b0
         State:          0
         Logging:        true
         FMU time:       -Inf
