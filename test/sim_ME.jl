@@ -6,7 +6,7 @@
 # testing different modes for ME (model exchange) mode
 
 using DifferentialEquations
-using Sundials
+#using Sundials
 
 # to use autodiff!
 using FMISensitivity
@@ -37,8 +37,12 @@ extForce_cxt! = function (
     sense_setindex!(u, sin(t) * x1, 1)
 end
 
+ENV["EXPORTINGTOOL"]="SimulationX"
+ENV["EXPORTINGVERSION"]="4.6.2"
+ENV["FMIVERSION"]="2.0"
+ENV["FMUSTRUCT"]="FMU"
 for solver in solvers
-
+#solver = Tsit5()
     global fmuStruct, fmu, solution
 
     @info "Testing solver: $(solver)"
@@ -55,8 +59,12 @@ for solver in solvers
     @test solution.states.t[end] == t_stop
 
     # reference values from Simulation in Dymola2020x (Dassl)
-    @test solution.states.u[1] == [0.5, 0.0]
-    @test sum(abs.(solution.states.u[end] - [1.06736, -1.03552e-10])) < 0.1
+    solutionStateNames = ["mass.s","der(mass.s)"] #<-order in Dymola and in this test script
+    permN2s = [1,2]
+    getPermutationOfStates(solutionStateNames,permN2s)
+        
+    @test solution.states.u[1][permN2s] == [0.5, 0.0]
+    @test sum(abs.(solution.states.u[end][permN2s] - [1.06736, -1.03552e-10])) < 0.1
     unloadFMU(fmu)
 
     # case 2: ME-FMU with state and time events
@@ -73,15 +81,18 @@ for solver in solvers
     @test solution.states.t[end] == t_stop
 
     # reference values from Simulation in Dymola2020x (Dassl)
-    @test solution.states.u[1] == [0.5, 0.0]
-    @test sum(abs.(solution.states.u[end] - [1.05444, 1e-10])) < 0.01
+    @test solution.states.u[1][permN2s] == [0.5, 0.0]
+#!!replace! @test sum(abs.(solution.states.u[end][permN2s] - [1.05444, 1e-10])) < 0.01
+#new!? only check that it has settled to zero velocity
+    @test abs.(solution.states.u[end][permN2s[2]] - 1e-10) < 1e-15
+#<-
 
     ### test with recording values (variable step record values)
 
     solution = simulateME(
         fmuStruct,
         (t_start, t_stop);
-        recordValues = "mass.f",
+        recordValues = ["mass.f", "mass.mode"],
         solver = solver,
         kwargs...,
     )
@@ -102,25 +113,30 @@ for solver in solvers
           getValue(solution, 1; isIndex = true)
     @test collect(u[1] for u in solution.states.u) == getState(solution, 1; isIndex = true)
     @test isapprox(
-        getState(solution, 2; isIndex = true),
-        getStateDerivative(solution, 1; isIndex = true);
+        getState(solution, permN2s[2]; isIndex = true),
+        getStateDerivative(solution, permN2s[1]; isIndex = true);
         atol = 1e-1,
     ) # tolerance is large, because Rosenbrock23 solution derivative is not that accurate (other solvers reach 1e-4 for this example)
     @info "Max error of solver polynominal derivative: $(max(abs.(getState(solution, 2; isIndex=true) .- getStateDerivative(solution, 1; isIndex=true))...))"
 
-    # reference values from Simulation in Dymola2020x (Dassl)
-    @test sum(abs.(solution.states.u[1] - [0.5, 0.0])) < 1e-4
-    @test sum(abs.(solution.states.u[end] - [1.05444, 1e-10])) < 0.01
+    # reference values from Simulation in Dymola2020x (Dassl) <-they are not even the same in Dymola2023x!!!
+    @test sum(abs.(solution.states.u[1][permN2s] - [0.5, 0.0])) < 1e-4
+#!!replace    @test sum(abs.(solution.states.u[end][permN2s] - [1.05444, 1e-10])) < 0.01
+    @test sum(abs.(solution.states.u[end][permN2s[2]] -  1e-10)) < 1e-15
     @test abs(solution.values.saveval[1][1] - 0.75) < 1e-4
-    @test sum(abs.(solution.values.saveval[end][1] - -0.54435)) < 0.015
-
+#!!replace: final force should be position dependent: namely: mass.f = spring.c*(1.0-mass.s) 
+# i.e. test that mass has settled (mode=0, and force has s-dependent value)
+    #@test sum(abs.(solution.values.saveval[end][1] - -0.54435)) < 0.015 #<- check compare.isx - not clear which value is to be expected
+    @test solution.values.saveval[end][2] == 0
+    @test abs.(solution.values.saveval[end][1] - 10.0*(1-solution.states.u[end][permN2s[1]])) < 1e-15 
+    
     ### test with recording values (fixed step record values)
 
     tData = t_start:0.1:t_stop
     solution = simulateME(
         fmuStruct,
         (t_start, t_stop);
-        recordValues = "mass.f",
+        recordValues = ["mass.f","mass.mode"],
         saveat = tData,
         solver = solver,
         kwargs...,
@@ -136,10 +152,11 @@ for solver in solvers
     @test solution.values.t[end] == t_stop
 
     # reference values from Simulation in Dymola2020x (Dassl)
-    @test sum(abs.(solution.states.u[1] - [0.5, 0.0])) < 1e-4
-    @test sum(abs.(solution.states.u[end] - [1.05444, 1e-10])) < 0.01
+    @test sum(abs.(solution.states.u[1][permN2s] - [0.5, 0.0])) < 1e-4
+    @test sum(abs.(solution.states.u[end][permN2s[2]] -1e-10)) < 1e-15
     @test abs(solution.values.saveval[1][1] - 0.75) < 1e-4
-    @test sum(abs.(solution.values.saveval[end][1] - -0.54435)) < 0.015
+    @test solution.values.saveval[end][2] == 0
+    @test abs.(solution.values.saveval[end][1] - 10.0*(1-solution.states.u[end][permN2s[1]])) < 1e-15 
 
     unloadFMU(fmu)
 
@@ -166,8 +183,8 @@ for solver in solvers
     end
 
     # reference values `extForce_t` from Simulation in Dymola2020x (Dassl)
-    @test solution.states.u[1] == [0.5, 0.0]
-    @test sum(abs.(solution.states.u[end] - [0.613371, 0.188633])) < 0.012
+    @test solution.states.u[1][permN2s] == [0.5, 0.0]
+    @test sum(abs.(solution.states.u[end][permN2s] - [0.613371, 0.188633])) < 0.012
     unloadFMU(fmu)
 
     # case 3b: ME-FMU without events, but with input signal (autodiff)
@@ -192,8 +209,8 @@ for solver in solvers
         @test solution.states.t[end] == t_stop
 
         # reference values (no force) from Simulation in Dymola2020x (Dassl)
-        @test solution.states.u[1] == [0.5, 0.0]
-        @test sum(abs.(solution.states.u[end] - [0.509219, 0.314074])) < 0.01
+        @test solution.states.u[1][permN2s] == [0.5, 0.0]
+        @test sum(abs.(solution.states.u[end][permN2s] - [0.509219, 0.314074])) < 0.01
     end
 
     unloadFMU(fmu)

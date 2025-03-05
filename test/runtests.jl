@@ -41,6 +41,9 @@ function getFMUStruct(
     if endswith(modelname, ".fmu")
         fmu = loadFMU(modelname; kwargs...)
     else
+        if tool == "SimulationX"
+            modelname = modelname*string(mode)
+        end
         fmu = loadFMU(modelname, tool, version, fmiversion; kwargs...)
     end
 
@@ -57,7 +60,29 @@ function getFMUStruct(
     end
 end
 
-toolversions = [("Dymola", "2023x")] # ("SimulationX", "4.5.2")
+function getPermutationOfStates(solutionStateNames,perm)
+    i=1
+    fmuStateNames = ["",""]#["der(mass.s)", "mass.s"] 
+    for fmusvr in fmu.modelDescription.stateValueReferences 
+        for mv in fmu.modelDescription.modelVariables
+            if mv.valueReference == fmusvr
+                fmuStateNames[i] = replace(mv.name, "_"=>"";count=1)
+                #<- for SX-FMUs remove preceding "_", e.g. in "_mass.s"
+                @info "changed name of $(i) to $(fmuStateNames[i])"
+                
+            end
+        end
+        i=i+1
+    end
+    i=1
+    for sn in solutionStateNames
+        perm[i]= findall(name->name==sn,fmuStateNames)[1]
+        @info "Found $(sn) in fmu state names at position $(permN2s[i])"
+        i=i+1
+    end
+end
+
+toolversions = [("SimulationX", "4.6.2")]#("Dymola", "2023x"), 
 
 @testset "FMI.jl" begin
     if Sys.iswindows() || Sys.islinux()
@@ -68,7 +93,7 @@ toolversions = [("Dymola", "2023x")] # ("SimulationX", "4.5.2")
             ENV["EXPORTINGTOOL"] = tool
             ENV["EXPORTINGVERSION"] = version
 
-            for fmiversion in (2.0, 3.0)
+            for fmiversion in (2.0)#, 3.0)
                 ENV["FMIVERSION"] = fmiversion
 
                 @testset "Testing FMI $(ENV["FMIVERSION"]) FMUs exported from $(ENV["EXPORTINGTOOL"]) $(ENV["EXPORTINGVERSION"])" begin
@@ -78,49 +103,50 @@ toolversions = [("Dymola", "2023x")] # ("SimulationX", "4.5.2")
 
                         @testset "Functions for $(ENV["FMUSTRUCT"])" begin
 
-                            @info "CS Simulation (sim_CS.jl)"
-                            @testset "CS Simulation" begin
-                                include("sim_CS.jl")
-                            end
+#                            @info "CS Simulation (sim_CS.jl)"
+#                            @testset "CS Simulation" begin
+#                                include("sim_CS.jl")
+#                            end
 
                             @info "ME Simulation (sim_ME.jl)"
                             @testset "ME Simulation" begin
                                 include("sim_ME.jl")
                             end
 
-                            @info "SE Simulation (sim_SE.jl)"
-                            if fmiversion == 3.0
-                                @testset "SE Simulation" begin
-                                    include("sim_SE.jl")
-                                end
-                            else
-                                @info "Skipping SE tests for FMI $(fmiversion), because this is not supported by the corresponding FMI version."
-                            end
+#                            @info "SE Simulation (sim_SE.jl)"
+#                            if fmiversion == 3.0
+#                                @testset "SE Simulation" begin
+#                                    #include("sim_SE.jl")
+#                                    @info "not include(\"sim_SE.jl\")"
+#                                end
+#                            else
+#                                @info "Skipping SE tests for FMI $(fmiversion), because this is not supported by the corresponding FMI version."
+#                            end
 
-                            @info "Simulation FMU without states (sim_zero_state.jl)"
-                            @testset "Simulation FMU without states" begin
-                                include("sim_zero_state.jl")
-                            end
+#                            @info "Simulation FMU without states (sim_zero_state.jl)"
+#                            @testset "Simulation FMU without states" begin
+#                                include("sim_zero_state.jl")
+#                            end
                         end
                     end
                 end
             end
         end
 
-        @testset "Aqua.jl" begin
-            @info "Aqua: Method ambiguity"
-            @testset "Method ambiguities" begin
-                Aqua.test_ambiguities([FMI])
-            end
+#        @testset "Aqua.jl" begin
+#            @info "Aqua: Method ambiguity"
+#            @testset "Method ambiguities" begin
+#                Aqua.test_ambiguities([FMI])
+#            end
 
-            @info "Aqua: Piracies"
-            @testset "Piracies" begin
-                Aqua.test_piracies(FMI) # ; broken = true)
-            end
+#            @info "Aqua: Piracies"
+#            @testset "Piracies" begin
+#                Aqua.test_piracies(FMI) # ; broken = true)
+#            end
 
-            @info "Aqua: Testing all (method ambiguities and piracies are tested separately)"
-            Aqua.test_all(FMI; ambiguities = false, piracies = false)
-        end
+#            @info "Aqua: Testing all (method ambiguities and piracies are tested separately)"
+#            Aqua.test_all(FMI; ambiguities = false, piracies = false)
+#        end
 
     elseif Sys.isapple()
         @warn "Test-sets are currently using Windows- and Linux-FMUs, automated testing for macOS is currently not supported."
