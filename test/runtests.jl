@@ -60,6 +60,7 @@ function getFMUStruct(
     end
 end
 
+solutionStateNames = [("mass.s",),("der(mass.s)","mass.v")]
 function getPermutationOfStates(solutionStateNames,perm)
     i=1
     fmuStateNames = ["",""]#["der(mass.s)", "mass.s"] 
@@ -68,7 +69,7 @@ function getPermutationOfStates(solutionStateNames,perm)
             if mv.valueReference == fmusvr
                 fmuStateNames[i] = replace(mv.name, "_"=>"";count=1)
                 #<- for SX-FMUs remove preceding "_", e.g. in "_mass.s"
-                @info "changed name of $(i) to $(fmuStateNames[i])"
+                @info "changed name of $(i) with vr $(fmusvr) to $(fmuStateNames[i])"
                 
             end
         end
@@ -76,13 +77,13 @@ function getPermutationOfStates(solutionStateNames,perm)
     end
     i=1
     for sn in solutionStateNames
-        perm[i]= findall(name->name==sn,fmuStateNames)[1]
-        @info "Found $(sn) in fmu state names at position $(permN2s[i])"
+        perm[i]= findall(name->name in sn,fmuStateNames)[1]
+        @info "Found $(sn) in fmu state names at position $(perm[i])"
         i=i+1
     end
 end
 
-toolversions = [("SimulationX", "4.6.2")]#("Dymola", "2023x"), 
+toolversions = [("Dymola", "2023x"),("SimulationX", "4.6.2")] 
 
 @testset "FMI.jl" begin
     if Sys.iswindows() || Sys.islinux()

@@ -37,12 +37,8 @@ extForce_cxt! = function (
     sense_setindex!(u, sin(t) * x1, 1)
 end
 
-ENV["EXPORTINGTOOL"]="SimulationX"
-ENV["EXPORTINGVERSION"]="4.6.2"
-ENV["FMIVERSION"]="2.0"
-ENV["FMUSTRUCT"]="FMU"
 for solver in solvers
-#solver = Tsit5()
+
     global fmuStruct, fmu, solution
 
     @info "Testing solver: $(solver)"
@@ -58,8 +54,8 @@ for solver in solvers
     @test solution.states.t[1] == t_start
     @test solution.states.t[end] == t_stop
 
-    # reference values from Simulation in Dymola2020x (Dassl)
-    solutionStateNames = ["mass.s","der(mass.s)"] #<-order in Dymola and in this test script
+    # reference values from Simulation in Dymola2020x (Dassl) (and SimulationX4.6.2)
+    solutionStateNames = [("mass.s",),("der(mass.s)","mass.v")] #<-order in Dymola and in this test script
     permN2s = [1,2]
     getPermutationOfStates(solutionStateNames,permN2s)
         
@@ -68,7 +64,6 @@ for solver in solvers
     unloadFMU(fmu)
 
     # case 2: ME-FMU with state and time events
-
     fmuStruct, fmu = getFMUStruct("SpringTimeFrictionPendulum1D", :ME)
 
     ### test without recording values
