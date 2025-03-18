@@ -38,15 +38,23 @@ function getFMUStruct(
 )
 
     # choose FMU or FMUInstance
-    if endswith(modelname, ".fmu")
-        fmu = loadFMU(modelname; kwargs...)
-    else
-        if tool == "SimulationX"
-            modelname = modelname*string(mode)
+    fmu = try 
+            if endswith(modelname, ".fmu")
+                loadFMU(modelname; kwargs...)
+            else
+                if tool == "SimulationX"
+                    modelname = modelname*string(mode)
+                end
+                loadFMU(modelname, tool, version, fmiversion; kwargs...)
+            end
+        catch 
+            #there is no fmu
+            nothing
         end
-        fmu = loadFMU(modelname, tool, version, fmiversion; kwargs...)
+    if fmu === nothing
+        @info "There is no FMU for $(modelname), $(tool), $(version), $(fmiversion). Test is skipped.\n"
+        return nothing, nothing
     end
-
     if fmustruct == "FMU"
         return fmu, fmu
 
@@ -60,7 +68,6 @@ function getFMUStruct(
     end
 end
 
-solutionStateNames = [("mass.s",),("der(mass.s)","mass.v")]
 function getPermutationOfStates(solutionStateNames,perm)
     i=1
     fmuStateNames = ["",""]#["der(mass.s)", "mass.s"] 
@@ -69,7 +76,7 @@ function getPermutationOfStates(solutionStateNames,perm)
             if mv.valueReference == fmusvr
                 fmuStateNames[i] = replace(mv.name, "_"=>"";count=1)
                 #<- for SX-FMUs remove preceding "_", e.g. in "_mass.s"
-                @info "changed name of $(i) with vr $(fmusvr) to $(fmuStateNames[i])"
+                @debug "changed name of $(i) with vr $(fmusvr) to $(fmuStateNames[i])"
                 
             end
         end
@@ -78,7 +85,7 @@ function getPermutationOfStates(solutionStateNames,perm)
     i=1
     for sn in solutionStateNames
         perm[i]= findall(name->name in sn,fmuStateNames)[1]
-        @info "Found $(sn) in fmu state names at position $(perm[i])"
+        @debug "Found $(sn) in fmu state names at position $(perm[i])"
         i=i+1
     end
 end
@@ -94,7 +101,7 @@ toolversions = [("Dymola", "2023x"),("SimulationX", "4.6.2")]
             ENV["EXPORTINGTOOL"] = tool
             ENV["EXPORTINGVERSION"] = version
 
-            for fmiversion in (2.0)#, 3.0)
+            for fmiversion in (2.0,3.0)
                 ENV["FMIVERSION"] = fmiversion
 
                 @testset "Testing FMI $(ENV["FMIVERSION"]) FMUs exported from $(ENV["EXPORTINGTOOL"]) $(ENV["EXPORTINGVERSION"])" begin
