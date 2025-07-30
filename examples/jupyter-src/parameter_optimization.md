@@ -43,15 +43,6 @@ using Plots
 using DifferentialEquations
 ```
 
-    [32m[1mPrecompiling[22m[39m packages...
-
-    
-    
-
-       3174.7 ms[32m  ✓ [39m[90mFMIBase → PlotsExt[39m
-      1 dependency successfully precompiled in 5 seconds. 267 already precompiled.
-    
-
 ### Simulation setup
 
 Next, the start time and end time of the simulation are set.
@@ -91,8 +82,8 @@ info(fmu)
     	Var. naming conv.:		structured
     	Event indicators:		0
     	Inputs:				0
-
     
+
     	Outputs:			0
     	States:				2
     		33554432 ["mass.s"]
@@ -216,10 +207,10 @@ p_res = opt.minimizer # the optimized parameters
 
 
     4-element Vector{Float64}:
-     1.001607442195743
-     0.9774413450248616
-     0.28059832558351366
-     0.24437837961845005
+     1.0016083769219626
+     0.9774429651701898
+     0.2051756144168058
+     0.1786912714901097
 
 
 
