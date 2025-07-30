@@ -36,13 +36,6 @@ using Plots
 using DifferentialEquations # for auto solver detection
 ```
 
-    [32m[1mPrecompiling[22m[39m packages...
-    
-
-       3099.9 ms[32m  ✓ [39m[90mFMIBase → PlotsExt[39m
-      1 dependency successfully precompiled in 5 seconds. 267 already precompiled.
-    
-
 ### Simulation setup
 
 Next, the start time and end time of the simulation are set.
@@ -92,7 +85,7 @@ simData = simulate(fmu, (tStart, tStop); recordValues=vrs)
 
     [34mSimulating ME-FMU ...   0%|█                             |  ETA: N/A[39m
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:10[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:12[39m
     
 
 
@@ -121,7 +114,7 @@ simData = simulate(fmu, (tStart, tStop); recordValues=vrs)
     	∂y_∂t: 0
     	∂e_∂t: 0
     Callback-Evaluations:
-    	Condition (event-indicators): 1451
+    	Condition (event-indicators): 1529
     	Time-Choice (event-instances): 0
     	Affect (event-handling): 6
     	Save values: 108
@@ -240,7 +233,7 @@ fmi2SetFctGetReal(fmu, myGetReal!)
 
 
 
-    Ptr{Nothing} @0x0000016980530fc0
+    Ptr{Nothing} @0x0000022918e20fc0
 
 
 
