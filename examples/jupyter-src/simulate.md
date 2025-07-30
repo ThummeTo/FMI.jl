@@ -52,15 +52,6 @@ using Plots
 using DifferentialEquations
 ```
 
-    [32m[1mPrecompiling[22m[39m packages...
-    
-
-       3110.2 ms[32m  ✓ [39m[90mFMIBase → PlotsExt[39m
-      1 dependency successfully precompiled in 5 seconds. 267 already precompiled.
-
-    
-    
-
 ### Simulation setup
 
 Next, the start time and end time of the simulation are set. Finally, a step size is specified to store the results of the simulation at these time steps.
@@ -211,7 +202,7 @@ dataME = simulateME(myFMU, (tStart, tStop); saveat=tSave)
 
     [34mSimulating ME-FMU ...   0%|█                             |  ETA: N/A[39m
 
-    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:09[39m
+    [34mSimulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:12[39m
     
 
 
@@ -240,7 +231,7 @@ dataME = simulateME(myFMU, (tStart, tStop); saveat=tSave)
     	∂y_∂t: 0
     	∂e_∂t: 0
     Callback-Evaluations:
-    	Condition (event-indicators): 1451
+    	Condition (event-indicators): 1529
     	Time-Choice (event-instances): 0
     	Affect (event-handling): 6
     	Save values: 0
