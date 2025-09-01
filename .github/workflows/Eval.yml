@@ -24,7 +24,7 @@ jobs:
     
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Set up Julia
       - name: "Set up Julia"

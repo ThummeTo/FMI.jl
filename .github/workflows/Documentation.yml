@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Check out repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v2
@@ -49,7 +49,7 @@ jobs:
           cp ./README.md ./docs/src/index.md
 
       - name: "Check out fmi-export repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: 'ThummeTo/FMIExport.jl'
           path: 'FMIExport.jl'
