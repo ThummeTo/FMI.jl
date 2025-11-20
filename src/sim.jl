@@ -218,6 +218,11 @@ function simulateME(
         x0 = [0.0]
     end
 
+    # add a dummy discrete state
+    if c.fmu.isDummyDiscrete
+        x0 = vcat(x0, 0.0)
+    end
+
     @assert !isnothing(x0) "x0 is nothing after prepare!"
 
     c.problem = setupODEProblem(c, x0, tspan; inputFunction = _inputFunction)
@@ -278,6 +283,11 @@ function simulateME(
     # ZeroStateFMU: remove dummy state
     if c.fmu.isZeroState
         c.solution.states = nothing
+    end
+
+    # remove dummy discrete state
+    if c.fmu.isDummyDiscrete
+        @warn "Dummy discrete state not removed yet."
     end
 
     # cleanup progress meter
