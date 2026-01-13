@@ -18,7 +18,7 @@
 ## Breaking Changes in FMI.jl (starting from v0.14.0 until release of v1.0.0)
 If you want to migrate your project from [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) < v1.0.0 to >= v1.0.0, you will face some breaking changes - but they are worth it as you will see! We decided to do multiple smaller breaking changes starting with v0.14.0, instead of one big one. Some of them are already implemented (checked), some are still on the todo (unchecked) but will be implemented before releasing v1.0.0.
 
-- [x] Many functions, that are not part of the FMI-standard, had the prefix `fmi2...` or `fmi3...`. This was corrected. Now, only functions that are defined by the standard itself, like e.g. `fmi2Instantiate` are allowed to keep the prefix. Other methods, like `fmi2ValueReferenceToString`, that where added to make this library more comfortable, are now cleaned to be more the Julia way: `valueReferenceToString`. If your code errors, the corresponding function might have lost it's prefix, so try this first.
+- [x] Many functions, that are not part of the FMI-standard, had the prefix `fmi2...` or `fmi3...`. This was corrected. Now, only functions that are defined by the standard itself, like e.g. `fmi2Instantiate` are allowed to keep the prefix. Other methods, like `fmi2ValueReferenceToString`, that where added to make this library more comfortable, are now cleaned to be more the Julia way: `valueReferenceToString`. If your code errors, the corresponding function might have lost its prefix, so try this first.
 
 - [x] Wrapper functions where removed, because that is not the Julia way. In most cases, this will not affect your code.
 
