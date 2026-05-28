@@ -15,7 +15,7 @@ fmuStruct, myFMU = getFMUStruct(pathToFMU)
 fmiUnload(myFMU)
 
 # load FMU in source directory 
-fmuDir = joinpath(splitpath(pathToFMU)[1:end-1]...)
+fmuDir = joinpath(splitpath(pathToFMU)[1:(end-1)]...)
 fmuStruct, myFMU = getFMUStruct(pathToFMU; unpackPath = fmuDir)
 @test isfile(splitext(pathToFMU)[1] * ".zip") == true
 @test isdir(splitext(pathToFMU)[1]) == true

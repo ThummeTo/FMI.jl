@@ -81,7 +81,7 @@ FMU source: $(@bind mode Select([:zoo => "FMIZoo.jl", :local => "Local file", :u
 begin
     if mode == :zoo
         tools_path = joinpath(
-            (splitpath(FMIZoo.get_model_filename("BouncingBall1D", "Dymola", "2022x"))[1:end-4])...,
+            (splitpath(FMIZoo.get_model_filename("BouncingBall1D", "Dymola", "2022x"))[1:(end-4)])...,
         )
         tools = readdir(tools_path)
         md"""

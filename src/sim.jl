@@ -208,7 +208,7 @@ function simulateME(
         inputs = inputs,
         instantiate = instantiate,
         freeInstance = freeInstance,
-        terminate= terminate,
+        terminate = terminate,
         reset = reset,
         setup = setup,
     )
@@ -313,10 +313,10 @@ function auto_interval(t)
     """
     # Initial interval estimation
     h = 10 ^ (round(log10(t)) - 3)
-    
+
     # Number of samples
     n_samples = t / h
-    
+
     # Adjust interval based on number of samples
     if n_samples >= 2500
         h *= 5
@@ -331,7 +331,7 @@ function auto_interval(t)
     elseif n_samples <= 500
         h /= 2
     end
-    
+
     return h
 end
 """
