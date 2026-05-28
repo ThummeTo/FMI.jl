@@ -27,10 +27,10 @@ jobs:
 
     steps:
       - name: "Check out repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: "Set up Julia"
-        uses: julia-actions/setup-julia@v2
+        uses: julia-actions/setup-julia@v3
         with:
             version: ${{ matrix.julia-version }}
             arch: ${{ matrix.julia-arch }}
@@ -107,10 +107,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Check out repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: "Set up Julia"
-        uses: julia-actions/setup-julia@v2
+        uses: julia-actions/setup-julia@v3
         with:
             version: '1.10'
             
@@ -161,6 +161,6 @@ jobs:
     steps:
       # Trigger an repoisitory dispath event
       - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@v4
         with:
           event-type: trigger-docu
