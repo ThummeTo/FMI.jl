@@ -28,11 +28,11 @@ If you want to migrate your project from [*FMI.jl*](https://github.com/ThummeTo/
 
 - [ ] Updated all library tests for a better code coverage.
 
-- [ ] We tried to document every function, if you find undocumented user-level functions, please open an issue or PR.
+- [x] We tried to document every function, if you find undocumented user-level functions, please open an issue or PR.
 
 - [ ] Allocations, type stability and code format where optimized and are monitored by CI now.
 
-- [ ] Dependencies are reduced a little, to make the libraries more light-weight.
+- [x] Dependencies are reduced a little, to make the libraries more light-weight.
 
 - [ ] RAM for allocated FMUs, their instances and states, is now auto-released. For maximum performance/safety you can use FMUs in blocks (like file reading/writing).
 
