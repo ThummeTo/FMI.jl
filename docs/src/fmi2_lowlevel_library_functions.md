@@ -90,11 +90,10 @@ fmi2SampleJacobian!
 ## External/Additional functions
 
 ```@docs
-setDiscreteStates
-getDiscreteStates
-getDiscreteStates!
-getSimpleTypeAttributeStruct
-getDeclaredType
+FMIBase.setDiscreteStates
+FMIBase.getDiscreteStates
+FMIBase.getSimpleTypeAttributeStruct
+FMIBase.getDeclaredType
 ```
 fmi2GetSolutionDerivative
 fmi2GetSolutionState
