@@ -40,6 +40,8 @@ setValue
 getValue
 getValue!
 getUnit
+FMIBase.snapshot_if_needed!
+FMIBase.getSnapshot
 ```
 fmi2GetSolutionDerivative
 fmi2GetSolutionState

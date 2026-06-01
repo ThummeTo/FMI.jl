@@ -208,7 +208,7 @@ function simulateME(
         inputs = inputs,
         instantiate = instantiate,
         freeInstance = freeInstance,
-        terminate= terminate,
+        terminate = terminate,
         reset = reset,
         setup = setup,
     )
@@ -312,11 +312,11 @@ function auto_interval(t)
     from https://github.com/CATIA-Systems/FMPy/blob/4166f08dd991cb6b5df2522ba125669e635327fe/fmpy/util.py#L1042
     """
     # Initial interval estimation
-    h = 10 ^ (round(log10(t)) - 3)
-    
+    h = 10^(round(log10(t)) - 3)
+
     # Number of samples
     n_samples = t / h
-    
+
     # Adjust interval based on number of samples
     if n_samples >= 2500
         h *= 5
@@ -331,7 +331,7 @@ function auto_interval(t)
     elseif n_samples <= 500
         h /= 2
     end
-    
+
     return h
 end
 """
@@ -436,7 +436,7 @@ function simulateCS(
     tolerance = tolerance === nothing ? 0.0 : tolerance
 
     dt = dt === nothing ? getDefaultStepSize(fmu.modelDescription) : dt
-    dt = dt === nothing ? auto_interval(t_stop-t_start) : dt
+    dt = dt === nothing ? auto_interval(t_stop - t_start) : dt
 
     @debug "Simulating CS-FMU: Preparing inputs ..."
     inputs = nothing

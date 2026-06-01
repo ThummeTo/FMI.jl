@@ -11,6 +11,7 @@ fmi2LoadModelDescription
 ## general information about the FMU
 
 ```@docs
+FMIBase.FMIModelDescriptionLSSA
 getGUID
 getInstantiationToken
 getGenerationDateAndTime
