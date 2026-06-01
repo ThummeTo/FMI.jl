@@ -104,7 +104,7 @@ jobs:
         # retrying is required, as a race condition can occur: all parallel example builds try to push to the same branch. Instead of merging, retrying is the cleanest solution
         # successful termination is guaranteed, if max_attemts is >= the number of jupyter-examples plus one (pluto-slider-server) as each race condition ends with one example successfully pushing, as long as ONLY ONE PUSHING ACTION-RUN IS RUNNING AT THE SAME TIME (only pushing for runs on main branch)
         # successful termination is still likely, even if max_attemts is < number of examples, as long as runtimes of most examples do not match eachother. This is also why there is no prevention of simultaneous runs of this action implemented.
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@v4
         env: 
           CI_COMMIT_MESSAGE: jupyter-example-${{ matrix.file-name }}-${{ matrix.os }}-${{ matrix.julia-version }}-${{ matrix.julia-arch }}-${{ matrix.experimental }}[${{ github.ref_name }}]
           CI_COMMIT_AUTHOR: github-actions[bot]
@@ -156,7 +156,7 @@ jobs:
         # only push to examples branch, if we execute on the current main branch of this repo and the examples build successfully!
         if: success() && github.event_name != 'pull_request' && github.ref_name == 'main'
         # retrying is required, as a race condition can occur: all parallel example builds (one pluto and multiple jupyter) try to push to the same branch. Instead of merging, retrying is the cleanest solution
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@v4
         env: 
           CI_COMMIT_MESSAGE: pluto-examples[${{ github.ref_name }}]
           CI_COMMIT_AUTHOR: github-actions[bot]
