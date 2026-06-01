@@ -36,7 +36,7 @@ jobs:
 
       # Set up julia-cache
       - name: Set up julia-cache
-        uses: julia-actions/cache@v2
+        uses: julia-actions/cache@v3
 
       # Set up cache
       - name: "Set up cache"
