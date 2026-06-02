@@ -119,7 +119,12 @@ toolversions = [("Dymola", "2023x")] # ("SimulationX", "4.5.2")
             end
 
             @info "Aqua: Testing all (method ambiguities and piracies are tested separately)"
-            Aqua.test_all(FMI; ambiguities = false, piracies = false)
+            Aqua.test_all(
+                FMI;
+                ambiguities = false,
+                piracies = false,
+                persistent_tasks = (tmax = 60,),
+            )
         end
 
     elseif Sys.isapple()
