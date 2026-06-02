@@ -62,7 +62,7 @@ s_fmu = simulateFMU(p); # simulate the position
 plot(tSave, s_fmu; label="FMU")
 plot!(tSave, s_tar; label="Optimization target")
 
-opt = Optim.optimize(objective, p; iterations=250) # do max. 250 iterations
+opt = Optim.optimize(objective, p, Optim.Options(iterations=250)) # do max. 250 iterations
 obj_after = opt.minimum # much better!
 p_res = opt.minimizer # the optimized parameters
 
