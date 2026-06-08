@@ -244,3 +244,33 @@ for solver in solvers
     @test solution.states.u[1] == rand_x0
     unloadFMU(fmu)
 end
+
+# Sparse Jacobian: run once per tool/version/fmiversion (not per solver or fmustruct)
+if ENV["FMUSTRUCT"] == "FMU"
+    @testset "Sparse Jacobian (use_jac_prototype)" begin
+        fmuStruct, fmu = getFMUStruct("SpringPendulum1D", :ME)
+
+        fmu.executionConfig.use_jac_prototype = true
+        sol_sparse = simulateME(
+            fmuStruct,
+            (t_start, t_stop);
+            solver = Rodas5(autodiff = false),
+            showProgress = false,
+            kwargs...,
+        )
+
+        fmu.executionConfig.use_jac_prototype = false
+        sol_dense = simulateME(
+            fmuStruct,
+            (t_start, t_stop);
+            solver = Rodas5(autodiff = false),
+            showProgress = false,
+            kwargs...,
+        )
+
+        @test length(sol_sparse.states.u) > 0
+        @test maximum(abs.(sol_sparse.states.u[end] .- sol_dense.states.u[end])) < 1e-4
+
+        unloadFMU(fmu)
+    end
+end
