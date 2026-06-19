@@ -15,7 +15,6 @@ using FMI.FMIImport.FMIBase.FMICore
 
 import FMI.FMIImport.FMIBase: FMU_EXECUTION_CONFIGURATIONS
 
-using FMI.FMIImport
 
 using DifferentialEquations: FBDF
 
@@ -38,12 +37,23 @@ function getFMUStruct(
 )
 
     # choose FMU or FMUInstance
-    if endswith(modelname, ".fmu")
-        fmu = loadFMU(modelname; kwargs...)
-    else
-        fmu = loadFMU(modelname, tool, version, fmiversion; kwargs...)
+    fmu = try 
+            if endswith(modelname, ".fmu")
+                loadFMU(modelname; kwargs...)
+            else
+                if tool == "SimulationX"
+                    modelname = modelname*string(mode)
+                end
+                loadFMU(modelname, tool, version, fmiversion; kwargs...)
+            end
+        catch 
+            #there is no fmu
+            nothing
+        end
+    if fmu === nothing
+        @info "There is no FMU for $(modelname), $(tool), $(version), FMU $(mode), $(fmiversion).  Test is skipped.\n"
+        return nothing, nothing
     end
-
     if fmustruct == "FMU"
         return fmu, fmu
 
@@ -57,7 +67,29 @@ function getFMUStruct(
     end
 end
 
-toolversions = [("Dymola", "2023x")] # ("SimulationX", "4.5.2")
+function getPermutationOfStates(solutionStateNames,perm)
+    i=1
+    fmuStateNames = ["",""]#["der(mass.s)", "mass.s"] 
+    for fmusvr in fmu.modelDescription.stateValueReferences 
+        for mv in fmu.modelDescription.modelVariables
+            if mv.valueReference == fmusvr
+                fmuStateNames[i] = replace(mv.name, "_"=>"";count=1)
+                #<- for SX-FMUs remove preceding "_", e.g. in "_mass.s"
+                @debug "changed name of $(i) with vr $(fmusvr) to $(fmuStateNames[i])"
+                
+            end
+        end
+        i=i+1
+    end
+    i=1
+    for sn in solutionStateNames
+        perm[i]= findall(name->name in sn,fmuStateNames)[1]
+        @debug "Found $(sn) in fmu state names at position $(perm[i])"
+        i=i+1
+    end
+end
+
+toolversions = [("SimulationX", "4.6.2")]# ("Dymola", "2023x"),
 
 @testset "FMI.jl" begin
     if Sys.iswindows() || Sys.islinux()
@@ -68,7 +100,7 @@ toolversions = [("Dymola", "2023x")] # ("SimulationX", "4.5.2")
             ENV["EXPORTINGTOOL"] = tool
             ENV["EXPORTINGVERSION"] = version
 
-            for fmiversion in (2.0, 3.0)
+            for fmiversion in (2.0,3.0)
                 ENV["FMIVERSION"] = fmiversion
 
                 @testset "Testing FMI $(ENV["FMIVERSION"]) FMUs exported from $(ENV["EXPORTINGTOOL"]) $(ENV["EXPORTINGVERSION"])" begin
@@ -92,7 +124,8 @@ toolversions = [("Dymola", "2023x")] # ("SimulationX", "4.5.2")
                             if fmiversion == 3.0
                                 @testset "SE Simulation" begin
                                     include("sim_SE.jl")
-                                end
+                                    @info "not include(\"sim_SE.jl\")"
+                               end
                             else
                                 @info "Skipping SE tests for FMI $(fmiversion), because this is not supported by the corresponding FMI version."
                             end
