@@ -107,11 +107,11 @@ fmi2GetFullJacobian!
 ## Export functions
 
 ```@docs
-fmi2ModelDescriptionAddModelStructureOutputs
-fmi2CreateEmbedded
-fmi2ModelDescriptionAddModelStructureInitialUnknowns
-fmi2ModelDescriptionAddModelVariable
-fmi2CreateSimple
-fmi2Create
-fmi2ModelDescriptionAddModelStructureDerivatives
+addModelStructureOutputs
+createFMU2Embedded
+addModelStructureInitialUnknowns
+addModelVariable
+createFMU2Simple
+createFMU2
+addModelStructureDerivatives
 ```
