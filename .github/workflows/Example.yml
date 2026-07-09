@@ -40,16 +40,19 @@ jobs:
 
       - name: "Install packages"
         run: pip install jupyter nbconvert
-        
+
+      - name: "Install no-color Julia kernel"
+        run: julia --project=examples/ -e 'using IJulia; IJulia.installkernel("Julia no color", "--project=$(Base.active_project())", "--color=no"; specname="julia-nocolor")'
+
       - name: "Execute notebook"
         env:
           FILE: examples/jupyter-src/${{ matrix.file-name }}.ipynb
-        run: jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-${{ matrix.julia-version }}" --to notebook --inplace --execute ${{ env.FILE }}
+        run: jupyter nbconvert --ExecutePreprocessor.kernel_name="julia-nocolor" --to notebook --inplace --execute ${{ env.FILE }}
 
-      # required, as newer versions of nbconvert create multiple ouput cells for graphics outputs (eg. plots). 
+      # required, as newer versions of nbconvert create multiple ouput cells for graphics outputs (eg. plots).
       # "--to markdown" fails to select the correct way to include those afterwards and prints the svg contents directly into the md file instead of linking them as !(svg)[...]
       # if the text/html output of the plot is removed, "--to markdown" links the svgs correctly afterwards
-      - name: "Fix SVGs" # on notebook (json) level: removes all cells, that have the tag "text/html" AND have "<?xml " within their content
+      - name: "Sanitize notebook outputs"
         run: |
           julia -e '
             using Pkg
@@ -79,7 +82,31 @@ jobs:
                 end
             end
 
+            function strip_ansi!(json, ansi_escape)
+                if json isa AbstractVector
+                    for i in eachindex(json)
+                        value = json[i]
+                        if value isa AbstractString
+                            json[i] = replace(value, ansi_escape => "")
+                        else
+                            strip_ansi!(value, ansi_escape)
+                        end
+                    end
+                elseif json isa AbstractDict
+                    for key in keys(json)
+                        value = json[key]
+                        if value isa AbstractString
+                            json[key] = replace(value, ansi_escape => "")
+                        else
+                            strip_ansi!(value, ansi_escape)
+                        end
+                    end
+                end
+                return json
+            end
+
             search_and_remove!(data, "text/html", "<?xml ")
+            strip_ansi!(data, Regex("\u001b\\[[0-9;?]*[A-Za-z]"))
             tmp = joinpath("examples", "jupyter-src", "tmp_${{ matrix.file-name }}.ipynb")
             open(tmp, "w") do io
                 JSON.print(io, data, 1)

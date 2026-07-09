@@ -108,6 +108,20 @@ for md in recursive_second(example_pages)
         r = open(joinpath("docs", "src", md), "r")
         s = read(r, String)
         close(r)
+        ansi_escape = Regex("\u001b\\[[0-9;?]*[A-Za-z]")
+        if occursin(ansi_escape, s)
+            print(
+                string(
+                    "::warning title=ANSI-Warning::example-page \"",
+                    md,
+                    "\" contains ANSI escape sequences. They have been removed for the doc-manual\r\n",
+                ),
+            )
+            s = replace(s, ansi_escape => "")
+            w = open(joinpath("docs", "src", md * "tmp"), "w+")
+            write(w, s)
+            close(w)
+        end
         if occursin("<svg", s) && occursin("</svg>", s)
             print(
                 string(
