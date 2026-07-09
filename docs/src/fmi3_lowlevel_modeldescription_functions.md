@@ -4,16 +4,11 @@ The FMI model description provides all human readable information on the model. 
 
 ## Loading/Parsing
 
-```@docs
-```
-fmi3LoadModelDescription
+Model descriptions are loaded through `loadFMU` as part of FMU setup.
 
 ## general information about the FMU
 
-```@docs
-```
-fmi3GetGenerationTool
-fmi3GetGenerationDateAndTime
+Use the version-independent model-description helpers for generation metadata.
 
 ## technical information about the FMU
 
@@ -26,7 +21,4 @@ fmi3GetNumberOfEventIndicators!
 
 ## FMU capabilities
 
-```@docs
-```
-fmi3CanGetSetState
-fmi3CanSerializeFMUState
+Use the version-independent capability helpers for FMI3 model descriptions.

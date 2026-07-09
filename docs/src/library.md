@@ -33,50 +33,23 @@ getState
 getTime
 getStateDerivative
 ```
-fmiSet
-fmiGet
-fmiGet!
-fmiCanGetSetState
-fmiSetState
-fmiFreeState!
-fmiGetDependencies
-fmiProvidesDirectionalDerivative
+Use `setValue`, `getValue`, and `getValue!` for generic value access on FMU instances.
 
 # Visualize simulation results
 
-```@docs
-```
-fmiPlot
-fmiPlot!
-Plots.plot
+Use `Plots.plot(solution)` to visualize `FMUSolution` objects when `Plots.jl` is loaded.
 
 # Save/load simulation results
 
 ```@docs
+saveSolution
+loadSolution
 ```
-fmiSaveSolution
-fmiSaveSolutionJLD2
-fmiSaveSolutionMAT
-fmiSaveSolutionCSV
-fmiLoadSolution
-fmiLoadSolutionJLD2
 
 # FMI2 specific
 
-```@docs
-```
-fmi2Info
-fmi2Simulate
-fmi2VariableDependsOnVariable
-fmi2GetDependencies
-fmi2PrintDependencies
+Deprecated `fmi2...` wrappers have been removed from the user-level API. Use the version-independent functions above.
 
 # FMI3 specific
 
-```@docs
-```
-fmi3Info
-fmi3Simulate
-fmi3VariableDependsOnVariable
-fmi3GetDependencies
-fmi3PrintDependencies
+Deprecated `fmi3...` wrappers have been removed from the user-level API. Use the version-independent functions above.

@@ -4,17 +4,13 @@ platform dependent header file, several access functions, as well as the schema 
 
 ## Opening and closing FMUs
 
-```@docs
-```
-fmi2Unzip
-fmi2Load
-fmi2Reload
-fmi2Unload
+The FMI-version-specific loading wrappers have been removed from the public API. Use `loadFMU`, `reload`, and `unloadFMU` from the user-level API instead.
 
 ##  Creation, Destruction and Logging of FMU Instances
 
 ```@docs
 fmi2Instantiate!
+fmi2FreeInstance!
 fmi2Instantiate
 fmi2FreeInstance
 fmi2SetDebugLogging
@@ -52,9 +48,6 @@ fmi2SetInteger
 fmi2SetBoolean
 fmi2SetString
 ```
-fmi2Get
-fmi2Get!
-fmi2Set
 
 ## Getting and Setting the Complete FMU State
 The FMU has an internal state consisting of all values that are needed to continue a simulation. This internal state consists especially of the values of the continuous-time states, iteration variables, parameter values, input values, delay buffers, file identifiers, and FMU internal status information. With the functions of this section, the internal FMU state can be copied and the pointer to this copy is returned to the environment. The FMU state copy can be set as actual FMU state, in order to continue the simulation from it.
@@ -84,34 +77,74 @@ fmi2GetDirectionalDerivative!
 fmi2SetRealInputDerivatives
 fmi2GetRealOutputDerivatives!
 ```
-fmi2SampleJacobian
-fmi2SampleJacobian!
 
 ## External/Additional functions
 
 ```@docs
-FMIBase.setDiscreteStates
-FMIBase.getDiscreteStates
 FMIBase.getSimpleTypeAttributeStruct
 FMIBase.getDeclaredType
 ```
-fmi2GetSolutionDerivative
-fmi2GetSolutionState
-fmi2GetSolutionValue
-fmi2GetSolutionTime
-fmi2GetJacobian
-fmi2GetJacobian!
-fmi2GetFullJacobian
-fmi2GetFullJacobian!
 
 ## Export functions
 
 ```@docs
-fmi2ModelDescriptionAddModelStructureOutputs
-fmi2CreateEmbedded
-fmi2ModelDescriptionAddModelStructureInitialUnknowns
-fmi2ModelDescriptionAddModelVariable
-fmi2CreateSimple
-fmi2Create
-fmi2ModelDescriptionAddModelStructureDerivatives
+createFMU2
+createFMU2Embedded
+createFMU2Simple
+createModelDescription
+addModelExchange
+addCoSimulation
+addEvent
+getIndexOfScalarVariable
+addRealState
+addRealDerivative
+addRealStateAndDerivative
+addRealInput
+addRealOutput
+addRealParameter
+addIntegerDiscreteState
+addEventIndicator
+addModelVariable
+addModelStructureOutputs
+addModelStructureDerivatives
+addModelStructureInitialUnknowns
+setFctGetTypesPlatform
+setFctGetVersion
+setFctInstantiate
+setFctFreeInstance
+setFctSetDebugLogging
+setFctSetupExperiment
+setFctEnterInitializationMode
+setFctExitInitializationMode
+setFctTerminate
+setFctReset
+setFctGetReal
+setFctGetInteger
+setFctGetBoolean
+setFctGetString
+setFctSetReal
+setFctSetInteger
+setFctSetBoolean
+setFctSetString
+setFctSetTime
+setFctSetContinuousStates
+setFctEnterEventMode
+setFctNewDiscreteStates
+setFctEnterContinuousTimeMode
+setFctCompletedIntegratorStep
+setFctGetDerivatives
+setFctGetEventIndicators
+setFctGetContinuousStates
+setFctGetNominalsOfContinuousStates
+setFctSetRealInputDerivatives
+setFctGetRealOutputDerivatives
+setFctDoStep
+setFctCancelStep
+setFctGetStatus
+setFctGetRealStatus
+setFctGetIntegerStatus
+setFctGetBooleanStatus
+setFctGetStringStatus
 ```
+
+The shorter model-description aliases `addStateAndDerivative`, `addInput`, `addOutput`, and `addParameter` are exported for convenience and map to the corresponding `addReal...` functions. The legacy `fmi2SetFct...` callback aliases are still exported for compatibility; new code should use the `setFct...` names above.

@@ -25,4 +25,3 @@ fmi3GetNominalsOfContinuousStates!
 fmi3GetNumberOfContinuousStates
 fmi3GetNumberOfContinuousStates!
 ```
-fmi3CompletedIntegratorStep
