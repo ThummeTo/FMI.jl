@@ -4,7 +4,12 @@
 #
 
 import Pkg;
-Pkg.develop(path = joinpath(@__DIR__, "../../FMI.jl"));
+for package in ("FMICore.jl", "FMIBase.jl", "FMIImport.jl", "FMIExport.jl", "FMI.jl")
+    package_path = normpath(joinpath(@__DIR__, "..", "..", package))
+    if isdir(package_path)
+        Pkg.develop(path = package_path)
+    end
+end
 using Plots, JLD2, DataFrames, CSV, MAT # need to be loaded, as they enable optional features in FMI.jl
 using FMI, FMIBase, FMIImport, FMICore, FMIExport
 using Documenter
@@ -147,7 +152,7 @@ my_makedocs() = makedocs(
     ),
     modules = [FMI, FMIImport, FMIExport, FMICore, FMIBase],
     checkdocs = :exports,
-    linkcheck = true,
+    linkcheck = lowercase(get(ENV, "DOCUMENTER_LINKCHECK", "true")) == "true",
     warnonly = :linkcheck,
     pages = Any[
         "Introduction" => "index.md"
