@@ -26,11 +26,6 @@ fmi2VariableNamingConvention
 fmi2Causality
 fmi2ComponentState
 ```
-fmi2StructMD
-FMU2Solution
-FMIImport.fmi2ValueReferenceFormat
-FMU2Event
-FMU2ExecutionConfiguration
 
 # FMI2 Constants in FMI Import/Core .jl 
 
@@ -44,10 +39,3 @@ fmi2ComponentStateTerminated
 fmi2ComponentStateError
 fmi2ComponentStateFatal
 ```
-fmi2False
-fmi2StatusOK
-fmi2StatusWarning
-fmi2StatusPending
-fmi2StatusError
-fmi2StatusDiscard
-fmi2StatusFatal

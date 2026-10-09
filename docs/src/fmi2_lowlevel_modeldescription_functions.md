@@ -4,16 +4,11 @@ The FMI model description provides all human readable information on the model. 
 
 ## Loading/Parsing
 
-```@docs
-```
-fmi2LoadModelDescription
+Model descriptions are loaded through `loadFMU` as part of FMU setup.
 
 ## general information about the FMU
 
-```@docs
-```
-fmi2GetGenerationTool
-fmi2GetGenerationDateAndTime
+Use the version-independent model-description helpers for generation metadata.
 
 ## technical information about the FMU
 
@@ -26,25 +21,16 @@ fmi2GetTypesPlatform
 ## FMU capabilities
 
 ```@docs
-canGetSetFMUState
 isModelStructureAvailable
 isModelStructureDerivativesAvailable
 ```
-fmi2DependenciesSupported
-fmi2DerivativeDependenciesSupported
-fmi2CanSerializeFMUstate
-fmi2ProvidesDirectionalDerivative
 
 ## value references
 
 ```@docs
 getModelVariableIndices
 ```
-fmi2GetValueReferencesAndNames
-fmi2GetNames
 
 ## In-/Outputs
 
-```@docs
-```
-fmi2GetOutputValueReferencesAndNames
+Use the version-independent input and output helper functions for FMI2 model variables.

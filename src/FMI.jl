@@ -14,7 +14,6 @@ using FMIImport.FMIBase.Reexport
 @reexport using FMIImport.FMIBase.FMICore
 @reexport using FMIExport
 
-include("sim.jl")
 include("deprecated.jl")
 
 end # module FMI

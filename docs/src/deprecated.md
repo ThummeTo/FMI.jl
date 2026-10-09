@@ -10,6 +10,4 @@ fmi2CallbackFunctions
 ### deprecated
 Mostly wrappers that are not supposed to be used (call specific wrapped functions instead)
 
-all gone since 0.14.0 (nice)
-```@docs
-```
+Deprecated wrappers are intentionally kept out of the public manual pages. Prefer the current version-independent APIs.
