@@ -14,6 +14,12 @@ unloadFMU
 reload
 ```
 
+# Solve FMUs via the SciML interface
+
+```@docs
+FMUProblem
+```
+
 # Handling Value References
 
 ```@docs

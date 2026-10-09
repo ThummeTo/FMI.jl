@@ -6,6 +6,12 @@ logWarning
 logError
 ```
 
+## Solver backend
+
+```@docs
+solveFMUProblem!
+```
+
 ## Conversion functions
 
 ```@docs
