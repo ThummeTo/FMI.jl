@@ -79,227 +79,6 @@ To run the example, the previously installed packages must be included.
 @everywhere using BenchmarkTools
 ```
 
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mError requiring `FMIImport` from `FMIZoo`
-    [33m[1m│ [22m[39m  exception =
-    [33m[1m│ [22m[39m   UndefVarError: `fmi2Load` not defined
-    [33m[1m│ [22m[39m   Stacktrace:
-    [33m[1m│ [22m[39m     [1] [0m[1mgetproperty[22m[0m[1m([22m[90mx[39m::[0mModule, [90mf[39m::[0mSymbol[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mBase.jl:31[24m[39m
-    [33m[1m│ [22m[39m     [2] top-level scope
-    [33m[1m│ [22m[39m   [90m    @[39m [90mC:\Users\runneradmin\.julia\packages\FMIZoo\Yw7SL\src\[39m[90m[4mFMIZoo.jl:46[24m[39m
-    [33m[1m│ [22m[39m     [3] [0m[1meval[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4mboot.jl:385[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m     [4] [0m[1meval[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mC:\Users\runneradmin\.julia\packages\FMIZoo\Yw7SL\src\[39m[90m[4mFMIZoo.jl:6[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m     [5] [0m[1m(::FMIZoo.var"#14#20")[22m[0m[1m([22m[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [35mFMIZoo[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:101[24m[39m
-    [33m[1m│ [22m[39m     [6] [0m[1mmacro expansion[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m[4mtiming.jl:395[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m     [7] [0m[1merr[22m[0m[1m([22m[90mf[39m::[0mAny, [90mlistener[39m::[0mModule, [90mmodname[39m::[0mString, [90mfile[39m::[0mString, [90mline[39m::[0mAny[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [36mRequires[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:47[24m[39m
-    [33m[1m│ [22m[39m     [8] [0m[1m(::FMIZoo.var"#13#19")[22m[0m[1m([22m[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [35mFMIZoo[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:100[24m[39m
-    [33m[1m│ [22m[39m     [9] [0m[1mwithpath[22m[0m[1m([22m[90mf[39m::[0mAny, [90mpath[39m::[0mString[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [36mRequires[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:37[24m[39m
-    [33m[1m│ [22m[39m    [10] [0m[1m(::FMIZoo.var"#12#18")[22m[0m[1m([22m[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [35mFMIZoo[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:99[24m[39m
-    [33m[1m│ [22m[39m    [11] [0m[1mlistenpkg[22m[0m[1m([22m[90mf[39m::[0mAny, [90mpkg[39m::[0mBase.PkgId[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [36mRequires[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:20[24m[39m
-    [33m[1m│ [22m[39m    [12] [0m[1mmacro expansion[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:98[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [13] [0m[1m__init__[22m[0m[1m([22m[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [35mFMIZoo[39m [90mC:\Users\runneradmin\.julia\packages\FMIZoo\Yw7SL\src\[39m[90m[4mFMIZoo.jl:42[24m[39m
-    [33m[1m│ [22m[39m    [14] [0m[1mrun_module_init[22m[0m[1m([22m[90mmod[39m::[0mModule, [90mi[39m::[0mInt64[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1197[24m[39m
-    [33m[1m│ [22m[39m    [15] [0m[1mregister_restored_modules[22m[0m[1m([22m[90msv[39m::[0mCore.SimpleVector, [90mpkg[39m::[0mBase.PkgId, [90mpath[39m::[0mString[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1185[24m[39m
-    [33m[1m│ [22m[39m    [16] [0m[1m_include_from_serialized[22m[0m[1m([22m[90mpkg[39m::[0mBase.PkgId, [90mpath[39m::[0mString, [90mocachepath[39m::[0mString, [90mdepmods[39m::[0mVector[90m{Any}[39m[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1129[24m[39m
-    [33m[1m│ [22m[39m    [17] [0m[1m_require_search_from_serialized[22m[0m[1m([22m[90mpkg[39m::[0mBase.PkgId, [90msourcepath[39m::[0mString, [90mbuild_id[39m::[0mUInt128[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1655[24m[39m
-    [33m[1m│ [22m[39m    [18] [0m[1m_require[22m[0m[1m([22m[90mpkg[39m::[0mBase.PkgId, [90menv[39m::[0mString[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:2012[24m[39m
-    [33m[1m│ [22m[39m    [19] [0m[1m__require_prelocked[22m[0m[1m([22m[90muuidkey[39m::[0mBase.PkgId, [90menv[39m::[0mString[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1886[24m[39m
-    [33m[1m│ [22m[39m    [20] [0m[1m#invoke_in_world#3[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:926[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [21] [0m[1minvoke_in_world[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:923[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [22] [0m[1m_require_prelocked[22m[0m[1m([22m[90muuidkey[39m::[0mBase.PkgId, [90menv[39m::[0mString[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1877[24m[39m
-    [33m[1m│ [22m[39m    [23] [0m[1mmacro expansion[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4mloading.jl:1864[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [24] [0m[1mmacro expansion[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4mlock.jl:270[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [25] [0m[1m__require[22m[0m[1m([22m[90minto[39m::[0mModule, [90mmod[39m::[0mSymbol[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1827[24m[39m
-    [33m[1m│ [22m[39m    [26] [0m[1m#invoke_in_world#3[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:926[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [27] [0m[1minvoke_in_world[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:923[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [28] [0m[1mrequire[22m[0m[1m([22m[90minto[39m::[0mModule, [90mmod[39m::[0mSymbol[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1820[24m[39m
-    [33m[1m│ [22m[39m    [29] top-level scope
-    [33m[1m│ [22m[39m   [90m    @[39m [90mC:\hostedtoolcache\windows\julia\1.10.11\x64\share\julia\stdlib\v1.10\Distributed\src\[39m[90m[4mmacros.jl:200[24m[39m
-    [33m[1m│ [22m[39m    [30] [0m[1meval[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4mboot.jl:385[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [31] [0m[1minclude_string[22m[0m[1m([22m[90mmapexpr[39m::[0mtypeof(REPL.softscope), [90mmod[39m::[0mModule, [90mcode[39m::[0mString, [90mfilename[39m::[0mString[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:2160[24m[39m
-    [33m[1m│ [22m[39m    [32] [0m[1mexecute_request[22m[0m[1m([22m[90msocket[39m::[0mZMQ.Socket, [90mkernel[39m::[0mIJulia.Kernel, [90mmsg[39m::[0mIJulia.Msg[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [32mIJulia[39m [90mC:\Users\runneradmin\.julia\packages\IJulia\Vl5w1\src\[39m[90m[4mexecute_request.jl:129[24m[39m
-    [33m[1m│ [22m[39m    [33] [0m[1m#invokelatest#2[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:892[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [34] [0m[1minvokelatest[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:889[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [35] [0m[1meventloop[22m[0m[1m([22m[90msocket[39m::[0mZMQ.Socket, [90mkernel[39m::[0mIJulia.Kernel[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [32mIJulia[39m [90mC:\Users\runneradmin\.julia\packages\IJulia\Vl5w1\src\[39m[90m[4meventloop.jl:26[24m[39m
-    [33m[1m│ [22m[39m    [36] [0m[1m(::IJulia.var"#40#43"{IJulia.Kernel})[22m[0m[1m([22m[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [32mIJulia[39m [90mC:\Users\runneradmin\.julia\packages\IJulia\Vl5w1\src\[39m[90m[4meventloop.jl:71[24m[39m
-    [33m[1m└ [22m[39m[90m@ Requires C:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\require.jl:51[39m
-    
-
-          From worker 3:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mError requiring `FMIImport` from `FMIZoo`
-          From worker 3:	[33m[1m│ [22m[39m  exception =
-          From worker 3:	[33m[1m│ [22m[39m   UndefVarError: `fmi2Load` not defined
-          From worker 3:	[33m[1m│ [22m[39m   Stacktrace:
-          From worker 3:	[33m[1m│ [22m[39m     [1] [0m[1mgetproperty[22m[0m[1m([22m[90mx[39m::[0mModule, [90mf[39m::[0mSymbol[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mBase.jl:31[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m     [2] top-level scope
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90mC:\Users\runneradmin\.julia\packages\FMIZoo\Yw7SL\src\[39m[90m[4mFMIZoo.jl:46[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m     [3] [0m[1meval[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4mboot.jl:385[24m[39m[90m [inlined][39m
-          From worker 3:	[33m[1m│ [22m[39m     [4] [0m[1meval[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90mC:\Users\runneradmin\.julia\packages\FMIZoo\Yw7SL\src\[39m[90m[4mFMIZoo.jl:6[24m[39m[90m [inlined][39m
-          From worker 3:	[33m[1m│ [22m[39m     [5] [0m[1m(::FMIZoo.var"#14#20")[22m[0m[1m([22m[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [35mFMIZoo[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:101[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m     [6] [0m[1mmacro expansion[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90m[4mtiming.jl:395[24m[39m[90m [inlined][39m
-          From worker 3:	[33m[1m│ [22m[39m     [7] [0m[1merr[22m[0m[1m([22m[90mf[39m::[0mAny, [90mlistener[39m::[0mModule, [90mmodname[39m::[0mString, [90mfile[39m::[0mString, [90mline[39m::[0mAny[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [36mRequires[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:47[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m     [8] [0m[1m(::FMIZoo.var"#13#19")[22m[0m[1m([22m[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [35mFMIZoo[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:100[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m     [9] [0m[1mwithpath[22m[0m[1m([22m[90mf[39m::[0mAny, [90mpath[39m::[0mString[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [36mRequires[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:37[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m    [10] [0m[1m(::FMIZoo.var"#12#18")[22m[0m[1m([22m[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [35mFMIZoo[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:99[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m    [11] [0m[1mlistenpkg[22m[0m[1m([22m[90mf[39m::[0mAny, [90mpkg[39m::[0mBase.PkgId[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [36mRequires[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:20[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m    [12] [0m[1mmacro expansion[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:98[24m[39m[90m [inlined][39m
-          From worker 3:	[33m[1m│ [22m[39m    [13] [0m[1m__init__[22m[0m[1m([22m[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [35mFMIZoo[39m [90mC:\Users\runneradmin\.julia\packages\FMIZoo\Yw7SL\src\[39m[90m[4mFMIZoo.jl:42[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m    [14] [0m[1mrun_module_init[22m[0m[1m([22m[90mmod[39m::[0mModule, [90mi[39m::[0mInt64[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1197[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m    [15] [0m[1mregister_restored_modules[22m[0m[1m([22m[90msv[39m::[0mCore.SimpleVector, [90mpkg[39m::[0mBase.PkgId, [90mpath[39m::[0mString[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1185[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m    [16] [0m[1m_include_from_serialized[22m[0m[1m([22m[90mpkg[39m::[0mBase.PkgId, [90mpath[39m::[0mString, [90mocachepath[39m::[0mString, [90mdepmods[39m::[0mVector[90m{Any}[39m[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1129[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m    [17] [0m[1m_require_search_from_serialized[22m[0m[1m([22m[90mpkg[39m::[0mBase.PkgId, [90msourcepath[39m::[0mString, [90mbuild_id[39m::[0mUInt128[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1655[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m    [18] [0m[1m_require[22m[0m[1m([22m[90mpkg[39m::[0mBase.PkgId, [90menv[39m::[0mNothing[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:2012[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m    [19] [0m[1m__require_prelocked[22m[0m[1m([22m[90muuidkey[39m::[0mBase.PkgId, [90menv[39m::[0mNothing[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1886[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m    [20] [0m[1m#invoke_in_world#3[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:926[24m[39m[90m [inlined][39m
-          From worker 3:	[33m[1m│ [22m[39m    [21] [0m[1minvoke_in_world[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:923[24m[39m[90m [inlined][39m
-          From worker 3:	[33m[1m│ [22m[39m    [22] [0m[1m_require_prelocked[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4mloading.jl:1877[24m[39m[90m [inlined][39m
-          From worker 3:	[33m[1m│ [22m[39m    [23] [0m[1m_require_prelocked[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4mloading.jl:1876[24m[39m[90m [inlined][39m
-          From worker 3:	[33m[1m│ [22m[39m    [24] [0m[1mmacro expansion[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4mlock.jl:270[24m[39m[90m [inlined][39m
-          From worker 3:	[33m[1m│ [22m[39m    [25] [0m[1mrequire[22m[0m[1m([22m[90muuidkey[39m::[0mBase.PkgId[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1871[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m    [26] [0m[1m(::Distributed.var"#2#4"{Base.PkgId})[22m[0m[1m([22m[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [32mDistributed[39m [90mC:\hostedtoolcache\windows\julia\1.10.11\x64\share\julia\stdlib\v1.10\Distributed\src\[39m[90m[4mDistributed.jl:83[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m    [27] [0m[1m#invokelatest#2[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:892[24m[39m[90m [inlined][39m
-          From worker 3:	[33m[1m│ [22m[39m    [28] [0m[1minvokelatest[22m[0m[1m([22m::[0mAny[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4messentials.jl:889[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m    [29] [0m[1m(::Distributed.var"#122#124"{Distributed.CallWaitMsg})[22m[0m[1m([22m[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [32mDistributed[39m [90mC:\hostedtoolcache\windows\julia\1.10.11\x64\share\julia\stdlib\v1.10\Distributed\src\[39m[90m[4mprocess_messages.jl:303[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m    [30] [0m[1mrun_work_thunk[22m[0m[1m([22m[90mthunk[39m::[0mDistributed.var"#122#124"[90m{Distributed.CallWaitMsg}[39m, [90mprint_error[39m::[0mBool[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [32mDistributed[39m [90mC:\hostedtoolcache\windows\julia\1.10.11\x64\share\julia\stdlib\v1.10\Distributed\src\[39m[90m[4mprocess_messages.jl:70[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m    [31] [0m[1mrun_work_thunk[22m[0m[1m([22m[90mrv[39m::[0mDistributed.RemoteValue, [90mthunk[39m::[0mFunction[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [32mDistributed[39m [90mC:\hostedtoolcache\windows\julia\1.10.11\x64\share\julia\stdlib\v1.10\Distributed\src\[39m[90m[4mprocess_messages.jl:79[24m[39m
-          From worker 3:	[33m[1m│ [22m[39m    [32] [0m[1m(::Distributed.var"#108#110"{Distributed.RemoteValue, Distributed.var"#122#124"{Distributed.CallWaitMsg}})[22m[0m[1m([22m[0m[1m)[22m
-          From worker 3:	[33m[1m│ [22m[39m   [90m    @[39m [32mDistributed[39m [90mC:\hostedtoolcache\windows\julia\1.10.11\x64\share\julia\stdlib\v1.10\Distributed\src\[39m[90m[4mprocess_messages.jl:88[24m[39m
-          From worker 3:	[33m[1m└ [22m[39m[90m@ Requires C:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\require.jl:51[39m
-          From worker 2:	[33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mError requiring `FMIImport` from `FMIZoo`
-          From worker 2:	[33m[1m│ [22m[39m  exception =
-          From worker 2:	[33m[1m│ [22m[39m   UndefVarError: `fmi2Load` not defined
-          From worker 2:	[33m[1m│ [22m[39m   Stacktrace:
-          From worker 2:	[33m[1m│ [22m[39m     [1] [0m[1mgetproperty[22m[0m[1m([22m[90mx[39m::[0mModule, [90mf[39m::[0mSymbol[0m[1m)[22m
-
-    
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mBase.jl:31[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m     [2] top-level scope
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90mC:\Users\runneradmin\.julia\packages\FMIZoo\Yw7SL\src\[39m[90m[4mFMIZoo.jl:46[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m     [3] [0m[1meval[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4mboot.jl:385[24m[39m[90m [inlined][39m
-          From worker 2:	[33m[1m│ [22m[39m     [4] [0m[1meval[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90mC:\Users\runneradmin\.julia\packages\FMIZoo\Yw7SL\src\[39m[90m[4mFMIZoo.jl:6[24m[39m[90m [inlined][39m
-          From worker 2:	[33m[1m│ [22m[39m     [5] [0m[1m(::FMIZoo.var"#14#20")[22m[0m[1m([22m[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [35mFMIZoo[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:101[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m     [6] [0m[1mmacro expansion[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90m[4mtiming.jl:395[24m[39m[90m [inlined][39m
-          From worker 2:	[33m[1m│ [22m[39m     [7] [0m[1merr[22m[0m[1m([22m[90mf[39m::[0mAny, [90mlistener[39m::[0mModule, [90mmodname[39m::[0mString, [90mfile[39m::[0mString, [90mline[39m::[0mAny[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [36mRequires[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:47[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m     [8] [0m[1m(::FMIZoo.var"#13#19")[22m[0m[1m([22m[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [35mFMIZoo[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:100[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m     [9] [0m[1mwithpath[22m[0m[1m([22m[90mf[39m::[0mAny, [90mpath[39m::[0mString[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [36mRequires[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:37[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m    [10] [0m[1m(::FMIZoo.var"#12#18")[22m[0m[1m([22m[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [35mFMIZoo[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:99[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m    [11] [0m[1mlistenpkg[22m[0m[1m([22m[90mf[39m::[0mAny, [90mpkg[39m::[0mBase.PkgId[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [36mRequires[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:20[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m    [12] [0m[1mmacro expansion[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:98[24m[39m[90m [inlined][39m
-          From worker 2:	[33m[1m│ [22m[39m    [13] [0m[1m__init__[22m[0m[1m([22m[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [35mFMIZoo[39m [90mC:\Users\runneradmin\.julia\packages\FMIZoo\Yw7SL\src\[39m[90m[4mFMIZoo.jl:42[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m    [14] [0m[1mrun_module_init[22m[0m[1m([22m[90mmod[39m::[0mModule, [90mi[39m::[0mInt64[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1197[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m    [15] [0m[1mregister_restored_modules[22m[0m[1m([22m[90msv[39m::[0mCore.SimpleVector, [90mpkg[39m::[0mBase.PkgId, [90mpath[39m::[0mString[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1185[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m    [16] [0m[1m_include_from_serialized[22m[0m[1m([22m[90mpkg[39m::[0mBase.PkgId, [90mpath[39m::[0mString, [90mocachepath[39m::[0mString, [90mdepmods[39m::[0mVector[90m{Any}[39m[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1129[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m    [17] [0m[1m_require_search_from_serialized[22m[0m[1m([22m[90mpkg[39m::[0mBase.PkgId, [90msourcepath[39m::[0mString, [90mbuild_id[39m::[0mUInt128[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1655[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m    [18] [0m[1m_require[22m[0m[1m([22m[90mpkg[39m::[0mBase.PkgId, [90menv[39m::[0mNothing[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:2012[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m    [19] [0m[1m__require_prelocked[22m[0m[1m([22m[90muuidkey[39m::[0mBase.PkgId, [90menv[39m::[0mNothing[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1886[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m    [20] [0m[1m#invoke_in_world#3[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:926[24m[39m[90m [inlined][39m
-          From worker 2:	[33m[1m│ [22m[39m    [21] [0m[1minvoke_in_world[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:923[24m[39m[90m [inlined][39m
-          From worker 2:	[33m[1m│ [22m[39m    [22] [0m[1m_require_prelocked[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4mloading.jl:1877[24m[39m[90m [inlined][39m
-          From worker 2:	[33m[1m│ [22m[39m    [23] [0m[1m_require_prelocked[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4mloading.jl:1876[24m[39m[90m [inlined][39m
-          From worker 2:	[33m[1m│ [22m[39m    [24] [0m[1mmacro expansion[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4mlock.jl:270[24m[39m[90m [inlined][39m
-          From worker 2:	[33m[1m│ [22m[39m    [25] [0m[1mrequire[22m[0m[1m([22m[90muuidkey[39m::[0mBase.PkgId[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1871[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m    [26] [0m[1m(::Distributed.var"#2#4"{Base.PkgId})[22m[0m[1m([22m[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [32mDistributed[39m [90mC:\hostedtoolcache\windows\julia\1.10.11\x64\share\julia\stdlib\v1.10\Distributed\src\[39m[90m[4mDistributed.jl:83[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m    [27] [0m[1m#invokelatest#2[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:892[24m[39m[90m [inlined][39m
-          From worker 2:	[33m[1m│ [22m[39m    [28] [0m[1minvokelatest[22m[0m[1m([22m::[0mAny[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4messentials.jl:889[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m    [29] [0m[1m(::Distributed.var"#122#124"{Distributed.CallWaitMsg})[22m[0m[1m([22m[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [32mDistributed[39m [90mC:\hostedtoolcache\windows\julia\1.10.11\x64\share\julia\stdlib\v1.10\Distributed\src\[39m[90m[4mprocess_messages.jl:303[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m    [30] [0m[1mrun_work_thunk[22m[0m[1m([22m[90mthunk[39m::[0mDistributed.var"#122#124"[90m{Distributed.CallWaitMsg}[39m, [90mprint_error[39m::[0mBool[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [32mDistributed[39m [90mC:\hostedtoolcache\windows\julia\1.10.11\x64\share\julia\stdlib\v1.10\Distributed\src\[39m[90m[4mprocess_messages.jl:70[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m    [31] [0m[1mrun_work_thunk[22m[0m[1m([22m[90mrv[39m::[0mDistributed.RemoteValue, [90mthunk[39m::[0mFunction[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [32mDistributed[39m [90mC:\hostedtoolcache\windows\julia\1.10.11\x64\share\julia\stdlib\v1.10\Distributed\src\[39m[90m[4mprocess_messages.jl:79[24m[39m
-          From worker 2:	[33m[1m│ [22m[39m    [32] [0m[1m(::Distributed.var"#108#110"{Distributed.RemoteValue, Distributed.var"#122#124"{Distributed.CallWaitMsg}})[22m[0m[1m([22m[0m[1m)[22m
-          From worker 2:	[33m[1m│ [22m[39m   [90m    @[39m [32mDistributed[39m [90mC:\hostedtoolcache\windows\julia\1.10.11\x64\share\julia\stdlib\v1.10\Distributed\src\[39m[90m[4mprocess_messages.jl:88[24m[39m
-          From worker 2:	[33m[1m└ [22m[39m[90m@ Requires C:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\require.jl:51[39m
-    
-
 Checking that we workers have been correctly initialized:
 
 
@@ -339,22 +118,22 @@ input_values = collect(collect.(eachrow(rand(batchSize,2))))
 
 
     16-element Vector{Vector{Float64}}:
-     [0.02442851601728213, 0.5610568135245778]
-     [0.2732873909568746, 0.04614190794982875]
-     [0.03385047786870887, 0.4571891493493089]
-     [0.8906603612894561, 0.7344596536944313]
-     [0.49647816122199706, 0.46296522873718027]
-     [0.7331804487791137, 0.43739324716893535]
-     [0.2782227370140673, 0.12982170806943394]
-     [0.14687063914806076, 0.8824321610028086]
-     [0.35952608506115613, 0.059645041335219195]
-     [0.7050583738230213, 0.04781370812475727]
-     [0.05226678619854597, 0.5484899029312109]
-     [0.5484869235725381, 0.9625119887878714]
-     [0.9325960059993951, 0.10178231394399129]
-     [0.23323682197286766, 0.5345176045739863]
-     [0.5227156311468691, 0.5111694634124148]
-     [0.14418229144725647, 0.014453796321238332]
+     [0.16640673170112974, 0.21490857687076337]
+     [0.11730406031265417, 0.4003512666911624]
+     [0.9252244849121054, 0.9802675541264196]
+     [0.12260031602527222, 0.46276055430324003]
+     [0.4628504977231723, 0.5823939682033519]
+     [0.6360143975998794, 0.6771940228160668]
+     [0.16283737570279888, 0.5441376786132768]
+     [0.010350349273628656, 0.06540620978192135]
+     [0.17122849664855955, 0.4776097853245219]
+     [0.09238891337948041, 0.9382424981819227]
+     [0.502892166507628, 0.760776733933313]
+     [0.6720197431074441, 0.3105561380040267]
+     [0.9961920526901044, 0.4054607633806766]
+     [0.5463401914777776, 0.6120278536701813]
+     [0.881454984268714, 0.03536389064145873]
+     [0.4315887735707845, 0.7579821028257134]
 
 
 
@@ -397,16 +176,16 @@ Running a single evaluation is pretty quick, therefore the speed can be better t
 
 
 
-    BenchmarkTools.Trial: 3 samples with 1 evaluation per sample.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m2.135 s[22m[39m … [35m  2.162 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m0.52% … 1.08%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m2.140 s              [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m0.52%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m2.145 s[22m[39m ± [32m14.303 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m0.69% ± 0.35%
+    BenchmarkTools.Trial: 4 samples with 1 evaluation per sample.
+     Range (min … max):  1.453 s …  1.468 s  ┊ GC (min … max): 0.08% … 0.91%
+     Time  (median):     1.459 s             ┊ GC (median):    0.12%
+     Time  (mean ± σ):   1.460 s ± 6.116 ms  ┊ GC (mean ± σ):  0.31% ± 0.40%
     
-      [34m█[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
-      [34m█[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      2.13 s[90m         Histogram: frequency by time[39m        2.16 s [0m[1m<[22m
+      █               █              █                       █  
+      █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
+      1.45 s        Histogram: frequency by time        1.47 s <
     
-     Memory estimate[90m: [39m[33m296.15 MiB[39m, allocs estimate[90m: [39m[33m4101765[39m.
+     Memory estimate: 64.21 MiB, allocs estimate: 4201025.
 
 
 
@@ -426,8 +205,8 @@ println("Single Threaded")
 
 
     BenchmarkTools.Trial: 1 sample with 1 evaluation per sample.
-     Single result which took [34m34.864 s[39m (0.47% GC) to evaluate,
-     with a memory estimate of [33m4.63 GiB[39m, over [33m65628228[39m allocations.
+     Single result which took 22.868 s (0.11% GC) to evaluate,
+     with a memory estimate of 1.00 GiB, over 67216388 allocations.
 
 
 
@@ -448,8 +227,8 @@ println("Multi Threaded")
 
 
     BenchmarkTools.Trial: 1 sample with 1 evaluation per sample.
-     Single result which took [34m17.885 s[39m (0.00% GC) to evaluate,
-     with a memory estimate of [33m126.09 KiB[39m, over [33m2413[39m allocations.
+     Single result which took 12.409 s (0.00% GC) to evaluate,
+     with a memory estimate of 113.02 KiB, over 1984 allocations.
 
 
 
