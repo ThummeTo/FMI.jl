@@ -4,7 +4,6 @@
 
 # imports
 using FMI
-using FMI: fmi2SetFctGetReal
 using FMIZoo
 using FMICore
 using Plots
@@ -45,8 +44,9 @@ function myGetReal!(c::fmi2Component, vr::Union{Array{fmi2ValueReference}, Ptr{f
     return status
 end
 
-# no we overwrite the original function
-fmi2SetFctGetReal(fmu, myGetReal!)
+# now we overwrite the original function
+fmu.cGetReal = @cfunction(myGetReal!, fmi2Status,
+    (fmi2Component, Ptr{fmi2ValueReference}, Csize_t, Ptr{fmi2Real}))
 
 simData = simulate(fmu, (tStart, tStop); recordValues=vrs)
 plot!(fig, simData; states=false, style=:dash)
