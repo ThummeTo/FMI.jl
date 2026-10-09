@@ -61,83 +61,6 @@ using BenchmarkTools
 using DifferentialEquations
 ```
 
-    [33m[1m┌ [22m[39m[33m[1mWarning: [22m[39mError requiring `FMIImport` from `FMIZoo`
-    [33m[1m│ [22m[39m  exception =
-    [33m[1m│ [22m[39m   UndefVarError: `fmi2Load` not defined
-    [33m[1m│ [22m[39m   Stacktrace:
-    [33m[1m│ [22m[39m     [1] [0m[1mgetproperty[22m[0m[1m([22m[90mx[39m::[0mModule, [90mf[39m::[0mSymbol[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mBase.jl:31[24m[39m
-    [33m[1m│ [22m[39m     [2] top-level scope
-    [33m[1m│ [22m[39m   [90m    @[39m [90mC:\Users\runneradmin\.julia\packages\FMIZoo\Yw7SL\src\[39m[90m[4mFMIZoo.jl:46[24m[39m
-    [33m[1m│ [22m[39m     [3] [0m[1meval[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4mboot.jl:385[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m     [4] [0m[1meval[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mC:\Users\runneradmin\.julia\packages\FMIZoo\Yw7SL\src\[39m[90m[4mFMIZoo.jl:6[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m     [5] [0m[1m(::FMIZoo.var"#14#20")[22m[0m[1m([22m[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [35mFMIZoo[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:101[24m[39m
-    [33m[1m│ [22m[39m     [6] [0m[1mmacro expansion[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m[4mtiming.jl:395[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m     [7] [0m[1merr[22m[0m[1m([22m[90mf[39m::[0mAny, [90mlistener[39m::[0mModule, [90mmodname[39m::[0mString, [90mfile[39m::[0mString, [90mline[39m::[0mAny[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [36mRequires[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:47[24m[39m
-    [33m[1m│ [22m[39m     [8] [0m[1m(::FMIZoo.var"#13#19")[22m[0m[1m([22m[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [35mFMIZoo[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:100[24m[39m
-    [33m[1m│ [22m[39m     [9] [0m[1mwithpath[22m[0m[1m([22m[90mf[39m::[0mAny, [90mpath[39m::[0mString[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [36mRequires[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:37[24m[39m
-    [33m[1m│ [22m[39m    [10] [0m[1m(::FMIZoo.var"#12#18")[22m[0m[1m([22m[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [35mFMIZoo[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:99[24m[39m
-    [33m[1m│ [22m[39m    [11] [0m[1mlistenpkg[22m[0m[1m([22m[90mf[39m::[0mAny, [90mpkg[39m::[0mBase.PkgId[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [36mRequires[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:20[24m[39m
-    [33m[1m│ [22m[39m    [12] [0m[1mmacro expansion[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mC:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\[39m[90m[4mrequire.jl:98[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [13] [0m[1m__init__[22m[0m[1m([22m[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [35mFMIZoo[39m [90mC:\Users\runneradmin\.julia\packages\FMIZoo\Yw7SL\src\[39m[90m[4mFMIZoo.jl:42[24m[39m
-    [33m[1m│ [22m[39m    [14] [0m[1mrun_module_init[22m[0m[1m([22m[90mmod[39m::[0mModule, [90mi[39m::[0mInt64[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1197[24m[39m
-    [33m[1m│ [22m[39m    [15] [0m[1mregister_restored_modules[22m[0m[1m([22m[90msv[39m::[0mCore.SimpleVector, [90mpkg[39m::[0mBase.PkgId, [90mpath[39m::[0mString[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1185[24m[39m
-    [33m[1m│ [22m[39m    [16] [0m[1m_include_from_serialized[22m[0m[1m([22m[90mpkg[39m::[0mBase.PkgId, [90mpath[39m::[0mString, [90mocachepath[39m::[0mString, [90mdepmods[39m::[0mVector[90m{Any}[39m[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1129[24m[39m
-    [33m[1m│ [22m[39m    [17] [0m[1m_require_search_from_serialized[22m[0m[1m([22m[90mpkg[39m::[0mBase.PkgId, [90msourcepath[39m::[0mString, [90mbuild_id[39m::[0mUInt128[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1655[24m[39m
-    [33m[1m│ [22m[39m    [18] [0m[1m_require[22m[0m[1m([22m[90mpkg[39m::[0mBase.PkgId, [90menv[39m::[0mString[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:2012[24m[39m
-    [33m[1m│ [22m[39m    [19] [0m[1m__require_prelocked[22m[0m[1m([22m[90muuidkey[39m::[0mBase.PkgId, [90menv[39m::[0mString[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1886[24m[39m
-    [33m[1m│ [22m[39m    [20] [0m[1m#invoke_in_world#3[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:926[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [21] [0m[1minvoke_in_world[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:923[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [22] [0m[1m_require_prelocked[22m[0m[1m([22m[90muuidkey[39m::[0mBase.PkgId, [90menv[39m::[0mString[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1877[24m[39m
-    [33m[1m│ [22m[39m    [23] [0m[1mmacro expansion[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4mloading.jl:1864[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [24] [0m[1mmacro expansion[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4mlock.jl:270[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [25] [0m[1m__require[22m[0m[1m([22m[90minto[39m::[0mModule, [90mmod[39m::[0mSymbol[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1827[24m[39m
-    [33m[1m│ [22m[39m    [26] [0m[1m#invoke_in_world#3[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:926[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [27] [0m[1minvoke_in_world[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:923[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [28] [0m[1mrequire[22m[0m[1m([22m[90minto[39m::[0mModule, [90mmod[39m::[0mSymbol[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:1820[24m[39m
-    [33m[1m│ [22m[39m    [29] [0m[1meval[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4mboot.jl:385[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [30] [0m[1minclude_string[22m[0m[1m([22m[90mmapexpr[39m::[0mtypeof(REPL.softscope), [90mmod[39m::[0mModule, [90mcode[39m::[0mString, [90mfilename[39m::[0mString[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90mBase[39m [90m.\[39m[90m[4mloading.jl:2160[24m[39m
-    [33m[1m│ [22m[39m    [31] [0m[1mexecute_request[22m[0m[1m([22m[90msocket[39m::[0mZMQ.Socket, [90mkernel[39m::[0mIJulia.Kernel, [90mmsg[39m::[0mIJulia.Msg[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [32mIJulia[39m [90mC:\Users\runneradmin\.julia\packages\IJulia\Vl5w1\src\[39m[90m[4mexecute_request.jl:129[24m[39m
-    [33m[1m│ [22m[39m    [32] [0m[1m#invokelatest#2[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:892[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [33] [0m[1minvokelatest[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [90m.\[39m[90m[4messentials.jl:889[24m[39m[90m [inlined][39m
-    [33m[1m│ [22m[39m    [34] [0m[1meventloop[22m[0m[1m([22m[90msocket[39m::[0mZMQ.Socket, [90mkernel[39m::[0mIJulia.Kernel[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [32mIJulia[39m [90mC:\Users\runneradmin\.julia\packages\IJulia\Vl5w1\src\[39m[90m[4meventloop.jl:26[24m[39m
-    [33m[1m│ [22m[39m    [35] [0m[1m(::IJulia.var"#40#43"{IJulia.Kernel})[22m[0m[1m([22m[0m[1m)[22m
-    [33m[1m│ [22m[39m   [90m    @[39m [32mIJulia[39m [90mC:\Users\runneradmin\.julia\packages\IJulia\Vl5w1\src\[39m[90m[4meventloop.jl:71[24m[39m
-    [33m[1m└ [22m[39m[90m@ Requires C:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\require.jl:51[39m
-    
-
 First, check the amount of available threads:
 
 
@@ -178,7 +101,7 @@ input_values = collect(collect.(eachrow(rand(batchSize,2))))
 
 
     1-element Vector{Vector{Float64}}:
-     [0.7768264173226263, 0.4002275745626398]
+     [0.32746685435492195, 0.08138576006595677]
 
 
 
@@ -230,15 +153,15 @@ Running a single evaluation is pretty quick, therefore the speed can be better t
 
 
     BenchmarkTools.Trial: 3 samples with 1 evaluation per sample.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m2.107 s[22m[39m … [35m  2.193 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m0.44% … 1.01%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m2.113 s              [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m0.44%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m2.138 s[22m[39m ± [32m48.418 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m0.61% ± 0.36%
+     Range (min … max):  1.876 s …   1.899 s  ┊ GC (min … max): 0.34% … 0.04%
+     Time  (median):     1.880 s              ┊ GC (median):    0.34%
+     Time  (mean ± σ):   1.885 s ± 12.547 ms  ┊ GC (mean ± σ):  0.25% ± 0.18%
     
-      [34m█[39m[39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
-      [34m█[39m[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      2.11 s[90m         Histogram: frequency by time[39m        2.19 s [0m[1m<[22m
+      █        █                                              █  
+      █▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
+      1.88 s         Histogram: frequency by time         1.9 s <
     
-     Memory estimate[90m: [39m[33m296.15 MiB[39m, allocs estimate[90m: [39m[33m4101765[39m.
+     Memory estimate: 64.21 MiB, allocs estimate: 4201025.
 
 
 
@@ -258,15 +181,15 @@ println("Single Threaded")
 
 
     BenchmarkTools.Trial: 3 samples with 1 evaluation per sample.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m2.101 s[22m[39m … [35m 2.112 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m0.44% … 0.43%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m2.101 s             [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m0.43%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m2.105 s[22m[39m ± [32m6.566 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m0.41% ± 0.04%
+     Range (min … max):  1.878 s …   1.912 s  ┊ GC (min … max): 0.05% … 0.09%
+     Time  (median):     1.900 s              ┊ GC (median):    0.05%
+     Time  (mean ± σ):   1.897 s ± 17.121 ms  ┊ GC (mean ± σ):  0.06% ± 0.02%
     
-      [34m█[39m[39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
-      [34m█[39m[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      2.1 s[90m         Histogram: frequency by time[39m        2.11 s [0m[1m<[22m
+      █                                    █                  █  
+      █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
+      1.88 s         Histogram: frequency by time        1.91 s <
     
-     Memory estimate[90m: [39m[33m296.15 MiB[39m, allocs estimate[90m: [39m[33m4101768[39m.
+     Memory estimate: 64.21 MiB, allocs estimate: 4201028.
 
 
 
@@ -281,21 +204,23 @@ println("Multi Threaded")
 ```
 
     Multi Threaded
+
+    
     
 
 
 
 
     BenchmarkTools.Trial: 3 samples with 1 evaluation per sample.
-     Range [90m([39m[36m[1mmin[22m[39m … [35mmax[39m[90m):  [39m[36m[1m2.099 s[22m[39m … [35m  2.120 s[39m  [90m┊[39m GC [90m([39mmin … max[90m): [39m0.46% … 0.38%
-     Time  [90m([39m[34m[1mmedian[22m[39m[90m):     [39m[34m[1m2.101 s              [22m[39m[90m┊[39m GC [90m([39mmedian[90m):    [39m0.39%
-     Time  [90m([39m[32m[1mmean[22m[39m ± [32mσ[39m[90m):   [39m[32m[1m2.107 s[22m[39m ± [32m11.612 ms[39m  [90m┊[39m GC [90m([39mmean ± σ[90m):  [39m0.41% ± 0.04%
+     Range (min … max):  1.883 s …  1.891 s  ┊ GC (min … max): 0.09% … 0.04%
+     Time  (median):     1.888 s             ┊ GC (median):    0.05%
+     Time  (mean ± σ):   1.887 s ± 4.265 ms  ┊ GC (mean ± σ):  0.06% ± 0.02%
     
-      [34m█[39m[39m [39m [39m [39m [39m [39m [39m█[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [32m [39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m█[39m [39m 
-      [34m█[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[32m▁[39m[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m▁[39m█[39m [39m▁
-      2.1 s[90m          Histogram: frequency by time[39m        2.12 s [0m[1m<[22m
+      █                                   █                  █  
+      █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
+      1.88 s        Histogram: frequency by time        1.89 s <
     
-     Memory estimate[90m: [39m[33m296.15 MiB[39m, allocs estimate[90m: [39m[33m4101783[39m.
+     Memory estimate: 64.21 MiB, allocs estimate: 4201043.
 
 
 
