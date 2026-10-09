@@ -3,81 +3,7 @@
 # Licensed under the MIT license. 
 # See LICENSE (https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.</code></pre><h2 id="Introduction"><a class="docs-heading-anchor" href="#Introduction">Introduction</a><a id="Introduction-1"></a><a class="docs-heading-anchor-permalink" href="#Introduction" title="Permalink"></a></h2><p>This example shows how to parameterize a FMU. We will show to possible ways to parameterize: The default option using the parameterization feature of <code>fmiSimulate</code>, <code>fmiSimulateME</code> or <code>fmiSimulateCS</code>. Second, a custom parameterization routine for advanced users. </p><h2 id="Other-formats"><a class="docs-heading-anchor" href="#Other-formats">Other formats</a><a id="Other-formats-1"></a><a class="docs-heading-anchor-permalink" href="#Other-formats" title="Permalink"></a></h2><p>Besides, this <a href="https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/parameterize.ipynb">Jupyter Notebook</a> there is also a <a href="https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/parameterize.jl">Julia file</a> with the same name, which contains only the code cells and for the documentation there is a <a href="https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/parameterize.md">Markdown file</a> corresponding to the notebook.  </p><h2 id="Code-section"><a class="docs-heading-anchor" href="#Code-section">Code section</a><a id="Code-section-1"></a><a class="docs-heading-anchor-permalink" href="#Code-section" title="Permalink"></a></h2><p>To run the example, the previously installed packages must be included. </p><pre><code class="language-julia hljs"># imports
 using FMI
-using FMIZoo</code></pre><pre><code class="nohighlight hljs">┌ Warning: Error requiring `FMIImport` from `FMIZoo`
-│   exception =
-│    UndefVarError: `fmi2Load` not defined
-│    Stacktrace:
-│      [1] getproperty(x::Module, f::Symbol)
-│        @ Base .\Base.jl:31
-│      [2] top-level scope
-│        @ C:\Users\runneradmin\.julia\packages\FMIZoo\Yw7SL\src\FMIZoo.jl:46
-│      [3] eval
-│        @ .\boot.jl:385 [inlined]
-│      [4] eval
-│        @ C:\Users\runneradmin\.julia\packages\FMIZoo\Yw7SL\src\FMIZoo.jl:6 [inlined]
-│      [5] (::FMIZoo.var&quot;#14#20&quot;)()
-│        @ FMIZoo C:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\require.jl:101
-│      [6] macro expansion
-│        @ timing.jl:395 [inlined]
-│      [7] err(f::Any, listener::Module, modname::String, file::String, line::Any)
-│        @ Requires C:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\require.jl:47
-│      [8] (::FMIZoo.var&quot;#13#19&quot;)()
-│        @ FMIZoo C:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\require.jl:100
-│      [9] withpath(f::Any, path::String)
-│        @ Requires C:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\require.jl:37
-│     [10] (::FMIZoo.var&quot;#12#18&quot;)()
-│        @ FMIZoo C:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\require.jl:99
-│     [11] listenpkg(f::Any, pkg::Base.PkgId)
-│        @ Requires C:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\require.jl:20
-│     [12] macro expansion
-│        @ C:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\require.jl:98 [inlined]
-│     [13] __init__()
-│        @ FMIZoo C:\Users\runneradmin\.julia\packages\FMIZoo\Yw7SL\src\FMIZoo.jl:42
-│     [14] run_module_init(mod::Module, i::Int64)
-│        @ Base .\loading.jl:1197
-│     [15] register_restored_modules(sv::Core.SimpleVector, pkg::Base.PkgId, path::String)
-│        @ Base .\loading.jl:1185
-│     [16] _include_from_serialized(pkg::Base.PkgId, path::String, ocachepath::String, depmods::Vector{Any})
-│        @ Base .\loading.jl:1129
-│     [17] _require_search_from_serialized(pkg::Base.PkgId, sourcepath::String, build_id::UInt128)
-│        @ Base .\loading.jl:1655
-│     [18] _require(pkg::Base.PkgId, env::String)
-│        @ Base .\loading.jl:2012
-│     [19] __require_prelocked(uuidkey::Base.PkgId, env::String)
-│        @ Base .\loading.jl:1886
-│     [20] #invoke_in_world#3
-│        @ .\essentials.jl:926 [inlined]
-│     [21] invoke_in_world
-│        @ .\essentials.jl:923 [inlined]
-│     [22] _require_prelocked(uuidkey::Base.PkgId, env::String)
-│        @ Base .\loading.jl:1877
-│     [23] macro expansion
-│        @ .\loading.jl:1864 [inlined]
-│     [24] macro expansion
-│        @ .\lock.jl:270 [inlined]
-│     [25] __require(into::Module, mod::Symbol)
-│        @ Base .\loading.jl:1827
-│     [26] #invoke_in_world#3
-│        @ .\essentials.jl:926 [inlined]
-│     [27] invoke_in_world
-│        @ .\essentials.jl:923 [inlined]
-│     [28] require(into::Module, mod::Symbol)
-│        @ Base .\loading.jl:1820
-│     [29] eval
-│        @ .\boot.jl:385 [inlined]
-│     [30] include_string(mapexpr::typeof(REPL.softscope), mod::Module, code::String, filename::String)
-│        @ Base .\loading.jl:2160
-│     [31] execute_request(socket::ZMQ.Socket, kernel::IJulia.Kernel, msg::IJulia.Msg)
-│        @ IJulia C:\Users\runneradmin\.julia\packages\IJulia\Vl5w1\src\execute_request.jl:129
-│     [32] #invokelatest#2
-│        @ .\essentials.jl:892 [inlined]
-│     [33] invokelatest
-│        @ .\essentials.jl:889 [inlined]
-│     [34] eventloop(socket::ZMQ.Socket, kernel::IJulia.Kernel)
-│        @ IJulia C:\Users\runneradmin\.julia\packages\IJulia\Vl5w1\src\eventloop.jl:26
-│     [35] (::IJulia.var&quot;#40#43&quot;{IJulia.Kernel})()
-│        @ IJulia C:\Users\runneradmin\.julia\packages\IJulia\Vl5w1\src\eventloop.jl:71
-└ @ Requires C:\Users\runneradmin\.julia\packages\Requires\1eCOK\src\require.jl:51</code></pre><h3 id="Simulation-setup"><a class="docs-heading-anchor" href="#Simulation-setup">Simulation setup</a><a id="Simulation-setup-1"></a><a class="docs-heading-anchor-permalink" href="#Simulation-setup" title="Permalink"></a></h3><p>Next, the start time and end time of the simulation are set.</p><pre><code class="language-julia hljs">tStart = 0.0
+using FMIZoo</code></pre><h3 id="Simulation-setup"><a class="docs-heading-anchor" href="#Simulation-setup">Simulation setup</a><a id="Simulation-setup-1"></a><a class="docs-heading-anchor-permalink" href="#Simulation-setup" title="Permalink"></a></h3><p>Next, the start time and end time of the simulation are set.</p><pre><code class="language-julia hljs">tStart = 0.0
 tStop = 1.0
 tSave = collect(tStart:tStop)</code></pre><pre><code class="nohighlight hljs">2-element Vector{Float64}:
  0.0
@@ -95,8 +21,6 @@ info(fmu)</code></pre><pre><code class="nohighlight hljs">#################### B
 	Var. naming conv.:		structured
 	Event indicators:		4
 	Inputs:				3
-
-
 		352321536 [&quot;u_real&quot;]
 		352321537 [&quot;u_boolean&quot;]
 		352321538 [&quot;u_integer&quot;]
@@ -127,7 +51,7 @@ info(fmu)</code></pre><pre><code class="nohighlight hljs">#################### B
 ##################### End information for FMU #####################</code></pre><h3 id="Option-A:-Integrated-parameterization-feature-of-*FMI.jl*"><a class="docs-heading-anchor" href="#Option-A:-Integrated-parameterization-feature-of-*FMI.jl*">Option A: Integrated parameterization feature of <em>FMI.jl</em></a><a id="Option-A:-Integrated-parameterization-feature-of-*FMI.jl*-1"></a><a class="docs-heading-anchor-permalink" href="#Option-A:-Integrated-parameterization-feature-of-*FMI.jl*" title="Permalink"></a></h3><p>If you are using the commands for simulation integrated in <em>FMI.jl</em>, the parameters and initial conditions are set at the correct locations during the initialization process of your FMU. This is the recommended way of parameterizing your model, if you don&#39;t have very uncommon requirements regarding initialization.</p><pre><code class="language-julia hljs">dict = Dict{String, Any}()
 dict</code></pre><pre><code class="nohighlight hljs">Dict{String, Any}()</code></pre><h3 id="Option-B:-Custom-parameterization-routine"><a class="docs-heading-anchor" href="#Option-B:-Custom-parameterization-routine">Option B: Custom parameterization routine</a><a id="Option-B:-Custom-parameterization-routine-1"></a><a class="docs-heading-anchor-permalink" href="#Option-B:-Custom-parameterization-routine" title="Permalink"></a></h3><p>If you have special requirements for initialization and parameterization, you can write your very own parameterization routine.</p><h3 id="Instantiate-and-Setup-FMU"><a class="docs-heading-anchor" href="#Instantiate-and-Setup-FMU">Instantiate and Setup FMU</a><a id="Instantiate-and-Setup-FMU-1"></a><a class="docs-heading-anchor-permalink" href="#Instantiate-and-Setup-FMU" title="Permalink"></a></h3><p>Next it is necessary to create an instance of the FMU. This is achieved by the command <code>fmiInstantiate!()</code>.</p><pre><code class="language-julia hljs">c = fmi2Instantiate!(fmu; loggingOn=true)</code></pre><pre><code class="nohighlight hljs">FMU:            IO
     InstanceName:   IO
-    Address:        Ptr{Nothing} @0x00000123e2485990
+    Address:        Ptr{Nothing} @0x0000021d60c80c20
     State:          0
     Logging:        true
     FMU time:       -Inf
@@ -146,7 +70,7 @@ dict</code></pre><pre><code class="nohighlight hljs">Dict{String, Any}()</code><
     rndString = &quot;Random number $(100 * rand())!&quot;
 
     return rndReal, rndBoolean, rndInteger, rndString
-end</code></pre><pre><code class="nohighlight hljs">generateRandomNumbers (generic function with 1 method)</code></pre><p>The previously defined function is called and the results are displayed in the console.</p><pre><code class="language-julia hljs">paramsVal = generateRandomNumbers()</code></pre><pre><code class="nohighlight hljs">(65.80248459914777, true, 90, &quot;Random number 3.042377558822895!&quot;)</code></pre><h4 id="First-variant"><a class="docs-heading-anchor" href="#First-variant">First variant</a><a id="First-variant-1"></a><a class="docs-heading-anchor-permalink" href="#First-variant" title="Permalink"></a></h4><p>To show the first variant, it is necessary to terminate and reset the FMU instance. Then, as before, the setup command must be called for the FMU. </p><pre><code class="language-julia hljs">fmi2Terminate(c)
+end</code></pre><pre><code class="nohighlight hljs">generateRandomNumbers (generic function with 1 method)</code></pre><p>The previously defined function is called and the results are displayed in the console.</p><pre><code class="language-julia hljs">paramsVal = generateRandomNumbers()</code></pre><pre><code class="nohighlight hljs">(37.12068309305578, true, 88, &quot;Random number 99.6832863742104!&quot;)</code></pre><h4 id="First-variant"><a class="docs-heading-anchor" href="#First-variant">First variant</a><a id="First-variant-1"></a><a class="docs-heading-anchor-permalink" href="#First-variant" title="Permalink"></a></h4><p>To show the first variant, it is necessary to terminate and reset the FMU instance. Then, as before, the setup command must be called for the FMU. </p><pre><code class="language-julia hljs">fmi2Terminate(c)
 fmi2Reset(c)
 fmi2SetupExperiment(c, tStart, tStop)</code></pre><pre><code class="nohighlight hljs">0x00000000</code></pre><p>In the next step it is possible to set the parameters for the FMU. With the first variant it is quickly possible to set all parameters at once. Even different data types can be set with only one command. The command <code>setValue()</code> selects itself which function is chosen for which data type.  As long as the output of the function gives the status code 0, setting the parameters has worked.</p><pre><code class="language-julia hljs">setValue(c, params, collect(paramsVal))</code></pre><pre><code class="nohighlight hljs">4-element Vector{UInt32}:
  0x00000000
@@ -184,11 +108,11 @@ Callback-Evaluations:
 	Save values: 0
 	Steps completed: 0
 Values [2]:
-	0.0	(65.80248459914777, 1.0, 90.0)
-	1.0	(65.80248459914777, 1.0, 90.0)
+	0.0	(37.12068309305578, 1.0, 88.0)
+	1.0	(37.12068309305578, 1.0, 88.0)
 Events [0]:</code></pre><h4 id="Second-variant"><a class="docs-heading-anchor" href="#Second-variant">Second variant</a><a id="Second-variant-1"></a><a class="docs-heading-anchor-permalink" href="#Second-variant" title="Permalink"></a></h4><p>To show the second variant, it is necessary to terminate and reset the FMU instance. Then, as before, the setup command must be called for the FMU. </p><pre><code class="language-julia hljs">fmi2Terminate(c)
 fmi2Reset(c)
-fmi2SetupExperiment(c, tStart, tStop)</code></pre><pre><code class="nohighlight hljs">0x00000000</code></pre><p>To make sure that the functions work it is necessary to generate random numbers again. As shown already, we call the defined function <code>generateRandomNumbers()</code> and output the values.</p><pre><code class="language-julia hljs">rndReal, rndBoolean, rndInteger, rndString = generateRandomNumbers()</code></pre><pre><code class="nohighlight hljs">(45.712992000720035, false, 1, &quot;Random number 0.7551911104533349!&quot;)</code></pre><p>In the second variant, the value for each data type is set separately by the corresponding command. By this variant one has the maximum control and can be sure that also the correct data type is set. </p><pre><code class="language-julia hljs">fmi2SetReal(c, &quot;p_real&quot;, rndReal)
+fmi2SetupExperiment(c, tStart, tStop)</code></pre><pre><code class="nohighlight hljs">0x00000000</code></pre><p>To make sure that the functions work it is necessary to generate random numbers again. As shown already, we call the defined function <code>generateRandomNumbers()</code> and output the values.</p><pre><code class="language-julia hljs">rndReal, rndBoolean, rndInteger, rndString = generateRandomNumbers()</code></pre><pre><code class="nohighlight hljs">(33.882562645049866, true, 3, &quot;Random number 39.66740941597525!&quot;)</code></pre><p>In the second variant, the value for each data type is set separately by the corresponding command. By this variant one has the maximum control and can be sure that also the correct data type is set. </p><pre><code class="language-julia hljs">fmi2SetReal(c, &quot;p_real&quot;, rndReal)
 fmi2SetBoolean(c, &quot;p_boolean&quot;, rndBoolean)
 fmi2SetInteger(c, &quot;p_integer&quot;, rndInteger)
 fmi2SetString(c, &quot;p_string&quot;, rndString)</code></pre><pre><code class="nohighlight hljs">0x00000000</code></pre><p>To illustrate the functionality of the parameterization with the separate functions, the corresponding get function can be also called separately for each data type:</p><ul><li><code>fmi2SetReal()</code> &amp;#8660; <code>fmi2GetReal()</code></li><li><code>fmi2SetBoolean()</code> &amp;#8660; <code>fmi2GetBoolean()</code></li><li><code>fmi2SetInteger()</code> &amp;#8660; <code>fmi2GetInteger()</code></li><li><code>fmi2SetString()</code> &amp;#8660; <code>fmi2GetString()</code>.</li></ul><p>As before, the FMU must be in initialization mode.</p><pre><code class="language-julia hljs">fmi2EnterInitializationMode(c)
@@ -226,6 +150,6 @@ Callback-Evaluations:
 	Save values: 0
 	Steps completed: 0
 Values [2]:
-	0.0	(45.712992000720035, 0.0, 1.0)
-	1.0	(45.712992000720035, 0.0, 1.0)
-Events [0]:</code></pre><h3 id="Unload-FMU"><a class="docs-heading-anchor" href="#Unload-FMU">Unload FMU</a><a id="Unload-FMU-1"></a><a class="docs-heading-anchor-permalink" href="#Unload-FMU" title="Permalink"></a></h3><p>The FMU will be unloaded and all unpacked data on disc will be removed.</p><pre><code class="language-julia hljs">unloadFMU(fmu)</code></pre><h3 id="Summary"><a class="docs-heading-anchor" href="#Summary">Summary</a><a id="Summary-1"></a><a class="docs-heading-anchor-permalink" href="#Summary" title="Permalink"></a></h3><p>Based on this tutorial it can be seen that there are two different variants to set and get parameters.These examples should make it clear to the user how parameters can also be set with different data types. As a small reminder, the sequence of commands for the manual parameterization of an FMU is summarized again. </p><p><code>loadFMU()</code> &amp;#8594; <code>fmiInstantiate!()</code> &amp;#8594; <code>fmiSetupExperiment()</code> &amp;#8594; <code>fmiSetXXX()</code> &amp;#8594; <code>fmiEnterInitializationMode()</code> &amp;#8594; <code>fmiGetXXX()</code> &amp;#8594; <code>fmiExitInitializationMode()</code> &amp;#8594; <code>simualte()</code> &amp;#8594; <code>unloadFMU()</code></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../simulate/">« Simulate</a><a class="docs-footer-nextpage" href="../inputs/">Inputs »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.19.0 on <span class="colophon-date" title="Friday 9 October 2026 10:38">Friday 9 October 2026</span>. Using Julia version 1.13.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+	0.0	(33.882562645049866, 1.0, 3.0)
+	1.0	(33.882562645049866, 1.0, 3.0)
+Events [0]:</code></pre><h3 id="Unload-FMU"><a class="docs-heading-anchor" href="#Unload-FMU">Unload FMU</a><a id="Unload-FMU-1"></a><a class="docs-heading-anchor-permalink" href="#Unload-FMU" title="Permalink"></a></h3><p>The FMU will be unloaded and all unpacked data on disc will be removed.</p><pre><code class="language-julia hljs">unloadFMU(fmu)</code></pre><h3 id="Summary"><a class="docs-heading-anchor" href="#Summary">Summary</a><a id="Summary-1"></a><a class="docs-heading-anchor-permalink" href="#Summary" title="Permalink"></a></h3><p>Based on this tutorial it can be seen that there are two different variants to set and get parameters.These examples should make it clear to the user how parameters can also be set with different data types. As a small reminder, the sequence of commands for the manual parameterization of an FMU is summarized again. </p><p><code>loadFMU()</code> &amp;#8594; <code>fmiInstantiate!()</code> &amp;#8594; <code>fmiSetupExperiment()</code> &amp;#8594; <code>fmiSetXXX()</code> &amp;#8594; <code>fmiEnterInitializationMode()</code> &amp;#8594; <code>fmiGetXXX()</code> &amp;#8594; <code>fmiExitInitializationMode()</code> &amp;#8594; <code>simualte()</code> &amp;#8594; <code>unloadFMU()</code></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../simulate/">« Simulate</a><a class="docs-footer-nextpage" href="../inputs/">Inputs »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.19.0 on <span class="colophon-date" title="Friday 9 October 2026 11:03">Friday 9 October 2026</span>. Using Julia version 1.13.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
