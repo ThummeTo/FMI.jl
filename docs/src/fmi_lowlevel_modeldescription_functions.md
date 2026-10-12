@@ -4,9 +4,7 @@ The FMI model description provides all human readable information on the model. 
 
 ## Loading/Parsing
 
-```@docs
-```
-fmi2LoadModelDescription
+Model descriptions are loaded through `loadFMU` as part of FMU setup.
 
 ## general information about the FMU
 
@@ -25,8 +23,6 @@ getNumberOfEventIndicators
 getModelIdentifier
 getVariableNamingConvention
 ```
-fmi2GetVersion
-fmi2GetTypesPlatform
 
 ## default experiment settings
 
@@ -40,14 +36,11 @@ getDefaultTolerance
 ## FMU capabilities
 
 ```@docs
+canGetSetFMUState
 canSerializeFMUState
 providesDirectionalDerivatives
 providesAdjointDerivatives
 ```
-canGetSetFMUState
-fmi2DependenciesSupported
-fmi2DerivativeDependenciesSupported
-fmi2ProvidesDirectionalDerivative
 
 ## value references
 

@@ -10,9 +10,7 @@ In order to enable the slave to interpolate the continuous real inputs between c
 derivatives of the inputs with respect to time can be provided. Also, higher derivatives can be set to allow
 higher order interpolation.
 
-```@docs
-```
-fmi3CallbackIntermediateUpdate
+Intermediate-update callbacks are provided by the importer internals and are not part of the public API.
 
 ## Computation
 The computation of time steps is controlled by the following function.
@@ -25,5 +23,4 @@ fmi3DoStep!
 ## Retrieving Status Information from the Slave
 Status information is retrieved from the slave by the following functions:
 
-```@docs
-```
+No FMI3 Co-Simulation status helper is exported separately from the common FMI3 API.

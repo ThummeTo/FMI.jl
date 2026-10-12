@@ -24,10 +24,10 @@ end
 function getFMUStruct(
     modelname,
     mode,
-    tool=ENV["EXPORTINGTOOL"],
-    version=ENV["EXPORTINGVERSION"],
-    fmiversion=ENV["FMIVERSION"],
-    fmustruct=ENV["FMUSTRUCT"];
+    tool = ENV["EXPORTINGTOOL"],
+    version = ENV["EXPORTINGVERSION"],
+    fmiversion = ENV["FMIVERSION"],
+    fmustruct = ENV["FMUSTRUCT"];
     kwargs...,
 )
 
@@ -42,7 +42,7 @@ function getFMUStruct(
         return fmu, fmu
 
     elseif fmustruct == "INSTANCE"
-        inst, _ = FMIBase.prepareSolveFMU(fmu, nothing, mode; loggingOn=true)
+        inst, _ = FMIBase.prepareSolveFMU(fmu, nothing, mode; loggingOn = true)
         @test !isnothing(inst)
         return inst, fmu
 
@@ -71,9 +71,9 @@ toolversions = [("Dymola", "2023x")] # ("SimulationX", "4.5.2")
             @info "Aqua: Testing all (method ambiguities and piracies are tested separately)"
             Aqua.test_all(
                 FMI;
-                ambiguities=false,
-                piracies=false,
-                persistent_tasks=(tmax=60,),
+                ambiguities = false,
+                piracies = false,
+                persistent_tasks = (tmax = 60,),
             )
         end
 

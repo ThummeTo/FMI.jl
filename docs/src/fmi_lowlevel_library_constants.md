@@ -3,6 +3,7 @@
 ```@docs
 FMU
 FMUInstance
+AbstractDependencyMatrix
 FMUSolution
 FMUEvent
 FMUSnapshot
@@ -13,5 +14,4 @@ FMUInputFunction
 
 # Constants in FMI Import/Core .jl 
 
-```@docs
-```
+Version-specific FMI constants are listed in the FMI2 and FMI3 constants pages.

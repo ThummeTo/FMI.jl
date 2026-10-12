@@ -77,9 +77,6 @@ fmi3SetBoolean
 fmi3SetString
 fmi3SetBinary
 ```
-fmi3Get
-fmi3Get!
-fmi3Set
 
 ## Getting and Setting the Complete FMU State
 The FMU has an internal state consisting of all values that are needed to continue a simulation. This internal state consists especially of the values of the continuous-time states, iteration variables, parameter values, input values, delay buffers, file identifiers, and FMU internal status information. With the functions of this section, the internal FMU state can be copied and the pointer to this copy is returned to the environment. The FMU state copy can be set as actual FMU state, in order to continue the simulation from it.
@@ -116,12 +113,6 @@ fmi3GetAdjointDerivative!
 fmi3GetOutputDerivatives
 fmi3GetOutputDerivatives!
 ```
-fmi3SampleDirectionalDerivative
-fmi3SampleDirectionalDerivative!
-fmi3GetJacobian
-fmi3GetJacobian!
-fmi3GetFullJacobian
-fmi3GetFullJacobian!
 
 ## TODO: Clockstuff
 
@@ -137,7 +128,6 @@ fmi3GetClock!
 fmi3SetClock
 fmi3ActivateModelPartition
 ```
-fmi3CallbackClockUpdate
 
 ## Conversion functions
 
@@ -148,9 +138,6 @@ stringToVariableNamingConvention
 variableNamingConventionToString
 intervalQualifierToString
 ```
-fmi3StringToCausality
-fmi3StatusToString
-fmi3StringToInitial
 
 ## External/Additional functions
 

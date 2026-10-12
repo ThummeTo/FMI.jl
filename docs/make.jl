@@ -4,7 +4,12 @@
 #
 
 import Pkg;
-Pkg.develop(path = joinpath(@__DIR__, "../../FMI.jl"));
+for package in ("FMICore.jl", "FMIBase.jl", "FMIImport.jl", "FMIExport.jl", "FMI.jl")
+    package_path = normpath(joinpath(@__DIR__, "..", "..", package))
+    if isdir(package_path)
+        Pkg.develop(path = package_path)
+    end
+end
 using Plots, JLD2, DataFrames, CSV, MAT # need to be loaded, as they enable optional features in FMI.jl
 using FMI, FMIBase, FMIImport, FMICore, FMIExport
 using Documenter
@@ -103,6 +108,20 @@ for md in recursive_second(example_pages)
         r = open(joinpath("docs", "src", md), "r")
         s = read(r, String)
         close(r)
+        ansi_escape = Regex("\u001b\\[[0-9;?]*[A-Za-z]")
+        if occursin(ansi_escape, s)
+            print(
+                string(
+                    "::warning title=ANSI-Warning::example-page \"",
+                    md,
+                    "\" contains ANSI escape sequences. They have been removed for the doc-manual\r\n",
+                ),
+            )
+            s = replace(s, ansi_escape => "")
+            w = open(joinpath("docs", "src", md * "tmp"), "w+")
+            write(w, s)
+            close(w)
+        end
         if occursin("<svg", s) && occursin("</svg>", s)
             print(
                 string(
@@ -147,7 +166,7 @@ my_makedocs() = makedocs(
     ),
     modules = [FMI, FMIImport, FMIExport, FMICore, FMIBase],
     checkdocs = :exports,
-    linkcheck = true,
+    linkcheck = lowercase(get(ENV, "DOCUMENTER_LINKCHECK", "true")) == "true",
     warnonly = :linkcheck,
     pages = Any[
         "Introduction" => "index.md"

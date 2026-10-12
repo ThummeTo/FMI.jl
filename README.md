@@ -15,33 +15,6 @@
 | Collaboration | [![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac) |
 | Formatting | [![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle) |
 
-## Breaking Changes in FMI.jl (starting from v0.14.0 until release of v1.0.0)
-If you want to migrate your project from [*FMI.jl*](https://github.com/ThummeTo/FMI.jl) < v1.0.0 to >= v1.0.0, you will face some breaking changes - but they are worth it as you will see! We decided to do multiple smaller breaking changes starting with v0.14.0, instead of one big one. Some of them are already implemented (checked), some are still on the to-do (unchecked) but will be implemented before releasing v1.0.0.
-
-- [x] Many functions, that are not part of the FMI-standard, had the prefix `fmi2...` or `fmi3...`. This was corrected. Now, only functions that are defined by the standard itself, like e.g. `fmi2Instantiate` are allowed to keep the prefix. Other methods, like `fmi2ValueReferenceToString`, that where added to make this library more comfortable, are now cleaned to be more the Julia way: `valueReferenceToString`. If your code errors, the corresponding function might have lost its prefix, so try this first.
-
-- [x] Wrapper functions where removed, because that is not the Julia way. In most cases, this will not affect your code.
-
-- [x] [*FMICore.jl*](https://github.com/ThummeTo/FMICore.jl) and [*FMIImport.jl*](https://github.com/ThummeTo/FMIImport.jl) were divided into [*FMICore.jl*](https://github.com/ThummeTo/FMICore.jl), [*FMIImport.jl*](https://github.com/ThummeTo/FMIImport.jl) and [*FMIBase.jl*](https://github.com/ThummeTo/FMIBase.jl). [*FMICore.jl*](https://github.com/ThummeTo/FMICore.jl) now holds the pure standard definition (C-types and -functions), while [*FMIBase.jl*](https://github.com/ThummeTo/FMIBase.jl) holds everything that is needed on top of that in [*FMIImport.jl*](https://github.com/ThummeTo/FMIImport.jl) as well as in [*FMIExport.jl*](https://github.com/ThummeTo/FMIExport.jl).
-
-- [ ] Updated all library examples.
-
-- [ ] Updated all library tests for a better code coverage.
-
-- [x] We tried to document every function, if you find undocumented user-level functions, please open an issue or PR.
-
-- [ ] Allocations, type stability and code format where optimized and are monitored by CI now.
-
-- [x] Dependencies are reduced a little, to make the libraries more light-weight.
-
-- [ ] RAM for allocated FMUs, their instances and states, is now auto-released. For maximum performance/safety you can use FMUs in blocks (like file reading/writing).
-
-- [ ] New low-level interfaces are introduced, that fit the SciML ecosystem. For example, a FMU can still be simulated with `simulate(fmu)`, but one can also decide to create a `prob = FMUProblem(fmu)` (like an `ODEProblem`) and use `solve(prob)` to obtain a solution. Keywords will be adapted to have a fully consistent interface with the remaining SciML ecosystem.
-
-- [x] Optimization for new Julia LTS v1.10, removing code to keep downward compatibility with old LTS v1.6.
-
-🎉 After all listed features are implemented, v1.0.0 will be released! 🎉 
-
 ## How can I use FMI.jl?
 1\. Open a Julia-REPL, switch to package mode using `]`, activate your preferred environment.
 

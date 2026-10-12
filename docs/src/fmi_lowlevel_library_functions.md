@@ -5,8 +5,12 @@ logInfo
 logWarning
 logError
 ```
-loadBinary
-eval!
+
+## Solver backend
+
+```@docs
+solveFMUProblem!
+```
 
 ## Conversion functions
 
@@ -26,8 +30,6 @@ stringToVariability
 variabilityToString
 ```
 
-fmi2StringToInitial
-
 ## External/Additional functions
 
 ```@docs
@@ -43,11 +45,3 @@ getUnit
 FMIBase.snapshot_if_needed!
 FMIBase.getSnapshot
 ```
-fmi2GetSolutionDerivative
-fmi2GetSolutionState
-fmi2GetSolutionValue
-fmi2GetSolutionTime
-fmi2GetJacobian
-fmi2GetJacobian!
-fmi2GetFullJacobian
-fmi2GetFullJacobian!
