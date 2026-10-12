@@ -48,14 +48,14 @@ unloadFMU(myFMU)
 ```
 
 ## What is currently supported in FMI.jl?
-- importing the full FMI 2.0.3 and FMI 3.0.0 command set, including optional specials like `fmi2GetFMUstate`, `fmi2SetFMUstate` and `fmi2GetDirectionalDerivatives`
+- importing the full FMI 2.0.5 and FMI 3.0.2 command set, including optional specials like `fmiXGetFMUstate`, `fmiXSetFMUstate`, `fmiXGetDirectionalDerivatives`, and more
 - parameterization, simulation & plotting of CS- and ME-FMUs
 - event-handling for imported discontinuous ME-FMUs
 
-|                                   | **FMI2.0.3** |        | **FMI3.0** |        | **SSP1.0** |        |
+|                                   | **FMI 2.0.5** |        | **FMI 3.0.2** |        | **SSP 2.0.1** |        |
 |-----------------------------------|--------------|--------|------------|--------|------------|--------|
 |                                   | Import       | Export | Import     | Export | Import     | Export |
-| CS                                | ✔️✔️         | 🚧    | ✔️✔️      | 📅     | 📅         | 📅      |
+| CS                                | ✔️✔️         | ✔️✔️    | ✔️✔️      | 📅     | 📅         | 📅      |
 | ME (continuous)                   | ✔️✔️         | ✔️✔️ | ✔️✔️      | 📅     | 📅         | 📅      |
 | ME (discontinuous)                | ✔️✔️         | ✔️✔️  | ✔️✔️     | 📅     | 📅         | 📅      |
 | SE                 		        | 🚫           | 🚫     | 🚧        | 📅     | 🚫         | 🚫     |
@@ -65,7 +65,7 @@ unloadFMU(myFMU)
 | get/setFMUstate                   | ✔️✔️         | 📅     | ✔️✔️     | 📅     | 🚫         | 🚫      |
 | getDirectionalDerivatives         | ✔️✔️         | 📅     | ✔️✔️     | 📅     | 🚫         | 🚫      |
 | getAdjointDerivatives             | 🚫           | 🚫     | ✔️✔️      | 📅     | 🚫         | 🚫     |
-| FMI Cross Checks                  | ✔️✔️         | 📅     | 📅        | 📅     | 🚫         | 🚫      |
+| FMI Cross Checks                  | ✔️✔️         | 🚫     | 🚫        | 🚫     | 🚫         | 🚫      |
 | 64-bit binaries in FMUs           | ✔️✔️         | ✔️✔️  | ✔️✔️      | 📅     | 🚫         | 🚫     |
 | 32-bit binaries in FMUs           | ✔️            | 📅     | 📅        | 📅     | 🚫         | 🚫      |
 
@@ -95,7 +95,7 @@ To keep dependencies nice and clean, the original package [*FMI.jl*](https://git
 - [*FMIZoo.jl*](https://github.com/ThummeTo/FMIZoo.jl): A collection of testing and example FMUs
 
 ## What Platforms are supported?
-[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is tested (and testing) under Julia Versions *LTS* (64-bit) and *latest* (64-bit) on Windows *latest* (64-bit, 32-bit) and Ubuntu *latest* (64-bit). Mac (64-bit, 32-bit) and Ubuntu (32-bit) should work, but untested.
+[*FMI.jl*](https://github.com/ThummeTo/FMI.jl) is tested (and testing) under Julia Versions *LTS* and *latest* on Windows *latest* and Ubuntu *latest*. Mac should work, but is not CI-tested.
 
 ## How to cite?
 Tobias Thummerer, Lars Mikelsons and Josef Kircher. 2021. **NeuralFMU: towards structural integration of FMUs into neural networks.** Martin Sjölund, Lena Buffoni, Adrian Pop and Lennart Ochel (Ed.). Proceedings of 14th Modelica Conference 2021, Linköping, Sweden, September 20-24, 2021. Linköping University Electronic Press, Linköping (Linköping Electronic Conference Proceedings ; 181), 297-306. [DOI: 10.3384/ecp21181297](https://doi.org/10.3384/ecp21181297)
