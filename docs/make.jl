@@ -238,7 +238,7 @@ for w in warns
 end
 
 deploydocs(
-    repo = string("github.com/", get(ENV, "GITHUB_REPOSITORY", ""), "git"),
+    repo = string("github.com/", get(ENV, "GITHUB_REPOSITORY", ""), ".git"),
     devbranch = "main",
     deploy_config = deployConfig(),
 )
