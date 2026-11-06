@@ -16,7 +16,17 @@ fmi3VariableDependency
 fmi3Binary
 fmi3SimpleType
 fmi3Type
+fmi3FloatType
+fmi3IntegerType
+fmi3BooleanType
+fmi3StringType
+fmi3BinaryType
+fmi3EnumerationType
+fmi3EnumerationItem
+fmi3ClockType
 fmi3Unit
+fmi3BaseUnit
+fmi3DisplayUnit
 fmi3Boolean
 fmi3Byte
 fmi3Char
