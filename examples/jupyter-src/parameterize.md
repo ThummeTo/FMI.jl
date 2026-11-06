@@ -11,14 +11,14 @@ Last update: 09.08.2023
 ```julia
 # Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher, Johannes Stoljar
 # Licensed under the MIT license. 
-# See LICENSE (https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.
+# See LICENSE (https://github.com/JuliaFMI/FMI.jl/blob/main/LICENSE) file in the project root for details.
 ```
 
 ## Introduction
 This example shows how to parameterize a FMU. We will show to possible ways to parameterize: The default option using the parameterization feature of `fmiSimulate`, `fmiSimulateME` or `fmiSimulateCS`. Second, a custom parameterization routine for advanced users. 
 
 ## Other formats
-Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/parameterize.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/parameterize.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/parameterize.md) corresponding to the notebook.  
+Besides, this [Jupyter Notebook](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/parameterize.ipynb) there is also a [Julia file](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/parameterize.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/parameterize.md) corresponding to the notebook.  
 
 ## Code section
 
@@ -137,7 +137,7 @@ c = fmi2Instantiate!(fmu; loggingOn=true)
 
     FMU:            IO
         InstanceName:   IO
-        Address:        Ptr{Nothing} @0x0000021d60c80c20
+        Address:        Ptr{Nothing} @0x000001bce6ca3900
         State:          0
         Logging:        true
         FMU time:       -Inf
@@ -256,7 +256,7 @@ paramsVal = generateRandomNumbers()
 
 
 
-    (37.12068309305578, true, 88, "Random number 99.6832863742104!")
+    (76.10114610580607, false, 26, "Random number 48.41182133037459!")
 
 
 
@@ -352,8 +352,8 @@ simData = simulate(c, (tStart, tStop); recordValues=params[1:3], saveat=tSave,
     	Save values: 0
     	Steps completed: 0
     Values [2]:
-    	0.0	(37.12068309305578, 1.0, 88.0)
-    	1.0	(37.12068309305578, 1.0, 88.0)
+    	0.0	(76.10114610580607, 0.0, 26.0)
+    	1.0	(76.10114610580607, 0.0, 26.0)
     Events [0]:
     
 
@@ -387,7 +387,7 @@ rndReal, rndBoolean, rndInteger, rndString = generateRandomNumbers()
 
 
 
-    (33.882562645049866, true, 3, "Random number 39.66740941597525!")
+    (18.802394475890626, true, 98, "Random number 52.591848845707524!")
 
 
 
@@ -473,8 +473,8 @@ simData = simulate(c, (tStart, tStop); recordValues=params[1:3], saveat=tSave,
     	Save values: 0
     	Steps completed: 0
     Values [2]:
-    	0.0	(33.882562645049866, 1.0, 3.0)
-    	1.0	(33.882562645049866, 1.0, 3.0)
+    	0.0	(18.802394475890626, 1.0, 98.0)
+    	1.0	(18.802394475890626, 1.0, 98.0)
     Events [0]:
     
 
