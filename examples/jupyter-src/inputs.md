@@ -9,14 +9,14 @@ Tutorial by Tobias Thummerer
 ```julia
 # Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher, Johannes Stoljar
 # Licensed under the MIT license. 
-# See LICENSE (https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.
+# See LICENSE (https://github.com/JuliaFMI/FMI.jl/blob/main/LICENSE) file in the project root for details.
 ```
 
 ## Introduction to the example
 This example shows how to add custom inputs to a FMU, that are used during simulation.
 
 ## Other formats
-Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/inputs.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/inputs.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/inputs.md) corresponding to the notebook.  
+Besides, this [Jupyter Notebook](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/inputs.ipynb) there is also a [Julia file](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/inputs.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/inputs.md) corresponding to the notebook.  
 
 ## Code section
 
