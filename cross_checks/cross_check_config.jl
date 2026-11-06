@@ -9,7 +9,7 @@ const TOOL_VERSION = "0.9.2"
 const FMI_CROSS_CHECK_REPO_NAME = "fmi-cross-check"
 const NRMSE_THRESHHOLD = 5
 const EXCLUDED_SYSTEMS = ["AMESim", "Test-FMUs", "SimulationX", "Silver"]
-const CROSS_CHECK_README_CONTENT = "See https://github.com/ThummeTo/FMI.jl for more information."
+const CROSS_CHECK_README_CONTENT = "See https://github.com/JuliaFMI/FMI.jl for more information."
 
 #static strings
 const ME = "me"

@@ -1,6 +1,6 @@
 # FMI.jl Library Functions
 
-Many of the functions in this library are based on already defined functions of the [FMIImport.jl](https://github.com/ThummeTo/FMIImport.jl) library. 
+Many of the functions in this library are based on already defined functions of the [FMIImport.jl](https://github.com/JuliaFMI/FMIImport.jl) library. 
 
 # Simulate FMUs
 

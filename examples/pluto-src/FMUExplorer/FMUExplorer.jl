@@ -35,7 +35,7 @@ md"""
 by Tobias Thummerer (University of Augsburg)
 
 Powered by: $br
-$(Resource("https://github.com/ThummeTo/FMI.jl/blob/main/logo/dark/fmijl_logo_640_320.png?raw=true", :width=>150))
+$(Resource("https://github.com/JuliaFMI/FMI.jl/blob/main/logo/dark/fmijl_logo_640_320.png?raw=true", :width=>150))
 
 Keywords: $br
 *#FMI, #FMU*

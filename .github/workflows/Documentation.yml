@@ -51,7 +51,7 @@ jobs:
       - name: "Check out fmi-export repository"
         uses: actions/checkout@v6
         with:
-          repository: 'ThummeTo/FMIExport.jl'
+          repository: 'JuliaFMI/FMIExport.jl'
           path: 'FMIExport.jl'
 
       - name: "Copy fmi-export examples from examples branch"
