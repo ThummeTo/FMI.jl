@@ -1,22 +1,26 @@
-name: Test v1.10 (LTS)
+name: Test LTS
 
 on:
   workflow_dispatch:
   pull_request:
   push:
-    branches: 
+    branches:
       - main
     paths:
       - 'src/**'
       - 'test/**'
-      - '.github/workflows/Test.yml'
       - 'Project.toml'
+      - '.github/workflows/TestLTS.yml'
+
+permissions:
+  actions: write # lets julia-actions/cache delete outdated caches
+  contents: read
 
 jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: false # keep the other jobs running if one fails
       matrix:
         julia-version: ['lts']
         julia-arch: [x64]
@@ -24,34 +28,20 @@ jobs:
         experimental: [false]
 
     steps:
-      # Checks-out your repository
-      - name: Check out repository
-        uses: actions/checkout@v6
+      - name: "Check out repository"
+        uses: actions/checkout@v7
 
-      # Set up Julia
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v3
         with:
-          version: ${{ matrix.julia-version }}
+          version: ${{ matrix.julia-version }} # 'lts' is the current long-term support release
           arch: ${{ matrix.julia-arch }}
 
-     # Set up cache
-      - name: "Set up cache"
-        uses: actions/cache@v5
-        env:
-          cache-name: cache-artifacts
-        with:
-          path: ~/.julia/artifacts
-          key: ${{ runner.os }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-test-${{ env.cache-name }}-
-            ${{ runner.os }}-test-
-            ${{ runner.os }}-
+      - name: "Set up julia-cache" # caches packages, artifacts and precompiled files
+        uses: julia-actions/cache@v3
 
-      # Build package
       - name: "Build package"
         uses: julia-actions/julia-buildpkg@v1
 
-      # Run the tests
       - name: "Run tests"
         uses: julia-actions/julia-runtest@v1
