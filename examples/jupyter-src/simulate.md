@@ -9,7 +9,7 @@ Tutorial by Johannes Stoljar, Tobias Thummerer
 ```julia
 # Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher, Johannes Stoljar
 # Licensed under the MIT license. 
-# See LICENSE (https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.
+# See LICENSE (https://github.com/JuliaFMI/FMI.jl/blob/main/LICENSE) file in the project root for details.
 ```
 
 ## Motivation
@@ -18,7 +18,7 @@ This Julia Package *FMI.jl* is motivated by the use of simulation models in Juli
 ## Introduction to the example
 In this example we want to show how fast and easy the simulation for an FMU is. For this purpose, the FMU is simulated in co-simulation mode and in model-exchange mode. After the FMU has been simulated, the simulation results are displayed in a graph. The graphs of the different modes are compared with each other. The used model is a one-dimensional spring pendulum with friction. The object-orientated structure of the *SpringFrictionPendulum1D* can be seen in the following graphic.
 
-![svg](https://github.com/thummeto/FMI.jl/blob/main/docs/src/examples/pics/SpringFrictionPendulum1D.svg?raw=true)  
+![svg](https://github.com/JuliaFMI/FMI.jl/blob/main/docs/src/examples/pics/SpringFrictionPendulum1D.svg?raw=true)  
 
 
 ## Target group
@@ -26,7 +26,7 @@ The example is primarily intended for users who work in the field of simulations
 
 
 ## Other formats
-Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/simulate.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/simulate.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/simulate.md) corresponding to the notebook.  
+Besides, this [Jupyter Notebook](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/simulate.ipynb) there is also a [Julia file](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/simulate.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/simulate.md) corresponding to the notebook.  
 
 
 ## Getting started
@@ -35,8 +35,8 @@ Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/example
 |     | Description                       | Command                   | Alternative                                    |   
 |:----|:----------------------------------|:--------------------------|:-----------------------------------------------|
 | 1.  | Enter Package Manager via         | ]                         |                                                |
-| 2.  | Install FMI via                   | add FMI                   | add " https://github.com/ThummeTo/FMI.jl "     |
-| 3.  | Install FMIZoo via                | add FMIZoo                | add " https://github.com/ThummeTo/FMIZoo.jl "  |
+| 2.  | Install FMI via                   | add FMI                   | add " https://github.com/JuliaFMI/FMI.jl "     |
+| 3.  | Install FMIZoo via                | add FMIZoo                | add " https://github.com/JuliaFMI/FMIZoo.jl "  |
 | 4.  | Install Plots via                 | add Plots                 |                                                |
 
 ## Code section
@@ -141,11 +141,6 @@ vrs = ["mass.s", "mass.v"]
 dataCS = simulateCS(myFMU, (tStart, tStop); recordValues=vrs, saveat=tSave)
 ```
 
-    Sim. CS-FMU ...  14%|██████                              |  ETA: 0:00:06
-
-    Sim. CS-FMU ... 100%|████████████████████████████████████| Time: 0:00:01
-    
-
 
 
 
@@ -203,9 +198,9 @@ In the function `simulateME()` the FMU is simulated in model-exchange mode (ME) 
 dataME = simulateME(myFMU, (tStart, tStop); saveat=tSave)
 ```
 
-    Simulating ME-FMU ...   0%|█                             |  ETA: N/A
+    Simulating ME-FMU ...   0%|█                            |  ETA: N/A
 
-    Simulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:18
+    Simulating ME-FMU ... 100%|█████████████████████████████| Time: 0:00:12
     
 
 
