@@ -9,17 +9,17 @@ Tutorial by Tobias Thummerer, Johannes Stoljar
 ```julia
 # Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher, Johannes Stoljar
 # Licensed under the MIT license. 
-# See LICENSE (https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.
+# See LICENSE (https://github.com/JuliaFMI/FMI.jl/blob/main/LICENSE) file in the project root for details.
 ```
 
 ## Introduction to the example
 This example shows how to overwrite a FMI function with a custom C-function. For this the FMU model is simulated first without changes. Then the function `fmi2GetReal()` is overwritten and simulated again. Both simulations are displayed in a graph to show the change caused by overwriting the function. The model used is a one-dimensional spring pendulum with friction. The object-orientated structure of the *SpringFrictionPendulum1D* can be seen in the following graphic.
 
-![svg](https://github.com/thummeto/FMI.jl/blob/main/docs/src/examples/pics/SpringFrictionPendulum1D.svg?raw=true)  
+![svg](https://github.com/JuliaFMI/FMI.jl/blob/main/docs/src/examples/pics/SpringFrictionPendulum1D.svg?raw=true)  
 
 
 ## Other formats
-Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/manipulation.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/manipulation.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/manipulation.md) corresponding to the notebook.  
+Besides, this [Jupyter Notebook](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/manipulation.ipynb) there is also a [Julia file](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/manipulation.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/manipulation.md) corresponding to the notebook.  
 
 ## Code section
 
@@ -82,9 +82,9 @@ vrs = ["mass.s"]
 simData = simulate(fmu, (tStart, tStop); recordValues=vrs)
 ```
 
-    Simulating ME-FMU ...   0%|█                             |  ETA: N/A
+    Simulating ME-FMU ...   0%|█                            |  ETA: N/A
 
-    Simulating ME-FMU ... 100%|██████████████████████████████| Time: 0:00:20
+    Simulating ME-FMU ... 100%|█████████████████████████████| Time: 0:00:20
     
 
 
@@ -191,7 +191,7 @@ originalGetReal = fmu.cGetReal
 
 
 
-To overwrite the function `fmi2GetReal!()`, the function header of the new custom function must be identical to the previous one. The function header looks like `fmi2GetReal!(cfunc::Ptr{Nothing}, c::fmi2Component, vr::Union{Array{fmi2ValueReference}, Ptr{fmi2ValueReference}}, nvr::Csize_t, value::Union{Array{fmi2Real}, Ptr{fmi2Real}})::fmi2Status`. The information how the FMI2 function are structured can be seen from [FMICore.jl](https://github.com/ThummeTo/FMICore.jl), the api of [`fmi2GetReal!`](@ref) or the FMI2.0.3-specification.
+To overwrite the function `fmi2GetReal!()`, the function header of the new custom function must be identical to the previous one. The function header looks like `fmi2GetReal!(cfunc::Ptr{Nothing}, c::fmi2Component, vr::Union{Array{fmi2ValueReference}, Ptr{fmi2ValueReference}}, nvr::Csize_t, value::Union{Array{fmi2Real}, Ptr{fmi2Real}})::fmi2Status`. The information how the FMI2 function are structured can be seen from [FMICore.jl](https://github.com/JuliaFMI/FMICore.jl), the api of [`fmi2GetReal!`](@ref) or the FMI2.0.3-specification.
 
 In the new implementation the original function is called by the previously stored pointer. Next there is a special handling if `value` is a pointer to an array. In this case the pointer is treated as an array, so that the entries are accessible. Otherwise, each value in `value` is multiplied by two. Finally, the original state of the original function is output.
 
@@ -236,7 +236,7 @@ fmu.cGetReal = @cfunction(myGetReal!, fmi2Status,
 
 
 
-    Ptr{Nothing} @0x000002a1b1a28e60
+    Ptr{Nothing} @0x0000029201017660
 
 
 
