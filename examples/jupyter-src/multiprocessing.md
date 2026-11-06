@@ -9,7 +9,7 @@ Tutorial by Jonas Wilfert, Tobias Thummerer
 ```julia
 # Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher, Johannes Stoljar, Jonas Wilfert
 # Licensed under the MIT license. 
-# See LICENSE (https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.
+# See LICENSE (https://github.com/JuliaFMI/FMI.jl/blob/main/LICENSE) file in the project root for details.
 ```
 
 ## Motivation
@@ -24,7 +24,7 @@ However in some cases multiprocessing can be faster as the garbage collector is 
 
 The model used is a one-dimensional spring pendulum with friction. The object-orientated structure of the *SpringFrictionPendulum1D* can be seen in the following graphic.
 
-![svg](https://github.com/thummeto/FMI.jl/blob/main/docs/src/examples/pics/SpringFrictionPendulum1D.svg?raw=true)  
+![svg](https://github.com/JuliaFMI/FMI.jl/blob/main/docs/src/examples/pics/SpringFrictionPendulum1D.svg?raw=true)  
 
 
 ## Target group
@@ -32,7 +32,7 @@ The example is primarily intended for users who work in the field of simulations
 
 
 ## Other formats
-Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/multiprocessing.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/multiprocessing.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/multiprocessing.md) corresponding to the notebook.  
+Besides, this [Jupyter Notebook](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/multiprocessing.ipynb) there is also a [Julia file](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/multiprocessing.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/multiprocessing.md) corresponding to the notebook.  
 
 
 ## Getting started
@@ -41,9 +41,9 @@ Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/example
 |     | Description                       | Command                   | Alternative                                    |   
 |:----|:----------------------------------|:--------------------------|:-----------------------------------------------|
 | 1.  | Enter Package Manager via         | ]                         |                                                |
-| 2.  | Install FMI via                   | add FMI                   | add " https://github.com/ThummeTo/FMI.jl "     |
-| 3.  | Install FMIZoo via                | add FMIZoo                | add " https://github.com/ThummeTo/FMIZoo.jl "  |
-| 4.  | Install FMICore via               | add FMICore               | add " https://github.com/ThummeTo/FMICore.jl " |
+| 2.  | Install FMI via                   | add FMI                   | add " https://github.com/JuliaFMI/FMI.jl "     |
+| 3.  | Install FMIZoo via                | add FMIZoo                | add " https://github.com/JuliaFMI/FMIZoo.jl "  |
+| 4.  | Install FMICore via               | add FMICore               | add " https://github.com/JuliaFMI/FMICore.jl " |
 | 5.  | Install BenchmarkTools via        | add BenchmarkTools        |                                                |
 
 ## Code section
@@ -96,8 +96,10 @@ workers()
 ```
 
     Hello World!
-          From worker 2:	Hello World!
           From worker 3:	Hello World!
+    
+
+          From worker 2:	Hello World!
     
 
 ### Simulation setup
@@ -118,22 +120,22 @@ input_values = collect(collect.(eachrow(rand(batchSize,2))))
 
 
     16-element Vector{Vector{Float64}}:
-     [0.16640673170112974, 0.21490857687076337]
-     [0.11730406031265417, 0.4003512666911624]
-     [0.9252244849121054, 0.9802675541264196]
-     [0.12260031602527222, 0.46276055430324003]
-     [0.4628504977231723, 0.5823939682033519]
-     [0.6360143975998794, 0.6771940228160668]
-     [0.16283737570279888, 0.5441376786132768]
-     [0.010350349273628656, 0.06540620978192135]
-     [0.17122849664855955, 0.4776097853245219]
-     [0.09238891337948041, 0.9382424981819227]
-     [0.502892166507628, 0.760776733933313]
-     [0.6720197431074441, 0.3105561380040267]
-     [0.9961920526901044, 0.4054607633806766]
-     [0.5463401914777776, 0.6120278536701813]
-     [0.881454984268714, 0.03536389064145873]
-     [0.4315887735707845, 0.7579821028257134]
+     [0.9293457920921313, 0.402576116372966]
+     [0.12259134734034649, 0.7179386581182066]
+     [0.0943252136813455, 0.5899702018324732]
+     [0.8663069822825797, 0.746084003852257]
+     [0.356068251604996, 0.23273698706839285]
+     [0.5862786539205335, 0.2690817433781445]
+     [0.9157317876486707, 0.8088371088506633]
+     [0.1474287777108576, 0.6200899872997935]
+     [0.3827716762542702, 0.5092584410668642]
+     [0.3991691214391897, 0.5471853281812993]
+     [0.6228151638578469, 0.7174572971417849]
+     [0.2276767909173708, 0.650923059680724]
+     [0.2407006466766225, 0.7062158918043433]
+     [0.08067005382484049, 0.38487092625255936]
+     [0.7293256191148918, 0.6150534212347081]
+     [0.6484325935206493, 0.1667546653845573]
 
 
 
@@ -177,13 +179,13 @@ Running a single evaluation is pretty quick, therefore the speed can be better t
 
 
     BenchmarkTools.Trial: 4 samples with 1 evaluation per sample.
-     Range (min … max):  1.453 s …  1.468 s  ┊ GC (min … max): 0.08% … 0.91%
-     Time  (median):     1.459 s             ┊ GC (median):    0.12%
-     Time  (mean ± σ):   1.460 s ± 6.116 ms  ┊ GC (mean ± σ):  0.31% ± 0.40%
+     Range (min … max):  1.437 s …   1.459 s  ┊ GC (min … max): 0.09% … 0.16%
+     Time  (median):     1.448 s              ┊ GC (median):    0.12%
+     Time  (mean ± σ):   1.448 s ± 12.329 ms  ┊ GC (mean ± σ):  0.31% ± 0.40%
     
-      █               █              █                       █  
-      █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
-      1.45 s        Histogram: frequency by time        1.47 s <
+      █                                                      ▁▁  
+      █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁██ ▁
+      1.44 s         Histogram: frequency by time        1.46 s <
     
      Memory estimate: 64.21 MiB, allocs estimate: 4201025.
 
@@ -205,7 +207,7 @@ println("Single Threaded")
 
 
     BenchmarkTools.Trial: 1 sample with 1 evaluation per sample.
-     Single result which took 22.868 s (0.11% GC) to evaluate,
+     Single result which took 23.210 s (0.12% GC) to evaluate,
      with a memory estimate of 1.00 GiB, over 67216388 allocations.
 
 
@@ -227,8 +229,8 @@ println("Multi Threaded")
 
 
     BenchmarkTools.Trial: 1 sample with 1 evaluation per sample.
-     Single result which took 12.409 s (0.00% GC) to evaluate,
-     with a memory estimate of 113.02 KiB, over 1984 allocations.
+     Single result which took 12.147 s (0.00% GC) to evaluate,
+     with a memory estimate of 115.89 KiB, over 2065 allocations.
 
 
 
