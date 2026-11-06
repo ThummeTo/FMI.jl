@@ -9,7 +9,7 @@ Tutorial by Jonas Wilfert, Tobias Thummerer
 ```julia
 # Copyright (c) 2021 Tobias Thummerer, Lars Mikelsons, Josef Kircher, Johannes Stoljar, Jonas Wilfert
 # Licensed under the MIT license. 
-# See LICENSE (https://github.com/thummeto/FMI.jl/blob/main/LICENSE) file in the project root for details.
+# See LICENSE (https://github.com/JuliaFMI/FMI.jl/blob/main/LICENSE) file in the project root for details.
 ```
 
 ## Motivation
@@ -24,7 +24,7 @@ However in some cases multiprocessing can be faster as the garbage collector is 
 
 The model used is a one-dimensional spring pendulum with friction. The object-orientated structure of the *SpringFrictionPendulum1D* can be seen in the following graphic.
 
-![svg](https://github.com/thummeto/FMI.jl/blob/main/docs/src/examples/pics/SpringFrictionPendulum1D.svg?raw=true)  
+![svg](https://github.com/JuliaFMI/FMI.jl/blob/main/docs/src/examples/pics/SpringFrictionPendulum1D.svg?raw=true)  
 
 
 ## Target group
@@ -32,7 +32,7 @@ The example is primarily intended for users who work in the field of simulations
 
 
 ## Other formats
-Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/multithreading.ipynb) there is also a [Julia file](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/multithreading.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/thummeto/FMI.jl/blob/examples/examples/jupyter-src/multithreading.md) corresponding to the notebook.  
+Besides, this [Jupyter Notebook](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/multithreading.ipynb) there is also a [Julia file](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/multithreading.jl) with the same name, which contains only the code cells and for the documentation there is a [Markdown file](https://github.com/JuliaFMI/FMI.jl/blob/examples/examples/jupyter-src/multithreading.md) corresponding to the notebook.  
 
 
 ## Getting started
@@ -41,9 +41,9 @@ Besides, this [Jupyter Notebook](https://github.com/thummeto/FMI.jl/blob/example
 |     | Description                       | Command                   | Alternative                                    |   
 |:----|:----------------------------------|:--------------------------|:-----------------------------------------------|
 | 1.  | Enter Package Manager via         | ]                         |                                                |
-| 2.  | Install FMI via                   | add FMI                   | add " https://github.com/ThummeTo/FMI.jl "     |
-| 3.  | Install FMIZoo via                | add FMIZoo                | add " https://github.com/ThummeTo/FMIZoo.jl "  |
-| 4.  | Install FMICore via               | add FMICore               | add " https://github.com/ThummeTo/FMICore.jl " |
+| 2.  | Install FMI via                   | add FMI                   | add " https://github.com/JuliaFMI/FMI.jl "     |
+| 3.  | Install FMIZoo via                | add FMIZoo                | add " https://github.com/JuliaFMI/FMIZoo.jl "  |
+| 4.  | Install FMICore via               | add FMICore               | add " https://github.com/JuliaFMI/FMICore.jl " |
 | 5.  | Install Folds via                 | add Folds                 |                                                |
 | 6.  | Install BenchmarkTools via        | add BenchmarkTools        |                                                |
 
@@ -101,7 +101,7 @@ input_values = collect(collect.(eachrow(rand(batchSize,2))))
 
 
     1-element Vector{Vector{Float64}}:
-     [0.32746685435492195, 0.08138576006595677]
+     [0.3777394916398018, 0.7770623809455213]
 
 
 
@@ -153,13 +153,13 @@ Running a single evaluation is pretty quick, therefore the speed can be better t
 
 
     BenchmarkTools.Trial: 3 samples with 1 evaluation per sample.
-     Range (min … max):  1.876 s …   1.899 s  ┊ GC (min … max): 0.34% … 0.04%
-     Time  (median):     1.880 s              ┊ GC (median):    0.34%
-     Time  (mean ± σ):   1.885 s ± 12.547 ms  ┊ GC (mean ± σ):  0.25% ± 0.18%
+     Range (min … max):  1.850 s …  1.854 s  ┊ GC (min … max): 0.40% … 0.33%
+     Time  (median):     1.853 s             ┊ GC (median):    0.33%
+     Time  (mean ± σ):   1.852 s ± 2.088 ms  ┊ GC (mean ± σ):  0.26% ± 0.19%
     
-      █        █                                              █  
-      █▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
-      1.88 s         Histogram: frequency by time         1.9 s <
+      █                                              █       █  
+      █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁█ ▁
+      1.85 s        Histogram: frequency by time        1.85 s <
     
      Memory estimate: 64.21 MiB, allocs estimate: 4201025.
 
@@ -181,13 +181,13 @@ println("Single Threaded")
 
 
     BenchmarkTools.Trial: 3 samples with 1 evaluation per sample.
-     Range (min … max):  1.878 s …   1.912 s  ┊ GC (min … max): 0.05% … 0.09%
-     Time  (median):     1.900 s              ┊ GC (median):    0.05%
-     Time  (mean ± σ):   1.897 s ± 17.121 ms  ┊ GC (mean ± σ):  0.06% ± 0.02%
+     Range (min … max):  1.841 s …   1.869 s  ┊ GC (min … max): 0.06% … 0.10%
+     Time  (median):     1.854 s              ┊ GC (median):    0.06%
+     Time  (mean ± σ):   1.854 s ± 13.991 ms  ┊ GC (mean ± σ):  0.07% ± 0.03%
     
-      █                                    █                  █  
-      █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
-      1.88 s         Histogram: frequency by time        1.91 s <
+      █                        █                              █  
+      █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
+      1.84 s         Histogram: frequency by time        1.87 s <
     
      Memory estimate: 64.21 MiB, allocs estimate: 4201028.
 
@@ -204,21 +204,19 @@ println("Multi Threaded")
 ```
 
     Multi Threaded
-
-    
     
 
 
 
 
     BenchmarkTools.Trial: 3 samples with 1 evaluation per sample.
-     Range (min … max):  1.883 s …  1.891 s  ┊ GC (min … max): 0.09% … 0.04%
-     Time  (median):     1.888 s             ┊ GC (median):    0.05%
-     Time  (mean ± σ):   1.887 s ± 4.265 ms  ┊ GC (mean ± σ):  0.06% ± 0.02%
+     Range (min … max):  1.854 s …  1.865 s  ┊ GC (min … max): 0.05% … 0.09%
+     Time  (median):     1.861 s             ┊ GC (median):    0.05%
+     Time  (mean ± σ):   1.860 s ± 5.344 ms  ┊ GC (mean ± σ):  0.07% ± 0.02%
     
-      █                                   █                  █  
-      █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
-      1.88 s        Histogram: frequency by time        1.89 s <
+      █                                 █                    █  
+      █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
+      1.85 s        Histogram: frequency by time        1.86 s <
     
      Memory estimate: 64.21 MiB, allocs estimate: 4201043.
 
